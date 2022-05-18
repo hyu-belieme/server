@@ -1,4 +1,4 @@
-package data.repository;
+package com.example.beliemeserver.data.repository;
 
 public interface StuffRepository {
 }

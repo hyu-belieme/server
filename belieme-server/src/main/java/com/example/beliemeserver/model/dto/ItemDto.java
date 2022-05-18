@@ -1,4 +1,4 @@
-package model.dto;
+package com.example.beliemeserver.model.dto;
 
 import lombok.Builder;
 import lombok.Getter;
