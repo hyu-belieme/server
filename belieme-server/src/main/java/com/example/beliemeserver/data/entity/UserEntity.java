@@ -1,4 +1,4 @@
-package data.entity;
+package com.example.beliemeserver.data.entity;
 
 public class UserEntity {
 }

@@ -11,7 +11,9 @@ import lombok.experimental.Accessors;
 @ToString
 @Builder
 @Accessors(chain = true)
-public class StuffDto {
-    private String name;
-    private String emoji;
+public class AuthorityDto {
+    public enum Permissions {
+        BANNED, USER, STAFF, MASTER, DEVELOPER;
+    }
+    private Permissions permission;
 }
