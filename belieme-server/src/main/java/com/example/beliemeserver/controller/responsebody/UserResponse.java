@@ -1,5 +1,6 @@
 package com.example.beliemeserver.controller.responsebody;
 
+import com.example.beliemeserver.model.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,11 +36,32 @@ public class UserResponse extends JSONResponse {
         super(false);
     }
 
+    public UserResponse toUserResponseNestedInHistory() {
+        return new UserResponse(studentId, name, null, 0, 0, null);
+    }
+
     public static UserResponse responseWillBeIgnore() {
         return new UserResponse(false);
     }
 
-    public UserResponse toUserResponseNestedInHistory() {
-        return new UserResponse(studentId, name, null, 0, 0, null);
+    public static UserResponse from(UserDto userDto) {
+        if(userDto.getMaxPermission() == null) {
+            return new UserResponse(
+                    userDto.getStudentId(),
+                    userDto.getName(),
+                    userDto.getToken(),
+                    userDto.getCreateTimeStamp(),
+                    userDto.getApprovalTimeStamp(),
+                    null
+            );
+        }
+        return new UserResponse(
+                userDto.getStudentId(),
+                userDto.getName(),
+                userDto.getToken(),
+                userDto.getCreateTimeStamp(),
+                userDto.getApprovalTimeStamp(),
+                userDto.getMaxPermission().toString()
+        );
     }
 }
