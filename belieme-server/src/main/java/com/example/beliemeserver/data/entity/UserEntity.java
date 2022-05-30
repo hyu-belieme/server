@@ -4,12 +4,13 @@ import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 
 @Entity
@@ -19,6 +20,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Builder
+@Accessors(chain = true)
 public class UserEntity implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -38,44 +41,37 @@ public class UserEntity implements Serializable {
     @Column(name = "approval_time_stamp")
     private long approvalTimeStamp;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_authority",
-            joinColumns = {@JoinColumn(name = "student_id", referencedColumnName = "student_id")},
-            inverseJoinColumns = {@JoinColumn(name = "permission", referencedColumnName = "permission")})
-    private Set<AuthorityEntity> authorities;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<AuthorityEntity> authorities;
 
     public UserDto toUserDto() throws FormatDoesNotMatchException {
-        Set<AuthorityDto> authorityDtoSet = new HashSet<>();
-        Iterator<AuthorityEntity> iterator = authorities.iterator();
-        while(iterator.hasNext()) {
-            authorityDtoSet.add(iterator.next().toAuthorityDto());
+        List<AuthorityDto> authorityDtoList = new ArrayList<>();
+        if(authorities != null) {
+            Iterator<AuthorityEntity> iterator = authorities.iterator();
+            while (iterator.hasNext()) {
+                authorityDtoList.add(iterator.next().toAuthorityDtoNestedToUser());
+            }
         }
 
         return new UserDto(
+                id,
                 studentId,
                 name,
                 token,
                 createTimeStamp,
                 approvalTimeStamp,
-                authorityDtoSet
+                authorityDtoList
         );
     }
 
     public static UserEntity from(UserDto userDto) {
-        Set<AuthorityEntity> authorityEntitySet = new HashSet<>();
-        Iterator<AuthorityDto> iterator = userDto.getAuthorities().iterator();
-        while(iterator.hasNext()) {
-            authorityEntitySet.add(AuthorityEntity.from(iterator.next()));
-        }
-        return new UserEntity(
-                0,
-                userDto.getStudentId(),
-                userDto.getName(),
-                userDto.getToken(),
-                userDto.getCreateTimeStamp(),
-                userDto.getApprovalTimeStamp(),
-                authorityEntitySet
-        );
+        return new UserEntityBuilder()
+                .id(userDto.getId())
+                .studentId(userDto.getStudentId())
+                .name(userDto.getName())
+                .token(userDto.getToken())
+                .createTimeStamp(userDto.getCreateTimeStamp())
+                .approvalTimeStamp(userDto.getApprovalTimeStamp())
+                .build();
     }
 }

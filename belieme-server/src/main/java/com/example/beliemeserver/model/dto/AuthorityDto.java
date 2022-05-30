@@ -1,6 +1,5 @@
 package com.example.beliemeserver.model.dto;
 
-import com.example.beliemeserver.data.entity.AuthorityEntity;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -12,6 +11,10 @@ import lombok.experimental.Accessors;
 @Builder
 @Accessors(chain = true)
 public class AuthorityDto {
+    private int id;
+    private Permission permission;
+    private UserDto userDto;
+
     public enum Permission {
         BANNED, USER, STAFF, MASTER, DEVELOPER;
 
@@ -44,20 +47,19 @@ public class AuthorityDto {
 
         public static Permission from(String string) throws FormatDoesNotMatchException {
             switch (string) {
-                case "BANNED" :
+                case "BANNED":
                     return BANNED;
-                case "USER" :
+                case "USER":
                     return USER;
-                case "STAFF" :
+                case "STAFF":
                     return STAFF;
-                case "MASTER" :
+                case "MASTER":
                     return MASTER;
-                case "DEVELOPER" :
+                case "DEVELOPER":
                     return DEVELOPER;
                 default:
                     throw new FormatDoesNotMatchException();
             }
         }
     }
-    private Permission permission;
 }

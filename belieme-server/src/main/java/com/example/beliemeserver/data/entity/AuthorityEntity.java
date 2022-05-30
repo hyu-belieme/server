@@ -14,6 +14,8 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Accessors(chain = true)
 public class AuthorityEntity implements Serializable {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
@@ -21,17 +23,23 @@ public class AuthorityEntity implements Serializable {
     @Column(name = "permission", length = 20)
     private String permission;
 
-    public static AuthorityEntity from(AuthorityDto authorityDto) {
-        if(authorityDto == null) {
-            return null;
-        }
-        return new AuthorityEntity(0, authorityDto.getPermission().toString());
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     public AuthorityDto toAuthorityDto() throws FormatDoesNotMatchException {
         return AuthorityDto.builder()
+                .id(id)
                 .permission(AuthorityDto.Permission.from(permission))
+                .userDto(user.toUserDto())
                 .build();
     }
 
+    public AuthorityDto toAuthorityDtoNestedToUser() throws FormatDoesNotMatchException {
+        return AuthorityDto.builder()
+                .id(id)
+                .permission(AuthorityDto.Permission.from(permission))
+                .userDto(null)
+                .build();
+    }
 }

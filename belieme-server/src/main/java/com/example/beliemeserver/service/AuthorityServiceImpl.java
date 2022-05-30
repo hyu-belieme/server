@@ -1,6 +1,7 @@
 package com.example.beliemeserver.service;
 
 import com.example.beliemeserver.data.entity.AuthorityEntity;
+import com.example.beliemeserver.data.entity.UserEntity;
 import com.example.beliemeserver.data.repository.AuthorityRepository;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
@@ -14,6 +15,11 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Override
     public AuthorityDto addAuthority(AuthorityDto authorityDto) throws FormatDoesNotMatchException {
-        return authorityRepository.save(AuthorityEntity.from(authorityDto)).toAuthorityDto();
+        AuthorityEntity newAuthority = AuthorityEntity.builder()
+                .permission(authorityDto.getPermission().toString())
+                .user(UserEntity.from(authorityDto.getUserDto()))
+                .build();
+        System.out.println("user entity" + UserEntity.from(authorityDto.getUserDto()).toString());
+        return authorityRepository.save(newAuthority).toAuthorityDto();
     }
 }

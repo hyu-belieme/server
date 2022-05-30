@@ -1,7 +1,6 @@
 package com.example.beliemeserver.service;
 
 import com.example.beliemeserver.data.entity.UserEntity;
-import com.example.beliemeserver.data.repository.AuthorityRepository;
 import com.example.beliemeserver.data.repository.UserRepository;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.exception.NotFoundOnDBException;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     @Override
-    public ArrayList<UserDto> getAllUser() throws FormatDoesNotMatchException {
+    public List<UserDto> getAllUser() throws FormatDoesNotMatchException {
         Iterator<UserEntity> iterator = userRepository.findAll().iterator();
 
         ArrayList<UserDto> userDtoList = new ArrayList<>();
@@ -48,6 +48,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto addUser(UserDto user) throws FormatDoesNotMatchException {
+        System.out.println("new ID : " + user.getId());
         return userRepository.save(UserEntity.from(user)).toUserDto();
     }
 
@@ -63,7 +64,6 @@ public class UserServiceImpl implements UserService {
         target.setToken(newUserEntity.getToken());
         target.setCreateTimeStamp(newUserEntity.getCreateTimeStamp());
         target.setApprovalTimeStamp(newUserEntity.getApprovalTimeStamp());
-        target.setAuthorities(newUserEntity.getAuthorities());
         return userRepository.save(target).toUserDto();
     }
 }

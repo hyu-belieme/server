@@ -80,25 +80,8 @@ public class UserApiController {
         newUser.setNewToken();
         newUser.setApprovalTimeStampNow();
 
-        String sosokId = (String) jsonResponse.get("sosokId");
-
-        if(newUser.getMaxPermission() == null) {
-            if(CSE_SOSOK_ID.contains(sosokId)) {
-                AuthorityDto newAuthority = new AuthorityDto(AuthorityDto.Permission.USER);
-                newUser.addAuthority(newAuthority);
-                try {
-                    authorityService.addAuthority(newAuthority);
-                } catch (FormatDoesNotMatchException e) {
-                    e.printStackTrace();
-                    throw new InternalServerErrorException("서버 내부에 형식에 맞지 않는 레코드가 존재합니다.");
-                }
-            }
-            else {
-                throw new ForbiddenException("You're not CSE student.");
-            }
-        }
-
         ResponseEntity.BodyBuilder responseBodyBuilder = ResponseEntity.ok();
+
         URI location;
         try {
             location = new URI(Globals.serverUrl + "/login/" + studentId);
@@ -124,6 +107,27 @@ public class UserApiController {
             } catch (FormatDoesNotMatchException e) {
                 e.printStackTrace();
                 throw new InternalServerErrorException("서버 내부에 형식에 맞지 않는 레코드가 존재합니다.");
+            }
+        }
+
+        String sosokId = (String) jsonResponse.get("sosokId");
+        if(savedUser.getMaxPermission() == null) {
+            if(CSE_SOSOK_ID.contains(sosokId)) {
+                AuthorityDto newAuthority = AuthorityDto.builder()
+                        .permission(AuthorityDto.Permission.USER)
+                        .userDto(savedUser)
+                        .build();
+
+                try {
+                    newAuthority = authorityService.addAuthority(newAuthority);
+                } catch (FormatDoesNotMatchException e) {
+                    e.printStackTrace();
+                    throw new InternalServerErrorException("서버 내부에 형식에 맞지 않는 레코드가 존재합니다.");
+                }
+                savedUser.addAuthority(newAuthority);
+            }
+            else {
+                throw new ForbiddenException("You're not CSE student.");
             }
         }
 
