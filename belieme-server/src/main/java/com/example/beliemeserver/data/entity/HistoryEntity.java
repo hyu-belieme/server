@@ -21,13 +21,13 @@ public class HistoryEntity {
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "stuff_id", referencedColumnName = "stuff_id"),
-            @JoinColumn(name = "item_num", referencedColumnName = "item_num")
+            @JoinColumn(name = "item_num", referencedColumnName = "num")
     })
     private ItemEntity item;
 
     @Id
-    @Column(name = "history_num")
-    private int historyNum;
+    @Column(name = "num")
+    private int num;
 
     @Column(name = "requester_id")
     private String requesterId;

@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 @Builder
 @Accessors(chain = true)
 public class AuthorityDto {
-    private int id;
     private Permission permission;
     private UserDto userDto;
 

@@ -9,6 +9,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class StuffId implements Serializable {
-    private int id;
+public class UserId implements Serializable {
+    private String studentId;
 }

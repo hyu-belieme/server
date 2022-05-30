@@ -16,8 +16,8 @@ public class AuthorityServiceImpl implements AuthorityService {
     @Override
     public AuthorityDto addAuthority(AuthorityDto authorityDto) throws FormatDoesNotMatchException {
         AuthorityEntity newAuthority = AuthorityEntity.builder()
-                .permission(authorityDto.getPermission().toString())
                 .user(UserEntity.from(authorityDto.getUserDto()))
+                .permission(authorityDto.getPermission().toString())
                 .build();
         System.out.println("user entity" + UserEntity.from(authorityDto.getUserDto()).toString());
         return authorityRepository.save(newAuthority).toAuthorityDto();

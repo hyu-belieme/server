@@ -15,7 +15,6 @@ import java.util.UUID;
 @Builder
 @Accessors(chain = true)
 public class UserDto {
-    private int id;
     private String studentId;
     private String name;
     private String token;

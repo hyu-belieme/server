@@ -11,5 +11,5 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class HistoryId implements Serializable {
     private ItemId item;
-    private int historyNum;
+    private int num;
 }

@@ -1,5 +1,6 @@
 package com.example.beliemeserver.data.entity;
 
+import com.example.beliemeserver.data.entity.id.*;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import lombok.*;
@@ -16,30 +17,28 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 @Accessors(chain = true)
+@IdClass(AuthorityId.class)
 public class AuthorityEntity implements Serializable {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
     @Column(name = "permission", length = 20)
     private String permission;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
 
     public AuthorityDto toAuthorityDto() throws FormatDoesNotMatchException {
         return AuthorityDto.builder()
-                .id(id)
-                .permission(AuthorityDto.Permission.from(permission))
                 .userDto(user.toUserDto())
+                .permission(AuthorityDto.Permission.from(permission))
                 .build();
     }
 
     public AuthorityDto toAuthorityDtoNestedToUser() throws FormatDoesNotMatchException {
         return AuthorityDto.builder()
-                .id(id)
-                .permission(AuthorityDto.Permission.from(permission))
                 .userDto(null)
+                .permission(AuthorityDto.Permission.from(permission))
                 .build();
     }
 }

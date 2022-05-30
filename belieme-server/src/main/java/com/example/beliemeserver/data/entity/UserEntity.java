@@ -1,5 +1,6 @@
 package com.example.beliemeserver.data.entity;
 
+import com.example.beliemeserver.data.entity.id.UserId;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.UserDto;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
 @Entity
 @Table(name = "user")
 @Getter
@@ -22,10 +22,9 @@ import java.util.List;
 @ToString
 @Builder
 @Accessors(chain = true)
+@IdClass(UserId.class)
 public class UserEntity implements Serializable {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
-
+    @Id
     @Column(name = "student_id")
     private String studentId;
 
@@ -54,7 +53,6 @@ public class UserEntity implements Serializable {
         }
 
         return new UserDto(
-                id,
                 studentId,
                 name,
                 token,
@@ -66,7 +64,6 @@ public class UserEntity implements Serializable {
 
     public static UserEntity from(UserDto userDto) {
         return new UserEntityBuilder()
-                .id(userDto.getId())
                 .studentId(userDto.getStudentId())
                 .name(userDto.getName())
                 .token(userDto.getToken())

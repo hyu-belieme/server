@@ -48,7 +48,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto addUser(UserDto user) throws FormatDoesNotMatchException {
-        System.out.println("new ID : " + user.getId());
         return userRepository.save(UserEntity.from(user)).toUserDto();
     }
 

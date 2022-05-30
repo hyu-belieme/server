@@ -18,16 +18,22 @@ import javax.persistence.*;
 @IdClass(ItemId.class)
 public class ItemEntity {
     @Id
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "stuff_id")
+    @ManyToOne
+    @JoinColumn(name = "stuff_id", referencedColumnName = "id")
     private StuffEntity stuff;
 
     @Id
     @Column(name = "num")
     private int num;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "last_history_id")
-    private HistoryEntity lastHistory;
+    @Column(name = "last_history_num")
+    private int lastHistoryNum;
 
+    @OneToOne
+    @JoinColumns({
+            @JoinColumn(name = "stuff_id", referencedColumnName = "stuff_id", insertable = false, updatable = false),
+            @JoinColumn(name = "num", referencedColumnName = "item_num", insertable = false, updatable = false),
+            @JoinColumn(name = "last_history_num", referencedColumnName = "num", insertable = false, updatable = false)
+    })
+    private HistoryEntity lastHistory;
 }

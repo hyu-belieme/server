@@ -19,12 +19,12 @@ import javax.persistence.*;
 @IdClass(StuffId.class)
 public class StuffEntity {
     @Id
-    @Column(name = "stuff_id")
-    private int stuffId;
+    @Column(name = "id")
+    private int id;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "name")
+    @Column(name = "emoji")
     private String emoji;
 }
