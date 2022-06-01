@@ -1,35 +1,56 @@
 package com.example.beliemeserver.controller.api;
 
+import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.StuffRequest;
-import com.example.beliemeserver.controller.responsebody.HistoryResponse;
-import com.example.beliemeserver.controller.responsebody.ItemResponse;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
+import com.example.beliemeserver.controller.util.Globals;
+
+import com.example.beliemeserver.model.exception.*;
+import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.service.ItemService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.net.URI;
 
 @RestController
-@RequestMapping(path="/stuffs/{name}/items")
+@RequestMapping(path="/real/stuffs/{name}/items")
 public class ItemApiController {
+    private final ItemService itemService;
+
+    public ItemApiController(ItemService itemService) {
+        this.itemService = itemService;
+    }
+
     @PostMapping("/")
-    public StuffResponse postOneItem(@PathVariable String name, @RequestBody Optional<StuffRequest> request) {
-        DummyData dummyData = DummyData.dummyData;
-        if(!name.equals(dummyData.stuff.getName())) {
-            return null;
+    public ResponseEntity<StuffResponse> postOneItem(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest request) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, NotFoundHttpException, ConflictHttpException {
+        URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + name + "/items");
+
+        StuffDto updatedStuff;
+        try {
+            if (request == null) {
+                updatedStuff = itemService.postItem(userToken, name, null);
+            } else {
+                updatedStuff = itemService.postItem(userToken, name, request.getAmount());
+            }
+        } catch (DataException e) {
+            e.printStackTrace();
+            throw new InternalServerErrorHttpException(e);
+        } catch (UnauthorizedException e) {
+            e.printStackTrace();
+            throw new UnauthorizedHttpException(e);
+        } catch (ForbiddenException e) {
+            e.printStackTrace();
+            throw new ForbiddenHttpException(e);
+        } catch (NotFoundException e) {
+            e.printStackTrace();
+            throw new NotFoundHttpException(e);
+        } catch (ConflictException e) {
+            e.printStackTrace();
+            throw new ConflictHttpException(e);
         }
-        List<ItemResponse> itemList = dummyData.stuff.getItemList();
-        if(!request.isPresent() || request.get().getAmount() == 0) {
-            itemList.add(new ItemResponse(null, null, itemList.size()+1, null));
-            dummyData.stuff.setAmount(dummyData.stuff.getAmount()+1);
-            dummyData.stuff.setCount(dummyData.stuff.getCount()+1);
-            return dummyData.stuff;
-        }
-        for(int i = 0; i < request.get().getAmount(); i++) {
-            itemList.add(new ItemResponse(null, null, itemList.size() + 1, null));
-        }
-        dummyData.stuff.setAmount(dummyData.stuff.getAmount()+request.get().getAmount());
-        dummyData.stuff.setCount(dummyData.stuff.getCount()+request.get().getAmount());
-        return dummyData.stuff;
+
+        return ResponseEntity.created(location).body(StuffResponse.from(updatedStuff));
     }
 }

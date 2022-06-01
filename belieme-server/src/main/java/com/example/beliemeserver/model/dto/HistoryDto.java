@@ -20,21 +20,65 @@ public class HistoryDto {
         REQUESTED, USING, DELAYED, LOST, EXPIRED, RETURNED, FOUND, ERROR
     }
 
-    private String stuffName;
-    private int itemNum;
-    private int historyNum;
+    private ItemDto item;
+    private int num;
 
-    private String requesterId;
-    private String approveManagerId;
-    private String returnManagerId;
-    private String lostManagerId;
-    private String cancelManagerId;
+    private UserDto requester;
+    private UserDto approveManager;
+    private UserDto returnManager;
+    private UserDto lostManager;
+    private UserDto cancelManager;
 
     private long reservedTimeStamp;
     private long approveTimeStamp;
     private long returnTimeStamp;
     private long lostTimeStamp;
     private long cancelTimeStamp;
+
+    public String getRequesterId() {
+        if(requester == null) {
+            return null;
+        }
+        else {
+            return requester.getStudentId();
+        }
+    }
+
+    public String getApproveManagerId() {
+        if(approveManager == null) {
+            return null;
+        }
+        else {
+            return approveManager.getStudentId();
+        }
+    }
+
+    public String getReturnManagerId() {
+        if(returnManager == null) {
+            return null;
+        }
+        else {
+            return returnManager.getStudentId();
+        }
+    }
+
+    public String getLostManagerId() {
+        if(lostManager == null) {
+            return null;
+        }
+        else {
+            return lostManager.getStudentId();
+        }
+    }
+
+    public String getCancelManagerId() {
+        if(cancelManager == null) {
+            return null;
+        }
+        else {
+            return cancelManager.getStudentId();
+        }
+    }
 
     public HistoryStatus getStatus() {
         //TODO 여기 분기 다시 깔끔하게 짜기

@@ -1,7 +1,7 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.data.entity.id.*;
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import lombok.*;
 import lombok.experimental.Accessors;

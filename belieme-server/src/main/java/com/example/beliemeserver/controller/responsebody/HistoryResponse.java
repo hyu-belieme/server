@@ -1,5 +1,6 @@
 package com.example.beliemeserver.controller.responsebody;
 
+import com.example.beliemeserver.model.dto.HistoryDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -57,5 +58,33 @@ public class HistoryResponse extends JSONResponse {
 
     public HistoryResponse toHistoryResponseNestedInItem() {
         return new HistoryResponse(ItemResponse.responseWillBeIgnore(), num, requester, approveManager, returnManager, lostManager, cancelManager, reservedTimeStamp, approveTimeStamp, returnTimeStamp, lostTimeStamp, cancelTimeStamp, status);
+    }
+
+    public static HistoryResponse from(HistoryDto historyDto) {
+        HistoryResponse historyResponse = new HistoryResponse(
+                ItemResponse.responseWillBeIgnore(), historyDto.getNum(), null, null,
+                null, null, null, historyDto.getReservedTimeStamp(),
+                historyDto.getApproveTimeStamp(), historyDto.getReturnTimeStamp(), historyDto.getLostTimeStamp(),
+                historyDto.getCancelTimeStamp(), historyDto.getStatus().toString());
+        if(historyDto.getItem() != null) {
+            historyResponse.setItem(ItemResponse.from(historyDto.getItem()));
+        }
+
+        if(historyDto.getRequester() != null) {
+            historyResponse.setRequester(UserResponse.from(historyDto.getRequester()));
+        }
+        if(historyDto.getApproveManager() != null) {
+            historyResponse.setApproveManager(UserResponse.from(historyDto.getApproveManager()));
+        }
+        if(historyDto.getReturnManager() != null) {
+            historyResponse.setReturnManager(UserResponse.from(historyDto.getReturnManager()));
+        }
+        if(historyDto.getLostManager() != null) {
+            historyResponse.setLostManager(UserResponse.from(historyDto.getLostManager()));
+        }
+        if(historyDto.getCancelManager() != null) {
+            historyResponse.setCancelManager(UserResponse.from(historyDto.getCancelManager()));
+        }
+        return historyResponse;
     }
 }

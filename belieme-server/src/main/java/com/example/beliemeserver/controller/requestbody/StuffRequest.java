@@ -9,5 +9,5 @@ import lombok.Setter;
 public class StuffRequest {
     private String name;
     private String emoji;
-    private int amount;
+    private Integer amount;
 }

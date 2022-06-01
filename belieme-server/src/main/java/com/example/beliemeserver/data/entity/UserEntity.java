@@ -1,7 +1,7 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.data.entity.id.UserId;
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import lombok.*;
@@ -17,7 +17,6 @@ import java.util.List;
 @Table(name = "user")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Builder
@@ -43,6 +42,10 @@ public class UserEntity implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<AuthorityEntity> authorities;
 
+    public UserEntity() {
+        authorities = new ArrayList<>();
+    }
+
     public UserDto toUserDto() throws FormatDoesNotMatchException {
         List<AuthorityDto> authorityDtoList = new ArrayList<>();
         if(authorities != null) {
@@ -63,7 +66,10 @@ public class UserEntity implements Serializable {
     }
 
     public static UserEntity from(UserDto userDto) {
-        return new UserEntityBuilder()
+        if(userDto == null) {
+            return null;
+        }
+        return UserEntity.builder()
                 .studentId(userDto.getStudentId())
                 .name(userDto.getName())
                 .token(userDto.getToken())

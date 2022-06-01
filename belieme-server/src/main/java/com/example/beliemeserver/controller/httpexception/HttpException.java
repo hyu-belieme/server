@@ -33,6 +33,6 @@ public class HttpException extends Exception {
     }
 
     public ResponseEntity<ExceptionResponse> toResponseEntity() {
-        return ResponseEntity.status(httpStatus).body(new ExceptionResponse(httpStatus.name(), message));
+        return ResponseEntity.status(getHttpStatus()).body(new ExceptionResponse(getHttpStatus().name(), getMessage()));
     }
 }

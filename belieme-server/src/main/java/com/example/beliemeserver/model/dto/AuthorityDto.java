@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.dto;
 
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -17,28 +17,68 @@ public class AuthorityDto {
     public enum Permission {
         BANNED, USER, STAFF, MASTER, DEVELOPER;
 
+        public boolean hasUserPermission() {
+            switch (this) {
+                case DEVELOPER:
+                case MASTER:
+                case STAFF:
+                case USER:
+                    return true;
+                case BANNED:
+                default:
+                    return false;
+            }
+        }
+
+        public boolean hasStaffPermission() {
+            switch (this) {
+                case DEVELOPER:
+                case MASTER:
+                case STAFF:
+                    return true;
+                case USER:
+                case BANNED:
+                default:
+                    return false;
+            }
+        }
+
+        public boolean hasMasterPermission() {
+            switch (this) {
+                case DEVELOPER:
+                case MASTER:
+                    return true;
+                case STAFF:
+                case USER:
+                case BANNED:
+                default:
+                    return false;
+            }
+        }
+
+        public boolean hasDeveloperPermission() {
+            switch (this) {
+                case DEVELOPER:
+                    return true;
+                case MASTER:
+                case STAFF:
+                case USER:
+                case BANNED:
+                default:
+                    return false;
+            }
+        }
+
         public boolean hasMorePermission(Permission other) {
             switch (this) {
                 case BANNED:
                     return true;
                 case USER:
-                    if (other == BANNED || other == USER) {
-                        return false;
-                    } else {
-                        return true;
-                    }
+                    return other != BANNED && other != USER;
                 case STAFF:
-                    if (other == MASTER || other == DEVELOPER) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return other == MASTER || other == DEVELOPER;
                 case MASTER:
-                    if (other == DEVELOPER) {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    return other == DEVELOPER;
                 default:
                     return false;
             }
