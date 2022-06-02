@@ -44,7 +44,7 @@ public class StuffResponse extends JSONResponse {
         List<ItemResponse> itemResponseList = new ArrayList<>();
 
         List<ItemDto> itemDtoList = stuffDto.getItems();
-        for(int i = 0; i < itemResponseList.size(); i++) {
+        for(int i = 0; i < itemDtoList.size(); i++) {
             itemResponseList.add(ItemResponse.from(itemDtoList.get(i)));
         }
         return new StuffResponse(stuffDto.getName(), stuffDto.getEmoji(), stuffDto.getAmount(), stuffDto.getCount(), itemResponseList);

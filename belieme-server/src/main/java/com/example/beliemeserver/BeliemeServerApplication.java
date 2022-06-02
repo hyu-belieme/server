@@ -13,6 +13,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Iterator;
+import java.util.List;
+
 @SpringBootApplication
 public class BeliemeServerApplication {
 	public static void main(String[] args) {
@@ -22,6 +25,16 @@ public class BeliemeServerApplication {
 	@Bean
 	public CommandLineRunner run(UserRepository userRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) throws Exception {
 		return (String[] args) -> {
+			int maxId = 0;
+			Iterator<StuffEntity> iterator = stuffRepository.findAll().iterator();
+			while(iterator.hasNext()) {
+				StuffEntity tmp = iterator.next();
+				if(tmp.getId() > maxId) {
+					maxId = tmp.getId();
+				}
+			}
+			System.out.println("#######run###### maxId : " + maxId);
+			StuffEntity.setCounter(maxId+1);
 		};
 	}
 }

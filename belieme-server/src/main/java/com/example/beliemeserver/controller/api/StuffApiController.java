@@ -132,7 +132,7 @@ public class StuffApiController {
     private List<StuffResponse> toStuffResponseList(List<StuffDto> allStuffDtoList) {
         List<StuffResponse> allStuffResponseList = new ArrayList<>();
         for(int i = 0; i < allStuffDtoList.size(); i++) {
-            allStuffResponseList.add(StuffResponse.from(allStuffDtoList.get(i)));
+            allStuffResponseList.add(StuffResponse.from(allStuffDtoList.get(i)).toStuffResponseWithoutItemList());
         }
         return allStuffResponseList;
     }

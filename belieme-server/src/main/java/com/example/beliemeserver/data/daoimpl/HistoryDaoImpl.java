@@ -76,7 +76,9 @@ public class HistoryDaoImpl implements HistoryDao {
         }
 
         StuffId stuffId = new StuffId(stuffEntity.getId());
-        ItemId itemId = new ItemId(stuffId, newHistory.getNum());
+
+        ItemId itemId = new ItemId(stuffId, newHistory.getItem().getNum());
+        System.out.println("######addHistoryData####### stuffId : " + stuffId.getId() + "itemId : " + itemId.getNum());
         ItemEntity itemEntity = itemRepository.findById(itemId).orElse(null);
         if(itemEntity == null) {
             throw new NotFoundException();
@@ -88,6 +90,7 @@ public class HistoryDaoImpl implements HistoryDao {
             throw new ConflictException();
         }
 
+        System.out.println("######addHistoryData####### stuffId : " + stuffId.getId() + "itemId : " + itemId.getNum());
         HistoryEntity newHistoryEntity = HistoryEntity.builder()
                 .item(itemEntity)
                 .num(newHistoryNum)

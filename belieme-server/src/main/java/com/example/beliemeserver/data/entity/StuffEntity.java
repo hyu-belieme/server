@@ -30,6 +30,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @IdClass(StuffId.class)
 public class StuffEntity {
     private static final AtomicInteger counter = new AtomicInteger(1);
+
+    public static void setCounter(int initVal) {
+        counter.set(initVal);
+    }
+
     public static int getNextId() {
         return counter.getAndIncrement();
     }
