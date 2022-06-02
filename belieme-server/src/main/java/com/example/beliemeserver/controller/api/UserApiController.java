@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/real/")
+@RequestMapping("/")
 public class UserApiController {
     private final UserService userService;
 

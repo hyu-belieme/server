@@ -21,10 +21,17 @@ import javax.persistence.*;
 @IdClass(HistoryId.class)
 public class HistoryEntity {
     @Id
-    @ManyToOne
+    @Column(name = "stuff_id")
+    private int stuffId;
+
+    @Id
+    @Column(name = "item_num")
+    private int itemNum;
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumns({
-            @JoinColumn(name = "stuff_id", referencedColumnName = "stuff_id"),
-            @JoinColumn(name = "item_num", referencedColumnName = "num")
+            @JoinColumn(name = "stuff_id", referencedColumnName = "stuff_id", insertable = false, updatable = false),
+            @JoinColumn(name = "item_num", referencedColumnName = "num", insertable = false, updatable = false)
     })
     private ItemEntity item;
 

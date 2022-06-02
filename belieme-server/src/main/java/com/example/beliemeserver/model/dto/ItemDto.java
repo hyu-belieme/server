@@ -27,7 +27,7 @@ public class ItemDto {
         return lastHistory.getNum();
     }
 
-    public ItemStatus getState() {
+    public ItemStatus getStatus() {
         if(lastHistory == null) {
             return ItemStatus.USABLE;
         }

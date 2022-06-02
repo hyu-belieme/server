@@ -1,22 +1,21 @@
 package com.example.beliemeserver;
 
-import com.example.beliemeserver.data.entity.HistoryEntity;
-import com.example.beliemeserver.data.entity.ItemEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
-import com.example.beliemeserver.data.entity.UserEntity;
 import com.example.beliemeserver.data.repository.HistoryRepository;
 import com.example.beliemeserver.data.repository.ItemRepository;
 import com.example.beliemeserver.data.repository.StuffRepository;
 import com.example.beliemeserver.data.repository.UserRepository;
+import com.example.beliemeserver.data.repository.custom.RefreshRepositoryImpl;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.Iterator;
-import java.util.List;
 
 @SpringBootApplication
+@EnableJpaRepositories(repositoryBaseClass = RefreshRepositoryImpl.class)
 public class BeliemeServerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BeliemeServerApplication.class, args);

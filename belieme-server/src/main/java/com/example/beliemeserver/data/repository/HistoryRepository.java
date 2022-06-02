@@ -2,10 +2,10 @@ package com.example.beliemeserver.data.repository;
 
 import com.example.beliemeserver.data.entity.HistoryEntity;
 import com.example.beliemeserver.data.entity.id.HistoryId;
-import org.springframework.data.repository.CrudRepository;
+import com.example.beliemeserver.data.repository.custom.RefreshRepository;
 
 import java.util.List;
 
-public interface HistoryRepository extends CrudRepository<HistoryEntity, HistoryId> {
+public interface HistoryRepository extends RefreshRepository<HistoryEntity, HistoryId> {
     List<HistoryEntity> findByRequesterId(String requesterId);
 }

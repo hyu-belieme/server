@@ -49,7 +49,10 @@ public class StuffDaoImpl implements StuffDao {
                 .nextItemNum(1)
                 .build();
 
-        return stuffRepository.save(newStuffEntity).toStuffDto();
+        StuffEntity savedStuff = stuffRepository.save(newStuffEntity);
+        stuffRepository.refresh(savedStuff);
+
+        return savedStuff.toStuffDto();
     }
 
     @Override
@@ -61,6 +64,10 @@ public class StuffDaoImpl implements StuffDao {
         }
         target.setName(newStuff.getName());
         target.setEmoji(newStuff.getEmoji());
-        return stuffRepository.save(target).toStuffDto();
+
+        StuffEntity savedStuff = stuffRepository.save(target);
+        stuffRepository.refresh(savedStuff);
+
+        return savedStuff.toStuffDto();
     }
 }

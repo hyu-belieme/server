@@ -26,6 +26,10 @@ public class AuthorityDaoImpl implements AuthorityDao {
                 .user(UserEntity.from(authorityDto.getUserDto()))
                 .permission(authorityDto.getPermission().toString())
                 .build();
-        return authorityRepository.save(newAuthority).toAuthorityDto();
+
+        AuthorityEntity savedAuthority = authorityRepository.save(newAuthority);
+        authorityRepository.refresh(savedAuthority);
+
+        return savedAuthority.toAuthorityDto();
     }
 }

@@ -18,15 +18,18 @@ public class ItemResponse extends JSONResponse {
 
     int num;
 
+    String status;
+
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     HistoryResponse lastHistory;
 
-    public ItemResponse(String stuffName, String stuffEmoji, int num, HistoryResponse lastHistory) {
+    public ItemResponse(String stuffName, String stuffEmoji, int num, HistoryResponse lastHistory, String status) {
         super(true);
         this.stuffName = stuffName;
         this.stuffEmoji = stuffEmoji;
         this.num = num;
         this.lastHistory = lastHistory;
+        this.status = status;
     }
 
     private ItemResponse(boolean isNested) {
@@ -37,12 +40,12 @@ public class ItemResponse extends JSONResponse {
         return new ItemResponse(false);
     }
 
-    public ItemResponse toItemResponseNestedInHistory() {
-        return new ItemResponse(stuffName, stuffEmoji, num, HistoryResponse.responseWillBeIgnore());
+    public ItemResponse toItemResponseWithoutLastHistory() {
+        return new ItemResponse(stuffName, stuffEmoji, num, HistoryResponse.responseWillBeIgnore(), status);
     }
 
     public static ItemResponse from(ItemDto itemDto) {
-        ItemResponse itemResponse = new ItemResponse(null, null, itemDto.getNum(), null);
+        ItemResponse itemResponse = new ItemResponse(null, null, itemDto.getNum(), null, itemDto.getStatus().toString());
         if(itemDto.getStuff() != null) {
             itemResponse.setStuffName(itemDto.getStuff().getName());
             itemResponse.setStuffEmoji(itemDto.getStuff().getEmoji());

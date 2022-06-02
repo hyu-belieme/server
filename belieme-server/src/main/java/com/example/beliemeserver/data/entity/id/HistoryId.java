@@ -10,6 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class HistoryId implements Serializable {
-    private ItemId item;
+    private int stuffId;
+    private int itemNum;
     private int num;
 }

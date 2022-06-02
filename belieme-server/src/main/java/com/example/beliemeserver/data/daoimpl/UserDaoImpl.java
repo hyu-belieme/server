@@ -54,7 +54,11 @@ public class UserDaoImpl implements UserDao {
         if(userRepository.existsById(new UserId(user.getStudentId()))) {
             throw new ConflictException();
         }
-        return userRepository.save(UserEntity.from(user)).toUserDto();
+
+        UserEntity savedUser = userRepository.save(UserEntity.from(user));
+        userRepository.refresh(savedUser);
+
+        return savedUser.toUserDto();
     }
 
     @Override
@@ -69,6 +73,10 @@ public class UserDaoImpl implements UserDao {
         target.setToken(newUserEntity.getToken());
         target.setCreateTimeStamp(newUserEntity.getCreateTimeStamp());
         target.setApprovalTimeStamp(newUserEntity.getApprovalTimeStamp());
-        return userRepository.save(target).toUserDto();
+
+        UserEntity savedUser = userRepository.save(target);
+        userRepository.refresh(savedUser);
+
+        return savedUser.toUserDto();
     }
 }

@@ -81,7 +81,7 @@ public class HistoryService {
         ItemDto target = null;
         for(int i = 0; i < itemsByStuffName.size(); i++) {
             target = itemsByStuffName.get(i);
-            if(target.getState() == ItemDto.ItemStatus.USABLE) {
+            if(target.getStatus() == ItemDto.ItemStatus.USABLE) {
                 break;
             }
             target = null;
@@ -101,14 +101,14 @@ public class HistoryService {
 
         boolean shouldPostNewHistory;
         HistoryDto targetHistory;
-        if(targetItem.getState() == ItemDto.ItemStatus.UNUSABLE) {
+        if(targetItem.getStatus() == ItemDto.ItemStatus.UNUSABLE) {
             try {
                 targetHistory = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, targetItem.getLastHistoryNum());
             } catch (NotFoundException e) {
                 throw new ItCannotBeException();
             }
             shouldPostNewHistory = false;
-        } else if(targetItem.getState() == ItemDto.ItemStatus.USABLE) {
+        } else if(targetItem.getStatus() == ItemDto.ItemStatus.USABLE) {
             targetHistory = HistoryDto.builder()
                     .item(targetItem)
                     .build();

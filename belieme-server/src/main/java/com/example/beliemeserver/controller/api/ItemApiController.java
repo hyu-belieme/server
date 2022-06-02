@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 
 @RestController
-@RequestMapping(path="/real/stuffs/{name}/items")
+@RequestMapping(path="/stuffs/{name}/items")
 public class ItemApiController {
     private final ItemService itemService;
 

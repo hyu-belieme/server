@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/real/stuffs")
+@RequestMapping(path="/stuffs")
 public class StuffApiController {
     private final StuffService stuffService;
 

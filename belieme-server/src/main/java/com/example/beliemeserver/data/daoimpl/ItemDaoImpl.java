@@ -3,7 +3,6 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.ItemEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.entity.id.ItemId;
-import com.example.beliemeserver.data.entity.id.StuffId;
 import com.example.beliemeserver.data.repository.ItemRepository;
 import com.example.beliemeserver.data.repository.StuffRepository;
 import com.example.beliemeserver.model.dao.ItemDao;
@@ -47,7 +46,7 @@ public class ItemDaoImpl implements ItemDao {
             throw new NotFoundException();
         }
 
-        ItemId itemId = new ItemId(new StuffId(stuffEntity.getId()), itemNum);
+        ItemId itemId = new ItemId(stuffEntity.getId(), itemNum);
 
         ItemEntity itemEntity = itemRepository.findById(itemId).orElse(null);
         if(itemEntity == null) {
@@ -64,19 +63,21 @@ public class ItemDaoImpl implements ItemDao {
         }
 
         int newItemNum = stuffEntity.getAndIncrementNextItemNum();
-        ItemId itemId = new ItemId(new StuffId(stuffEntity.getId()), newItemNum);
+        ItemId itemId = new ItemId(stuffEntity.getId(), newItemNum);
         if(itemRepository.existsById(itemId)) {
             throw new ConflictException();
         }
 
         ItemEntity newItemEntity = ItemEntity.builder()
-                .stuff(stuffEntity)
+                .stuffId(stuffEntity.getId())
                 .num(newItemNum)
                 .lastHistoryNum(null)
                 .nextHistoryNum(1)
                 .build();
 
         ItemEntity savedItemEntity = itemRepository.save(newItemEntity);
+        itemRepository.refresh(savedItemEntity);
+        stuffRepository.refresh(stuffEntity);
         return savedItemEntity.toItemDto();
     }
 
@@ -87,13 +88,17 @@ public class ItemDaoImpl implements ItemDao {
             throw new NotFoundException();
         }
 
-        ItemId itemId = new ItemId(new StuffId(stuffEntity.getId()), itemNum);
+        ItemId itemId = new ItemId(stuffEntity.getId(), itemNum);
 
         ItemEntity target = itemRepository.findById(itemId).orElse(null);
         if(target == null) {
             throw new NotFoundException();
         }
         target.setLastHistoryNum(itemDto.getLastHistoryNum());
-        return itemRepository.save(target).toItemDto();
+
+        ItemEntity savedItemEntity = itemRepository.save(target);
+        itemRepository.refresh(savedItemEntity);
+        stuffRepository.refresh(stuffEntity);
+        return savedItemEntity.toItemDto();
     }
 }

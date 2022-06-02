@@ -22,8 +22,11 @@ import javax.persistence.*;
 @IdClass(ItemId.class)
 public class ItemEntity {
     @Id
+    @Column(name = "stuff_id")
+    private int stuffId;
+
     @ManyToOne
-    @JoinColumn(name = "stuff_id", referencedColumnName = "id")
+    @JoinColumn(name = "stuff_id", referencedColumnName = "id", insertable = false, updatable = false)
     private StuffEntity stuff;
 
     @Id

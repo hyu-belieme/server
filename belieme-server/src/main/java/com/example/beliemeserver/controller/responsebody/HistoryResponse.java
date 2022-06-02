@@ -60,6 +60,10 @@ public class HistoryResponse extends JSONResponse {
         return new HistoryResponse(ItemResponse.responseWillBeIgnore(), num, requester, approveManager, returnManager, lostManager, cancelManager, reservedTimeStamp, approveTimeStamp, returnTimeStamp, lostTimeStamp, cancelTimeStamp, status);
     }
 
+    public HistoryResponse toHistoryResponseWithItemWithoutLastHistory() {
+        return new HistoryResponse(item.toItemResponseWithoutLastHistory(), num, requester, approveManager, returnManager, lostManager, cancelManager, reservedTimeStamp, approveTimeStamp, returnTimeStamp, lostTimeStamp, cancelTimeStamp, status);
+    }
+
     public static HistoryResponse from(HistoryDto historyDto) {
         HistoryResponse historyResponse = new HistoryResponse(
                 ItemResponse.responseWillBeIgnore(), historyDto.getNum(), null, null,
@@ -71,19 +75,19 @@ public class HistoryResponse extends JSONResponse {
         }
 
         if(historyDto.getRequester() != null) {
-            historyResponse.setRequester(UserResponse.from(historyDto.getRequester()));
+            historyResponse.setRequester(UserResponse.from(historyDto.getRequester()).toUserResponseNestedInHistory());
         }
         if(historyDto.getApproveManager() != null) {
-            historyResponse.setApproveManager(UserResponse.from(historyDto.getApproveManager()));
+            historyResponse.setApproveManager(UserResponse.from(historyDto.getApproveManager()).toUserResponseNestedInHistory());
         }
         if(historyDto.getReturnManager() != null) {
-            historyResponse.setReturnManager(UserResponse.from(historyDto.getReturnManager()));
+            historyResponse.setReturnManager(UserResponse.from(historyDto.getReturnManager()).toUserResponseNestedInHistory());
         }
         if(historyDto.getLostManager() != null) {
-            historyResponse.setLostManager(UserResponse.from(historyDto.getLostManager()));
+            historyResponse.setLostManager(UserResponse.from(historyDto.getLostManager()).toUserResponseNestedInHistory());
         }
         if(historyDto.getCancelManager() != null) {
-            historyResponse.setCancelManager(UserResponse.from(historyDto.getCancelManager()));
+            historyResponse.setCancelManager(UserResponse.from(historyDto.getCancelManager()).toUserResponseNestedInHistory());
         }
         return historyResponse;
     }
