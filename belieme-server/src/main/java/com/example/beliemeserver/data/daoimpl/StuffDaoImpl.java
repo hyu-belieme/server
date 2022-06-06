@@ -23,7 +23,10 @@ public class StuffDaoImpl implements StuffDao {
         Iterator<StuffEntity> iterator = stuffRepository.findAll().iterator();
         List<StuffDto> stuffDtoList = new ArrayList<>();
         while(iterator.hasNext()) {
-            stuffDtoList.add(iterator.next().toStuffDto());
+            StuffEntity tmp = iterator.next();
+//            tmp.setNextItemNum(tmp.getItems().size()+1);
+            stuffDtoList.add(tmp.toStuffDto());
+//            stuffRepository.save(tmp);
         }
         return stuffDtoList;
     }

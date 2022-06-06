@@ -86,6 +86,7 @@ public class StuffEntity {
                 .name(name)
                 .emoji(emoji)
                 .items(itemDtoList)
+                .nextItemNum(nextItemNum)
                 .build();
     }
 }

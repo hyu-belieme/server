@@ -18,6 +18,7 @@ public class StuffResponse extends JSONResponse {
     private String emoji;
     private int amount;
     private int count;
+//    private int nextItemNum;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ItemResponse> itemList;
@@ -31,6 +32,16 @@ public class StuffResponse extends JSONResponse {
         this.count = count;
         this.itemList = itemList;
     }
+
+//    public StuffResponse(String name, String emoji, int amount, int count, List<ItemResponse> itemList, int nextItemNum) {
+//        super(true);
+//        this.name = name;
+//        this.emoji = emoji;
+//        this.amount = amount;
+//        this.count = count;
+//        this.itemList = itemList;
+//        this.nextItemNum = nextItemNum;
+//    }
 
     private StuffResponse(boolean doesJsonInclude) {
         super(false);

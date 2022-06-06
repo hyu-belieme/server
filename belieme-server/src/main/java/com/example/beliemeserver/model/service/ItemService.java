@@ -7,6 +7,8 @@ import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.util.AuthCheck;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ItemService {
     private final StuffDao stuffDao;
@@ -19,6 +21,14 @@ public class ItemService {
         this.stuffDao = stuffDao;
         this.itemDao = itemDao;
         this.authCheck = new AuthCheck(userDao);
+    }
+
+    public List<ItemDto> getItems(String userToken, String stuffName) throws DataException, UnauthorizedException, ForbiddenException {
+        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+//        authCheck.checkIfRequesterHasStaffPermission(requester);
+        authCheck.checkIfRequesterHasUserPermission(requester);
+
+        return itemDao.getItemsByStuffNameData(stuffName);
     }
 
     public StuffDto postItem(String userToken, String stuffName, Integer amount) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException {

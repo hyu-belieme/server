@@ -2,9 +2,11 @@ package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.StuffRequest;
+import com.example.beliemeserver.controller.responsebody.ItemResponse;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
 import com.example.beliemeserver.controller.util.Globals;
 
+import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.service.ItemService;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping(path="/stuffs/{name}/items")
@@ -21,6 +25,25 @@ public class ItemApiController {
 
     public ItemApiController(ItemService itemService) {
         this.itemService = itemService;
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<ItemResponse>> getItemsByStuffName(@RequestHeader("user-token") String userToken, @PathVariable String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
+        List<ItemDto> itemDtoList;
+        try {
+            itemDtoList = itemService.getItems(userToken, name);
+        } catch (DataException e) {
+            e.printStackTrace();
+            throw new InternalServerErrorHttpException(e);
+        } catch (UnauthorizedException e) {
+            e.printStackTrace();
+            throw new UnauthorizedHttpException(e);
+        } catch (ForbiddenException e) {
+            e.printStackTrace();
+            throw new ForbiddenHttpException(e);
+        }
+
+        return ResponseEntity.ok(toItemResponseList(itemDtoList));
     }
 
     @PostMapping("/")
@@ -52,5 +75,13 @@ public class ItemApiController {
         }
 
         return ResponseEntity.created(location).body(StuffResponse.from(updatedStuff));
+    }
+
+    private List<ItemResponse> toItemResponseList(List<ItemDto> allItemDtoList) {
+        List<ItemResponse> allItemResponseList = new ArrayList<>();
+        for(int i = 0; i < allItemDtoList.size(); i++) {
+            allItemResponseList.add(ItemResponse.from(allItemDtoList.get(i)));
+        }
+        return allItemResponseList;
     }
 }

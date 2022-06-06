@@ -76,6 +76,7 @@ public class ItemDaoImpl implements ItemDao {
                 .build();
 
         ItemEntity savedItemEntity = itemRepository.save(newItemEntity);
+        stuffRepository.save(stuffEntity);
         itemRepository.refresh(savedItemEntity);
         stuffRepository.refresh(stuffEntity);
         return savedItemEntity.toItemDto();

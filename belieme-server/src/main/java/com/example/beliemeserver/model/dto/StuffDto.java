@@ -17,6 +17,7 @@ public class StuffDto {
     private String name;
     private String emoji;
     private List<ItemDto> items;
+    private int nextItemNum;
 
     public int getAmount() {
         int amount = 0;
