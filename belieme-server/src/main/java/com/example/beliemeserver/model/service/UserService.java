@@ -1,5 +1,7 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.model.util.AuthCheck;
 import com.example.beliemeserver.model.util.HttpRequest;
 
 import com.example.beliemeserver.model.dao.AuthorityDao;
@@ -23,22 +25,36 @@ public class UserService {
 
     private final UserDao userDao;
     private final AuthorityDao authorityDao;
+    private final AuthCheck authCheck;
 
     public UserService(UserDao userDao, AuthorityDao authorityDao) {
         this.userDao = userDao;
         this.authorityDao = authorityDao;
+        this.authCheck = new AuthCheck(userDao);
     }
 
     public UserDto getUserInfoFromUnivApiByApiToken(String apiToken) throws DataException, ConflictException, NotFoundException, ForbiddenException, BadGateWayException {
-        JSONObject jsonResponse = getStudentInfoFromHanyangApi(apiToken);
-        String studentId = (String) (jsonResponse.get("gaeinNo"));
-        String name = (String) (jsonResponse.get("userNm"));
-        String sosokId = (String) jsonResponse.get("sosokId");
+        String studentId, name, sosokId;
+        if(apiToken.equals(Globals.developerApiToken)) {
+            studentId = "dev";
+            name = "dev";
+            sosokId = "dev";
+        } else {
+            JSONObject jsonResponse = getStudentInfoFromHanyangApi(apiToken);
+            studentId = (String) (jsonResponse.get("gaeinNo"));
+            name = (String) (jsonResponse.get("userNm"));
+            sosokId = (String) jsonResponse.get("sosokId");
+        }
 
         UserDto savedUser = setUserAndUpdateDB(studentId, name);
 
         if(savedUser.getMaxPermission() == null) {
-            AuthorityDto newAuthority = addAuthority(savedUser, sosokId);
+            AuthorityDto newAuthority;
+            if(apiToken.equals(Globals.developerApiToken)) {
+                newAuthority = addAuthority(savedUser, AuthorityDto.Permission.DEVELOPER);
+            } else {
+                newAuthority = checkAndAddUserAuthority(savedUser, sosokId);
+            }
             savedUser.addAuthority(newAuthority);
         }
 
@@ -46,14 +62,23 @@ public class UserService {
     }
 
     public UserDto getUserByUserToken(String userToken) throws DataException, UnauthorizedException {
-        UserDto user;
-        try {
-            user = userDao.getUserByTokenData(userToken);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            throw new UnauthorizedException("There is no user in User-Token.");
+        return authCheck.checkTokenAndGetUser(userToken);
+    }
+
+    public UserDto makeUserHavePermission(String userToken, String studentId, AuthorityDto.Permission permission) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException, MethodNotAllowedException {
+        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+        authCheck.checkIfRequesterHasDeveloperPermission(requester);
+
+        UserDto target = userDao.getUserByStudentIdData(studentId);
+
+        if(target.getMaxPermission() == AuthorityDto.Permission.DEVELOPER) {
+            throw new MethodNotAllowedException("DEVELOPER의 권한을 변경할 수 없습니다.");
+        } else if(target.getMaxPermission() == null) {
+            addAuthority(target, permission);
+        } else {
+            updateAuthority(target, permission);
         }
-        return user;
+        return userDao.getUserByStudentIdData(studentId);
     }
 
     private JSONObject getStudentInfoFromHanyangApi(String apiToken) throws BadGateWayException {
@@ -102,17 +127,29 @@ public class UserService {
         }
     }
 
-    private AuthorityDto addAuthority(UserDto savedUser, String sosokId) throws ConflictException, DataException, ForbiddenException {
+    private AuthorityDto checkAndAddUserAuthority(UserDto savedUser, String sosokId) throws ConflictException, DataException, ForbiddenException {
         if(CSE_SOSOK_ID.contains(sosokId)) {
-            AuthorityDto newAuthority = AuthorityDto.builder()
-                    .permission(AuthorityDto.Permission.USER)
-                    .userDto(savedUser)
-                    .build();
-
-            return authorityDao.addAuthorityData(newAuthority);
-
+            return addAuthority(savedUser, AuthorityDto.Permission.USER);
         } else {
             throw new ForbiddenException("You're not CSE student.");
         }
+    }
+
+    private AuthorityDto addAuthority(UserDto savedUser, AuthorityDto.Permission permission) throws ConflictException, DataException {
+        AuthorityDto newAuthority = AuthorityDto.builder()
+                .permission(permission)
+                .userDto(savedUser)
+                .build();
+
+        return authorityDao.addAuthorityData(newAuthority);
+    }
+
+    private AuthorityDto updateAuthority(UserDto savedUser, AuthorityDto.Permission permission) throws DataException {
+        AuthorityDto newAuthority = AuthorityDto.builder()
+                .permission(permission)
+                .userDto(savedUser)
+                .build();
+
+        return authorityDao.updateAuthorityData(savedUser.getStudentId(), newAuthority);
     }
 }

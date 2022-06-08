@@ -3,7 +3,7 @@ package com.example.beliemeserver.controller.api;
 import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.ItemRequest;
 import com.example.beliemeserver.controller.responsebody.HistoryResponse;
-import com.example.beliemeserver.controller.util.Globals;
+import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.service.HistoryService;

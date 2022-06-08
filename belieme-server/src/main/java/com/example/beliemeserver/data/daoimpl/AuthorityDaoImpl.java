@@ -32,4 +32,16 @@ public class AuthorityDaoImpl implements AuthorityDao {
 
         return savedAuthority.toAuthorityDto();
     }
+
+    @Override
+    public AuthorityDto updateAuthorityData(String studentId, AuthorityDto authorityDto) throws DataException {
+        AuthorityEntity target = authorityRepository.findById(new AuthorityId(new UserId(studentId))).orElse(null);
+
+        target.setPermission(authorityDto.getPermission().toString());
+
+        AuthorityEntity savedAuthority = authorityRepository.save(target);
+        authorityRepository.refresh(savedAuthority);
+
+        return savedAuthority.toAuthorityDto();
+    }
 }
