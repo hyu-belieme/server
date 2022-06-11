@@ -28,7 +28,7 @@ public class BeliemeServerApplication {
 			Iterator<StuffEntity> iterator = stuffRepository.findAll().iterator();
 			while(iterator.hasNext()) {
 				StuffEntity tmp = iterator.next();
-				if(tmp.getId() > maxId) {
+				if (tmp.getId() > maxId) {
 					maxId = tmp.getId();
 				}
 			}
