@@ -1,7 +1,6 @@
 package com.example.beliemeserver.data.entity;
 
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,30 +13,34 @@ import java.util.List;
         )
 })
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
-@Builder
-@Accessors(chain = true)
 public class DepartmentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @Setter(AccessLevel.NONE)
     private int id;
 
+    @NonNull
     @Column(name = "university_code")
     private String universityCode;
 
-    @ManyToOne
-    @JoinColumn(name = "university_code", referencedColumnName = "code", insertable = false, updatable = false)
-    private UniversityEntity university;
-
+    @NonNull
     @Column(name = "code")
     private String code;
 
+    @NonNull
     @Column(name = "name")
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "university_code", referencedColumnName = "code", insertable = false, updatable = false)
+    @Setter(AccessLevel.NONE)
+    private UniversityEntity university;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "department")
+    @Setter(AccessLevel.NONE)
     private List<MajorDepartmentJoinEntity> majorDepartmentJoinEntities;
 }

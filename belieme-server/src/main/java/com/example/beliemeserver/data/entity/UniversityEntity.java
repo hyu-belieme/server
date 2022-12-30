@@ -1,27 +1,35 @@
 package com.example.beliemeserver.data.entity;
 
+import com.example.beliemeserver.model.dto.UniversityDto;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "university")
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
-@ToString
-@Builder
-@Accessors(chain = true)
 public class UniversityEntity {
     @Id
+    @NonNull
     @Column(name = "code")
     private String code;
 
+    @NonNull
     @Column(name = "name")
     private String name;
 
+    @NonNull
     @Column(name = "api_url")
     private String apiUrl;
+
+    public UniversityDto toUniversityDto() {
+        return UniversityDto.builder()
+                .code(code)
+                .name(name)
+                .apiUrl(apiUrl)
+                .build();
+    }
 }
