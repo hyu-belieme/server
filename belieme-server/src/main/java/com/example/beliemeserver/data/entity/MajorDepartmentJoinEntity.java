@@ -1,5 +1,6 @@
 package com.example.beliemeserver.data.entity;
 
+import com.example.beliemeserver.data.entity.id.MajorDepartmentJoinId;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -14,6 +15,7 @@ import javax.persistence.*;
 @ToString
 @Builder
 @Accessors(chain = true)
+@IdClass(MajorDepartmentJoinId.class)
 public class MajorDepartmentJoinEntity {
     @Id
     @Column(name = "major_id")
