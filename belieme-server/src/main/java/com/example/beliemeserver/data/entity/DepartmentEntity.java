@@ -10,7 +10,7 @@ import java.util.List;
 @Table(name = "department", uniqueConstraints={
         @UniqueConstraint(
                 name = "department_index",
-                columnNames={"university_code", "code"}
+                columnNames={"university_id", "code"}
         )
 })
 @NoArgsConstructor
@@ -25,8 +25,8 @@ public class DepartmentEntity {
     private int id;
 
     @NonNull
-    @Column(name = "university_code")
-    private String universityCode;
+    @Column(name = "university_id")
+    private int universityId;
 
     @NonNull
     @Column(name = "code")
@@ -37,7 +37,7 @@ public class DepartmentEntity {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "university_code", referencedColumnName = "code", insertable = false, updatable = false)
+    @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private UniversityEntity university;
 

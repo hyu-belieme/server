@@ -9,10 +9,15 @@ import javax.persistence.*;
 @Table(name = "university")
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class UniversityEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
     @NonNull
     @Column(name = "code")
     private String code;
