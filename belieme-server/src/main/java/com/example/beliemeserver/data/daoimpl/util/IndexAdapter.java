@@ -7,8 +7,6 @@ import com.example.beliemeserver.data.repository.MajorRepository;
 import com.example.beliemeserver.data.repository.UniversityRepository;
 import com.example.beliemeserver.model.exception.NotFoundException;
 
-import javax.persistence.Entity;
-
 public class IndexAdapter {
     public static UniversityEntity getUniversityEntityByCode(UniversityRepository universityRepository, String code) throws NotFoundException {
         UniversityEntity target = universityRepository.findByCode(code).orElse(null);
@@ -17,10 +15,7 @@ public class IndexAdapter {
 
     public static MajorEntity getMajorEntity(MajorRepository majorRepository, int universityId, String majorCode) throws NotFoundException {
         MajorEntity target = majorRepository.findByUniversityIdAndCode(universityId, majorCode).orElse(null);
-        if (target == null) {
-            throw new NotFoundException();
-        }
-        return target;
+        return (MajorEntity) checkNullAndReturn(target);
     }
 
     private static DataEntity checkNullAndReturn(DataEntity target) throws NotFoundException {

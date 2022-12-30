@@ -36,6 +36,12 @@ public class MajorEntity implements DataEntity {
     @Setter(AccessLevel.NONE)
     private UniversityEntity university;
 
+    public MajorEntity(int id, int universityId, String code) {
+        this.id = id;
+        this.universityId = universityId;
+        this.code = code;
+    }
+
     public MajorDto toMajorDto() {
         return new MajorDto(
                 university.toUniversityDto(),
