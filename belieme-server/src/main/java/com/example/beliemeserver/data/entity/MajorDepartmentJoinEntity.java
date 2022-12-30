@@ -14,7 +14,7 @@ import javax.persistence.*;
 @ToString
 @Builder
 @Accessors(chain = true)
-public class MajorJoinDepartmentEntity {
+public class MajorDepartmentJoinEntity {
     @Id
     @Column(name = "major_id")
     private int majorId;

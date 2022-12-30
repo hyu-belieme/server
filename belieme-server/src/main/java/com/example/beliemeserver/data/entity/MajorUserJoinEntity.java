@@ -1,5 +1,5 @@
 package com.example.beliemeserver.data.entity;
 
-public class MajorJoinUserEntity {
+public class MajorUserJoinEntity {
     // TODO : Implement after fixing UserEntity.
 }
