@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Builder
 @Accessors(chain = true)
 @IdClass(MajorDepartmentJoinId.class)
-public class MajorDepartmentJoinEntity {
+public class MajorDepartmentJoinEntity implements DataEntity {
     @Id
     @Column(name = "major_id")
     private int majorId;

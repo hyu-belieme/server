@@ -19,7 +19,7 @@ import javax.persistence.*;
 @Builder
 @Accessors(chain = true)
 @IdClass(HistoryId.class)
-public class HistoryEntity {
+public class HistoryEntity implements DataEntity{
     @Id
     @Column(name = "stuff_id")
     private int stuffId;

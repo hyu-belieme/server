@@ -16,7 +16,7 @@ import javax.persistence.*;
 @RequiredArgsConstructor
 @Getter
 @Setter
-public class MajorEntity {
+public class MajorEntity implements DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

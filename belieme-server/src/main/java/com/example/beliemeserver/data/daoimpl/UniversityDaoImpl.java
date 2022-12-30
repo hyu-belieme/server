@@ -1,5 +1,6 @@
 package com.example.beliemeserver.data.daoimpl;
 
+import com.example.beliemeserver.data.daoimpl.util.IndexAdapter;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.UniversityRepository;
 import com.example.beliemeserver.model.dao.UniversityDao;
@@ -14,8 +15,7 @@ import java.util.List;
 
 @Component
 public class UniversityDaoImpl implements UniversityDao {
-    final
-    UniversityRepository universityRepository;
+    private final UniversityRepository universityRepository;
 
     public UniversityDaoImpl(UniversityRepository universityRepository) {
         this.universityRepository = universityRepository;
@@ -33,7 +33,7 @@ public class UniversityDaoImpl implements UniversityDao {
 
     @Override
     public UniversityDto getUniversityByCodeData(String code) throws DataException, NotFoundException {
-        UniversityEntity targetUniversity = getUniversityEntityByCode(code);
+        UniversityEntity targetUniversity = IndexAdapter.getUniversityEntityByCode(universityRepository,code);
         return targetUniversity.toUniversityDto();
     }
 
@@ -55,7 +55,7 @@ public class UniversityDaoImpl implements UniversityDao {
 
     @Override
     public UniversityDto updateUniversityData(String code, UniversityDto newUniversity) throws DataException, NotFoundException {
-        UniversityEntity targetUniversity = getUniversityEntityByCode(code);
+        UniversityEntity targetUniversity = IndexAdapter.getUniversityEntityByCode(universityRepository,code);
 
         UniversityEntity newUniversityEntity = new UniversityEntity(
                 targetUniversity.getId(),
@@ -66,13 +66,5 @@ public class UniversityDaoImpl implements UniversityDao {
 
         UniversityEntity savedUniversityEntity = universityRepository.save(newUniversityEntity);
         return savedUniversityEntity.toUniversityDto();
-    }
-
-    private UniversityEntity getUniversityEntityByCode(String code) throws NotFoundException {
-        UniversityEntity targetUniversity = universityRepository.findByCode(code).orElse(null);
-        if(targetUniversity == null) {
-            throw new NotFoundException();
-        }
-        return targetUniversity;
     }
 }

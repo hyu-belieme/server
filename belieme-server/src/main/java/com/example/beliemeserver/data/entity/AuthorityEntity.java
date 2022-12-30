@@ -18,7 +18,7 @@ import java.io.Serializable;
 @Builder
 @Accessors(chain = true)
 @IdClass(AuthorityId.class)
-public class AuthorityEntity implements Serializable {
+public class AuthorityEntity implements Serializable, DataEntity {
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id")

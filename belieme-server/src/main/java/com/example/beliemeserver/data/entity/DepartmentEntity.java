@@ -17,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 @Setter
-public class DepartmentEntity {
+public class DepartmentEntity implements DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
