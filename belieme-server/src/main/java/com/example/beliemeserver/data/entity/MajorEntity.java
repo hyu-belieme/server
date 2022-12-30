@@ -6,7 +6,12 @@ import lombok.experimental.Accessors;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "major")
+@Table(name = "major", uniqueConstraints={
+        @UniqueConstraint(
+                name = "major_index",
+                columnNames={"university_code", "code"}
+        )
+})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
