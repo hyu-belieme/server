@@ -21,6 +21,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class DepartmentEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
