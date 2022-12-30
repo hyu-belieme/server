@@ -45,6 +45,13 @@ public class DepartmentEntity implements DataEntity {
     @Setter(AccessLevel.NONE)
     private List<MajorDepartmentJoinEntity> majorDepartmentJoinEntities;
 
+    public DepartmentEntity(int id, int universityId, String code, String name) {
+        this.id = id;
+        this.universityId = universityId;
+        this.code = code;
+        this.name = name;
+    }
+
     public DepartmentDto toDepartmentDto() {
         DepartmentDto output = new DepartmentDto(
                 university.toUniversityDto(),

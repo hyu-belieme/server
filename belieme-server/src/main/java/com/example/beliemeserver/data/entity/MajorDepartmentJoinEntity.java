@@ -2,26 +2,24 @@ package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.data.entity.id.MajorDepartmentJoinId;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "major")
 @NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Getter
 @Setter
-@ToString
-@Builder
-@Accessors(chain = true)
 @IdClass(MajorDepartmentJoinId.class)
 public class MajorDepartmentJoinEntity implements DataEntity {
     @Id
+    @NonNull
     @Column(name = "major_id")
     private int majorId;
 
     @Id
+    @NonNull
     @Column(name = "department_id")
     private int departmentId;
 
