@@ -44,9 +44,12 @@ public class MajorDaoImpl implements MajorDao {
         int universityId = IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode).getId();
         int targetId = IndexAdapter.getMajorEntity(majorRepository, universityId, majorCode).getId();
 
+        String newUniversityCode = newMajor.getUniversity().getCode();
+        int newUniversityId = IndexAdapter.getUniversityEntityByCode(universityRepository, newUniversityCode).getId();
+
         MajorEntity newMajorEntity = new MajorEntity(
                 targetId,
-                universityId,
+                newUniversityId,
                 newMajor.getCode()
         );
 
