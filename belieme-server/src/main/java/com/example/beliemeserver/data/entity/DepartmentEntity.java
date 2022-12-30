@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "department", uniqueConstraints={
@@ -16,7 +17,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Builder
 @Accessors(chain = true)
 public class DepartmentEntity {
@@ -36,4 +36,7 @@ public class DepartmentEntity {
 
     @Column(name = "name")
     private String name;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "department")
+    private List<MajorDepartmentJoinEntity> majorDepartmentJoinEntities;
 }
