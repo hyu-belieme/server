@@ -4,11 +4,11 @@ import lombok.*;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
+//@Getter
+//@Setter
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@EqualsAndHashCode
 public class MajorUserJoinId implements Serializable {
     // TODO : Implement after fixing UserEntity.
 }
