@@ -26,10 +26,10 @@ public class UniversityEntity {
     private String apiUrl;
 
     public UniversityDto toUniversityDto() {
-        return UniversityDto.builder()
-                .code(code)
-                .name(name)
-                .apiUrl(apiUrl)
-                .build();
+        return new UniversityDto(
+                code,
+                name,
+                apiUrl
+        );
     }
 }

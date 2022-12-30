@@ -1,21 +1,25 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
-@ToString
-@Builder
-@Accessors(chain = true)
+@AllArgsConstructor
 public class DepartmentDto {
     private UniversityDto university;
+
+    @NonNull
     private String code;
+
+    @NonNull
     private String name;
-    private List<MajorDto> baseMajors;
+
+    private final List<MajorDto> baseMajors = new ArrayList<>();
+
+    public void addBaseMajor(MajorDto major) {
+        baseMajors.add(major);
+    }
 }

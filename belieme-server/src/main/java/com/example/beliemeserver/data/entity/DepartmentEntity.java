@@ -1,5 +1,6 @@
 package com.example.beliemeserver.data.entity;
 
+import com.example.beliemeserver.model.dto.DepartmentDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -43,4 +44,18 @@ public class DepartmentEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "department")
     @Setter(AccessLevel.NONE)
     private List<MajorDepartmentJoinEntity> majorDepartmentJoinEntities;
+
+    public DepartmentDto toDepartmentDto() {
+        DepartmentDto output = new DepartmentDto(
+                university.toUniversityDto(),
+                code,
+                name
+        );
+
+        for(MajorDepartmentJoinEntity major : majorDepartmentJoinEntities) {
+            output.addBaseMajor(major.getMajor().toMajorDto());
+        }
+
+        return output;
+    }
 }

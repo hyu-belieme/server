@@ -1,5 +1,6 @@
 package com.example.beliemeserver.data.entity;
 
+import com.example.beliemeserver.model.dto.MajorDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,4 +35,11 @@ public class MajorEntity {
     @JoinColumn(name = "university_code", referencedColumnName = "code", insertable = false, updatable = false)
     @Setter(AccessLevel.NONE)
     private UniversityEntity university;
+
+    public MajorDto toMajorDto() {
+        return new MajorDto(
+                university.toUniversityDto(),
+                code
+        );
+    }
 }
