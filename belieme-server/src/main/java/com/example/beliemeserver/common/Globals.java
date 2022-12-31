@@ -1,4 +1,4 @@
-package com.example.beliemeserver.controller.util;
+package com.example.beliemeserver.common;
 
 import com.example.beliemeserver.controller.httpexception.InternalServerErrorHttpException;
 

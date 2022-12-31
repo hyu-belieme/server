@@ -94,8 +94,7 @@ public class HistoryService {
 
     public HistoryDto addOrEditToLostHistory(String userToken, String stuffName, int itemNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ItCannotBeException, MethodNotAllowedException, ConflictException {
         UserDto requester = authCheck.checkTokenAndGetUser(userToken);
-//        authCheck.checkIfRequesterHasStaffPermission(requester);
-        authCheck.checkIfRequesterHasUserPermission(requester);
+        authCheck.checkIfRequesterHasStaffPermission(requester);
 
         ItemDto targetItem = itemDao.getItemByStuffNameAndItemNumData(stuffName, itemNum);
 
@@ -160,8 +159,7 @@ public class HistoryService {
 
     public HistoryDto editToApprovedHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
         UserDto requester = authCheck.checkTokenAndGetUser(userToken);
-//        authCheck.checkIfRequesterHasStaffPermission(requester);
-        authCheck.checkIfRequesterHasUserPermission(requester);
+        authCheck.checkIfRequesterHasStaffPermission(requester);
 
         HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
 
@@ -180,8 +178,7 @@ public class HistoryService {
 
     public HistoryDto editToReturnedHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
         UserDto requester = authCheck.checkTokenAndGetUser(userToken);
-//        authCheck.checkIfRequesterHasStaffPermission(requester);
-        authCheck.checkIfRequesterHasUserPermission(requester);
+        authCheck.checkIfRequesterHasStaffPermission(requester);
 
         HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
 
@@ -200,8 +197,7 @@ public class HistoryService {
 
     public HistoryDto editToFoundHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
         UserDto requester = authCheck.checkTokenAndGetUser(userToken);
-//        authCheck.checkIfRequesterHasStaffPermission(requester);
-        authCheck.checkIfRequesterHasUserPermission(requester);
+        authCheck.checkIfRequesterHasStaffPermission(requester);
 
         HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
 
@@ -220,8 +216,7 @@ public class HistoryService {
     private void checkIfRequesterHasPermissionToStudentId(UserDto requester, String studentId) throws ForbiddenException {
         authCheck.checkIfRequesterHasUserPermission(requester);
         if(!requester.getStudentId().equals(studentId)) {
-//            authCheck.checkIfRequesterHasStaffPermission(requester);
-            authCheck.checkIfRequesterHasUserPermission(requester);
+            authCheck.checkIfRequesterHasStaffPermission(requester);
         }
     }
 

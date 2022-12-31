@@ -4,7 +4,7 @@ import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.StuffRequest;
 import com.example.beliemeserver.controller.responsebody.ItemResponse;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
-import com.example.beliemeserver.controller.util.Globals;
+import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.exception.*;

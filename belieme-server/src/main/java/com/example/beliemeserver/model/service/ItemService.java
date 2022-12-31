@@ -25,16 +25,14 @@ public class ItemService {
 
     public List<ItemDto> getItems(String userToken, String stuffName) throws DataException, UnauthorizedException, ForbiddenException {
         UserDto requester = authCheck.checkTokenAndGetUser(userToken);
-//        authCheck.checkIfRequesterHasStaffPermission(requester);
-        authCheck.checkIfRequesterHasUserPermission(requester);
+        authCheck.checkIfRequesterHasStaffPermission(requester);
 
         return itemDao.getItemsByStuffNameData(stuffName);
     }
 
     public StuffDto postItem(String userToken, String stuffName, Integer amount) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException {
         UserDto requester = authCheck.checkTokenAndGetUser(userToken);
-//        authCheck.checkIfRequesterHasStaffPermission(requester);
-        authCheck.checkIfRequesterHasUserPermission(requester);
+        authCheck.checkIfRequesterHasStaffPermission(requester);
 
         StuffDto targetStuff = stuffDao.getStuffByNameData(stuffName);
 
