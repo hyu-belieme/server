@@ -13,7 +13,6 @@ import javax.persistence.*;
         )
 })
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Getter
 @Setter
 public class MajorEntity implements DataEntity {
@@ -33,13 +32,20 @@ public class MajorEntity implements DataEntity {
 
     @ManyToOne
     @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @Setter(AccessLevel.NONE)
+//    @Setter(AccessLevel.NONE)
     private UniversityEntity university;
 
-    public MajorEntity(int id, int universityId, String code) {
+    public MajorEntity(int universityId, String code,  UniversityEntity university) {
+        this.universityId = universityId;
+        this.code = code;
+        this.university = university;
+    }
+
+    public MajorEntity(int id, int universityId, String code, UniversityEntity university) {
         this.id = id;
         this.universityId = universityId;
         this.code = code;
+        this.university = university;
     }
 
     public MajorDto toMajorDto() {
