@@ -72,7 +72,7 @@ public class UniversityDaoTest {
     }
 
     @Test
-    public void updateNewUniversityTest() throws DataException, NotFoundException {
+    public void updateNewUniversityTest() throws DataException, NotFoundException, ConflictException {
         String targetUnivCode = "HYU";
         UniversityDto newUniversity = new UniversityDto("HYU", "한양대학교", null);
 
@@ -93,7 +93,7 @@ public class UniversityDaoTest {
     }
 
     @Test
-    public void updateNewUniversityWithCodeChangeTest() throws DataException, NotFoundException {
+    public void updateNewUniversityWithCodeChangeTest() throws DataException, NotFoundException, ConflictException {
         String targetUnivCode = "HYU";
         UniversityDto newUniversity = new UniversityDto("HYU-ERICA", "한양대학교 에리카", null);
 

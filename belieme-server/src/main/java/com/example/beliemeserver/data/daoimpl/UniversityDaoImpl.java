@@ -54,7 +54,7 @@ public class UniversityDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto updateUniversityData(String code, UniversityDto newUniversity) throws DataException, NotFoundException {
+    public UniversityDto updateUniversityData(String code, UniversityDto newUniversity) throws DataException, NotFoundException, ConflictException {
         int targetUniversityId = IndexAdapter.getUniversityEntityByCode(universityRepository,code).getId();
 
         UniversityEntity newUniversityEntity = new UniversityEntity(
@@ -63,6 +63,12 @@ public class UniversityDaoImpl implements UniversityDao {
                 newUniversity.getName(),
                 newUniversity.getApiUrl()
         );
+
+        if (!code.equals(newUniversity.getCode())) {
+            if (universityRepository.existsByCode(newUniversity.getCode())) {
+                throw new ConflictException();
+            }
+        }
 
         UniversityEntity savedUniversityEntity = universityRepository.save(newUniversityEntity);
         return savedUniversityEntity.toUniversityDto();

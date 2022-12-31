@@ -11,5 +11,5 @@ public interface UniversityDao {
     List<UniversityDto> getAllUniversitiesData() throws DataException;
     UniversityDto getUniversityByCodeData(String code) throws DataException, NotFoundException;
     UniversityDto addUniversityData(UniversityDto newUniversity) throws DataException, ConflictException;
-    UniversityDto updateUniversityData(String code, UniversityDto newUniversityDto) throws DataException, NotFoundException;
+    UniversityDto updateUniversityData(String code, UniversityDto newUniversityDto) throws DataException, NotFoundException, ConflictException;
 }
