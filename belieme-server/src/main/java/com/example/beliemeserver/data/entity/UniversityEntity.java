@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "university")
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
@@ -26,9 +25,14 @@ public class UniversityEntity implements DataEntity {
     @Column(name = "name")
     private String name;
 
-    @NonNull
     @Column(name = "api_url")
     private String apiUrl;
+
+    public UniversityEntity(String code, String name, String apiUrl) {
+        this.code = code;
+        this.name = name;
+        this.apiUrl = apiUrl;
+    }
 
     public UniversityDto toUniversityDto() {
         return new UniversityDto(
