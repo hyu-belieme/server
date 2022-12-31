@@ -8,9 +8,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "university")
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
-@Setter
 public class UniversityEntity implements DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +27,13 @@ public class UniversityEntity implements DataEntity {
     private String apiUrl;
 
     public UniversityEntity(String code, String name, String apiUrl) {
+        this.code = code;
+        this.name = name;
+        this.apiUrl = apiUrl;
+    }
+
+    public UniversityEntity(int id, String code, String name, String apiUrl) {
+        this.id = id;
         this.code = code;
         this.name = name;
         this.apiUrl = apiUrl;

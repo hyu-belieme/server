@@ -14,14 +14,11 @@ import java.util.List;
         )
 })
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Getter
-@Setter
 public class DepartmentEntity implements DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @Setter(AccessLevel.NONE)
     private int id;
 
     @NonNull
@@ -38,15 +35,19 @@ public class DepartmentEntity implements DataEntity {
 
     @ManyToOne
     @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
-    @Setter(AccessLevel.NONE)
     private UniversityEntity university;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "department")
-    @Setter(AccessLevel.NONE)
     private List<MajorDepartmentJoinEntity> majorDepartmentJoinEntities;
 
     public DepartmentEntity(int id, int universityId, String code, String name) {
         this.id = id;
+        this.universityId = universityId;
+        this.code = code;
+        this.name = name;
+    }
+
+    public DepartmentEntity(int universityId, String code, String name) {
         this.universityId = universityId;
         this.code = code;
         this.name = name;

@@ -14,12 +14,10 @@ import javax.persistence.*;
 })
 @NoArgsConstructor
 @Getter
-@Setter
 public class MajorEntity implements DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @Setter(AccessLevel.NONE)
     private int id;
 
     @NonNull
