@@ -6,7 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "major")
+@Table(name = "major_department_join")
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Getter
