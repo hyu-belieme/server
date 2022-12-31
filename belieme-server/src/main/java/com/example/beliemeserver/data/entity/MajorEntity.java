@@ -32,7 +32,6 @@ public class MajorEntity implements DataEntity {
 
     @ManyToOne
     @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
-//    @Setter(AccessLevel.NONE)
     private UniversityEntity university;
 
     public MajorEntity(int universityId, String code,  UniversityEntity university) {
