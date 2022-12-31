@@ -1,6 +1,7 @@
 package com.example.beliemeserver.data;
 
 import com.example.beliemeserver.model.dao.UniversityDao;
+import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.assertj.core.api.Assertions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -19,22 +21,21 @@ public class UniversityDaoTest {
     @Autowired
     private UniversityDao universityDao;
 
+    private final List<UniversityDto> initialData = List.of(
+            new UniversityDto("HYU", "한양대학교", "https://api.hanyang.ac.kr/oauth/authorize/"),
+            new UniversityDto("CKU", "가톨릭관동대학교", null),
+            new UniversityDto("SNU", "서울대학교", null)
+    );
+
     @Test
     public void getAllUniversitiesTest() throws DataException {
-        List<UniversityDto> expected = List.of(
-                new UniversityDto("HYU", "한양대학교", "https://api.hanyang.ac.kr/oauth/authorize/"),
-                new UniversityDto("CKU", "가톨릭관동대학교", null),
-                new UniversityDto("SNU", "서울대학교", null)
-        );
-
         List<UniversityDto> result = universityDao.getAllUniversitiesData();
-        assertThatAllElementIsEqual(expected, result);
+        assertThatAllElementIsEqual(initialData, result);
     }
 
     @Test
     public void getUniversityByCodeTest() throws DataException, NotFoundException {
-        UniversityDto expected = new UniversityDto("CKU", "가톨릭관동대학교", null);
-
+        UniversityDto expected = findByCodeOnInitialData("CKU");
         UniversityDto result = universityDao.getUniversityByCodeData("CKU");
         Assertions.assertThat(result).isEqualTo(expected);
     }
@@ -49,18 +50,14 @@ public class UniversityDaoTest {
     public void createNewUniversityTest() throws DataException, ConflictException {
         UniversityDto newUniversity = new UniversityDto("KNU", "강원대학교", null);
 
-        List<UniversityDto> expectedDBStatus = universityDao.getAllUniversitiesData();
-        expectedDBStatus.add(newUniversity);
-
         UniversityDto result = universityDao.addUniversityData(newUniversity);
         Assertions.assertThat(result).isEqualTo(newUniversity);
 
-        List<UniversityDto> resultDBStatus = universityDao.getAllUniversitiesData();
-        Assertions.assertThat(resultDBStatus.size()).isEqualTo(expectedDBStatus.size());
+        List<UniversityDto> expectedDBStatus = new ArrayList<>(initialData);
+        expectedDBStatus.add(newUniversity);
 
-        for(UniversityDto universityDto : resultDBStatus) {
-            Assertions.assertThat(expectedDBStatus).contains(universityDto);
-        }
+        List<UniversityDto> resultDBStatus = universityDao.getAllUniversitiesData();
+        assertThatAllElementIsEqual(expectedDBStatus, resultDBStatus);
     }
 
     @Test
@@ -72,24 +69,19 @@ public class UniversityDaoTest {
     }
 
     @Test
-    public void updateNewUniversityTest() throws DataException, NotFoundException, ConflictException {
+    public void updateNewUniversityWithSameCodeTest() throws DataException, NotFoundException, ConflictException {
         String targetUnivCode = "HYU";
         UniversityDto newUniversity = new UniversityDto("HYU", "한양대학교", null);
-
-        List<UniversityDto> expectedDBStatus = universityDao.getAllUniversitiesData();
-
-        expectedDBStatus.removeIf(universityDto -> universityDto.getCode().equals(targetUnivCode));
-        expectedDBStatus.add(newUniversity);
 
         UniversityDto result = universityDao.updateUniversityData(targetUnivCode, newUniversity);
         Assertions.assertThat(result).isEqualTo(newUniversity);
 
-        List<UniversityDto> resultDBStatus = universityDao.getAllUniversitiesData();
-        Assertions.assertThat(resultDBStatus.size()).isEqualTo(expectedDBStatus.size());
+        List<UniversityDto> expectedDBStatus = new ArrayList<>(initialData);
+        expectedDBStatus.removeIf(universityDto -> universityDto.getCode().equals(targetUnivCode));
+        expectedDBStatus.add(newUniversity);
 
-        for(UniversityDto universityDto : resultDBStatus) {
-            Assertions.assertThat(expectedDBStatus).contains(universityDto);
-        }
+        List<UniversityDto> resultDBStatus = universityDao.getAllUniversitiesData();
+        assertThatAllElementIsEqual(expectedDBStatus, resultDBStatus);
     }
 
     @Test
@@ -97,20 +89,15 @@ public class UniversityDaoTest {
         String targetUnivCode = "HYU";
         UniversityDto newUniversity = new UniversityDto("HYU-ERICA", "한양대학교 에리카", null);
 
-        List<UniversityDto> expectedDBStatus = universityDao.getAllUniversitiesData();
-
-        expectedDBStatus.removeIf(universityDto -> universityDto.getCode().equals(targetUnivCode));
-        expectedDBStatus.add(newUniversity);
-
         UniversityDto result = universityDao.updateUniversityData(targetUnivCode, newUniversity);
         Assertions.assertThat(result).isEqualTo(newUniversity);
 
-        List<UniversityDto> resultDBStatus = universityDao.getAllUniversitiesData();
-        Assertions.assertThat(resultDBStatus.size()).isEqualTo(expectedDBStatus.size());
+        List<UniversityDto> expectedDBStatus =  new ArrayList<>(initialData);
+        expectedDBStatus.removeIf(universityDto -> universityDto.getCode().equals(targetUnivCode));
+        expectedDBStatus.add(newUniversity);
 
-        for(UniversityDto universityDto : resultDBStatus) {
-            Assertions.assertThat(expectedDBStatus).contains(universityDto);
-        }
+        List<UniversityDto> resultDBStatus = universityDao.getAllUniversitiesData();
+        assertThatAllElementIsEqual(expectedDBStatus, resultDBStatus);
     }
 
     @Test
@@ -127,6 +114,15 @@ public class UniversityDaoTest {
 
         Assertions.assertThatThrownBy(() -> universityDao.updateUniversityData("SNU", newUniversity))
                 .isInstanceOf(ConflictException.class);
+    }
+
+    private UniversityDto findByCodeOnInitialData(String code) {
+        for(UniversityDto universityDto : initialData) {
+            if(universityDto.getCode().equals(code)) {
+                return universityDto;
+            }
+        }
+        return null;
     }
 
     private void assertThatAllElementIsEqual(List<UniversityDto> expected, List<UniversityDto> result) {
