@@ -4,6 +4,7 @@ import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InitialData {
@@ -24,23 +25,23 @@ public class InitialData {
             new MajorDto(universityDummies.get(1), "A70")
     );
 
-    private static final List<MajorDto> hyuCseBaseMajors = List.of(
+    private static final List<MajorDto> HYU_CSE_BASE_MAJORS = List.of(
             majorDummies.get(0),
             majorDummies.get(1)
     );
 
-    private static final List<MajorDto> hyuStudentUnionBaseMajors = List.of(
+    private static final List<MajorDto> HYU_STU_BASE_MAJORS = List.of(
             majorDummies.get(0),
             majorDummies.get(1),
             majorDummies.get(2),
             majorDummies.get(4)
     );
 
-    private static final List<MajorDto> ckuMedBaseMajors = List.of(
+    private static final List<MajorDto> CKU_MED_BASE_MAJORS = List.of(
             majorDummies.get(5)
     );
 
-    private static final List<MajorDto> ckuStudentUnionBaseMajors = List.of(
+    private static final List<MajorDto> CKU_STU_BASE_MAJORS = List.of(
             majorDummies.get(3),
             majorDummies.get(5),
             majorDummies.get(6),
@@ -48,9 +49,54 @@ public class InitialData {
     );
 
     public static final List<DepartmentDto> departmentDummies = List.of(
-            new DepartmentDto(universityDummies.get(0), "CSE", "컴퓨터소프트웨어학부", hyuCseBaseMajors),
-            new DepartmentDto(universityDummies.get(0), "STU", "총학생회", hyuStudentUnionBaseMajors),
-            new DepartmentDto(universityDummies.get(1), "MED", "의과대학", ckuMedBaseMajors),
-            new DepartmentDto(universityDummies.get(1), "STU", "총학생회", ckuStudentUnionBaseMajors)
+            new DepartmentDto(universityDummies.get(0), "CSE", "컴퓨터소프트웨어학부", HYU_CSE_BASE_MAJORS),
+            new DepartmentDto(universityDummies.get(0), "STU", "총학생회", HYU_STU_BASE_MAJORS),
+            new DepartmentDto(universityDummies.get(1), "MED", "의과대학", CKU_MED_BASE_MAJORS),
+            new DepartmentDto(universityDummies.get(1), "STU", "총학생회", CKU_STU_BASE_MAJORS)
     );
+
+    public static List<UniversityDto> getUniversityDummies() {
+        return new ArrayList<>(universityDummies);
+    }
+
+    public static List<MajorDto> getMajorDummies() {
+        return new ArrayList<>(majorDummies);
+    }
+
+    public static List<DepartmentDto> getDepartmentDummies() {
+        return new ArrayList<>(departmentDummies);
+    }
+
+    public static UniversityDto getUniversityDummy(String universityCode) {
+        for(UniversityDto universityDto : universityDummies) {
+            if(universityCode.equals(universityDto.getCode())) {
+                return universityDto;
+            }
+        }
+        return null;
+    }
+
+    public static MajorDto getMajorDummy(String universityCode, String majorCode) {
+        for(MajorDto majorDto : majorDummies) {
+            if(!universityCode.equals(majorDto.getUniversity().getCode())) {
+                continue;
+            }
+            if(majorCode.equals(majorDto.getCode())) {
+                return majorDto;
+            }
+        }
+        return null;
+    }
+
+    public static DepartmentDto getDepartmentDummy(String universityCode, String departmentCode) {
+        for(DepartmentDto departmentDto : departmentDummies) {
+            if(!universityCode.equals(departmentDto.getUniversity().getCode())) {
+                continue;
+            }
+            if(departmentCode.equals(departmentDto.getCode())) {
+                return departmentDto;
+            }
+        }
+        return null;
+    }
 }

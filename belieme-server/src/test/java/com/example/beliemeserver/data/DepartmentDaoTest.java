@@ -324,6 +324,86 @@ public class DepartmentDaoTest {
                 .isInstanceOf(ConflictException.class);
     }
 
+    @Test
+    public void putBaseMajorOnDepartmentTest() {
+        String targetUniversityCode = "HYU";
+        String targetDepartmentCode = "CSE";
+
+        String newUniversityCode = "HYU";
+        String newMajorCode = "FH04069";
+
+        MajorDto newMajor = InitialData.getMajorDummy(newUniversityCode, newMajorCode);
+
+        DepartmentDto targetDepartment = InitialData.getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
+        List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
+        expectedBaseMajors.add(newMajor);
+
+        DepartmentDto expectedResult = new DepartmentDto(
+                InitialData.getUniversityDummy(targetUniversityCode),
+                targetDepartmentCode,
+                targetDepartment.getName(),
+                expectedBaseMajors
+        );
+
+        try {
+            DepartmentDto result = departmentDao.putBaseMajorOnDepartmentData(targetUniversityCode, targetDepartmentCode, newMajor);
+            Assertions.assertThat(result).isEqualTo(expectedResult);
+
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            expectedDBStatus.removeIf(
+                    departmentDto -> (targetUniversityCode.equals(departmentDto.getUniversity().getCode())
+                            && targetDepartmentCode.equals(departmentDto.getCode()))
+            );
+            expectedDBStatus.add(expectedResult);
+
+            List<DepartmentDto> resultDBStatus = departmentDao.getAllDepartmentsData();
+            assertThatAllElementIsEqual(expectedDBStatus, resultDBStatus);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assert false;
+        }
+    }
+
+    @Test
+    public void removeBaseMajorOnDepartmentTest() {
+        String targetUniversityCode = "HYU";
+        String targetDepartmentCode = "CSE";
+
+        String targetMajorUniversityCode = "HYU";
+        String targetMajorCode = "FH04068";
+
+        MajorDto targetMajor = InitialData.getMajorDummy(targetMajorUniversityCode, targetMajorCode);
+
+        DepartmentDto targetDepartment = InitialData.getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
+        List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
+        expectedBaseMajors.remove(targetMajor);
+
+        DepartmentDto expectedResult = new DepartmentDto(
+                InitialData.getUniversityDummy(targetUniversityCode),
+                targetDepartmentCode,
+                targetDepartment.getName(),
+                expectedBaseMajors
+        );
+
+        try {
+            DepartmentDto result = departmentDao.removeBaseMajorOnDepartmentData(targetUniversityCode, targetDepartmentCode, targetMajor);
+            Assertions.assertThat(result).isEqualTo(expectedResult);
+
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            expectedDBStatus.removeIf(
+                    departmentDto -> (targetUniversityCode.equals(departmentDto.getUniversity().getCode())
+                            && targetDepartmentCode.equals(departmentDto.getCode()))
+            );
+            expectedDBStatus.add(expectedResult);
+
+            List<DepartmentDto> resultDBStatus = departmentDao.getAllDepartmentsData();
+            assertThatAllElementIsEqual(expectedDBStatus, resultDBStatus);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assert false;
+        }
+    }
+
     private void assertThatAllElementIsEqual(List<DepartmentDto> expected, List<DepartmentDto> result) {
         Assertions.assertThat(result.size()).isEqualTo(expected.size());
 
