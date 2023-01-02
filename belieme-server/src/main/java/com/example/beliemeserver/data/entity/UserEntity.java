@@ -22,7 +22,7 @@ import java.util.List;
 @Builder
 @Accessors(chain = true)
 @IdClass(UserId.class)
-public class UserEntity implements Serializable {
+public class UserEntity implements Serializable, DataEntity {
     @Id
     @Column(name = "student_id")
     private String studentId;

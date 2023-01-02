@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Builder
 @Accessors(chain = true)
 @IdClass(StuffId.class)
-public class StuffEntity {
+public class StuffEntity implements DataEntity {
     private static final AtomicInteger counter = new AtomicInteger(1);
 
     public static void setCounter(int initVal) {
