@@ -14,6 +14,7 @@ import java.util.List;
         )
 })
 @NoArgsConstructor
+@ToString
 @Getter
 public class DepartmentEntity implements DataEntity {
     @Id
@@ -37,7 +38,7 @@ public class DepartmentEntity implements DataEntity {
     @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
     private UniversityEntity university;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "department")
+    @OneToMany(mappedBy = "department")
     private List<MajorDepartmentJoinEntity> majorDepartmentJoinEntities;
 
     public DepartmentEntity(int id, int universityId, String code, String name) {

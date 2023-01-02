@@ -34,7 +34,7 @@ public interface DepartmentDao {
             String universityCode,
             String departmentCode,
             MajorDto newBaseMajor
-    ) throws NotFoundException;
+    ) throws NotFoundException, ConflictException;
 
     DepartmentDto removeBaseMajorOnDepartmentData(
             String universityCode,

@@ -3,6 +3,7 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.daoimpl.util.IndexAdapter;
 import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.entity.MajorDepartmentJoinEntity;
+import com.example.beliemeserver.data.entity.MajorEntity;
 import com.example.beliemeserver.data.repository.DepartmentRepository;
 import com.example.beliemeserver.data.repository.MajorDepartmentJoinRepository;
 import com.example.beliemeserver.data.repository.MajorRepository;
@@ -101,25 +102,25 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto putBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto newBaseMajor) throws NotFoundException {
+    public DepartmentDto putBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto newBaseMajor) throws NotFoundException, ConflictException {
         int universityIdForTarget = IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode).getId();
         DepartmentEntity target = IndexAdapter.getDepartmentEntity(departmentRepository, universityIdForTarget, departmentCode);
 
-        int newBaseMajorId = getMajorId(newBaseMajor);
+        MajorEntity newMajorEntity = getMajorEntity(newBaseMajor.getUniversity().getCode(), newBaseMajor.getCode());
+
         for(MajorDepartmentJoinEntity majorDepartmentJoin : target.getMajorDepartmentJoinEntities()) {
-            if(majorDepartmentJoin.getMajorId() == newBaseMajorId) {
-                departmentRepository.refresh(target);
-                return target.toDepartmentDto();
+            if(majorDepartmentJoin.getMajorId() == newMajorEntity.getId()) {
+                throw new ConflictException();
             }
         }
 
         MajorDepartmentJoinEntity newJoin = new MajorDepartmentJoinEntity(
-                newBaseMajorId,
-                target.getId()
+                newMajorEntity.getId(),
+                target.getId(),
+                newMajorEntity,
+                target
         );
         majorDepartmentJoinRepository.save(newJoin);
-
-        departmentRepository.refresh(target);
         return target.toDepartmentDto();
     }
 
@@ -128,26 +129,19 @@ public class DepartmentDaoImpl implements DepartmentDao {
         int universityIdForTarget = IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode).getId();
         DepartmentEntity target = IndexAdapter.getDepartmentEntity(departmentRepository, universityIdForTarget, departmentCode);
 
-        int targetBaseMajorId = getMajorId(targetBaseMajor);
+        int targetBaseMajorId = getMajorEntity(targetBaseMajor.getUniversity().getCode(), targetBaseMajor.getCode()).getId();
         for(MajorDepartmentJoinEntity majorDepartmentJoin : target.getMajorDepartmentJoinEntities()) {
             if(majorDepartmentJoin.getMajorId() == targetBaseMajorId) {
-                majorDepartmentJoinRepository.delete(new MajorDepartmentJoinEntity(
-                        targetBaseMajorId,
-                        target.getId()
-                ));
+                majorDepartmentJoinRepository.delete(majorDepartmentJoin);
+                break;
             }
         }
 
-        departmentRepository.refresh(target);
         return target.toDepartmentDto();
     }
 
-    private int getMajorId(MajorDto major) throws NotFoundException {
-        String newBaseMajorCode = major.getCode();
-        String universityCodeForNewBaseMajor = major.getUniversity().getCode();
-        int universityIdForNewBaseMajor = IndexAdapter.getUniversityEntityByCode(universityRepository, universityCodeForNewBaseMajor).getId();
-        int newBaseMajorId = IndexAdapter.getMajorEntity(majorRepository, universityIdForNewBaseMajor, newBaseMajorCode).getId();
-
-        return newBaseMajorId;
+    private MajorEntity getMajorEntity(String universityCode, String majorCode) throws NotFoundException {
+        int universityId = IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode).getId();
+        return IndexAdapter.getMajorEntity(majorRepository, universityId, majorCode);
     }
 }
