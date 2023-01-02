@@ -43,11 +43,11 @@ public class MajorDepartmentJoinEntity implements DataEntity {
 
     @PreRemove
     private void commitToDepartmentBeforeRemove() {
-        department.getMajorDepartmentJoinEntities().remove(this);
+        department.getBaseMajorJoin().remove(this);
     }
 
     @PrePersist
     private void commitOnDepartmentAfterCreate() {
-        department.getMajorDepartmentJoinEntities().add(this);
+        department.getBaseMajorJoin().add(this);
     }
 }

@@ -28,7 +28,7 @@ public interface DepartmentDao {
             String universityCode,
             String departmentCode,
             DepartmentDto newDepartment
-    ) throws DataException, NotFoundException;
+    ) throws DataException, NotFoundException, ConflictException;
 
     DepartmentDto putBaseMajorOnDepartmentData(
             String universityCode,

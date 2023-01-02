@@ -4,6 +4,7 @@ import com.example.beliemeserver.model.dto.DepartmentDto;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -39,19 +40,23 @@ public class DepartmentEntity implements DataEntity {
     private UniversityEntity university;
 
     @OneToMany(mappedBy = "department")
-    private List<MajorDepartmentJoinEntity> majorDepartmentJoinEntities;
+    private List<MajorDepartmentJoinEntity> baseMajorJoin;
 
-    public DepartmentEntity(int id, int universityId, String code, String name) {
+    public DepartmentEntity(int id, int universityId, String code, String name, UniversityEntity university, List<MajorDepartmentJoinEntity> baseMajorJoin) {
         this.id = id;
         this.universityId = universityId;
         this.code = code;
         this.name = name;
+        this.university = university;
+        this.baseMajorJoin = baseMajorJoin;
     }
 
-    public DepartmentEntity(int universityId, String code, String name) {
+    public DepartmentEntity(int universityId, String code, String name, UniversityEntity university) {
         this.universityId = universityId;
         this.code = code;
         this.name = name;
+        this.university = university;
+        this.baseMajorJoin = new ArrayList<>();
     }
 
     public DepartmentDto toDepartmentDto() {
@@ -61,10 +66,9 @@ public class DepartmentEntity implements DataEntity {
                 name
         );
 
-        for(MajorDepartmentJoinEntity major : majorDepartmentJoinEntities) {
+        for(MajorDepartmentJoinEntity major : baseMajorJoin) {
             output.addBaseMajor(major.getMajor().toMajorDto());
         }
-
         return output;
     }
 }
