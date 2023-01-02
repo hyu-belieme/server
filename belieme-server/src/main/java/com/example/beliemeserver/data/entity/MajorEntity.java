@@ -32,17 +32,21 @@ public class MajorEntity implements DataEntity {
     @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
     private UniversityEntity university;
 
-    public MajorEntity(int universityId, String code,  UniversityEntity university) {
-        this.universityId = universityId;
-        this.code = code;
+    public MajorEntity(UniversityEntity university, String code) {
         this.university = university;
+        this.universityId = university.getId();
+        this.code = code;
     }
 
-    public MajorEntity(int id, int universityId, String code, UniversityEntity university) {
-        this.id = id;
-        this.universityId = universityId;
-        this.code = code;
+    public MajorEntity setUniversity(UniversityEntity university) {
         this.university = university;
+        this.universityId = university.getId();
+        return this;
+    }
+
+    public MajorEntity setCode(String code) {
+        this.code = code;
+        return this;
     }
 
     public MajorDto toMajorDto() {

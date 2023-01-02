@@ -37,18 +37,13 @@ public class MajorDaoImpl implements MajorDao {
     @Override
     public MajorDto addMajorData(MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
         String universityCode = newMajor.getUniversity().getCode();
+        UniversityEntity university = getUniversityEntity(universityCode);
 
-        UniversityEntity university = IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode);
-        String majorCode = newMajor.getCode();
-
-        if(majorRepository.existsByUniversityIdAndCode(university.getId(), majorCode)) {
-            throw new ConflictException();
-        }
+        checkMajorConflict(university.getId(), newMajor.getCode());
 
         MajorEntity newMajorEntity = new MajorEntity(
-                university.getId(),
-                majorCode,
-                university
+                university,
+                newMajor.getCode()
         );
 
         MajorEntity savedMajorEntity = majorRepository.save(newMajorEntity);
@@ -57,24 +52,30 @@ public class MajorDaoImpl implements MajorDao {
 
     @Override
     public MajorDto updateMajorData(String universityCode, String majorCode, MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
-        UniversityEntity oldUniversity = IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode);
-        MajorEntity target = IndexAdapter.getMajorEntity(majorRepository, oldUniversity.getId(), majorCode);
+        MajorEntity target = getMajorEntity(universityCode, majorCode);
 
-        String newUniversityCode = newMajor.getUniversity().getCode();
-        UniversityEntity newUniversity = IndexAdapter.getUniversityEntityByCode(universityRepository, newUniversityCode);
+        UniversityEntity newUniversity = getUniversityEntity(newMajor.getUniversity().getCode());
 
-        MajorEntity newMajorEntity = new MajorEntity(
-                target.getId(),
-                newUniversity.getId(),
-                newMajor.getCode(),
-                newUniversity
-        );
+        checkMajorConflict(newUniversity.getId(), newMajor.getCode());
 
-        if(majorRepository.existsByUniversityIdAndCode(newUniversity.getId(), newMajor.getCode())) {
+        target.setUniversity(newUniversity)
+                .setCode(newMajor.getCode());
+
+        return target.toMajorDto();
+    }
+
+    private void checkMajorConflict(int universityId, String majorCode) throws ConflictException {
+        if(majorRepository.existsByUniversityIdAndCode(universityId, majorCode)) {
             throw new ConflictException();
         }
+    }
 
-        MajorEntity savedMajorEntity = majorRepository.save(newMajorEntity);
-        return savedMajorEntity.toMajorDto();
+    private UniversityEntity getUniversityEntity(String universityCode) throws NotFoundException {
+        return IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode);
+    }
+
+    private MajorEntity getMajorEntity(String universityCode, String majorCode) throws NotFoundException {
+        int universityId = getUniversityEntity(universityCode).getId();
+        return IndexAdapter.getMajorEntity(majorRepository, universityId, majorCode);
     }
 }

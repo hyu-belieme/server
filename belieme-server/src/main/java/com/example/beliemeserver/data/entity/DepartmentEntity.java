@@ -42,21 +42,28 @@ public class DepartmentEntity implements DataEntity {
     @OneToMany(mappedBy = "department")
     private List<MajorDepartmentJoinEntity> baseMajorJoin;
 
-    public DepartmentEntity(int id, int universityId, String code, String name, UniversityEntity university, List<MajorDepartmentJoinEntity> baseMajorJoin) {
-        this.id = id;
-        this.universityId = universityId;
+    public DepartmentEntity(UniversityEntity university, String code, String name) {
         this.code = code;
         this.name = name;
         this.university = university;
-        this.baseMajorJoin = baseMajorJoin;
+        this.universityId = university.getId();
+        this.baseMajorJoin = new ArrayList<>();
     }
 
-    public DepartmentEntity(int universityId, String code, String name, UniversityEntity university) {
-        this.universityId = universityId;
-        this.code = code;
-        this.name = name;
+    public DepartmentEntity setUniversity(UniversityEntity university) {
         this.university = university;
-        this.baseMajorJoin = new ArrayList<>();
+        this.universityId = university.getId();
+        return this;
+    }
+
+    public DepartmentEntity setCode(String code) {
+        this.code = code;
+        return this;
+    }
+
+    public DepartmentEntity setName(String name) {
+        this.name = name;
+        return this;
     }
 
     public DepartmentDto toDepartmentDto() {

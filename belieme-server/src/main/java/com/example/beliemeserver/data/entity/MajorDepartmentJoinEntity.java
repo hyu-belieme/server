@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Table(name = "major_department_join")
 @NoArgsConstructor
 @Getter
-@Setter
 @ToString
 public class MajorDepartmentJoinEntity implements DataEntity {
     @Id
@@ -34,11 +33,11 @@ public class MajorDepartmentJoinEntity implements DataEntity {
     @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
     private DepartmentEntity department;
 
-    public MajorDepartmentJoinEntity(int majorId, int departmentId, MajorEntity major, DepartmentEntity department) {
-        this.majorId = majorId;
-        this.departmentId = departmentId;
+    public MajorDepartmentJoinEntity(MajorEntity major, DepartmentEntity department) {
         this.major = major;
+        this.majorId = major.getId();
         this.department = department;
+        this.departmentId = department.getId();
     }
 
     @PreRemove
