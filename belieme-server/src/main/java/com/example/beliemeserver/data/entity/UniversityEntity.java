@@ -32,11 +32,19 @@ public class UniversityEntity implements DataEntity {
         this.apiUrl = apiUrl;
     }
 
-    public UniversityEntity(int id, String code, String name, String apiUrl) {
-        this.id = id;
+    public UniversityEntity setCode(String code) {
         this.code = code;
+        return this;
+    }
+
+    public UniversityEntity setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public UniversityEntity setApiUrl(String apiUrl) {
         this.apiUrl = apiUrl;
+        return this;
     }
 
     public UniversityDto toUniversityDto() {

@@ -32,16 +32,14 @@ public class UniversityDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto getUniversityByCodeData(String code) throws DataException, NotFoundException {
-        UniversityEntity targetUniversity = IndexAdapter.getUniversityEntityByCode(universityRepository,code);
+    public UniversityDto getUniversityByCodeData(String universityCode) throws DataException, NotFoundException {
+        UniversityEntity targetUniversity = getUniversityEntity(universityCode);
         return targetUniversity.toUniversityDto();
     }
 
     @Override
     public UniversityDto addUniversityData(UniversityDto newUniversity) throws DataException, ConflictException {
-        if(universityRepository.existsByCode(newUniversity.getCode())) {
-            throw new ConflictException();
-        }
+        checkUniversityConflict(newUniversity.getCode());
 
         UniversityEntity newUniversityEntity = new UniversityEntity(
                 newUniversity.getCode(),
@@ -54,23 +52,30 @@ public class UniversityDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto updateUniversityData(String code, UniversityDto newUniversity) throws DataException, NotFoundException, ConflictException {
-        int targetUniversityId = IndexAdapter.getUniversityEntityByCode(universityRepository,code).getId();
-
-        UniversityEntity newUniversityEntity = new UniversityEntity(
-                targetUniversityId,
-                newUniversity.getCode(),
-                newUniversity.getName(),
-                newUniversity.getApiUrl()
-        );
-
-        if (!code.equals(newUniversity.getCode())) {
-            if (universityRepository.existsByCode(newUniversity.getCode())) {
-                throw new ConflictException();
-            }
+    public UniversityDto updateUniversityData(String universityCode, UniversityDto newUniversity) throws DataException, NotFoundException, ConflictException {
+        UniversityEntity target = getUniversityEntity(universityCode);
+        if (doesIndexOfUniversityChange(universityCode, newUniversity)) {
+            checkUniversityConflict(newUniversity.getCode());
         }
 
-        UniversityEntity savedUniversityEntity = universityRepository.save(newUniversityEntity);
-        return savedUniversityEntity.toUniversityDto();
+        target.setCode(newUniversity.getCode())
+                .setName(newUniversity.getName())
+                .setApiUrl(newUniversity.getApiUrl());
+
+        return target.toUniversityDto();
+    }
+
+    private boolean doesIndexOfUniversityChange(String oldUniversityCode, UniversityDto newUniversity) {
+        return !oldUniversityCode.equals(newUniversity.getCode());
+    }
+
+    private void checkUniversityConflict(String universityCode) throws ConflictException {
+        if (universityRepository.existsByCode(universityCode)) {
+            throw new ConflictException();
+        }
+    }
+
+    private UniversityEntity getUniversityEntity(String universityCode) throws NotFoundException {
+        return IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode);
     }
 }
