@@ -3,15 +3,15 @@ package com.example.beliemeserver.data.entity.old;
 import com.example.beliemeserver.data.entity.DataEntity;
 import com.example.beliemeserver.data.entity.id.*;
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
-import com.example.beliemeserver.model.dto.old.HistoryDto;
-import com.example.beliemeserver.model.dto.old.UserDto;
+import com.example.beliemeserver.model.dto.old.OldHistoryDto;
+import com.example.beliemeserver.model.dto.old.OldUserDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "history")
+@Table(name = "old_history")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,8 +19,8 @@ import javax.persistence.*;
 @ToString
 @Builder
 @Accessors(chain = true)
-@IdClass(HistoryId.class)
-public class HistoryEntity implements DataEntity {
+@IdClass(OldHistoryId.class)
+public class OldHistoryEntity implements DataEntity {
     @Id
     @Column(name = "stuff_id")
     private int stuffId;
@@ -34,7 +34,7 @@ public class HistoryEntity implements DataEntity {
             @JoinColumn(name = "stuff_id", referencedColumnName = "stuff_id", insertable = false, updatable = false),
             @JoinColumn(name = "item_num", referencedColumnName = "num", insertable = false, updatable = false)
     })
-    private ItemEntity item;
+    private OldItemEntity item;
 
     @Id
     @Column(name = "num")
@@ -57,23 +57,23 @@ public class HistoryEntity implements DataEntity {
 
     @ManyToOne
     @JoinColumn(name = "requester_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity requester;
+    private OldUserEntity requester;
 
     @ManyToOne
     @JoinColumn(name = "approve_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity approveManager;
+    private OldUserEntity approveManager;
 
     @ManyToOne
     @JoinColumn(name = "return_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity returnManager;
+    private OldUserEntity returnManager;
 
     @ManyToOne
     @JoinColumn(name = "lost_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity lostManager;
+    private OldUserEntity lostManager;
 
     @ManyToOne
     @JoinColumn(name = "cancel_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity cancelManager;
+    private OldUserEntity cancelManager;
 
     @Column(name = "reserved_time_stamp")
     private long reservedTimeStamp;
@@ -90,12 +90,12 @@ public class HistoryEntity implements DataEntity {
     @Column(name = "cancel_time_stamp")
     private long cancelTimeStamp;
 
-    public HistoryDto toHistoryDto() throws FormatDoesNotMatchException {
-        UserDto requesterDto = null;
-        UserDto approveManagerDto = null;
-        UserDto returnManagerDto = null;
-        UserDto lostManagerDto = null;
-        UserDto cancelManagerDto = null;
+    public OldHistoryDto toHistoryDto() throws FormatDoesNotMatchException {
+        OldUserDto requesterDto = null;
+        OldUserDto approveManagerDto = null;
+        OldUserDto returnManagerDto = null;
+        OldUserDto lostManagerDto = null;
+        OldUserDto cancelManagerDto = null;
 
         if(requester != null) {
             requesterDto = requester.toUserDto();
@@ -113,7 +113,7 @@ public class HistoryEntity implements DataEntity {
             cancelManagerDto = cancelManager.toUserDto();
         }
 
-        return HistoryDto.builder()
+        return OldHistoryDto.builder()
                 .item(item.toItemDto())
                 .num(num)
                 .requester(requesterDto)
@@ -129,12 +129,12 @@ public class HistoryEntity implements DataEntity {
                 .build();
     }
 
-    public HistoryDto toHistoryDtoNestedToItem() throws FormatDoesNotMatchException {
-        UserDto requesterDto = null;
-        UserDto approveManagerDto = null;
-        UserDto returnManagerDto = null;
-        UserDto lostManagerDto = null;
-        UserDto cancelManagerDto = null;
+    public OldHistoryDto toHistoryDtoNestedToItem() throws FormatDoesNotMatchException {
+        OldUserDto requesterDto = null;
+        OldUserDto approveManagerDto = null;
+        OldUserDto returnManagerDto = null;
+        OldUserDto lostManagerDto = null;
+        OldUserDto cancelManagerDto = null;
 
         if(requester != null) {
             requesterDto = requester.toUserDto();
@@ -151,7 +151,7 @@ public class HistoryEntity implements DataEntity {
         if(cancelManager != null) {
             cancelManagerDto = cancelManager.toUserDto();
         }
-        return HistoryDto.builder()
+        return OldHistoryDto.builder()
                 .item(null)
                 .num(num)
                 .requester(requesterDto)

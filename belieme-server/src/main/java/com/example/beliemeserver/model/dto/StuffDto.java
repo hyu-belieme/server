@@ -40,4 +40,8 @@ public class StuffDto {
         }
         return count;
     }
+
+    public void addItem(ItemDto item) {
+        items.add(item);
+    }
 }

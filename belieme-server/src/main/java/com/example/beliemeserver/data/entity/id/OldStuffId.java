@@ -9,7 +9,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class ItemId implements Serializable  {
-    private int stuffId;
-    private int num;
+public class OldStuffId implements Serializable {
+    private int id;
 }

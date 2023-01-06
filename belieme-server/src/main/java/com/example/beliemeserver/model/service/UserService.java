@@ -7,8 +7,8 @@ import com.example.beliemeserver.model.util.HttpRequest;
 import com.example.beliemeserver.model.dao.old.AuthorityDao;
 import com.example.beliemeserver.model.dao.old.UserDao;
 
-import com.example.beliemeserver.model.dto.old.AuthorityDto;
-import com.example.beliemeserver.model.dto.old.UserDto;
+import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
+import com.example.beliemeserver.model.dto.old.OldUserDto;
 
 import com.example.beliemeserver.model.exception.*;
 import org.json.simple.JSONObject;
@@ -33,7 +33,7 @@ public class UserService {
         this.authCheck = new AuthCheck(userDao);
     }
 
-    public UserDto getUserInfoFromUnivApiByApiToken(String apiToken) throws DataException, ConflictException, NotFoundException, ForbiddenException, BadGateWayException {
+    public OldUserDto getUserInfoFromUnivApiByApiToken(String apiToken) throws DataException, ConflictException, NotFoundException, ForbiddenException, BadGateWayException {
         String studentId, name, sosokId;
         if(apiToken.equals(Globals.developerApiToken)) {
             studentId = "dev";
@@ -46,12 +46,12 @@ public class UserService {
             sosokId = (String) jsonResponse.get("sosokId");
         }
 
-        UserDto savedUser = setUserAndUpdateDB(studentId, name);
+        OldUserDto savedUser = setUserAndUpdateDB(studentId, name);
 
         if(savedUser.getMaxPermission() == null) {
-            AuthorityDto newAuthority;
+            OldAuthorityDto newAuthority;
             if(apiToken.equals(Globals.developerApiToken)) {
-                newAuthority = addAuthority(savedUser, AuthorityDto.Permission.DEVELOPER);
+                newAuthority = addAuthority(savedUser, OldAuthorityDto.Permission.DEVELOPER);
             } else {
                 newAuthority = checkAndAddUserAuthority(savedUser, sosokId);
             }
@@ -61,17 +61,17 @@ public class UserService {
         return savedUser;
     }
 
-    public UserDto getUserByUserToken(String userToken) throws DataException, UnauthorizedException {
+    public OldUserDto getUserByUserToken(String userToken) throws DataException, UnauthorizedException {
         return authCheck.checkTokenAndGetUser(userToken);
     }
 
-    public UserDto makeUserHavePermission(String userToken, String studentId, AuthorityDto.Permission permission) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException, MethodNotAllowedException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldUserDto makeUserHavePermission(String userToken, String studentId, OldAuthorityDto.Permission permission) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException, MethodNotAllowedException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasDeveloperPermission(requester);
 
-        UserDto target = userDao.getUserByStudentIdData(studentId);
+        OldUserDto target = userDao.getUserByStudentIdData(studentId);
 
-        if(target.getMaxPermission() == AuthorityDto.Permission.DEVELOPER) {
+        if(target.getMaxPermission() == OldAuthorityDto.Permission.DEVELOPER) {
             throw new MethodNotAllowedException("DEVELOPER의 권한을 변경할 수 없습니다.");
         } else if(target.getMaxPermission() == null) {
             addAuthority(target, permission);
@@ -103,15 +103,15 @@ public class UserService {
         return jsonResponse;
     }
 
-    private UserDto setUserAndUpdateDB(String studentId, String name) throws DataException, ConflictException, NotFoundException {
+    private OldUserDto setUserAndUpdateDB(String studentId, String name) throws DataException, ConflictException, NotFoundException {
         boolean isNew = false;
 
-        UserDto newUser;
+        OldUserDto newUser;
         try {
             newUser = userDao.getUserByStudentIdData(studentId);
         } catch (NotFoundException e) {
             isNew = true;
-            newUser = new UserDto();
+            newUser = new OldUserDto();
             newUser.setCreateTimeStampNow();
         }
 
@@ -127,16 +127,16 @@ public class UserService {
         }
     }
 
-    private AuthorityDto checkAndAddUserAuthority(UserDto savedUser, String sosokId) throws ConflictException, DataException, ForbiddenException {
+    private OldAuthorityDto checkAndAddUserAuthority(OldUserDto savedUser, String sosokId) throws ConflictException, DataException, ForbiddenException {
         if(CSE_SOSOK_ID.contains(sosokId)) {
-            return addAuthority(savedUser, AuthorityDto.Permission.USER);
+            return addAuthority(savedUser, OldAuthorityDto.Permission.USER);
         } else {
             throw new ForbiddenException("You're not CSE student.");
         }
     }
 
-    private AuthorityDto addAuthority(UserDto savedUser, AuthorityDto.Permission permission) throws ConflictException, DataException {
-        AuthorityDto newAuthority = AuthorityDto.builder()
+    private OldAuthorityDto addAuthority(OldUserDto savedUser, OldAuthorityDto.Permission permission) throws ConflictException, DataException {
+        OldAuthorityDto newAuthority = OldAuthorityDto.builder()
                 .permission(permission)
                 .userDto(savedUser)
                 .build();
@@ -144,8 +144,8 @@ public class UserService {
         return authorityDao.addAuthorityData(newAuthority);
     }
 
-    private AuthorityDto updateAuthority(UserDto savedUser, AuthorityDto.Permission permission) throws DataException {
-        AuthorityDto newAuthority = AuthorityDto.builder()
+    private OldAuthorityDto updateAuthority(OldUserDto savedUser, OldAuthorityDto.Permission permission) throws DataException {
+        OldAuthorityDto newAuthority = OldAuthorityDto.builder()
                 .permission(permission)
                 .userDto(savedUser)
                 .build();

@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.dao.old;
 
-import com.example.beliemeserver.model.dto.old.ItemDto;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.NotFoundException;
@@ -8,8 +8,8 @@ import com.example.beliemeserver.model.exception.NotFoundException;
 import java.util.List;
 
 public interface ItemDao {
-    public List<ItemDto> getItemsByStuffNameData(String stuffName) throws DataException;
-    ItemDto getItemByStuffNameAndItemNumData(String stuffName, int itemNum) throws NotFoundException, DataException;
-    public ItemDto addItemData(ItemDto newItem) throws ConflictException, NotFoundException, DataException;
-    public ItemDto updateItemData(String stuffName, int itemNum, ItemDto itemDto) throws NotFoundException, DataException;
+    public List<OldItemDto> getItemsByStuffNameData(String stuffName) throws DataException;
+    OldItemDto getItemByStuffNameAndItemNumData(String stuffName, int itemNum) throws NotFoundException, DataException;
+    public OldItemDto addItemData(OldItemDto newItem) throws ConflictException, NotFoundException, DataException;
+    public OldItemDto updateItemData(String stuffName, int itemNum, OldItemDto itemDto) throws NotFoundException, DataException;
 }

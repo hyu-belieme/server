@@ -4,15 +4,15 @@ import com.example.beliemeserver.data.entity.DataEntity;
 import com.example.beliemeserver.data.entity.id.*;
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 
-import com.example.beliemeserver.model.dto.old.HistoryDto;
-import com.example.beliemeserver.model.dto.old.ItemDto;
+import com.example.beliemeserver.model.dto.old.OldHistoryDto;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "item")
+@Table(name = "old_item")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,15 +20,15 @@ import javax.persistence.*;
 @ToString
 @Builder
 @Accessors(chain = true)
-@IdClass(ItemId.class)
-public class ItemEntity implements DataEntity {
+@IdClass(OldItemId.class)
+public class OldItemEntity implements DataEntity {
     @Id
     @Column(name = "stuff_id")
     private int stuffId;
 
     @ManyToOne
     @JoinColumn(name = "stuff_id", referencedColumnName = "id", insertable = false, updatable = false)
-    private StuffEntity stuff;
+    private OldStuffEntity stuff;
 
     @Id
     @Column(name = "num")
@@ -46,32 +46,32 @@ public class ItemEntity implements DataEntity {
             @JoinColumn(name = "num", referencedColumnName = "item_num", insertable = false, updatable = false),
             @JoinColumn(name = "last_history_num", referencedColumnName = "num", insertable = false, updatable = false)
     })
-    private HistoryEntity lastHistory;
+    private OldHistoryEntity lastHistory;
 
     public int getAndIncrementNextHistoryNum() {
         return nextHistoryNum++;
     }
 
-    public ItemDto toItemDto() throws FormatDoesNotMatchException {
-        HistoryDto lastHistoryDto = null;
+    public OldItemDto toItemDto() throws FormatDoesNotMatchException {
+        OldHistoryDto lastHistoryDto = null;
         if(lastHistory != null) {
             lastHistoryDto = lastHistory.toHistoryDtoNestedToItem();
         }
 
-        return ItemDto.builder()
+        return OldItemDto.builder()
                 .stuff(stuff.toStuffDto())
                 .num(num)
                 .lastHistory(lastHistoryDto)
                 .build();
     }
 
-    public ItemDto toItemDtoNestedToStuff() throws FormatDoesNotMatchException {
-        HistoryDto lastHistoryDto = null;
+    public OldItemDto toItemDtoNestedToStuff() throws FormatDoesNotMatchException {
+        OldHistoryDto lastHistoryDto = null;
         if(lastHistory != null) {
             lastHistoryDto = lastHistory.toHistoryDtoNestedToItem();
         }
 
-        return ItemDto.builder()
+        return OldItemDto.builder()
                 .stuff(null)
                 .num(num)
                 .lastHistory(lastHistoryDto)

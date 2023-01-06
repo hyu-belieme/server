@@ -4,8 +4,8 @@ import com.example.beliemeserver.data.entity.DataEntity;
 import com.example.beliemeserver.data.entity.id.*;
 
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
-import com.example.beliemeserver.model.dto.old.ItemDto;
-import com.example.beliemeserver.model.dto.old.StuffDto;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
+import com.example.beliemeserver.model.dto.old.OldStuffDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
-@Table(name = "stuff",
+@Table(name = "old_stuff",
         uniqueConstraints={
         @UniqueConstraint(
                 name = "stuff_name",
@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ToString
 @Builder
 @Accessors(chain = true)
-@IdClass(StuffId.class)
-public class StuffEntity implements DataEntity {
+@IdClass(OldStuffId.class)
+public class OldStuffEntity implements DataEntity {
     private static final AtomicInteger counter = new AtomicInteger(1);
 
     public static void setCounter(int initVal) {
@@ -54,9 +54,9 @@ public class StuffEntity implements DataEntity {
     private int nextItemNum;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "stuff")
-    private List<ItemEntity> items;
+    private List<OldItemEntity> items;
 
-    private StuffEntity(int id, String name, String emoji, int nextItemNum, List<ItemEntity> items) {
+    private OldStuffEntity(int id, String name, String emoji, int nextItemNum, List<OldItemEntity> items) {
         this.items = new ArrayList<>();
         this.id = id;
         this.name = name;
@@ -68,7 +68,7 @@ public class StuffEntity implements DataEntity {
         }
     }
 
-    public StuffEntity() {
+    public OldStuffEntity() {
         items = new ArrayList<>();
     }
 
@@ -76,14 +76,14 @@ public class StuffEntity implements DataEntity {
         return nextItemNum++;
     }
 
-    public StuffDto toStuffDto() throws FormatDoesNotMatchException {
-        List<ItemDto> itemDtoList = new ArrayList<>();
-        Iterator<ItemEntity> iterator = items.iterator();
+    public OldStuffDto toStuffDto() throws FormatDoesNotMatchException {
+        List<OldItemDto> itemDtoList = new ArrayList<>();
+        Iterator<OldItemEntity> iterator = items.iterator();
         while (iterator.hasNext()) {
             itemDtoList.add(iterator.next().toItemDtoNestedToStuff());
         }
 
-        return StuffDto.builder()
+        return OldStuffDto.builder()
                 .name(name)
                 .emoji(emoji)
                 .items(itemDtoList)

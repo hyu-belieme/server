@@ -1,6 +1,6 @@
 package com.example.beliemeserver.controller.responsebody;
 
-import com.example.beliemeserver.model.dto.old.HistoryDto;
+import com.example.beliemeserver.model.dto.old.OldHistoryDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -64,7 +64,7 @@ public class HistoryResponse extends JSONResponse {
         return new HistoryResponse(item.toItemResponseWithoutLastHistory(), num, requester, approveManager, returnManager, lostManager, cancelManager, reservedTimeStamp, approveTimeStamp, returnTimeStamp, lostTimeStamp, cancelTimeStamp, status);
     }
 
-    public static HistoryResponse from(HistoryDto historyDto) {
+    public static HistoryResponse from(OldHistoryDto historyDto) {
         HistoryResponse historyResponse = new HistoryResponse(
                 ItemResponse.responseWillBeIgnore(), historyDto.getNum(), null, null,
                 null, null, null, historyDto.getReservedTimeStamp(),

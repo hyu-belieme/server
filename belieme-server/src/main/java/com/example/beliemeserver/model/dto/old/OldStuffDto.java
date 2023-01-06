@@ -13,16 +13,16 @@ import java.util.List;
 @ToString
 @Builder
 @Accessors(chain = true)
-public class StuffDto {
+public class OldStuffDto {
     private String name;
     private String emoji;
-    private List<ItemDto> items;
+    private List<OldItemDto> items;
     private int nextItemNum;
 
     public int getAmount() {
         int amount = 0;
         for(int i = 0; i < items.size(); i++) {
-            if(items.get(i).getStatus() == ItemDto.ItemStatus.USABLE || items.get(i).getStatus() == ItemDto.ItemStatus.UNUSABLE) {
+            if(items.get(i).getStatus() == OldItemDto.ItemStatus.USABLE || items.get(i).getStatus() == OldItemDto.ItemStatus.UNUSABLE) {
                 amount++;
             }
         }
@@ -32,7 +32,7 @@ public class StuffDto {
     public int getCount() {
         int count = 0;
         for(int i = 0; i < items.size(); i++) {
-            if(items.get(i).getStatus() == ItemDto.ItemStatus.USABLE) {
+            if(items.get(i).getStatus() == OldItemDto.ItemStatus.USABLE) {
                 count++;
             }
         }

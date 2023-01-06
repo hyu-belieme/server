@@ -9,8 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class HistoryId implements Serializable {
+public class OldItemId implements Serializable  {
     private int stuffId;
-    private int itemNum;
     private int num;
 }

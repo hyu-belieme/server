@@ -9,6 +9,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class AuthorityId implements Serializable {
-    private UserId user;
+public class OldAuthorityId implements Serializable {
+    private OldUserId user;
 }

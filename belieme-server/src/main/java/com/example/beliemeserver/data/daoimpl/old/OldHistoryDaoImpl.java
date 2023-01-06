@@ -1,15 +1,15 @@
 package com.example.beliemeserver.data.daoimpl.old;
 
-import com.example.beliemeserver.data.entity.old.HistoryEntity;
-import com.example.beliemeserver.data.entity.old.ItemEntity;
-import com.example.beliemeserver.data.entity.old.StuffEntity;
-import com.example.beliemeserver.data.entity.id.HistoryId;
-import com.example.beliemeserver.data.entity.id.ItemId;
-import com.example.beliemeserver.data.repository.old.HistoryRepository;
-import com.example.beliemeserver.data.repository.old.ItemRepository;
-import com.example.beliemeserver.data.repository.old.StuffRepository;
+import com.example.beliemeserver.data.entity.old.OldHistoryEntity;
+import com.example.beliemeserver.data.entity.old.OldItemEntity;
+import com.example.beliemeserver.data.entity.old.OldStuffEntity;
+import com.example.beliemeserver.data.entity.id.OldHistoryId;
+import com.example.beliemeserver.data.entity.id.OldItemId;
+import com.example.beliemeserver.data.repository.old.OldHistoryRepository;
+import com.example.beliemeserver.data.repository.old.OldItemRepository;
+import com.example.beliemeserver.data.repository.old.OldStuffRepository;
 import com.example.beliemeserver.model.dao.old.HistoryDao;
-import com.example.beliemeserver.model.dto.old.HistoryDto;
+import com.example.beliemeserver.model.dto.old.OldHistoryDto;
 import com.example.beliemeserver.model.exception.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,33 +20,33 @@ import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class HistoryDaoImpl implements HistoryDao {
+public class OldHistoryDaoImpl implements HistoryDao {
     @Autowired
-    StuffRepository stuffRepository;
+    OldStuffRepository stuffRepository;
 
     @Autowired
-    ItemRepository itemRepository;
+    OldItemRepository itemRepository;
 
     @Autowired
-    HistoryRepository historyRepository;
+    OldHistoryRepository historyRepository;
 
     @Override
-    public List<HistoryDto> getHistoriesData() throws DataException {
-        List<HistoryDto> historyDtoList = new ArrayList<>();
+    public List<OldHistoryDto> getHistoriesData() throws DataException {
+        List<OldHistoryDto> historyDtoList = new ArrayList<>();
 
-        Iterator<HistoryEntity> iterator = historyRepository.findAll().iterator();
+        Iterator<OldHistoryEntity> iterator = historyRepository.findAll().iterator();
         while(iterator.hasNext()) {
-            HistoryEntity tmp = iterator.next();
+            OldHistoryEntity tmp = iterator.next();
             historyDtoList.add(tmp.toHistoryDto());
         }
         return historyDtoList;
     }
 
     @Override
-    public List<HistoryDto> getHistoriesByRequesterIdData(String requesterId) throws DataException {
-        List<HistoryDto> historyDtoList = new ArrayList<>();
+    public List<OldHistoryDto> getHistoriesByRequesterIdData(String requesterId) throws DataException {
+        List<OldHistoryDto> historyDtoList = new ArrayList<>();
 
-        Iterator<HistoryEntity> iterator = historyRepository.findByRequesterId(requesterId).iterator();
+        Iterator<OldHistoryEntity> iterator = historyRepository.findByRequesterId(requesterId).iterator();
         while(iterator.hasNext()) {
             historyDtoList.add(iterator.next().toHistoryDto());
         }
@@ -54,14 +54,14 @@ public class HistoryDaoImpl implements HistoryDao {
     }
 
     @Override
-    public HistoryDto getHistoryByStuffNameAndItemNumAndHistoryNumData(String stuffName, int itemNum, int historyNum) throws NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
+    public OldHistoryDto getHistoryByStuffNameAndItemNumAndHistoryNumData(String stuffName, int itemNum, int historyNum) throws NotFoundException, DataException {
+        OldStuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
         if(stuffEntity == null) {
             throw new NotFoundException();
         }
 
-        HistoryId historyId = new HistoryId(stuffEntity.getId(), itemNum, historyNum);
-        HistoryEntity historyEntity = historyRepository.findById(historyId).orElse(null);
+        OldHistoryId historyId = new OldHistoryId(stuffEntity.getId(), itemNum, historyNum);
+        OldHistoryEntity historyEntity = historyRepository.findById(historyId).orElse(null);
         if(historyEntity == null) {
             throw new NotFoundException();
         }
@@ -69,25 +69,25 @@ public class HistoryDaoImpl implements HistoryDao {
     }
 
     @Override
-    public HistoryDto addHistoryData(HistoryDto newHistory) throws ConflictException, NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(newHistory.getItem().getStuff().getName()).orElse(null);
+    public OldHistoryDto addHistoryData(OldHistoryDto newHistory) throws ConflictException, NotFoundException, DataException {
+        OldStuffEntity stuffEntity = stuffRepository.findByName(newHistory.getItem().getStuff().getName()).orElse(null);
         if(stuffEntity == null) {
             throw new NotFoundException();
         }
 
-        ItemId itemId = new ItemId(stuffEntity.getId(), newHistory.getItem().getNum());
-        ItemEntity itemEntity = itemRepository.findById(itemId).orElse(null);
+        OldItemId itemId = new OldItemId(stuffEntity.getId(), newHistory.getItem().getNum());
+        OldItemEntity itemEntity = itemRepository.findById(itemId).orElse(null);
         if(itemEntity == null) {
             throw new NotFoundException();
         }
 
         int newHistoryNum = itemEntity.getAndIncrementNextHistoryNum();
-        HistoryId historyId = new HistoryId(stuffEntity.getId(), newHistory.getItem().getNum(), newHistoryNum);
+        OldHistoryId historyId = new OldHistoryId(stuffEntity.getId(), newHistory.getItem().getNum(), newHistoryNum);
         if(historyRepository.existsById(historyId)) {
             throw new ConflictException();
         }
 
-        HistoryEntity newHistoryEntity = HistoryEntity.builder()
+        OldHistoryEntity newHistoryEntity = OldHistoryEntity.builder()
                 .stuffId(itemEntity.getStuffId())
                 .itemNum(itemEntity.getNum())
                 .num(newHistoryNum)
@@ -103,25 +103,25 @@ public class HistoryDaoImpl implements HistoryDao {
                 .cancelTimeStamp(newHistory.getCancelTimeStamp())
                 .build();
 
-        HistoryEntity savedHistoryEntity = historyRepository.save(newHistoryEntity);
+        OldHistoryEntity savedHistoryEntity = historyRepository.save(newHistoryEntity);
         historyRepository.refresh(savedHistoryEntity);
 
         itemEntity.setLastHistoryNum(savedHistoryEntity.getNum());
-        ItemEntity savedItem = itemRepository.save(itemEntity);
+        OldItemEntity savedItem = itemRepository.save(itemEntity);
         itemRepository.refresh(savedItem);
 
         return savedHistoryEntity.toHistoryDto();
     }
 
     @Override
-    public HistoryDto updateHistoryData(String stuffName, int itemNum, int historyNum, HistoryDto newHistory) throws NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
+    public OldHistoryDto updateHistoryData(String stuffName, int itemNum, int historyNum, OldHistoryDto newHistory) throws NotFoundException, DataException {
+        OldStuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
         if(stuffEntity == null) {
             throw new NotFoundException();
         }
 
-        HistoryId historyId = new HistoryId(stuffEntity.getId(), itemNum, historyNum);
-        HistoryEntity target = historyRepository.findById(historyId).orElse(null);
+        OldHistoryId historyId = new OldHistoryId(stuffEntity.getId(), itemNum, historyNum);
+        OldHistoryEntity target = historyRepository.findById(historyId).orElse(null);
         if(target == null) {
             throw new NotFoundException();
         }
@@ -137,7 +137,7 @@ public class HistoryDaoImpl implements HistoryDao {
         target.setLostTimeStamp(newHistory.getLostTimeStamp());
         target.setCancelTimeStamp(newHistory.getCancelTimeStamp());
 
-        HistoryEntity savedHistoryEntity = historyRepository.save(target);
+        OldHistoryEntity savedHistoryEntity = historyRepository.save(target);
         historyRepository.refresh(savedHistoryEntity);
         return savedHistoryEntity.toHistoryDto();
     }

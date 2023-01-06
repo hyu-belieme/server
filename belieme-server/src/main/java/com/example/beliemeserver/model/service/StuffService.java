@@ -3,9 +3,9 @@ package com.example.beliemeserver.model.service;
 import com.example.beliemeserver.model.dao.old.ItemDao;
 import com.example.beliemeserver.model.dao.old.StuffDao;
 import com.example.beliemeserver.model.dao.old.UserDao;
-import com.example.beliemeserver.model.dto.old.ItemDto;
-import com.example.beliemeserver.model.dto.old.StuffDto;
-import com.example.beliemeserver.model.dto.old.UserDto;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
+import com.example.beliemeserver.model.dto.old.OldStuffDto;
+import com.example.beliemeserver.model.dto.old.OldUserDto;
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.util.AuthCheck;
 
@@ -27,41 +27,41 @@ public class StuffService {
         this.authCheck = new AuthCheck(userDao);
     }
 
-    public List<StuffDto> getStuffs(String userToken) throws DataException, UnauthorizedException, ForbiddenException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public List<OldStuffDto> getStuffs(String userToken) throws DataException, UnauthorizedException, ForbiddenException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasUserPermission(requester);
 
         return stuffDao.getStuffsData();
     }
 
-    public StuffDto getStuffByName(String userToken, String name) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldStuffDto getStuffByName(String userToken, String name) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasStaffPermission(requester);
 
         return stuffDao.getStuffByNameData(name);
     }
 
 
-    public List<StuffDto> addStuff(String userToken, String name, String emoji, Integer amount) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, ConflictException, ItCannotBeException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public List<OldStuffDto> addStuff(String userToken, String name, String emoji, Integer amount) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, ConflictException, ItCannotBeException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasStaffPermission(requester);
 
         if(amount != null && amount <= 0) {
             throw new BadRequestException("amount는 음수가 될 수 없습니다.");
         }
 
-        StuffDto newStuff = StuffDto.builder()
+        OldStuffDto newStuff = OldStuffDto.builder()
                 .name(name)
                 .emoji(emoji)
                 .build();
-        StuffDto savedStuff = stuffDao.addStuffData(newStuff);
+        OldStuffDto savedStuff = stuffDao.addStuffData(newStuff);
 
         int realAmount = 1;
         if(amount != null) {
             realAmount = amount;
         }
         for(int i = 0; i < realAmount; i++) {
-            ItemDto newItem = ItemDto.builder()
+            OldItemDto newItem = OldItemDto.builder()
                     .stuff(savedStuff)
                     .build();
             try {
@@ -75,15 +75,15 @@ public class StuffService {
         return stuffDao.getStuffsData();
     }
 
-    public StuffDto updateStuff(String userToken, String name, String newName, String newEmoji) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, NotFoundException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldStuffDto updateStuff(String userToken, String name, String newName, String newEmoji) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, NotFoundException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasStaffPermission(requester);
 
         if(newName == null && newEmoji == null) {
             throw new BadRequestException("정보가 부족합니다.\n필요한 정보 : name(String), emoji(String) 중 하나 이상");
         }
 
-        StuffDto newStuff = stuffDao.getStuffByNameData(name);
+        OldStuffDto newStuff = stuffDao.getStuffByNameData(name);
 
         if(newName != null) {
             newStuff.setName(newName);

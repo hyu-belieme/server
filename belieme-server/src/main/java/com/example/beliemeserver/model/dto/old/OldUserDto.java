@@ -13,25 +13,25 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Accessors(chain = true)
-public class UserDto {
+public class OldUserDto {
     private String studentId;
     private String name;
     private String token;
     private long createTimeStamp;
     private long approvalTimeStamp;
-    private List<AuthorityDto> authorities;
+    private List<OldAuthorityDto> authorities;
 
-    public UserDto() {
+    public OldUserDto() {
         authorities = new ArrayList<>();
     }
 
-    public AuthorityDto.Permission getMaxPermission() {
-        AuthorityDto.Permission maxPermission = null;
-        Iterator<AuthorityDto> iterator = authorities.iterator();
+    public OldAuthorityDto.Permission getMaxPermission() {
+        OldAuthorityDto.Permission maxPermission = null;
+        Iterator<OldAuthorityDto> iterator = authorities.iterator();
         while(iterator.hasNext()) {
-            AuthorityDto currentAuthorityDto = iterator.next();
-            if(currentAuthorityDto.getPermission() == AuthorityDto.Permission.BANNED) {
-                return AuthorityDto.Permission.BANNED;
+            OldAuthorityDto currentAuthorityDto = iterator.next();
+            if(currentAuthorityDto.getPermission() == OldAuthorityDto.Permission.BANNED) {
+                return OldAuthorityDto.Permission.BANNED;
             }
             if(maxPermission == null || maxPermission.hasMorePermission(currentAuthorityDto.getPermission())) {
                 maxPermission = currentAuthorityDto.getPermission();
@@ -40,7 +40,7 @@ public class UserDto {
         return maxPermission;
     }
 
-    public void addAuthority(AuthorityDto authorityDto) {
+    public void addAuthority(OldAuthorityDto authorityDto) {
         authorities.add(authorityDto);
     }
 

@@ -1,9 +1,9 @@
 package com.example.beliemeserver.data.daoimpl.old;
 
-import com.example.beliemeserver.data.entity.old.StuffEntity;
-import com.example.beliemeserver.data.repository.old.StuffRepository;
+import com.example.beliemeserver.data.entity.old.OldStuffEntity;
+import com.example.beliemeserver.data.repository.old.OldStuffRepository;
 import com.example.beliemeserver.model.dao.old.StuffDao;
-import com.example.beliemeserver.model.dto.old.StuffDto;
+import com.example.beliemeserver.model.dto.old.OldStuffDto;
 import com.example.beliemeserver.model.exception.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +14,16 @@ import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class StuffDaoImpl implements StuffDao {
+public class OldStuffDaoImpl implements StuffDao {
     @Autowired
-    StuffRepository stuffRepository;
+    OldStuffRepository stuffRepository;
 
     @Override
-    public List<StuffDto> getStuffsData() throws DataException {
-        Iterator<StuffEntity> iterator = stuffRepository.findAll().iterator();
-        List<StuffDto> stuffDtoList = new ArrayList<>();
+    public List<OldStuffDto> getStuffsData() throws DataException {
+        Iterator<OldStuffEntity> iterator = stuffRepository.findAll().iterator();
+        List<OldStuffDto> stuffDtoList = new ArrayList<>();
         while(iterator.hasNext()) {
-            StuffEntity tmp = iterator.next();
+            OldStuffEntity tmp = iterator.next();
 //            tmp.setNextItemNum(tmp.getItems().size()+1);
             stuffDtoList.add(tmp.toStuffDto());
 //            stuffRepository.save(tmp);
@@ -32,8 +32,8 @@ public class StuffDaoImpl implements StuffDao {
     }
 
     @Override
-    public StuffDto getStuffByNameData(String name) throws NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(name).orElse(null);
+    public OldStuffDto getStuffByNameData(String name) throws NotFoundException, DataException {
+        OldStuffEntity stuffEntity = stuffRepository.findByName(name).orElse(null);
         if(stuffEntity == null) {
             throw new NotFoundException();
         }
@@ -41,26 +41,26 @@ public class StuffDaoImpl implements StuffDao {
     }
 
     @Override
-    public StuffDto addStuffData(StuffDto newStuff) throws ConflictException, DataException {
+    public OldStuffDto addStuffData(OldStuffDto newStuff) throws ConflictException, DataException {
         if(stuffRepository.existsByName(newStuff.getName())) {
             throw new ConflictException();
         }
-        StuffEntity newStuffEntity = StuffEntity.builder()
-                .id(StuffEntity.getNextId())
+        OldStuffEntity newStuffEntity = OldStuffEntity.builder()
+                .id(OldStuffEntity.getNextId())
                 .name(newStuff.getName())
                 .emoji(newStuff.getEmoji())
                 .nextItemNum(1)
                 .build();
 
-        StuffEntity savedStuff = stuffRepository.save(newStuffEntity);
+        OldStuffEntity savedStuff = stuffRepository.save(newStuffEntity);
         stuffRepository.refresh(savedStuff);
 
         return savedStuff.toStuffDto();
     }
 
     @Override
-    public StuffDto updateStuffData(String name, StuffDto newStuff) throws NotFoundException, DataException {
-        StuffEntity target = stuffRepository.findByName(name).orElse(null);
+    public OldStuffDto updateStuffData(String name, OldStuffDto newStuff) throws NotFoundException, DataException {
+        OldStuffEntity target = stuffRepository.findByName(name).orElse(null);
 
         if(target == null) {
             throw new NotFoundException();
@@ -68,7 +68,7 @@ public class StuffDaoImpl implements StuffDao {
         target.setName(newStuff.getName());
         target.setEmoji(newStuff.getEmoji());
 
-        StuffEntity savedStuff = stuffRepository.save(target);
+        OldStuffEntity savedStuff = stuffRepository.save(target);
         stuffRepository.refresh(savedStuff);
 
         return savedStuff.toStuffDto();

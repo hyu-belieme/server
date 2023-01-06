@@ -1,10 +1,10 @@
 package com.example.beliemeserver;
 
-import com.example.beliemeserver.data.entity.old.StuffEntity;
-import com.example.beliemeserver.data.repository.old.HistoryRepository;
-import com.example.beliemeserver.data.repository.old.ItemRepository;
-import com.example.beliemeserver.data.repository.old.StuffRepository;
-import com.example.beliemeserver.data.repository.old.UserRepository;
+import com.example.beliemeserver.data.entity.old.OldStuffEntity;
+import com.example.beliemeserver.data.repository.old.OldHistoryRepository;
+import com.example.beliemeserver.data.repository.old.OldItemRepository;
+import com.example.beliemeserver.data.repository.old.OldStuffRepository;
+import com.example.beliemeserver.data.repository.old.OldUserRepository;
 import com.example.beliemeserver.data.repository.custom.RefreshRepositoryImpl;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,18 +22,18 @@ public class BeliemeServerApplication {
 	}
 
 	@Bean
-	public CommandLineRunner run(UserRepository userRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) throws Exception {
+	public CommandLineRunner run(OldUserRepository userRepository, OldStuffRepository stuffRepository, OldItemRepository itemRepository, OldHistoryRepository historyRepository) throws Exception {
 		return (String[] args) -> {
 			int maxId = 0;
-			Iterator<StuffEntity> iterator = stuffRepository.findAll().iterator();
+			Iterator<OldStuffEntity> iterator = stuffRepository.findAll().iterator();
 			while(iterator.hasNext()) {
-				StuffEntity tmp = iterator.next();
+				OldStuffEntity tmp = iterator.next();
 				if (tmp.getId() > maxId) {
 					maxId = tmp.getId();
 				}
 			}
 			System.out.println("#######run###### maxId : " + maxId);
-			StuffEntity.setCounter(maxId+1);
+			OldStuffEntity.setCounter(maxId+1);
 		};
 	}
 }

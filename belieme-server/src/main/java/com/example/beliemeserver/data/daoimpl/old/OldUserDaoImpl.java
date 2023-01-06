@@ -1,10 +1,10 @@
 package com.example.beliemeserver.data.daoimpl.old;
 
-import com.example.beliemeserver.data.entity.old.UserEntity;
-import com.example.beliemeserver.data.entity.id.UserId;
-import com.example.beliemeserver.data.repository.old.UserRepository;
+import com.example.beliemeserver.data.entity.old.OldUserEntity;
+import com.example.beliemeserver.data.entity.id.OldUserId;
+import com.example.beliemeserver.data.repository.old.OldUserRepository;
 import com.example.beliemeserver.model.dao.old.UserDao;
-import com.example.beliemeserver.model.dto.old.UserDto;
+import com.example.beliemeserver.model.dto.old.OldUserDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
@@ -16,15 +16,15 @@ import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class UserDaoImpl implements UserDao {
+public class OldUserDaoImpl implements UserDao {
     @Autowired
-    UserRepository userRepository;
+    OldUserRepository userRepository;
 
     @Override
-    public List<UserDto> getUsersData() throws DataException {
-        Iterator<UserEntity> iterator = userRepository.findAll().iterator();
+    public List<OldUserDto> getUsersData() throws DataException {
+        Iterator<OldUserEntity> iterator = userRepository.findAll().iterator();
 
-        ArrayList<UserDto> userDtoList = new ArrayList<>();
+        ArrayList<OldUserDto> userDtoList = new ArrayList<>();
         while(iterator.hasNext()) {
             userDtoList.add(iterator.next().toUserDto());
         }
@@ -32,8 +32,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto getUserByTokenData(String token) throws NotFoundException, DataException {
-        UserEntity userEntity = userRepository.findWithAuthoritiesByToken(token).orElse(null);
+    public OldUserDto getUserByTokenData(String token) throws NotFoundException, DataException {
+        OldUserEntity userEntity = userRepository.findWithAuthoritiesByToken(token).orElse(null);
         if(userEntity == null) {
             throw new NotFoundException();
         }
@@ -41,8 +41,8 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto getUserByStudentIdData(String studentId) throws NotFoundException, DataException {
-        UserEntity userEntity = userRepository.findWithAuthoritiesByStudentId(studentId).orElse(null);
+    public OldUserDto getUserByStudentIdData(String studentId) throws NotFoundException, DataException {
+        OldUserEntity userEntity = userRepository.findWithAuthoritiesByStudentId(studentId).orElse(null);
         if(userEntity == null) {
             throw new NotFoundException();
         }
@@ -50,21 +50,21 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto addUserData(UserDto user) throws ConflictException, DataException {
-        if(userRepository.existsById(new UserId(user.getStudentId()))) {
+    public OldUserDto addUserData(OldUserDto user) throws ConflictException, DataException {
+        if(userRepository.existsById(new OldUserId(user.getStudentId()))) {
             throw new ConflictException();
         }
 
-        UserEntity savedUser = userRepository.save(UserEntity.from(user));
+        OldUserEntity savedUser = userRepository.save(OldUserEntity.from(user));
         userRepository.refresh(savedUser);
 
         return savedUser.toUserDto();
     }
 
     @Override
-    public UserDto updateUserData(String studentId, UserDto user) throws NotFoundException, DataException {
-        UserEntity target = userRepository.findWithAuthoritiesByStudentId(studentId).orElse(null);
-        UserEntity newUserEntity = UserEntity.from(user);
+    public OldUserDto updateUserData(String studentId, OldUserDto user) throws NotFoundException, DataException {
+        OldUserEntity target = userRepository.findWithAuthoritiesByStudentId(studentId).orElse(null);
+        OldUserEntity newUserEntity = OldUserEntity.from(user);
         if(target == null) {
             throw new NotFoundException();
         }
@@ -74,7 +74,7 @@ public class UserDaoImpl implements UserDao {
         target.setCreateTimeStamp(newUserEntity.getCreateTimeStamp());
         target.setApprovalTimeStamp(newUserEntity.getApprovalTimeStamp());
 
-        UserEntity savedUser = userRepository.save(target);
+        OldUserEntity savedUser = userRepository.save(target);
         userRepository.refresh(savedUser);
 
         return savedUser.toUserDto();

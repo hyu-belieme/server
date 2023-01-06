@@ -1,6 +1,6 @@
 package com.example.beliemeserver.controller.responsebody;
 
-import com.example.beliemeserver.model.dto.old.ItemDto;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +43,7 @@ public class ItemResponse extends JSONResponse {
         return new ItemResponse(stuffName, stuffEmoji, num, HistoryResponse.responseWillBeIgnore(), status);
     }
 
-    public static ItemResponse from(ItemDto itemDto) {
+    public static ItemResponse from(OldItemDto itemDto) {
         ItemResponse itemResponse = new ItemResponse(null, null, itemDto.getNum(), null, itemDto.getStatus().toString());
         if(itemDto.getStuff() != null) {
             itemResponse.setStuffName(itemDto.getStuff().getName());

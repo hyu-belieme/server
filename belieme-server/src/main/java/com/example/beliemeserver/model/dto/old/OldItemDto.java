@@ -11,14 +11,14 @@ import lombok.experimental.Accessors;
 @ToString
 @Builder
 @Accessors(chain = true)
-public class ItemDto {
+public class OldItemDto {
     public enum ItemStatus {
         USABLE, UNUSABLE, INACTIVE, ERROR
     }
 
-    private StuffDto stuff;
+    private OldStuffDto stuff;
     private int num;
-    private HistoryDto lastHistory;
+    private OldHistoryDto lastHistory;
 
     public Integer getLastHistoryNum() {
         if(lastHistory == null) {

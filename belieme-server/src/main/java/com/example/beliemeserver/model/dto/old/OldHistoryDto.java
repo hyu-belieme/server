@@ -15,19 +15,19 @@ import java.util.TimeZone;
 @ToString
 @Builder
 @Accessors(chain = true)
-public class HistoryDto {
+public class OldHistoryDto {
     public enum HistoryStatus {
         REQUESTED, USING, DELAYED, LOST, EXPIRED, RETURNED, FOUND, ERROR
     }
 
-    private ItemDto item;
+    private OldItemDto item;
     private int num;
 
-    private UserDto requester;
-    private UserDto approveManager;
-    private UserDto returnManager;
-    private UserDto lostManager;
-    private UserDto cancelManager;
+    private OldUserDto requester;
+    private OldUserDto approveManager;
+    private OldUserDto returnManager;
+    private OldUserDto lostManager;
+    private OldUserDto cancelManager;
 
     private long reservedTimeStamp;
     private long approveTimeStamp;

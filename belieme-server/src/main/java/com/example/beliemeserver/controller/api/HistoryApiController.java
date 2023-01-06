@@ -7,7 +7,7 @@ import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.service.HistoryService;
-import com.example.beliemeserver.model.dto.old.HistoryDto;
+import com.example.beliemeserver.model.dto.old.OldHistoryDto;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ public class HistoryApiController {
 
     @GetMapping("/histories/")
     public ResponseEntity<List<HistoryResponse>> getAllHistories(@RequestHeader("user-token") String userToken, @RequestParam(name = "studentId", required = false) String studentId) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException {
-        List<HistoryDto> historyList;
+        List<OldHistoryDto> historyList;
         try {
             historyList = historyService.getHistories(userToken, studentId);
         } catch (DataException e) {
@@ -44,7 +44,7 @@ public class HistoryApiController {
 
     @GetMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/")
     public ResponseEntity<HistoryResponse> getHistory(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws InternalServerErrorHttpException, UnauthorizedHttpException, NotFoundHttpException, ForbiddenHttpException {
-        HistoryDto target;
+        OldHistoryDto target;
 
         try {
             target = historyService.getHistoryByStuffNameAndItemNumAndHistoryNum(userToken, stuffName, itemNum, historyNum);
@@ -71,7 +71,7 @@ public class HistoryApiController {
             throw new BadRequestHttpException("'stuff_name'은 필수입니다.('item_num'은 Optional 입니다)");
         }
 
-        HistoryDto savedHistory = null;
+        OldHistoryDto savedHistory = null;
         try {
             savedHistory = historyService.addReserveHistory(userToken, itemRequest.getStuffName(), itemRequest.getItemNum());
         } catch (DataException | ItCannotBeException e) {
@@ -100,7 +100,7 @@ public class HistoryApiController {
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/lost")
     public ResponseEntity<HistoryResponse> postLostHistory(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException, MethodNotAllowedHttpException, ConflictHttpException {
-        HistoryDto savedHistoryDto;
+        OldHistoryDto savedHistoryDto;
         try {
             savedHistoryDto = historyService.addOrEditToLostHistory(userToken, stuffName, itemNum);
         } catch (DataException | ItCannotBeException e) {
@@ -127,7 +127,7 @@ public class HistoryApiController {
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/cancel")
     public ResponseEntity<HistoryResponse> patchHistoryToCancel(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
-        HistoryDto updatedHistory;
+        OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToCanceledHistory(userToken, stuffName, itemNum, historyNum);
         } catch (DataException | ItCannotBeException e) {
@@ -151,7 +151,7 @@ public class HistoryApiController {
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/approve")
     public ResponseEntity<HistoryResponse> patchHistoryToApprove(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
-        HistoryDto updatedHistory;
+        OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToApprovedHistory(userToken, stuffName, itemNum, historyNum);
         } catch (DataException | ItCannotBeException e) {
@@ -175,7 +175,7 @@ public class HistoryApiController {
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/return")
     public ResponseEntity<HistoryResponse> patchHistoryToReturn(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
-        HistoryDto updatedHistory;
+        OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToReturnedHistory(userToken, stuffName, itemNum, historyNum);
         } catch (DataException | ItCannotBeException e) {
@@ -199,7 +199,7 @@ public class HistoryApiController {
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/found")
     public ResponseEntity<HistoryResponse> patchHistoryToFound(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
-        HistoryDto updatedHistory;
+        OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToFoundHistory(userToken, stuffName, itemNum, historyNum);
         } catch (DataException | ItCannotBeException e) {
@@ -221,7 +221,7 @@ public class HistoryApiController {
         return ResponseEntity.ok(HistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
     }
 
-    private List<HistoryResponse> toHistoryResponse(List<HistoryDto> historyDtoList) {
+    private List<HistoryResponse> toHistoryResponse(List<OldHistoryDto> historyDtoList) {
         List<HistoryResponse> historyResponseList = new ArrayList<>();
         for(int i = 0; i < historyDtoList.size(); i++) {
             historyResponseList.add(HistoryResponse.from(historyDtoList.get(i)));

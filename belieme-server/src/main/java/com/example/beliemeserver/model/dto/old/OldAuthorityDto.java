@@ -10,9 +10,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @Builder
 @Accessors(chain = true)
-public class AuthorityDto {
+public class OldAuthorityDto {
     private Permission permission;
-    private UserDto userDto;
+    private OldUserDto userDto;
 
     public enum Permission {
         BANNED, USER, STAFF, MASTER, DEVELOPER;

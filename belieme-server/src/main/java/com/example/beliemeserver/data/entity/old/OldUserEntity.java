@@ -1,10 +1,10 @@
 package com.example.beliemeserver.data.entity.old;
 
 import com.example.beliemeserver.data.entity.DataEntity;
-import com.example.beliemeserver.data.entity.id.UserId;
+import com.example.beliemeserver.data.entity.id.OldUserId;
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
-import com.example.beliemeserver.model.dto.old.AuthorityDto;
-import com.example.beliemeserver.model.dto.old.UserDto;
+import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
+import com.example.beliemeserver.model.dto.old.OldUserDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -15,15 +15,15 @@ import java.util.Iterator;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
+@Table(name = "old_user")
 @Getter
 @Setter
 @AllArgsConstructor
 @ToString
 @Builder
 @Accessors(chain = true)
-@IdClass(UserId.class)
-public class UserEntity implements Serializable, DataEntity {
+@IdClass(OldUserId.class)
+public class OldUserEntity implements Serializable, DataEntity {
     @Id
     @Column(name = "student_id")
     private String studentId;
@@ -41,22 +41,22 @@ public class UserEntity implements Serializable, DataEntity {
     private long approvalTimeStamp;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<AuthorityEntity> authorities;
+    private List<OldAuthorityEntity> authorities;
 
-    public UserEntity() {
+    public OldUserEntity() {
         authorities = new ArrayList<>();
     }
 
-    public UserDto toUserDto() throws FormatDoesNotMatchException {
-        List<AuthorityDto> authorityDtoList = new ArrayList<>();
+    public OldUserDto toUserDto() throws FormatDoesNotMatchException {
+        List<OldAuthorityDto> authorityDtoList = new ArrayList<>();
         if(authorities != null) {
-            Iterator<AuthorityEntity> iterator = authorities.iterator();
+            Iterator<OldAuthorityEntity> iterator = authorities.iterator();
             while (iterator.hasNext()) {
                 authorityDtoList.add(iterator.next().toAuthorityDtoNestedToUser());
             }
         }
 
-        return new UserDto(
+        return new OldUserDto(
                 studentId,
                 name,
                 token,
@@ -66,11 +66,11 @@ public class UserEntity implements Serializable, DataEntity {
         );
     }
 
-    public static UserEntity from(UserDto userDto) {
+    public static OldUserEntity from(OldUserDto userDto) {
         if(userDto == null) {
             return null;
         }
-        return UserEntity.builder()
+        return OldUserEntity.builder()
                 .studentId(userDto.getStudentId())
                 .name(userDto.getName())
                 .token(userDto.getToken())
