@@ -5,9 +5,11 @@ import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class HistoryDaoImpl implements HistoryDao {
     @Override
     public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) throws DataException {

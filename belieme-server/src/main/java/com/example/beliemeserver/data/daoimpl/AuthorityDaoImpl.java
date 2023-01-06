@@ -4,7 +4,9 @@ import com.example.beliemeserver.model.dao.AuthorityDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AuthorityDaoImpl implements AuthorityDao {
     @Override
     public AuthorityDto create(AuthorityDto authority) throws ConflictException, DataException {

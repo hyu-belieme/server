@@ -5,9 +5,11 @@ import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class StuffDaoImpl implements StuffDao {
     @Override
     public List<StuffDto> getListByDepartment(String universityCode, String departmentCode) throws DataException {
