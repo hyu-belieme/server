@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Table(name = "university")
 @NoArgsConstructor
 @Getter
-public class UniversityEntity implements DataEntity {
+public class UniversityEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

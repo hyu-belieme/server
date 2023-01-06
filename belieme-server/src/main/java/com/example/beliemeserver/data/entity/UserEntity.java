@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Getter
-public class UserEntity implements DataEntity {
+public class UserEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

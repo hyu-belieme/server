@@ -20,7 +20,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
-public class ItemEntity implements DataEntity {
+public class ItemEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -52,7 +52,7 @@ public class ItemEntity implements DataEntity {
         this.stuffId = stuff.getId();
         this.num = num;
         this.lastHistory = lastHistory;
-        this.lastHistoryId = getHistoryId(lastHistory);
+        this.lastHistoryId = getIdOrElse(lastHistory, 0);
     }
 
     public void setStuff(StuffEntity stuff) {
@@ -62,7 +62,7 @@ public class ItemEntity implements DataEntity {
 
     public void setLastHistory(HistoryEntity lastHistory) {
         this.lastHistory = lastHistory;
-        this.lastHistoryId = getHistoryId(lastHistory);
+        this.lastHistoryId = getIdOrElse(lastHistory, 0);
     }
 
     public int getAndIncrementNextHistoryNum() {
@@ -92,12 +92,5 @@ public class ItemEntity implements DataEntity {
             return null;
         }
         return lastHistory.toHistoryDtoNestedToItem();
-    }
-
-    private static int getHistoryId(HistoryEntity history) {
-        if(history == null) {
-            return 0;
-        }
-        return history.getId();
     }
 }

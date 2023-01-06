@@ -23,7 +23,7 @@ import java.util.List;
 @Builder
 @Accessors(chain = true)
 @IdClass(OldUserId.class)
-public class OldUserEntity implements Serializable, DataEntity {
+public class OldUserEntity extends DataEntity {
     @Id
     @Column(name = "student_id")
     private String studentId;
@@ -77,5 +77,10 @@ public class OldUserEntity implements Serializable, DataEntity {
                 .createTimeStamp(userDto.getCreateTimeStamp())
                 .approvalTimeStamp(userDto.getApprovalTimeStamp())
                 .build();
+    }
+
+    @Override
+    public int getId() {
+        return 0;
     }
 }

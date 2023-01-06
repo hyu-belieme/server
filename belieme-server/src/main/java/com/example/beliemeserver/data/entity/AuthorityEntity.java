@@ -16,7 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
-public class AuthorityEntity implements DataEntity {
+public class AuthorityEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

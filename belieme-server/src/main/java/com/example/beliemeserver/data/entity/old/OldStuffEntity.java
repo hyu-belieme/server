@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Builder
 @Accessors(chain = true)
 @IdClass(OldStuffId.class)
-public class OldStuffEntity implements DataEntity {
+public class OldStuffEntity extends DataEntity {
     private static final AtomicInteger counter = new AtomicInteger(1);
 
     public static void setCounter(int initVal) {

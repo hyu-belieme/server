@@ -20,7 +20,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
-public class HistoryEntity implements DataEntity {
+public class HistoryEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -116,7 +116,7 @@ public class HistoryEntity implements DataEntity {
 
     public void setItem(ItemEntity item) {
         this.item = item;
-        this.itemId = getItemId(item);
+        this.itemId = getIdOrElse(item, 0);
     }
 
     public void setRequester(UserEntity requester) {
@@ -126,22 +126,22 @@ public class HistoryEntity implements DataEntity {
 
     public void setApproveManager(UserEntity approveManager) {
         this.approveManager = approveManager;
-        this.approveManagerId = getUserId(approveManager);
+        this.approveManagerId = getIdOrElse(approveManager, 0);
     }
 
     public void setReturnManager(UserEntity returnManager) {
         this.returnManager = returnManager;
-        this.returnManagerId = getUserId(returnManager);
+        this.returnManagerId = getIdOrElse(returnManager, 0);
     }
 
     public void setLostManager(UserEntity lostManager) {
         this.lostManager = lostManager;
-        this.lostManagerId = getUserId(lostManager);
+        this.lostManagerId = getIdOrElse(lostManager, 0);
     }
 
     public void setCancelManager(UserEntity cancelManager) {
         this.cancelManager = cancelManager;
-        this.cancelManagerId = getUserId(cancelManager);
+        this.cancelManagerId = getIdOrElse(cancelManager, 0);
     }
 
     public HistoryDto toHistoryDto() throws FormatDoesNotMatchException {
@@ -176,20 +176,6 @@ public class HistoryEntity implements DataEntity {
                 lostTimeStamp,
                 cancelTimeStamp
         );
-    }
-
-    private static int getItemId(ItemEntity user) {
-        if(user == null) {
-            return 0;
-        }
-        return user.getId();
-    }
-
-    private static int getUserId(UserEntity user) {
-        if(user == null) {
-            return 0;
-        }
-        return user.getId();
     }
 
     private static UserDto getUserDtoOrNull(UserEntity user) throws FormatDoesNotMatchException {

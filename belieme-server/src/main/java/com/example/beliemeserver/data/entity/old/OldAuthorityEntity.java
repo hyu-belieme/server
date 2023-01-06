@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Builder
 @Accessors(chain = true)
 @IdClass(OldAuthorityId.class)
-public class OldAuthorityEntity implements Serializable, DataEntity {
+public class OldAuthorityEntity extends DataEntity {
     @Id
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -41,5 +41,10 @@ public class OldAuthorityEntity implements Serializable, DataEntity {
                 .userDto(null)
                 .permission(OldAuthorityDto.Permission.from(permission))
                 .build();
+    }
+
+    @Override
+    public int getId() {
+        return 0;
     }
 }

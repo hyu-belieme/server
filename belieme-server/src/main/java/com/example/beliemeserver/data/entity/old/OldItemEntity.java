@@ -21,7 +21,7 @@ import javax.persistence.*;
 @Builder
 @Accessors(chain = true)
 @IdClass(OldItemId.class)
-public class OldItemEntity implements DataEntity {
+public class OldItemEntity extends DataEntity {
     @Id
     @Column(name = "stuff_id")
     private int stuffId;
@@ -76,5 +76,10 @@ public class OldItemEntity implements DataEntity {
                 .num(num)
                 .lastHistory(lastHistoryDto)
                 .build();
+    }
+
+    @Override
+    public int getId() {
+        return 0;
     }
 }

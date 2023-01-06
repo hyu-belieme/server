@@ -20,7 +20,7 @@ import javax.persistence.*;
 @Builder
 @Accessors(chain = true)
 @IdClass(OldHistoryId.class)
-public class OldHistoryEntity implements DataEntity {
+public class OldHistoryEntity extends DataEntity {
     @Id
     @Column(name = "stuff_id")
     private int stuffId;
@@ -165,5 +165,10 @@ public class OldHistoryEntity implements DataEntity {
                 .lostTimeStamp(lostTimeStamp)
                 .cancelTimeStamp(cancelTimeStamp)
                 .build();
+    }
+
+    @Override
+    public int getId() {
+        return 0;
     }
 }
