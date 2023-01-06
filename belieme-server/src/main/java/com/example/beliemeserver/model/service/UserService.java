@@ -4,11 +4,11 @@ import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.model.util.AuthCheck;
 import com.example.beliemeserver.model.util.HttpRequest;
 
-import com.example.beliemeserver.model.dao.AuthorityDao;
-import com.example.beliemeserver.model.dao.UserDao;
+import com.example.beliemeserver.model.dao.old.AuthorityDao;
+import com.example.beliemeserver.model.dao.old.UserDao;
 
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.old.AuthorityDto;
+import com.example.beliemeserver.model.dto.old.UserDto;
 
 import com.example.beliemeserver.model.exception.*;
 import org.json.simple.JSONObject;

@@ -1,7 +1,11 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dao.old.ItemDao;
+import com.example.beliemeserver.model.dao.old.StuffDao;
+import com.example.beliemeserver.model.dao.old.UserDao;
+import com.example.beliemeserver.model.dto.old.ItemDto;
+import com.example.beliemeserver.model.dto.old.StuffDto;
+import com.example.beliemeserver.model.dto.old.UserDto;
 import com.example.beliemeserver.model.exception.*;
 
 import com.example.beliemeserver.model.util.AuthCheck;

@@ -7,7 +7,7 @@ import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.service.HistoryService;
-import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.model.dto.old.HistoryDto;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,11 +1,11 @@
 package com.example.beliemeserver.model.util;
 
-import com.example.beliemeserver.model.dao.UserDao;
+import com.example.beliemeserver.model.dao.old.UserDao;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.ForbiddenException;
 import com.example.beliemeserver.model.exception.UnauthorizedException;
 import com.example.beliemeserver.model.exception.NotFoundException;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.old.UserDto;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

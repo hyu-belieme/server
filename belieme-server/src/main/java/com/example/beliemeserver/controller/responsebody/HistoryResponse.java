@@ -1,6 +1,6 @@
 package com.example.beliemeserver.controller.responsebody;
 
-import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.model.dto.old.HistoryDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

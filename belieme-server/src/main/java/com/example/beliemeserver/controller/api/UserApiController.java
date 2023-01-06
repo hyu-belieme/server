@@ -4,10 +4,10 @@ import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.LoginInfoRequest;
 import com.example.beliemeserver.controller.responsebody.UserResponse;
 
-import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.old.AuthorityDto;
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.service.UserService;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.old.UserDto;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

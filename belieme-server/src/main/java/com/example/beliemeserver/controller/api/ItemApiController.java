@@ -6,9 +6,9 @@ import com.example.beliemeserver.controller.responsebody.ItemResponse;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
 import com.example.beliemeserver.common.Globals;
 
-import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.old.ItemDto;
 import com.example.beliemeserver.model.exception.*;
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.old.StuffDto;
 import com.example.beliemeserver.model.service.ItemService;
 
 import org.springframework.http.ResponseEntity;

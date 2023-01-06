@@ -1,10 +1,10 @@
 package com.example.beliemeserver;
 
-import com.example.beliemeserver.data.entity.StuffEntity;
-import com.example.beliemeserver.data.repository.HistoryRepository;
-import com.example.beliemeserver.data.repository.ItemRepository;
-import com.example.beliemeserver.data.repository.StuffRepository;
-import com.example.beliemeserver.data.repository.UserRepository;
+import com.example.beliemeserver.data.entity.old.StuffEntity;
+import com.example.beliemeserver.data.repository.old.HistoryRepository;
+import com.example.beliemeserver.data.repository.old.ItemRepository;
+import com.example.beliemeserver.data.repository.old.StuffRepository;
+import com.example.beliemeserver.data.repository.old.UserRepository;
 import com.example.beliemeserver.data.repository.custom.RefreshRepositoryImpl;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

@@ -1,6 +1,6 @@
 package com.example.beliemeserver.controller.responsebody;
 
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.old.UserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
