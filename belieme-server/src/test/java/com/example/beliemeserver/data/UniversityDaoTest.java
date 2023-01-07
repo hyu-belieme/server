@@ -1,23 +1,18 @@
 package com.example.beliemeserver.data;
 
 import com.example.beliemeserver.model.dao.UniversityDao;
-import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.assertj.core.api.Assertions;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
-@Transactional
-public class UniversityDaoTest {
+public class UniversityDaoTest extends DaoTest {
     @Autowired
     private UniversityDao universityDao;
 
