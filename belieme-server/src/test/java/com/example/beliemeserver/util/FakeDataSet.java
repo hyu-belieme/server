@@ -1,11 +1,10 @@
-package com.example.beliemeserver.data;
+package com.example.beliemeserver.util;
 
 import com.example.beliemeserver.model.dto.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class InitialData {
+public class FakeDataSet {
     public static List<UniversityDto> universityDummies;
     public static List<MajorDto> majorDummies;
     public static List<DepartmentDto> departmentDummies;

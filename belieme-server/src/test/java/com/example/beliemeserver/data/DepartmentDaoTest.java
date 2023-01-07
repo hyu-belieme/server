@@ -5,6 +5,8 @@ import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.util.FakeDataSet;
+import com.example.beliemeserver.util.SampleData;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ public class DepartmentDaoTest extends DaoTest {
             assert false;
             return;
         }
-        assertThatAllElementIsEqual(result, InitialData.departmentDummies);
+        assertThatAllElementIsEqual(result, FakeDataSet.departmentDummies);
     }
 
     @Test
@@ -43,7 +45,7 @@ public class DepartmentDaoTest extends DaoTest {
         }
 
         List<DepartmentDto> expected = new ArrayList<>();
-        for(DepartmentDto departmentDto : InitialData.departmentDummies) {
+        for(DepartmentDto departmentDto : FakeDataSet.departmentDummies) {
             String universityCode = departmentDto.getUniversity().getCode();
             if(targetUniversityCode.equals(universityCode)) {
                 expected.add(departmentDto);
@@ -76,7 +78,7 @@ public class DepartmentDaoTest extends DaoTest {
         }
 
         DepartmentDto expected = null;
-        for(DepartmentDto departmentDto : InitialData.departmentDummies) {
+        for(DepartmentDto departmentDto : FakeDataSet.departmentDummies) {
             if(targetUniversityCode.equals(departmentDto.getUniversity().getCode())
                     && targetDepartmentCode.equals(departmentDto.getCode())) {
                 expected = departmentDto;
@@ -97,13 +99,13 @@ public class DepartmentDaoTest extends DaoTest {
     @Test
     public void createNewDepartmentTest1() {
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(0),
-                InitialData.majorDummies.get(1),
-                InitialData.majorDummies.get(2)
+                FakeDataSet.majorDummies.get(0),
+                FakeDataSet.majorDummies.get(1),
+                FakeDataSet.majorDummies.get(2)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(0),
+                FakeDataSet.universityDummies.get(0),
                 "ENG",
                 "공과대학",
                 newDepartmentBaseMajor
@@ -113,7 +115,7 @@ public class DepartmentDaoTest extends DaoTest {
             DepartmentDto result = departmentDao.addDepartmentData(newDepartment);
             Assertions.assertThat(result).isEqualTo(newDepartment);
 
-            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(FakeDataSet.departmentDummies);
             expectedDBStatus.add(newDepartment);
 
             List<DepartmentDto> resultDBStatus = departmentDao.getAllDepartmentsData();
@@ -127,11 +129,11 @@ public class DepartmentDaoTest extends DaoTest {
     @Test
     public void createNewDepartmentTest2() {
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(6)
+                FakeDataSet.majorDummies.get(6)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(1),
+                FakeDataSet.universityDummies.get(1),
                 "CSE",
                 "컴퓨터공학과",
                 newDepartmentBaseMajor
@@ -141,7 +143,7 @@ public class DepartmentDaoTest extends DaoTest {
             DepartmentDto result = departmentDao.addDepartmentData(newDepartment);
             Assertions.assertThat(result).isEqualTo(newDepartment);
 
-            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(FakeDataSet.departmentDummies);
             expectedDBStatus.add(newDepartment);
 
             List<DepartmentDto> resultDBStatus = departmentDao.getAllDepartmentsData();
@@ -155,11 +157,11 @@ public class DepartmentDaoTest extends DaoTest {
     @Test
     public void createNewDepartmentFailByConflictExceptionTest() {
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(6)
+                FakeDataSet.majorDummies.get(6)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(1),
+                FakeDataSet.universityDummies.get(1),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -172,7 +174,7 @@ public class DepartmentDaoTest extends DaoTest {
     @Test
     public void createNewDepartmentFailByNotFoundExceptionTest() {
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(6)
+                FakeDataSet.majorDummies.get(6)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
@@ -192,12 +194,12 @@ public class DepartmentDaoTest extends DaoTest {
         String targetDepartmentCode = "CSE";
 
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(0),
-                InitialData.majorDummies.get(1)
+                FakeDataSet.majorDummies.get(0),
+                FakeDataSet.majorDummies.get(1)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(0),
+                FakeDataSet.universityDummies.get(0),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -207,7 +209,7 @@ public class DepartmentDaoTest extends DaoTest {
             DepartmentDto result = departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment);
             Assertions.assertThat(result).isEqualTo(newDepartment);
 
-            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(FakeDataSet.departmentDummies);
             expectedDBStatus.removeIf(
                     departmentDto -> (targetUniversityCode.equals(departmentDto.getUniversity().getCode())
                             && targetDepartmentCode.equals(departmentDto.getCode()))
@@ -228,13 +230,13 @@ public class DepartmentDaoTest extends DaoTest {
         String targetDepartmentCode = "CSE";
 
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(0),
-                InitialData.majorDummies.get(1),
-                InitialData.majorDummies.get(2)
+                FakeDataSet.majorDummies.get(0),
+                FakeDataSet.majorDummies.get(1),
+                FakeDataSet.majorDummies.get(2)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(0),
+                FakeDataSet.universityDummies.get(0),
                 "ENG",
                 "공과대학",
                 newDepartmentBaseMajor
@@ -244,7 +246,7 @@ public class DepartmentDaoTest extends DaoTest {
             DepartmentDto result = departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment);
             Assertions.assertThat(result).isEqualTo(newDepartment);
 
-            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(FakeDataSet.departmentDummies);
             expectedDBStatus.removeIf(
                     departmentDto -> (targetUniversityCode.equals(departmentDto.getUniversity().getCode())
                             && targetDepartmentCode.equals(departmentDto.getCode()))
@@ -265,11 +267,11 @@ public class DepartmentDaoTest extends DaoTest {
         String targetDepartmentCode = "COMPUTER";
 
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(6)
+                FakeDataSet.majorDummies.get(6)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(0),
+                FakeDataSet.universityDummies.get(0),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -285,12 +287,12 @@ public class DepartmentDaoTest extends DaoTest {
         String targetDepartmentCode = "CSE";
 
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(6),
+                FakeDataSet.majorDummies.get(6),
                 SampleData.notFoundedMajor
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(0),
+                FakeDataSet.universityDummies.get(0),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -306,11 +308,11 @@ public class DepartmentDaoTest extends DaoTest {
         String targetDepartmentCode = "CSE";
 
         List<MajorDto> newDepartmentBaseMajor = List.of(
-                InitialData.majorDummies.get(6)
+                FakeDataSet.majorDummies.get(6)
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                InitialData.universityDummies.get(1),
+                FakeDataSet.universityDummies.get(1),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -328,14 +330,14 @@ public class DepartmentDaoTest extends DaoTest {
         String newUniversityCode = "HYU";
         String newMajorCode = "FH04069";
 
-        MajorDto newMajor = InitialData.getMajorDummy(newUniversityCode, newMajorCode);
+        MajorDto newMajor = FakeDataSet.getMajorDummy(newUniversityCode, newMajorCode);
 
-        DepartmentDto targetDepartment = InitialData.getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
+        DepartmentDto targetDepartment = FakeDataSet.getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
         List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
         expectedBaseMajors.add(newMajor);
 
         DepartmentDto expectedResult = new DepartmentDto(
-                InitialData.getUniversityDummy(targetUniversityCode),
+                FakeDataSet.getUniversityDummy(targetUniversityCode),
                 targetDepartmentCode,
                 targetDepartment.getName(),
                 expectedBaseMajors
@@ -345,7 +347,7 @@ public class DepartmentDaoTest extends DaoTest {
             DepartmentDto result = departmentDao.putBaseMajorOnDepartmentData(targetUniversityCode, targetDepartmentCode, newMajor);
             Assertions.assertThat(result).isEqualTo(expectedResult);
 
-            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(FakeDataSet.departmentDummies);
             expectedDBStatus.removeIf(
                     departmentDto -> (targetUniversityCode.equals(departmentDto.getUniversity().getCode())
                             && targetDepartmentCode.equals(departmentDto.getCode()))
@@ -368,14 +370,14 @@ public class DepartmentDaoTest extends DaoTest {
         String targetMajorUniversityCode = "HYU";
         String targetMajorCode = "FH04068";
 
-        MajorDto targetMajor = InitialData.getMajorDummy(targetMajorUniversityCode, targetMajorCode);
+        MajorDto targetMajor = FakeDataSet.getMajorDummy(targetMajorUniversityCode, targetMajorCode);
 
-        DepartmentDto targetDepartment = InitialData.getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
+        DepartmentDto targetDepartment = FakeDataSet.getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
         List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
         expectedBaseMajors.remove(targetMajor);
 
         DepartmentDto expectedResult = new DepartmentDto(
-                InitialData.getUniversityDummy(targetUniversityCode),
+                FakeDataSet.getUniversityDummy(targetUniversityCode),
                 targetDepartmentCode,
                 targetDepartment.getName(),
                 expectedBaseMajors
@@ -385,7 +387,7 @@ public class DepartmentDaoTest extends DaoTest {
             DepartmentDto result = departmentDao.removeBaseMajorOnDepartmentData(targetUniversityCode, targetDepartmentCode, targetMajor);
             Assertions.assertThat(result).isEqualTo(expectedResult);
 
-            List<DepartmentDto> expectedDBStatus = new ArrayList<>(InitialData.departmentDummies);
+            List<DepartmentDto> expectedDBStatus = new ArrayList<>(FakeDataSet.departmentDummies);
             expectedDBStatus.removeIf(
                     departmentDto -> (targetUniversityCode.equals(departmentDto.getUniversity().getCode())
                             && targetDepartmentCode.equals(departmentDto.getCode()))
