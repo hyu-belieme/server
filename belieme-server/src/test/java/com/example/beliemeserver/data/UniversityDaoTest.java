@@ -25,7 +25,7 @@ public class UniversityDaoTest extends DaoTest {
         String targetUniversityCode = "CKU";
         TestHelper.objectCompareTest(
                 () -> universityDao.getUniversityByCodeData(targetUniversityCode),
-                getUniversityDummyByIndex(targetUniversityCode)
+                getUniversityDummy(targetUniversityCode)
         );
     }
 
@@ -110,7 +110,7 @@ public class UniversityDaoTest extends DaoTest {
         );
 
         UniversityDto targetOnDummy =
-                getUniversityDummyByIndex(targetUniversityCode);
+                getUniversityDummy(targetUniversityCode);
         TestHelper.listCompareTest(
                 () -> universityDao.getAllUniversitiesData(),
                 universityFakeDao.dummyStatusAfterUpdate(targetOnDummy, newUniversity)

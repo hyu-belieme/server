@@ -55,7 +55,7 @@ public class DepartmentDaoTest extends DaoTest {
 
         TestHelper.objectCompareTest(
                 () -> departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode),
-                getDepartmentDummyByIndex(targetUniversityCode, targetDepartmentCode)
+                getDepartmentDummy(targetUniversityCode, targetDepartmentCode)
         );
     }
 
@@ -259,15 +259,15 @@ public class DepartmentDaoTest extends DaoTest {
         String newMajorCode = "FH04069";
 
         DepartmentDto targetDepartment =
-                getDepartmentDummyByIndex(targetUniversityCode, targetDepartmentCode);
+                getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
         MajorDto newMajor =
-                getMajorDummyByIndex(newUniversityCode, newMajorCode);
+                getMajorDummy(newUniversityCode, newMajorCode);
 
         List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
         expectedBaseMajors.add(newMajor);
 
         DepartmentDto expectedResult = new DepartmentDto(
-                getUniversityDummyByIndex(targetUniversityCode),
+                getUniversityDummy(targetUniversityCode),
                 targetDepartmentCode,
                 targetDepartment.getName(),
                 expectedBaseMajors
@@ -295,14 +295,14 @@ public class DepartmentDaoTest extends DaoTest {
         String targetMajorUniversityCode = "HYU";
         String targetMajorCode = "FH04068";
 
-        MajorDto targetMajor = getMajorDummyByIndex(targetMajorUniversityCode, targetMajorCode);
+        MajorDto targetMajor = getMajorDummy(targetMajorUniversityCode, targetMajorCode);
 
-        DepartmentDto targetDepartment = getDepartmentDummyByIndex(targetUniversityCode, targetDepartmentCode);
+        DepartmentDto targetDepartment = getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
         List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
         expectedBaseMajors.remove(targetMajor);
 
         DepartmentDto expectedResult = new DepartmentDto(
-                getUniversityDummyByIndex(targetUniversityCode),
+                getUniversityDummy(targetUniversityCode),
                 targetDepartmentCode,
                 targetDepartment.getName(),
                 expectedBaseMajors
@@ -341,7 +341,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto targetOnDummy =
-                getDepartmentDummyByIndex(targetUniversityCode, targetDepartmentCode);
+                getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
         TestHelper.listCompareTest(
                 () -> departmentDao.getAllDepartmentsData(),
                 departmentFakeDao.dummyStatusAfterUpdate(targetOnDummy, newDepartment)

@@ -134,7 +134,7 @@ public class MajorDaoTest extends DaoTest {
         );
 
         MajorDto targetOnDummy =
-                getMajorDummyByIndex(targetUniversityCode, targetMajorCode);
+                getMajorDummy(targetUniversityCode, targetMajorCode);
         TestHelper.listCompareTest(
                 () -> majorDao.getAllMajorsData(),
                 majorFakeDao.dummyStatusAfterUpdate(targetOnDummy, newMajor)
