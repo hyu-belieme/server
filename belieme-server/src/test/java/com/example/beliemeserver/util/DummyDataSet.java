@@ -4,7 +4,7 @@ import com.example.beliemeserver.model.dto.*;
 
 import java.util.List;
 
-public class FakeDataSet {
+public class DummyDataSet {
     public static List<UniversityDto> universityDummies;
     public static List<MajorDto> majorDummies;
     public static List<DepartmentDto> departmentDummies;
@@ -13,6 +13,10 @@ public class FakeDataSet {
     public static List<StuffDto> stuffDummies;
     public static List<ItemDto> itemDummies;
     public static List<HistoryDto> historyDummies;
+
+    public static UniversityDto notFoundUniversity;
+    public static DepartmentDto notFoundDepartment;
+    public static MajorDto notFoundMajor;
 
     public static void init() {
         universityDummies = List.of(
@@ -75,38 +79,13 @@ public class FakeDataSet {
                 new AuthorityDto(userDummies.get(0), departmentDummies.get(1), AuthorityDto.Permission.USER),
                 new AuthorityDto(userDummies.get(2), departmentDummies.get(0), AuthorityDto.Permission.BANNED)
         );
+
+        initSampleData();
     }
 
-    public static UniversityDto getUniversityDummy(String universityCode) {
-        for(UniversityDto universityDto : universityDummies) {
-            if(universityCode.equals(universityDto.getCode())) {
-                return universityDto;
-            }
-        }
-        return null;
-    }
-
-    public static MajorDto getMajorDummy(String universityCode, String majorCode) {
-        for(MajorDto majorDto : majorDummies) {
-            if(!universityCode.equals(majorDto.getUniversity().getCode())) {
-                continue;
-            }
-            if(majorCode.equals(majorDto.getCode())) {
-                return majorDto;
-            }
-        }
-        return null;
-    }
-
-    public static DepartmentDto getDepartmentDummy(String universityCode, String departmentCode) {
-        for(DepartmentDto departmentDto : departmentDummies) {
-            if(!universityCode.equals(departmentDto.getUniversity().getCode())) {
-                continue;
-            }
-            if(departmentCode.equals(departmentDto.getCode())) {
-                return departmentDto;
-            }
-        }
-        return null;
+    private static void initSampleData() {
+        notFoundUniversity = new UniversityDto("HANYANG", "한양대학교", null);
+        notFoundDepartment = new DepartmentDto(DummyDataSet.universityDummies.get(0), "COMPUTER", "컴퓨터소프트웨어학부");
+        notFoundMajor = new MajorDto(DummyDataSet.universityDummies.get(0), "DOESNT_EXIST");
     }
 }
