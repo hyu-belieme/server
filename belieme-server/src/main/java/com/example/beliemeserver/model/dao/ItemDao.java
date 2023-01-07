@@ -8,6 +8,8 @@ import com.example.beliemeserver.model.exception.NotFoundException;
 import java.util.List;
 
 public interface ItemDao {
+    List<ItemDto> getAllList() throws DataException;
+
     List<ItemDto> getListByStuff(
             String universityCode, String departmentCode, String stuffName)
             throws DataException;

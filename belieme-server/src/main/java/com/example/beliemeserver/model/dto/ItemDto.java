@@ -16,8 +16,8 @@ public class ItemDto {
     private final int num;
     private HistoryDto lastHistory;
 
-    public static ItemDto init(StuffDto stuff) {
-        return new ItemDto(stuff, 0, null);
+    public static ItemDto init(StuffDto stuff, int itemNum) {
+        return new ItemDto(stuff, itemNum, null);
     }
 
     public ItemStatus getStatus() {

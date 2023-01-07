@@ -12,6 +12,12 @@ import java.util.List;
 @Component
 public class HistoryDaoImpl implements HistoryDao {
     @Override
+    public List<HistoryDto> getAllList() throws DataException {
+        // TODO Need Implement
+        return null;
+    }
+
+    @Override
     public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) throws DataException {
         // TODO Need Implement
         return null;

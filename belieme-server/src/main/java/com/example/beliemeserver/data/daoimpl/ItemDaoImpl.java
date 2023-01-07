@@ -12,6 +12,12 @@ import java.util.List;
 @Component
 public class ItemDaoImpl implements ItemDao {
     @Override
+    public List<ItemDto> getAllList() throws DataException {
+        // TODO Need Implement
+        return null;
+    }
+
+    @Override
     public List<ItemDto> getListByStuff(String universityCode, String departmentCode, String stuffName) throws DataException {
         // TODO Need Implement
         return null;

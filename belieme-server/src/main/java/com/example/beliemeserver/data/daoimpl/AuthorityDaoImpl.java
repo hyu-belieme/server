@@ -6,8 +6,16 @@ import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class AuthorityDaoImpl implements AuthorityDao {
+    @Override
+    public List<AuthorityDto> getAllList() throws DataException {
+        // TODO Need Implement
+        return null;
+    }
+
     @Override
     public AuthorityDto create(AuthorityDto authority) throws ConflictException, DataException {
         // TODO Need Implement
@@ -15,7 +23,7 @@ public class AuthorityDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public AuthorityDto update(String universityCodeForUser, String studentId, String universityCodeForDepartment, String departmentCode) throws DataException {
+    public AuthorityDto update(String universityCodeForUser, String studentId, String universityCodeForDepartment, String departmentCode, AuthorityDto authority) throws DataException {
         // TODO Need Implement
         return null;
     }
