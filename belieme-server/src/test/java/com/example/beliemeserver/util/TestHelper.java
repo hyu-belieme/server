@@ -35,7 +35,7 @@ public class TestHelper {
         Assertions.assertThatThrownBy(routine).isInstanceOf(type);
     }
 
-    private static <T> void assertThatAllElementIsEqual(List<T> expected, List<T> result) {
+    private static <T> void assertThatAllElementIsEqual(List<T> result, List<T> expected) {
         Assertions.assertThat(result.size()).isEqualTo(expected.size());
 
         for(T target : result) {
