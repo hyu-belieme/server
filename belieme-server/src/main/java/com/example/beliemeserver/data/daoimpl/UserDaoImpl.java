@@ -7,6 +7,7 @@ import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -14,13 +15,13 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<UserDto> getAllList() throws DataException {
         // TODO Need Implement
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public List<UserDto> getListByUniversity(String universityCode) throws NotFoundException, DataException {
         // TODO Need Implement
-        return null;
+        return new ArrayList<>();
     }
 
     @Override

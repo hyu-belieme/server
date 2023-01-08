@@ -6,6 +6,7 @@ import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -13,7 +14,7 @@ public class AuthorityDaoImpl implements AuthorityDao {
     @Override
     public List<AuthorityDto> getAllList() throws DataException {
         // TODO Need Implement
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
