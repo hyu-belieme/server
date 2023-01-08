@@ -9,6 +9,7 @@ import lombok.*;
 @EqualsAndHashCode
 @AllArgsConstructor
 public class AuthorityDto {
+    @ToString.Exclude
     private UserDto user;
     private DepartmentDto department;
     private Permission permission;
