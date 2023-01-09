@@ -1,6 +1,8 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import lombok.*;
 
@@ -96,25 +98,25 @@ public class UserEntity extends DataEntity {
     }
 
     public UserDto toUserDto() throws FormatDoesNotMatchException {
-        UserDto output = new UserDto(
+        List<MajorDto> majorDtoList = new ArrayList<>();
+        for(MajorUserJoinEntity major : majorJoin) {
+            majorDtoList.add(major.getMajor().toMajorDto());
+        }
+
+        List<AuthorityDto> authorityDtoList = new ArrayList<>();
+        for(AuthorityUserJoinEntity authority : authorityJoin) {
+            authorityDtoList.add(authority.getAuthority().toAuthorityDto());
+        }
+
+        return new UserDto(
                 university.toUniversityDto(),
                 studentId,
                 name,
                 token,
                 createTimeStamp,
                 approvalTimeStamp,
-                new ArrayList<>(),
-                new ArrayList<>()
+                majorDtoList,
+                authorityDtoList
         );
-
-        for(AuthorityUserJoinEntity authority : authorityJoin) {
-            output.addAuthority(authority.getAuthority().toAuthorityDto());
-        }
-
-        for(MajorUserJoinEntity major : majorJoin) {
-            output.addMajor(major.getMajor().toMajorDto());
-        }
-
-        return output;
     }
 }

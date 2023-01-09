@@ -1,157 +1,104 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.*;
-import lombok.experimental.Accessors;
-import org.apache.catalina.User;
+import lombok.NonNull;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Accessors(chain = true)
-public class HistoryDto {
-    @NonNull
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private ItemDto item;
+public record HistoryDto(
+        @NonNull ItemDto item, int num, UserDto requester, UserDto approveManager,
+        UserDto returnManager, UserDto lostManager, UserDto cancelManager,
+        long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp,
+        long lostTimeStamp, long cancelTimeStamp
+) {
+    public static final HistoryDto nestedEndpoint = new HistoryDto(ItemDto.nestedEndpoint, 0, null, null, null, null, null, 0, 0, 0, 0, 0);
 
-    private int num;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private UserDto requester;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private UserDto approveManager;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private UserDto returnManager;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private UserDto lostManager;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private UserDto cancelManager;
-
-    private long reservedTimeStamp;
-    private long approveTimeStamp;
-    private long returnTimeStamp;
-    private long lostTimeStamp;
-    private long cancelTimeStamp;
-
-    public HistoryDto(@NonNull HistoryDto historyDto) {
-        this.item = historyDto.getItem();
-        this.num = historyDto.getNum();
-        this.requester = historyDto.getRequester();
-        this.approveManager = historyDto.getApproveManager();
-        this.returnManager = historyDto.getReturnManager();
-        this.lostManager = historyDto.getLostManager();
-        this.cancelManager = historyDto.getCancelManager();
-        this.reservedTimeStamp = historyDto.getReservedTimeStamp();
-        this.approveTimeStamp = historyDto.getApproveTimeStamp();
-        this.returnTimeStamp = historyDto.getReturnTimeStamp();
-        this.lostTimeStamp = historyDto.getLostTimeStamp();
-        this.cancelTimeStamp = historyDto.getCancelTimeStamp();
+    public HistoryDto withItem(@NonNull ItemDto item) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public HistoryDto(@NonNull ItemDto item, int num, UserDto requester, UserDto approveManager, UserDto returnManager, UserDto lostManager, UserDto cancelManager, long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp, long lostTimeStamp, long cancelTimeStamp) {
-        setItem(item);
-        setNum(num);
-        setRequester(requester);
-        setApproveManager(approveManager);
-        setReturnManager(returnManager);
-        setLostManager(lostManager);
-        setCancelManager(cancelManager);
-        setReservedTimeStamp(reservedTimeStamp);
-        setApproveTimeStamp(approveTimeStamp);
-        setReturnTimeStamp(returnTimeStamp);
-        setLostTimeStamp(lostTimeStamp);
-        setCancelTimeStamp(cancelTimeStamp);
+    public HistoryDto withNum(int num) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public ItemDto getItem() {
-        return new ItemDto(item);
+    public HistoryDto withRequester(UserDto requester) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public UserDto getRequester() {
-        return copyUserDtoOrNull(requester);
+    public HistoryDto withApproveManager(UserDto approveManager) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public UserDto getApproveManager() {
-        return copyUserDtoOrNull(approveManager);
+    public HistoryDto withReturnManager(UserDto returnManager) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public UserDto getReturnManager() {
-        return copyUserDtoOrNull(returnManager);
+    public HistoryDto withLostManager(UserDto lostManager) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public UserDto getLostManager() {
-        return copyUserDtoOrNull(lostManager);
+    public HistoryDto withCancelManager(UserDto cancelManager) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public UserDto getCancelManager() {
-        return copyUserDtoOrNull(cancelManager);
+    public HistoryDto withReservedTimeStamp(long reservedTimeStamp) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public HistoryDto setItem(@NonNull ItemDto item) {
-        this.item = new ItemDto(item);
-        return this;
+    public HistoryDto withApprovalTimeStamp(long approvalTimeStamp) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public HistoryDto setRequester(UserDto requester) {
-        this.requester = copyUserDtoOrNull(requester);
-        return this;
+    public HistoryDto withReturnTimeStamp(long returnTimeStamp) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public HistoryDto setApproveManager(UserDto approveManager) {
-        this.approveManager = copyUserDtoOrNull(approveManager);
-        return this;
+    public HistoryDto withLostTimeStamp(long lostTimeStamp) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public HistoryDto setReturnManager(UserDto returnManager) {
-        this.returnManager = copyUserDtoOrNull(returnManager);
-        return this;
+    public HistoryDto withCancelTimeStamp(long cancelTimeStamp) {
+        return new HistoryDto(item, num, requester, approveManager,
+                returnManager, lostManager, cancelManager,
+                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                lostTimeStamp, cancelTimeStamp);
     }
 
-    public HistoryDto setLostManager(UserDto lostManager) {
-        this.lostManager = copyUserDtoOrNull(lostManager);
-        return this;
-    }
-
-    public HistoryDto setCancelManager(UserDto cancelManager) {
-        this.cancelManager = copyUserDtoOrNull(cancelManager);
-        return this;
-    }
-
-    public String getRequesterId() {
-        return getStudentIdOrNull(requester);
-    }
-
-    public String getApproveManagerId() {
-        return getStudentIdOrNull(approveManager);
-    }
-
-    public String getReturnManagerId() {
-        return getStudentIdOrNull(returnManager);
-    }
-
-    public String getLostManagerId() {
-        return getStudentIdOrNull(lostManager);
-    }
-
-    public String getCancelManagerId() {
-        return getStudentIdOrNull(cancelManager);
-    }
-
-    public HistoryDto.HistoryStatus getStatus() {
+    public HistoryDto.HistoryStatus status() {
         //TODO 여기 분기 다시 깔끔하게 짜기
         //TODO ERROR인 조건들 추가하기 ex)item이 널이거나 그런경우?...
         if(reservedTimeStamp != 0) {
@@ -220,15 +167,6 @@ public class HistoryDto {
         return tmp.getTime().getTime()/1000;
     }
 
-    private UserDto copyUserDtoOrNull(UserDto userDto) {
-        if(userDto == null) return null;
-        return new UserDto(userDto);
-    }
-
-    private String getStudentIdOrNull(UserDto userDto) {
-        if(userDto == null) return null;
-        return userDto.getStudentId();
-    }
     public enum HistoryStatus {
         REQUESTED, USING, DELAYED, LOST, EXPIRED, RETURNED, FOUND, ERROR
     }

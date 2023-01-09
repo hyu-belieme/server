@@ -10,7 +10,6 @@ import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DepartmentDaoTest extends DaoTest {
@@ -30,7 +29,7 @@ public class DepartmentDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
 
         List<DepartmentDto> expected = departmentFakeDao.getAllByCondition(
-                target -> targetUniversityCode.equals(target.getUniversity().getCode())
+                target -> targetUniversityCode.equals(target.university().code())
         );
         TestHelper.listCompareTest(
                 () -> departmentDao.getAllDepartmentsByUniversityCodeData(targetUniversityCode),
@@ -263,13 +262,13 @@ public class DepartmentDaoTest extends DaoTest {
         MajorDto newMajor =
                 getMajorDummy(newUniversityCode, newMajorCode);
 
-        List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
+        List<MajorDto> expectedBaseMajors = targetDepartment.baseMajors();
         expectedBaseMajors.add(newMajor);
 
         DepartmentDto expectedResult = new DepartmentDto(
                 getUniversityDummy(targetUniversityCode),
                 targetDepartmentCode,
-                targetDepartment.getName(),
+                targetDepartment.name(),
                 expectedBaseMajors
         );
 
@@ -298,13 +297,13 @@ public class DepartmentDaoTest extends DaoTest {
         MajorDto targetMajor = getMajorDummy(targetMajorUniversityCode, targetMajorCode);
 
         DepartmentDto targetDepartment = getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
-        List<MajorDto> expectedBaseMajors = new ArrayList<>(targetDepartment.getBaseMajors());
+        List<MajorDto> expectedBaseMajors = targetDepartment.baseMajors();
         expectedBaseMajors.remove(targetMajor);
 
         DepartmentDto expectedResult = new DepartmentDto(
                 getUniversityDummy(targetUniversityCode),
                 targetDepartmentCode,
-                targetDepartment.getName(),
+                targetDepartment.name(),
                 expectedBaseMajors
         );
 

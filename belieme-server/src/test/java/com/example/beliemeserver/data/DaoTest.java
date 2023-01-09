@@ -28,7 +28,7 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<UniversityDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(UniversityDto target) {
-                return universityCode.equals(target.getCode());
+                return universityCode.equals(target.code());
             }
         };
 
@@ -39,8 +39,8 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<DepartmentDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(DepartmentDto target) {
-                return universityCode.equals(target.getUniversity().getCode())
-                        && departmentCode.equals(target.getCode());
+                return universityCode.equals(target.university().code())
+                        && departmentCode.equals(target.code());
             }
         };
 
@@ -51,8 +51,8 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<MajorDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(MajorDto target) {
-                return universityCode.equals(target.getUniversity().getCode())
-                        && majorCode.equals(target.getCode());
+                return universityCode.equals(target.university().code())
+                        && majorCode.equals(target.code());
             }
         };
 
@@ -63,8 +63,8 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<UserDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(UserDto target) {
-                return universityCode.equals(target.getUniversity().getCode())
-                        && studentId.equals(target.getStudentId());
+                return universityCode.equals(target.university().code())
+                        && studentId.equals(target.studentId());
             }
         };
 
@@ -76,8 +76,8 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<AuthorityDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(AuthorityDto target) {
-                return universityCodeForDepartment.equals(target.getDepartment().getUniversity().getCode())
-                        && departmentCode.equals(target.getDepartment().getCode());
+                return universityCodeForDepartment.equals(target.department().university().code())
+                        && departmentCode.equals(target.department().code());
             }
         };
 
@@ -89,9 +89,9 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<StuffDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(StuffDto target) {
-                return universityCode.equals(target.getDepartment().getUniversity().getCode())
-                        && departmentCode.equals(target.getDepartment().getCode())
-                        && stuffName.equals(target.getName());
+                return universityCode.equals(target.department().university().code())
+                        && departmentCode.equals(target.department().code())
+                        && stuffName.equals(target.name());
             }
         };
 
@@ -104,10 +104,10 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<ItemDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(ItemDto target) {
-                return universityCode.equals(target.getStuff().getDepartment().getUniversity().getCode())
-                        && departmentCode.equals(target.getStuff().getDepartment().getCode())
-                        && stuffName.equals(target.getStuff().getName())
-                        && itemNum == target.getNum();
+                return universityCode.equals(target.stuff().department().university().code())
+                        && departmentCode.equals(target.stuff().department().code())
+                        && stuffName.equals(target.stuff().name())
+                        && itemNum == target.num();
             }
         };
 
@@ -120,11 +120,11 @@ public abstract class DaoTest {
         FakeDao.FilterMethod<HistoryDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(HistoryDto target) {
-                return universityCode.equals(target.getItem().getStuff().getDepartment().getUniversity().getCode())
-                        && departmentCode.equals(target.getItem().getStuff().getDepartment().getCode())
-                        && stuffName.equals(target.getItem().getStuff().getName())
-                        && itemNum == target.getItem().getNum()
-                        && historyNum == target.getNum();
+                return universityCode.equals(target.item().stuff().department().university().code())
+                        && departmentCode.equals(target.item().stuff().department().code())
+                        && stuffName.equals(target.item().stuff().name())
+                        && itemNum == target.item().num()
+                        && historyNum == target.num();
             }
         };
 

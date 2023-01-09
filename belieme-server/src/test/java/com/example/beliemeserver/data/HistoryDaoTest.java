@@ -29,8 +29,8 @@ public class HistoryDaoTest extends DaoTest {
                 () -> historyDao.getListByDepartment(universityCode, departmentCode),
                 historyFakeDao.getAllByCondition(
                         (target) -> {
-                            return universityCode.equals(target.getItem().getStuff().getDepartment().getUniversity().getCode())
-                                    && departmentCode.equals(target.getItem().getStuff().getDepartment().getCode());
+                            return universityCode.equals(target.item().stuff().department().university().code())
+                                    && departmentCode.equals(target.item().stuff().department().code());
                         }
                 )
         );
@@ -48,11 +48,11 @@ public class HistoryDaoTest extends DaoTest {
                 () -> historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, universityCodeForRequester, studentId),
                 historyFakeDao.getAllByCondition(
                         (target) -> {
-                            return universityCode.equals(target.getItem().getStuff().getDepartment().getUniversity().getCode())
-                                    && departmentCode.equals(target.getItem().getStuff().getDepartment().getCode())
-                                    && target.getRequester() != null
-                                    && universityCodeForRequester.equals(target.getRequester().getUniversity().getCode())
-                                    && departmentCode.equals(target.getRequester().getStudentId());
+                            return universityCode.equals(target.item().stuff().department().university().code())
+                                    && departmentCode.equals(target.item().stuff().department().code())
+                                    && target.requester() != null
+                                    && universityCodeForRequester.equals(target.requester().university().code())
+                                    && departmentCode.equals(target.requester().studentId());
                         }
                 )
         );

@@ -1,39 +1,19 @@
 package com.example.beliemeserver.model.dto;
 
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Accessors(chain = true)
-public class AuthorityDto {
-    @NonNull
-    @Setter(AccessLevel.NONE)
-    private DepartmentDto department;
+public record AuthorityDto(
+        @NonNull DepartmentDto department, @NonNull Permission permission
+) {
+    public static final AuthorityDto nestedEndpoint = new AuthorityDto(DepartmentDto.nestedEndpoint, Permission.BANNED);
 
-    @NonNull
-    private Permission permission;
-
-    public AuthorityDto(@NonNull AuthorityDto authorityDto) {
-        this.department = authorityDto.getDepartment();
-        this.permission = authorityDto.getPermission();
+    public AuthorityDto withDepartment(@NonNull DepartmentDto department) {
+        return new AuthorityDto(department, permission);
     }
 
-    public AuthorityDto(@NonNull DepartmentDto department, @NonNull Permission permission) {
-        setDepartment(department);
-        setPermission(permission);
-    }
-
-    public DepartmentDto getDepartment() {
-        return new DepartmentDto(department);
-    }
-
-    public AuthorityDto setDepartment(@NonNull DepartmentDto department) {
-        this.department = new DepartmentDto(department);
-        return this;
+    public AuthorityDto withPermission(@NonNull Permission permission) {
+        return new AuthorityDto(department, permission);
     }
 
     public enum Permission {

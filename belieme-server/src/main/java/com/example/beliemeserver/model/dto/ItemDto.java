@@ -1,70 +1,34 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Accessors(chain = true)
-public class ItemDto {
-    @NonNull
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private StuffDto stuff;
-
-    private int num;
-
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private HistoryDto lastHistory;
-
-    public ItemDto(@NonNull ItemDto itemDto) {
-        this.stuff = itemDto.getStuff();
-        this.num = itemDto.getNum();
-        this.lastHistory = itemDto.getLastHistory();
-    }
-
-    public ItemDto(@NonNull StuffDto stuff, int num, HistoryDto lastHistory) {
-        setStuff(stuff);
-        setNum(num);
-        setLastHistory(lastHistory);
-    }
+public record ItemDto(
+        @NonNull StuffDto stuff, int num, HistoryDto lastHistory
+) {
+    public static final ItemDto nestedEndpoint = new ItemDto(StuffDto.nestedEndpoint, 0, null);
 
     public static ItemDto init(@NonNull StuffDto stuff, int itemNum) {
         return new ItemDto(stuff, itemNum, null);
     }
 
-    public StuffDto getStuff() {
-        return new StuffDto(stuff);
+    public ItemDto withStuff(@NonNull StuffDto stuff) {
+        return new ItemDto(stuff, num, lastHistory);
     }
 
-    public HistoryDto getLastHistory() {
-        if(lastHistory == null) return null;
-        return new HistoryDto(lastHistory);
+    public ItemDto withNum(int num) {
+        return new ItemDto(stuff, num, lastHistory);
     }
 
-    public ItemDto setStuff(@NonNull StuffDto stuff) {
-        this.stuff = new StuffDto(stuff);
-        return this;
-    }
-
-    public ItemDto setLastHistory(HistoryDto lastHistory) {
-        if(lastHistory == null) {
-            this.lastHistory = null;
-            return this;
-        }
-        this.lastHistory = new HistoryDto(lastHistory);
-        return this;
+    public ItemDto withLastHistory(HistoryDto lastHistory) {
+        return new ItemDto(stuff, num, lastHistory);
     }
 
     public ItemStatus getStatus() {
         if(lastHistory == null) {
-            return ItemDto.ItemStatus.USABLE;
+            return ItemStatus.USABLE;
         }
 
-        return switch (lastHistory.getStatus()) {
+        return switch (lastHistory.status()) {
             case REQUESTED, USING, DELAYED -> ItemStatus.UNUSABLE;
             case RETURNED, EXPIRED, FOUND -> ItemStatus.USABLE;
             case LOST -> ItemStatus.INACTIVE;

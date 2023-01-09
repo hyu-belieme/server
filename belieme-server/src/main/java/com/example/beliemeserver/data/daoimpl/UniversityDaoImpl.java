@@ -39,12 +39,12 @@ public class UniversityDaoImpl implements UniversityDao {
 
     @Override
     public UniversityDto addUniversityData(UniversityDto newUniversity) throws DataException, ConflictException {
-        checkUniversityConflict(newUniversity.getCode());
+        checkUniversityConflict(newUniversity.code());
 
         UniversityEntity newUniversityEntity = new UniversityEntity(
-                newUniversity.getCode(),
-                newUniversity.getName(),
-                newUniversity.getApiUrl()
+                newUniversity.code(),
+                newUniversity.name(),
+                newUniversity.apiUrl()
         );
 
         UniversityEntity savedUniversityEntity = universityRepository.save(newUniversityEntity);
@@ -55,18 +55,18 @@ public class UniversityDaoImpl implements UniversityDao {
     public UniversityDto updateUniversityData(String universityCode, UniversityDto newUniversity) throws DataException, NotFoundException, ConflictException {
         UniversityEntity target = getUniversityEntity(universityCode);
         if (doesIndexOfUniversityChange(universityCode, newUniversity)) {
-            checkUniversityConflict(newUniversity.getCode());
+            checkUniversityConflict(newUniversity.code());
         }
 
-        target.setCode(newUniversity.getCode())
-                .setName(newUniversity.getName())
-                .setApiUrl(newUniversity.getApiUrl());
+        target.setCode(newUniversity.code())
+                .setName(newUniversity.name())
+                .setApiUrl(newUniversity.apiUrl());
 
         return target.toUniversityDto();
     }
 
     private boolean doesIndexOfUniversityChange(String oldUniversityCode, UniversityDto newUniversity) {
-        return !oldUniversityCode.equals(newUniversity.getCode());
+        return !oldUniversityCode.equals(newUniversity.code());
     }
 
     private void checkUniversityConflict(String universityCode) throws ConflictException {

@@ -1,79 +1,59 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Accessors(chain = true)
-public class DepartmentDto {
-    @NonNull
-    @Setter(AccessLevel.NONE)
-    private UniversityDto university;
-
-    @NonNull
-    private String code;
-
-    @NonNull
-    private String name;
-
-    @NonNull
-    @Setter(AccessLevel.NONE)
-    private List<MajorDto> baseMajors;
-
-    public DepartmentDto(@NonNull UniversityDto university, @NonNull String code, @NonNull String name) {
-        setUniversity(university);
-        setCode(code);
-        setName(name);
-        setBaseMajors(new ArrayList<>());
-    }
+public record DepartmentDto(
+        @NonNull UniversityDto university, @NonNull String code,
+        @NonNull String name, @NonNull List<MajorDto> baseMajors
+) {
+    public static final DepartmentDto nestedEndpoint = new DepartmentDto(UniversityDto.nestedEndpoint, "-", "-", new ArrayList<>());
 
     public DepartmentDto(@NonNull UniversityDto university, @NonNull String code, @NonNull String name, @NonNull List<MajorDto> baseMajors) {
-        setUniversity(university);
-        setCode(code);
-        setName(name);
-        setBaseMajors(baseMajors);
+        this.university = university;
+        this.code = code;
+        this.name = name;
+        this.baseMajors = new ArrayList<>(baseMajors);
     }
 
-    public DepartmentDto(DepartmentDto departmentDto) {
-        this.university = departmentDto.getUniversity();
-        this.code = departmentDto.getCode();
-        this.name = departmentDto.getName();
-        this.baseMajors = departmentDto.getBaseMajors();
+    public static DepartmentDto init(@NonNull UniversityDto university, @NonNull String code, @NonNull String name) {
+        return new DepartmentDto(university, code, name, new ArrayList<>());
     }
 
-    public UniversityDto getUniversity() {
-        return new UniversityDto(university);
+    @Override
+    public List<MajorDto> baseMajors() {
+        return new ArrayList<>(baseMajors);
     }
 
-    public List<MajorDto> getBaseMajors() {
-        List<MajorDto> output = new ArrayList<>();
-        for(MajorDto major : baseMajors) {
-            output.add(new MajorDto(major));
-        }
+    public DepartmentDto withUniversity(@NonNull UniversityDto university) {
+        return new DepartmentDto(university, code, name, baseMajors);
+    }
+
+    public DepartmentDto withCode(@NonNull String code) {
+        return new DepartmentDto(university, code, name, baseMajors);
+    }
+
+    public DepartmentDto withName(@NonNull String name) {
+        return new DepartmentDto(university, code, name, baseMajors);
+    }
+
+    public DepartmentDto withBaseMajors(@NonNull List<MajorDto> baseMajors) {
+        return new DepartmentDto(university, code, name, baseMajors);
+    }
+
+    public DepartmentDto withBaseMajorAdd(MajorDto newMajor) {
+        DepartmentDto output = new DepartmentDto(university, code, name, baseMajors);
+        output.baseMajors.add(newMajor);
 
         return output;
     }
 
-    public DepartmentDto setUniversity(@NonNull UniversityDto university) {
-        this.university = new UniversityDto(university);
-        return this;
-    }
+    public DepartmentDto withBaseMajorRemove(MajorDto targetMajor) {
+        DepartmentDto output = new DepartmentDto(university, code, name, baseMajors);
+        output.baseMajors.remove(targetMajor);
 
-    public DepartmentDto setBaseMajors(@NonNull List<MajorDto> baseMajors) {
-        this.baseMajors = new ArrayList<>();
-        for(MajorDto major : baseMajors) {
-            addBaseMajor(new MajorDto(major));
-        }
-        return this;
-    }
-
-    public void addBaseMajor(MajorDto major) {
-        baseMajors.add(major);
+        return output;
     }
 }

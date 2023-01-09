@@ -36,14 +36,14 @@ public class MajorDaoImpl implements MajorDao {
 
     @Override
     public MajorDto addMajorData(MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
-        String universityCode = newMajor.getUniversity().getCode();
+        String universityCode = newMajor.university().code();
         UniversityEntity university = getUniversityEntity(universityCode);
 
-        checkMajorConflict(university.getId(), newMajor.getCode());
+        checkMajorConflict(university.getId(), newMajor.code());
 
         MajorEntity newMajorEntity = new MajorEntity(
                 university,
-                newMajor.getCode()
+                newMajor.code()
         );
 
         MajorEntity savedMajorEntity = majorRepository.save(newMajorEntity);
@@ -54,12 +54,12 @@ public class MajorDaoImpl implements MajorDao {
     public MajorDto updateMajorData(String universityCode, String majorCode, MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
         MajorEntity target = getMajorEntity(universityCode, majorCode);
 
-        UniversityEntity newUniversity = getUniversityEntity(newMajor.getUniversity().getCode());
+        UniversityEntity newUniversity = getUniversityEntity(newMajor.university().code());
 
-        checkMajorConflict(newUniversity.getId(), newMajor.getCode());
+        checkMajorConflict(newUniversity.getId(), newMajor.code());
 
         target.setUniversity(newUniversity)
-                .setCode(newMajor.getCode());
+                .setCode(newMajor.code());
 
         return target.toMajorDto();
     }

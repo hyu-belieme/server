@@ -28,7 +28,7 @@ public class UserDaoTest extends DaoTest {
         TestHelper.listCompareTest(
                 () -> userDao.getListByUniversity(targetUniversityCode),
                 userFakeDao.getAllByCondition(
-                        (record) -> targetUniversityCode.equals(record.getUniversity().getCode())
+                        (record) -> targetUniversityCode.equals(record.university().code())
                 )
         );
     }
@@ -39,7 +39,7 @@ public class UserDaoTest extends DaoTest {
         TestHelper.objectCompareTest(
                 () -> userDao.getByToken(token),
                 userFakeDao.getFirstByCondition(
-                        (record) -> token.equals(record.getToken())
+                        (record) -> token.equals(record.token())
                 )
         );
     }

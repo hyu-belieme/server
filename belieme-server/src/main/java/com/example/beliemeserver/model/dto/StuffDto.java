@@ -1,78 +1,63 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Accessors(chain = true)
-public class StuffDto {
-    @NonNull
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private DepartmentDto department;
-
-    @NonNull
-    private String name;
-
-    private String emoji;
-
-    @NonNull
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private List<ItemDto> items;
-
-    public StuffDto(@NonNull StuffDto stuffDto) {
-        this.department = stuffDto.getDepartment();
-        this.name = stuffDto.getName();
-        this.emoji = stuffDto.getEmoji();
-        this.items = stuffDto.getItems();
-    }
+public record StuffDto(
+        @NonNull DepartmentDto department, @NonNull String name,
+        String emoji, @NonNull List<ItemDto> items
+) {
+    public static final StuffDto nestedEndpoint = new StuffDto(DepartmentDto.nestedEndpoint, "-", "-", new ArrayList<>());
 
     public StuffDto(@NonNull DepartmentDto department, @NonNull String name, String emoji, @NonNull List<ItemDto> items) {
-        setDepartment(department);
-        setName(name);
-        setEmoji(emoji);
-        setItems(items);
+        this.department = department;
+        this.name = name;
+        this.emoji = emoji;
+        this.items = new ArrayList<>(items);
     }
 
     public static StuffDto init(@NonNull DepartmentDto department, @NonNull String name, String emoji) {
         return new StuffDto(department, name, emoji, new ArrayList<>());
     }
 
-    public DepartmentDto getDepartment() {
-        return new DepartmentDto(department);
+    @Override
+    public List<ItemDto> items() {
+        return new ArrayList<>(items);
     }
 
-    public List<ItemDto> getItems() {
-        List<ItemDto> output = new ArrayList<>();
-        for(ItemDto item : items) {
-            output.add(new ItemDto(item));
-        }
+    public StuffDto withDepartment(@NonNull DepartmentDto department) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withName(@NonNull String name) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withEmoji(String emoji) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withItems(@NonNull List<ItemDto> items) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withItemAdd(ItemDto itemDto) {
+        StuffDto output = new StuffDto(department, name, emoji, items);
+        output.items.add(itemDto);
 
         return output;
     }
 
-    public StuffDto setDepartment(@NonNull DepartmentDto department) {
-        this.department = new DepartmentDto(department);
-        return this;
+    public StuffDto withItemRemove(ItemDto itemDto) {
+        StuffDto output = new StuffDto(department, name, emoji, items);
+        output.items.remove(itemDto);
+
+        return output;
     }
 
-    public StuffDto setItems(@NonNull List<ItemDto> items) {
-        this.items = new ArrayList<>();
-        for(ItemDto item : items) {
-            addItem(new ItemDto(item));
-        }
-
-        return this;
-    }
-
-    public int getAmount() {
+    public int amount() {
         int amount = 0;
         for (ItemDto item : items) {
             if (item.getStatus() == ItemDto.ItemStatus.USABLE
@@ -83,7 +68,7 @@ public class StuffDto {
         return amount;
     }
 
-    public int getCount() {
+    public int count() {
         int count = 0;
         for (ItemDto item : items) {
             if (item.getStatus() == ItemDto.ItemStatus.USABLE) {
@@ -91,9 +76,5 @@ public class StuffDto {
             }
         }
         return count;
-    }
-
-    public void addItem(ItemDto item) {
-        items.add(item);
     }
 }

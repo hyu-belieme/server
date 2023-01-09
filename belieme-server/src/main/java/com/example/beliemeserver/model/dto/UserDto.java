@@ -1,150 +1,117 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Accessors(chain = true)
-public class UserDto {
-    @NonNull
-    @Setter(AccessLevel.NONE)
-    private UniversityDto university;
-    @NonNull
-    private String studentId;
-    @NonNull
-    private String name;
-    @NonNull
-    private String token;
+public record UserDto(
+        @NonNull UniversityDto university, @NonNull String studentId,
+        @NonNull String name, @NonNull String token,
+        long createTimeStamp, long approvalTimeStamp,
+        @NonNull List<MajorDto> majors,
+        @NonNull List<AuthorityDto> authorities
+) {
+    public static final UserDto nestedEndpoint = new UserDto(UniversityDto.nestedEndpoint, "-", "-", "", 0, 0, new ArrayList<>(), new ArrayList<>());
 
-    private long createTimeStamp;
-    private long approvalTimeStamp;
-
-    @NonNull
-    @Setter(AccessLevel.NONE)
-    private List<MajorDto> majors;
-    @NonNull
-    @Setter(AccessLevel.NONE)
-    private List<AuthorityDto> authorities;
-
-    public UserDto(@NonNull UserDto userDto) {
-        this.university = userDto.getUniversity();
-        this.studentId = userDto.getStudentId();
-        this.name = userDto.getName();
-        this.token = userDto.getToken();
-        this.createTimeStamp = userDto.getCreateTimeStamp();
-        this.approvalTimeStamp = userDto.getApprovalTimeStamp();
-        this.majors = userDto.getMajors();
-        this.authorities = userDto.getAuthorities();
-    }
-
-    public UserDto(@NonNull UniversityDto university, @NonNull String studentId,
-                   @NonNull String name, @NonNull String token,
-                   long createTimeStamp, long approvalTimeStamp,
-                   @NonNull List<MajorDto> majors, @NonNull List<AuthorityDto> authorities) {
-        setUniversity(university);
-        setStudentId(studentId);
-        setName(name);
-        setToken(token);
-        setCreateTimeStamp(createTimeStamp);
-        setApprovalTimeStamp(approvalTimeStamp);
-        setMajors(majors);
-        setAuthorities(authorities);
+    public UserDto(
+            @NonNull UniversityDto university, @NonNull String studentId,
+            @NonNull String name, @NonNull String token,
+            long createTimeStamp, long approvalTimeStamp,
+            @NonNull List<MajorDto> majors, @NonNull List<AuthorityDto> authorities
+    ) {
+        this.university = university;
+        this.studentId = studentId;
+        this.name = name;
+        this.token = token;
+        this.createTimeStamp = createTimeStamp;
+        this.approvalTimeStamp = approvalTimeStamp;
+        this.majors = new ArrayList<>(majors);
+        this.authorities = new ArrayList<>(authorities);
     }
 
     public static UserDto init(@NonNull UniversityDto university, @NonNull String studentId, @NonNull String name) {
-        UserDto output = new UserDto(university, studentId, name, "",
-                0, 0, new ArrayList<>(), new ArrayList<>());
-        output.setCreateTimeStampNow();
-        output.setApprovalTimeStampNow();
-        output.setNewToken();
+        return new UserDto(university, studentId, name, newToken(),
+                currentTimeStamp(), currentTimeStamp(), new ArrayList<>(), new ArrayList<>());
+    }
+
+    @Override
+    public List<MajorDto> majors() {
+        return new ArrayList<>(majors);
+    }
+
+    @Override
+    public List<AuthorityDto> authorities() {
+        return new ArrayList<>(authorities);
+    }
+
+    public UserDto withUniversity(@NonNull UniversityDto university) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withStudentId(@NonNull String studentId) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withName(@NonNull String name) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withToken(@NonNull String token) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withCreateTimeStamp(long createTimeStamp) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withApprovalTimeStamp(long approvalTimeStamp) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withMajors(@NonNull List<MajorDto> majors) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withMajorAdd(MajorDto majorDto) {
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        output.majors.add(majorDto);
         return output;
     }
 
-    public UniversityDto getUniversity() {
-        return new UniversityDto(university);
-    }
-
-    public List<MajorDto> getMajors() {
-        List<MajorDto> output = new ArrayList<>();
-        for (MajorDto major : majors) {
-            output.add(new MajorDto(major));
-        }
+    public UserDto withMajorRemove(MajorDto majorDto) {
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        output.majors.remove(majorDto);
         return output;
     }
 
-    public List<AuthorityDto> getAuthorities() {
-        List<AuthorityDto> output = new ArrayList<>();
-        for (AuthorityDto authority : authorities) {
-            output.add(new AuthorityDto(authority));
-        }
+    public UserDto withAuthorities(@NonNull List<AuthorityDto> authorities) {
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+    }
+
+    public UserDto withAuthorityAdd(AuthorityDto authorityDto) {
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        output.authorities.add(authorityDto);
         return output;
     }
 
-    public UserDto setUniversity(@NonNull UniversityDto university) {
-        this.university = new UniversityDto(university);
-        return this;
-    }
-
-    public UserDto setMajors(@NonNull List<MajorDto> majors) {
-        this.majors = new ArrayList<>();
-        for (MajorDto major : majors) {
-            addMajor(new MajorDto(major));
-        }
-        return this;
-    }
-
-    public UserDto setAuthorities(@NonNull List<AuthorityDto> authorities) {
-        this.authorities = new ArrayList<>();
-        for (AuthorityDto authority : authorities) {
-            addAuthority(new AuthorityDto(authority));
-        }
-        return this;
-    }
-
-    public UserDto setCreateTimeStampNow() {
-        createTimeStamp = System.currentTimeMillis()/1000;
-        return this;
-    }
-
-    public UserDto setApprovalTimeStampNow() {
-        approvalTimeStamp = System.currentTimeMillis()/1000;
-        return this;
-    }
-
-    public UserDto setNewToken() {
-        this.token = UUID.randomUUID().toString();
-        return this;
-    }
-
-    public UserDto addMajor(MajorDto majorDto) {
-        this.majors.add(majorDto);
-        return this;
-    }
-
-    public UserDto addAuthority(AuthorityDto authorityDto) {
-        authorities.add(authorityDto);
-        return this;
-    }
-
-    public UserDto removeMajor(MajorDto majorDto) {
-        this.majors.remove(majorDto);
-        return this;
-    }
-
-    public UserDto removeAuthority(AuthorityDto authorityDto) {
-        authorities.remove(authorityDto);
-        return this;
+    public UserDto withAuthorityRemove(AuthorityDto authorityDto) {
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        output.authorities.remove(authorityDto);
+        return output;
     }
 
     public AuthorityDto.Permission getMaxPermission(DepartmentDto departmentDto) {
         // TODO Needs implement
         return AuthorityDto.Permission.USER;
+    }
+
+    private static long currentTimeStamp() {
+        return System.currentTimeMillis()/1000;
+    }
+
+    private static String newToken() {
+        return UUID.randomUUID().toString();
     }
 }

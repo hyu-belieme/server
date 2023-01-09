@@ -30,9 +30,9 @@ public class ItemDaoTest extends DaoTest {
                 () -> itemDao.getListByStuff(universityCode, departmentCode, stuffName),
                 itemFakeDao.getAllByCondition(
                         (target) -> {
-                            return universityCode.equals(target.getStuff().getDepartment().getUniversity().getCode())
-                                    && departmentCode.equals(target.getStuff().getDepartment().getCode())
-                                    && stuffName.equals(target.getStuff().getName());
+                            return universityCode.equals(target.stuff().department().university().code())
+                                    && departmentCode.equals(target.stuff().department().code())
+                                    && stuffName.equals(target.stuff().name());
                         }
                 )
         );
