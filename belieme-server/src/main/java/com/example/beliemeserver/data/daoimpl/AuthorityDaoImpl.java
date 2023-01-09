@@ -24,7 +24,7 @@ public class AuthorityDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public AuthorityDto update(String universityCodeForUser, String studentId, String universityCodeForDepartment, String departmentCode, AuthorityDto authority) throws DataException {
+    public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto authority) throws DataException {
         // TODO Need Implement
         return null;
     }

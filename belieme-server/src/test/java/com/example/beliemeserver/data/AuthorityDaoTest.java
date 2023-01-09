@@ -2,6 +2,8 @@ package com.example.beliemeserver.data;
 
 import com.example.beliemeserver.model.dao.AuthorityDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.exception.ConflictException;
+import com.example.beliemeserver.model.exception.NotFoundException;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;
@@ -21,31 +23,85 @@ public class AuthorityDaoTest extends DaoTest {
 
     @Test
     public void createTest() {
-        // TODO set good new data
         AuthorityDto newAuthority = new AuthorityDto(
-                DummyDataSet.userDummies.get(0),
-                DummyDataSet.departmentDummies.get(0),
-                AuthorityDto.Permission.STAFF
+                DummyDataSet.departmentDummies.get(3),
+                AuthorityDto.Permission.BANNED
         );
 
         testCreatingAuthority(newAuthority);
     }
 
     @Test
-    public void updateTest() {
-        String universityCodeForUser = "";
-        String studentId = "";
-        String universityCodeForDepartment = "";
-        String departmentCode = "";
-
-        // TODO set good new data
+    public void createFailByNotFound() {
         AuthorityDto newAuthority = new AuthorityDto(
-                DummyDataSet.userDummies.get(0),
-                DummyDataSet.departmentDummies.get(0),
+                DummyDataSet.notFoundDepartment,
+                AuthorityDto.Permission.MASTER
+        );
+
+        TestHelper.exceptionTest(
+                () -> authorityDao.create(newAuthority),
+                NotFoundException.class
+        );
+    }
+
+    @Test
+    public void createFailByConflict() {
+        AuthorityDto newAuthority = new AuthorityDto(
+                DummyDataSet.departmentDummies.get(2),
+                AuthorityDto.Permission.MASTER
+        );
+
+        TestHelper.exceptionTest(
+                () -> authorityDao.create(newAuthority),
+                ConflictException.class
+        );
+    }
+
+    @Test
+    public void updateTest() {
+        String universityCode = "CKU";
+        String departmentCode = "MED";
+        AuthorityDto.Permission permission = AuthorityDto.Permission.STAFF;
+
+        AuthorityDto newAuthority = new AuthorityDto(
+                DummyDataSet.departmentDummies.get(3),
                 AuthorityDto.Permission.STAFF
         );
 
-        testUpdatingUser(universityCodeForUser, studentId, universityCodeForDepartment, departmentCode, newAuthority);
+        testUpdatingAuthority(universityCode, departmentCode, permission, newAuthority);
+    }
+
+    @Test
+    public void updateFailByNotFound() {
+        String universityCode = "CKU";
+        String departmentCode = "STU";
+        AuthorityDto.Permission permission = AuthorityDto.Permission.BANNED;
+        AuthorityDto newAuthority = new AuthorityDto(
+                DummyDataSet.departmentDummies.get(3),
+                AuthorityDto.Permission.STAFF
+        );
+
+        TestHelper.exceptionTest(
+                () -> authorityDao.update(universityCode, departmentCode, permission, newAuthority),
+                NotFoundException.class
+        );
+    }
+
+    @Test
+    public void updateFailByConflict() {
+        String universityCode = "CKU";
+        String departmentCode = "MED";
+        AuthorityDto.Permission permission = AuthorityDto.Permission.STAFF;
+
+        AuthorityDto newAuthority = new AuthorityDto(
+                DummyDataSet.departmentDummies.get(2),
+                AuthorityDto.Permission.MASTER
+        );
+
+        TestHelper.exceptionTest(
+                () -> authorityDao.update(universityCode, departmentCode, permission, newAuthority),
+                ConflictException.class
+        );
     }
 
     private void testCreatingAuthority(AuthorityDto newAuthority) {
@@ -60,16 +116,15 @@ public class AuthorityDaoTest extends DaoTest {
         );
     }
 
-    private void testUpdatingUser(
-            String universityCodeForUser, String studentId, String universityCodeForDepartment,
-            String departmentCode, AuthorityDto newAuthority) {
+    private void testUpdatingAuthority(String universityCodeForDepartment, String departmentCode,
+                                       AuthorityDto.Permission permission, AuthorityDto newAuthority) {
         TestHelper.objectCompareTest(
-                () -> authorityDao.update(universityCodeForUser, studentId, universityCodeForDepartment, departmentCode, newAuthority),
+                () -> authorityDao.update(universityCodeForDepartment, departmentCode, permission, newAuthority),
                 newAuthority
         );
 
         AuthorityDto targetOnDummy =
-                getAuthorityDummy(universityCodeForUser, studentId, universityCodeForDepartment, departmentCode);
+                getAuthorityDummy(universityCodeForDepartment, departmentCode);
         TestHelper.listCompareTest(
                 () -> authorityDao.getAllList(),
                 authorityFakeDao.dummyStatusAfterUpdate(targetOnDummy, newAuthority)

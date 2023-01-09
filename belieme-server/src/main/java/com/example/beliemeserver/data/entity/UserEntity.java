@@ -59,8 +59,8 @@ public class UserEntity extends DataEntity {
     private List<MajorUserJoinEntity> majorJoin;
 
     @NonNull
-    @OneToMany(mappedBy = "user")
-    private List<AuthorityEntity> authorities;
+    @OneToMany(mappedBy = "userId") // TODO 실험
+    private List<AuthorityUserJoinEntity> authorityJoin;
 
     public UserEntity(UniversityEntity university, String studentId, String name, String token, long createTimeStamp, long approvalTimeStamp) {
         this.university = university;
@@ -70,7 +70,8 @@ public class UserEntity extends DataEntity {
         this.token = token;
         this.createTimeStamp = createTimeStamp;
         this.approvalTimeStamp = approvalTimeStamp;
-        this.authorities = new ArrayList<>();
+        this.majorJoin = new ArrayList<>();
+        this.authorityJoin = new ArrayList<>();
     }
 
     public void setUniversity(UniversityEntity university) {
@@ -78,12 +79,12 @@ public class UserEntity extends DataEntity {
         this.universityId = university.getId();
     }
 
-    public void addAuthority(AuthorityEntity authority) {
-        this.authorities.add(authority);
+    public void addAuthority(AuthorityUserJoinEntity authority) {
+        this.authorityJoin.add(authority);
     }
 
-    public void removeAuthority(AuthorityEntity authority) {
-        this.authorities.remove(authority);
+    public void removeAuthority(AuthorityUserJoinEntity authority) {
+        this.authorityJoin.remove(authority);
     }
 
     public void addMajor(MajorUserJoinEntity major) {
@@ -106,8 +107,8 @@ public class UserEntity extends DataEntity {
                 new ArrayList<>()
         );
 
-        for(AuthorityEntity authority : authorities) {
-            output.addAuthority(authority.toAuthorityDtoNestedToUser());
+        for(AuthorityUserJoinEntity authority : authorityJoin) {
+            output.addAuthority(authority.getAuthority().toAuthorityDto());
         }
 
         for(MajorUserJoinEntity major : majorJoin) {

@@ -12,8 +12,7 @@ public interface AuthorityDao {
     AuthorityDto create(AuthorityDto authority)
             throws ConflictException, DataException;
 
-    AuthorityDto update(
-            String universityCodeForUser, String studentId,
-            String universityCodeForDepartment, String departmentCode, AuthorityDto authority)
+    AuthorityDto update(String universityCode, String departmentCode,
+                        AuthorityDto.Permission permission, AuthorityDto authority)
             throws DataException;
 }
