@@ -19,7 +19,7 @@ public record AuthorityDto(
     @Override
     public String toString() {
         if(this.equals(nestedEndpoint)) {
-            return "-";
+            return "omitted";
         }
 
         return "AuthorityDto{" +
