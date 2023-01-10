@@ -16,4 +16,16 @@ public record UniversityDto(@NonNull String code, @NonNull String name, String a
     public UniversityDto withApiUrl(String apiUrl) {
         return new UniversityDto(code, name, apiUrl);
     }
+
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+        return "UniversityDto{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", apiUrl='" + apiUrl + '\'' +
+                '}';
+    }
 }

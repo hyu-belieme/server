@@ -57,6 +57,20 @@ public record StuffDto(
         return output;
     }
 
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "StuffDto{" +
+                "department=" + department +
+                ", name='" + name + '\'' +
+                ", emoji='" + emoji + '\'' +
+                ", items=" + items +
+                '}';
+    }
+
     public int amount() {
         int amount = 0;
         for (ItemDto item : items) {

@@ -102,6 +102,24 @@ public record UserDto(
         return output;
     }
 
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "UserDto{" +
+                "university=" + university +
+                ", studentId='" + studentId + '\'' +
+                ", name='" + name + '\'' +
+                ", token='" + token + '\'' +
+                ", createTimeStamp=" + createTimeStamp +
+                ", approvalTimeStamp=" + approvalTimeStamp +
+                ", majors=" + majors +
+                ", authorities=" + authorities +
+                '}';
+    }
+
     public AuthorityDto.Permission getMaxPermission(DepartmentDto departmentDto) {
         // TODO Needs implement
         return AuthorityDto.Permission.USER;

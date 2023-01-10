@@ -16,6 +16,18 @@ public record AuthorityDto(
         return new AuthorityDto(department, permission);
     }
 
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "-";
+        }
+
+        return "AuthorityDto{" +
+                "department=" + department +
+                ", permission=" + permission +
+                '}';
+    }
+
     public enum Permission {
         BANNED, USER, STAFF, MASTER, DEVELOPER;
 

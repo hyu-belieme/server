@@ -23,6 +23,19 @@ public record ItemDto(
         return new ItemDto(stuff, num, lastHistory);
     }
 
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "ItemDto{" +
+                "stuff=" + stuff +
+                ", num=" + num +
+                ", lastHistory=" + lastHistory +
+                '}';
+    }
+
     public ItemStatus getStatus() {
         if(lastHistory == null) {
             return ItemStatus.USABLE;

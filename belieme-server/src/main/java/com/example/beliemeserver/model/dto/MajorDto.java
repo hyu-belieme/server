@@ -12,4 +12,16 @@ public record MajorDto(@NonNull UniversityDto university, @NonNull String code) 
     public MajorDto withCode(@NonNull String code) {
         return new MajorDto(university, code);
     }
+
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "MajorDto{" +
+                "university=" + university +
+                ", code='" + code + '\'' +
+                '}';
+    }
 }

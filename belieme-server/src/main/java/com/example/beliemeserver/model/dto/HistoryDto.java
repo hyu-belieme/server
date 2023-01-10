@@ -98,6 +98,28 @@ public record HistoryDto(
                 lostTimeStamp, cancelTimeStamp);
     }
 
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "HistoryDto{" +
+                "item=" + item +
+                ", num=" + num +
+                ", requester=" + requester +
+                ", approveManager=" + approveManager +
+                ", returnManager=" + returnManager +
+                ", lostManager=" + lostManager +
+                ", cancelManager=" + cancelManager +
+                ", reservedTimeStamp=" + reservedTimeStamp +
+                ", approveTimeStamp=" + approveTimeStamp +
+                ", returnTimeStamp=" + returnTimeStamp +
+                ", lostTimeStamp=" + lostTimeStamp +
+                ", cancelTimeStamp=" + cancelTimeStamp +
+                '}';
+    }
+
     public HistoryDto.HistoryStatus status() {
         //TODO 여기 분기 다시 깔끔하게 짜기
         //TODO ERROR인 조건들 추가하기 ex)item이 널이거나 그런경우?...

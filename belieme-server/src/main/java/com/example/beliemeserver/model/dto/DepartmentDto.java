@@ -56,4 +56,18 @@ public record DepartmentDto(
 
         return output;
     }
+
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "DepartmentDto{" +
+                "university=" + university +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", baseMajors=" + baseMajors +
+                '}';
+    }
 }
