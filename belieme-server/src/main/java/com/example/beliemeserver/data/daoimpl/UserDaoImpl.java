@@ -79,7 +79,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
         saveMajorJoins(target, newUser.majors());
         saveAuthorityJoins(target, newUser.authorities());
-        return null;
+        return target.toUserDto();
     }
 
     private void checkUserConflict(int universityId, String studentId) throws ConflictException {
