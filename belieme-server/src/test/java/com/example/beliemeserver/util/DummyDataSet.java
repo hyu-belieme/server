@@ -136,25 +136,6 @@ public class DummyDataSet {
                 ItemDto.init(stuffDummies.get(7), 1)
         ));
 
-        { // TODO Try to extract method
-            List<StuffDto> stuffDummiesBuffer = new ArrayList<>(stuffDummies);
-            for (ItemDto item : itemDummies) {
-                ItemDto nestedItem = item.withStuff(StuffDto.nestedEndpoint);
-
-                int stuffIndex = stuffDummies.indexOf(item.stuff());
-                stuffDummiesBuffer.set(stuffIndex, stuffDummiesBuffer.get(stuffIndex).withItemAdd(nestedItem));
-            }
-
-            for (int i = 0; i < itemDummies.size(); i++) {
-                ItemDto item = itemDummies.get(i);
-
-                int stuffIndex = stuffDummies.indexOf(item.stuff());
-                ItemDto newItem = item.withStuff(stuffDummiesBuffer.get(stuffIndex));
-                itemDummies.set(i, newItem);
-            }
-            stuffDummies = stuffDummiesBuffer;
-        }
-
         historyDummies = new ArrayList<>(List.of(
                 new HistoryDto(itemDummies.get(0), 1, userDummies.get(0), userDummies.get(0), userDummies.get(0), null, null, 1673155356, 1673155430, 1673159244, 0, 0),
                 new HistoryDto(itemDummies.get(5), 1, userDummies.get(0), null, null, null, null, 1673155356, 0, 0, 0, 0),
@@ -183,6 +164,27 @@ public class DummyDataSet {
             }
             itemDummies = itemDummiesBuffer;
         }
+
+        { // TODO Try to extract method
+            List<StuffDto> stuffDummiesBuffer = new ArrayList<>(stuffDummies);
+            for (ItemDto item : itemDummies) {
+                ItemDto nestedItem = item.withStuff(StuffDto.nestedEndpoint);
+
+                int stuffIndex = stuffDummies.indexOf(item.stuff());
+                stuffDummiesBuffer.set(stuffIndex, stuffDummiesBuffer.get(stuffIndex).withItemAdd(nestedItem));
+            }
+
+            for (int i = 0; i < itemDummies.size(); i++) {
+                ItemDto item = itemDummies.get(i);
+
+                int stuffIndex = stuffDummies.indexOf(item.stuff());
+                ItemDto newItem = item.withStuff(stuffDummiesBuffer.get(stuffIndex));
+                itemDummies.set(i, newItem);
+            }
+            stuffDummies = stuffDummiesBuffer;
+        }
+
+
         initSampleData();
     }
 
