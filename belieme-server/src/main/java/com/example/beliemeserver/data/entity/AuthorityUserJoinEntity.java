@@ -43,14 +43,13 @@ public class AuthorityUserJoinEntity {
         this.userId = user.getId();
     }
 
-    // TODO 실험
-//    @PreRemove
-//    private void commitToUserBeforeRemove() {
-//        user.removeAuthority(this);
-//    }
+    @PreRemove
+    private void commitToUserBeforeRemove() {
+        user.removeAuthority(this);
+    }
 
-//    @PrePersist
-//    private void commitOnUserAfterCreate() {
-//        user.addAuthority(this);
-//    }
+    @PrePersist
+    private void commitOnUserAfterCreate() {
+        user.addAuthority(this);
+    }
 }
