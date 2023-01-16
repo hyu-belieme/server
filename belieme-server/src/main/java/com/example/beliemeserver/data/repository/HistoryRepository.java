@@ -1,4 +1,7 @@
 package com.example.beliemeserver.data.repository;
 
-public interface HistoryRepository {
+import com.example.beliemeserver.data.entity.HistoryEntity;
+import com.example.beliemeserver.data.repository.custom.RefreshRepository;
+
+public interface HistoryRepository extends RefreshRepository<HistoryEntity, Integer> {
 }

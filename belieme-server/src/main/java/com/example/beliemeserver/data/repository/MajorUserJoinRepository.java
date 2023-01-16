@@ -1,5 +1,8 @@
 package com.example.beliemeserver.data.repository;
 
-public interface MajorUserJoinRepository {
+import com.example.beliemeserver.data.entity.MajorUserJoinEntity;
+import com.example.beliemeserver.data.repository.custom.RefreshRepository;
+
+public interface MajorUserJoinRepository extends RefreshRepository<MajorUserJoinEntity, Integer> {
     // TODO : Implement after fixing UserEntity.
 }
