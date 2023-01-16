@@ -23,7 +23,7 @@ public class AuthorityEntity extends DataEntity {
     private int id;
 
     @Column(name = "department_id")
-    private int department_id;
+    private int departmentId;
 
     @NonNull
     @Column(name = "permission", length = 20)
@@ -35,13 +35,13 @@ public class AuthorityEntity extends DataEntity {
 
     public AuthorityEntity(DepartmentEntity department, String permission) {
         this.department = department;
-        this.department_id = department.getId();
+        this.departmentId = department.getId();
         this.permission = permission; // TODO : validate Permission String
     }
 
     public void setDepartment(DepartmentEntity department) {
         this.department = department;
-        this.department_id = department.getId();
+        this.departmentId = department.getId();
     }
 
     public void setPermission(String permission) {
