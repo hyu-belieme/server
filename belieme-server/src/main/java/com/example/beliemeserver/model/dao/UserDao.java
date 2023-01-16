@@ -21,8 +21,8 @@ public interface UserDao {
             throws NotFoundException, DataException;
 
     UserDto create(UserDto user)
-            throws ConflictException, DataException;
+            throws ConflictException, DataException, NotFoundException;
 
     UserDto update(String universityCode, String studentId, UserDto newUser)
-            throws NotFoundException, DataException;
+            throws NotFoundException, DataException, ConflictException;
 }

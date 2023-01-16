@@ -36,6 +36,13 @@ public class AuthorityUserJoinEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
     private UserEntity user;
 
+    public AuthorityUserJoinEntity(AuthorityEntity authority, UserEntity user) {
+        this.authority = authority;
+        this.authorityId = authority.getId();
+        this.user = user;
+        this.userId = user.getId();
+    }
+
     // TODO 실험
 //    @PreRemove
 //    private void commitToUserBeforeRemove() {

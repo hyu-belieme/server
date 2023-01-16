@@ -5,6 +5,7 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Getter
+@Accessors(chain = true)
 public class UserEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,9 +78,10 @@ public class UserEntity extends DataEntity {
         this.authorityJoin = new ArrayList<>();
     }
 
-    public void setUniversity(UniversityEntity university) {
+    public UserEntity setUniversity(UniversityEntity university) {
         this.university = university;
         this.universityId = university.getId();
+        return this;
     }
 
     public void addAuthority(AuthorityUserJoinEntity authority) {
