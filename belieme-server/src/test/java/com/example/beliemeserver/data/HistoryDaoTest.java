@@ -21,9 +21,24 @@ public class HistoryDaoTest extends DaoTest {
 
     @Test
     public void getListByDepartmentTest() {
-        // TODO set good new data
-        String universityCode = "";
-        String departmentCode = "";
+        String universityCode = "HYU";
+        String departmentCode = "CSE";
+
+        TestHelper.listCompareTest(
+                () -> historyDao.getListByDepartment(universityCode, departmentCode),
+                historyFakeDao.getAllByCondition(
+                        (target) -> {
+                            return universityCode.equals(target.item().stuff().department().university().code())
+                                    && departmentCode.equals(target.item().stuff().department().code());
+                        }
+                )
+        );
+    }
+
+    @Test
+    public void getListByDepartmentTest2() {
+        String universityCode = "HYU";
+        String departmentCode = "STU";
 
         TestHelper.listCompareTest(
                 () -> historyDao.getListByDepartment(universityCode, departmentCode),
@@ -38,11 +53,10 @@ public class HistoryDaoTest extends DaoTest {
 
     @Test
     public void getListByDepartmentAndRequesterTest() {
-        // TODO set good new data
-        String universityCode = "";
-        String departmentCode = "";
-        String universityCodeForRequester = "";
-        String studentId = "";
+        String universityCode = "HYU";
+        String departmentCode = "CSE";
+        String universityCodeForRequester = "HYU";
+        String studentId = "2018008886";
 
         TestHelper.listCompareTest(
                 () -> historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, universityCodeForRequester, studentId),
@@ -60,11 +74,10 @@ public class HistoryDaoTest extends DaoTest {
 
     @Test
     public void getByIndexTest() {
-        // TODO set good new data
-        String universityCode = "";
-        String departmentCode = "";
-        String stuffName = "";
-        int itemNum = 0;
+        String universityCode = "CKU";
+        String departmentCode = "MED";
+        String stuffName = "볼펜";
+        int itemNum = 3;
         int historyNum = 0;
 
         TestHelper.objectCompareTest(
@@ -77,16 +90,15 @@ public class HistoryDaoTest extends DaoTest {
 
     @Test
     public void createTest() {
-        // TODO set good new data
         HistoryDto newHistory = new HistoryDto(
-                DummyDataSet.itemDummies.get(0),
-                4,
-                DummyDataSet.userDummies.get(0),
+                DummyDataSet.itemDummies.get(12),
+                1,
+                DummyDataSet.userDummies.get(1),
                 null,
                 null,
                 null,
                 null,
-                12341234,
+                1673358789,
                 0,
                 0,
                 0,
@@ -98,24 +110,23 @@ public class HistoryDaoTest extends DaoTest {
 
     @Test
     public void updateTest() {
-        String universityCode = "";
-        String departmentCode = "";
-        String stuffName = "";
-        int itemNum = 0;
-        int historyNum = 0;
+        String universityCode = "HYU";
+        String departmentCode = "CSE";
+        String stuffName = "우산";
+        int itemNum = 1;
+        int historyNum = 2;
 
-        // TODO set good new data
         HistoryDto newHistory = new HistoryDto(
                 DummyDataSet.itemDummies.get(0),
-                4,
+                2,
+                DummyDataSet.userDummies.get(1),
+                DummyDataSet.userDummies.get(0),
                 DummyDataSet.userDummies.get(0),
                 null,
                 null,
-                null,
-                null,
-                12341234,
-                0,
-                0,
+                1673172221,
+                1673172521,
+                1673358789,
                 0,
                 0
         );
