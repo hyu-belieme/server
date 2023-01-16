@@ -38,7 +38,7 @@ public abstract class BaseDaoImpl {
     }
 
     protected UniversityEntity getUniversityEntity(String universityCode) throws NotFoundException {
-        return IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode);
+        return IndexAdapter.getUniversityEntity(universityRepository, universityCode);
     }
 
     protected UniversityEntity getUniversityEntity(UniversityDto universityDto) throws NotFoundException {

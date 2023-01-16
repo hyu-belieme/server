@@ -5,7 +5,7 @@ import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.exception.NotFoundException;
 
 public class IndexAdapter {
-    public static UniversityEntity getUniversityEntityByCode(UniversityRepository universityRepository, String code) throws NotFoundException {
+    public static UniversityEntity getUniversityEntity(UniversityRepository universityRepository, String code) throws NotFoundException {
         UniversityEntity target = universityRepository.findByCode(code).orElse(null);
         return (UniversityEntity) checkNullAndReturn(target);
     }

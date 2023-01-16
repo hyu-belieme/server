@@ -1,10 +1,8 @@
 package com.example.beliemeserver.data.daoimpl;
 
-import com.example.beliemeserver.data.daoimpl.util.IndexAdapter;
 import com.example.beliemeserver.data.entity.MajorEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
-import com.example.beliemeserver.data.repository.MajorRepository;
-import com.example.beliemeserver.data.repository.UniversityRepository;
+import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.MajorDao;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.exception.ConflictException;
@@ -16,13 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class MajorDaoImpl implements MajorDao {
-    private final UniversityRepository universityRepository;
-    private final MajorRepository majorRepository;
+public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
 
-    public MajorDaoImpl(UniversityRepository universityRepository, MajorRepository majorRepository) {
-        this.universityRepository = universityRepository;
-        this.majorRepository = majorRepository;
+    public MajorDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorUserJoinRepository majorUserJoinRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+        super(universityRepository, departmentRepository, userRepository, majorRepository, majorUserJoinRepository, majorDepartmentJoinRepository, authorityRepository, authorityUserJoinRepository, stuffRepository, itemRepository, historyRepository);
     }
 
     @Override
@@ -68,14 +63,5 @@ public class MajorDaoImpl implements MajorDao {
         if(majorRepository.existsByUniversityIdAndCode(universityId, majorCode)) {
             throw new ConflictException();
         }
-    }
-
-    private UniversityEntity getUniversityEntity(String universityCode) throws NotFoundException {
-        return IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode);
-    }
-
-    private MajorEntity getMajorEntity(String universityCode, String majorCode) throws NotFoundException {
-        int universityId = getUniversityEntity(universityCode).getId();
-        return IndexAdapter.getMajorEntity(majorRepository, universityId, majorCode);
     }
 }
