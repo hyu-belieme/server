@@ -2,10 +2,15 @@ package com.example.beliemeserver.data;
 
 import com.example.beliemeserver.model.dao.HistoryDao;
 import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HistoryDaoTest extends DaoTest {
     @Autowired
@@ -66,7 +71,7 @@ public class HistoryDaoTest extends DaoTest {
                                     && departmentCode.equals(target.item().stuff().department().code())
                                     && target.requester() != null
                                     && universityCodeForRequester.equals(target.requester().university().code())
-                                    && departmentCode.equals(target.requester().studentId());
+                                    && studentId.equals(target.requester().studentId());
                         }
                 )
         );
@@ -78,7 +83,7 @@ public class HistoryDaoTest extends DaoTest {
         String departmentCode = "MED";
         String stuffName = "볼펜";
         int itemNum = 3;
-        int historyNum = 0;
+        int historyNum = 1;
 
         TestHelper.objectCompareTest(
                 () -> historyDao.getByIndex(universityCode, departmentCode,
@@ -137,13 +142,13 @@ public class HistoryDaoTest extends DaoTest {
 
     private void testCreatingHistory(HistoryDto newHistory) {
         TestHelper.objectCompareTest(
-                () -> historyDao.create(newHistory),
-                newHistory
+                () -> simplify(historyDao.create(newHistory)),
+                simplify(newHistory)
         );
 
         TestHelper.listCompareTest(
-                () -> historyDao.getAllList(),
-                historyFakeDao.dummyStatusAfterCreate(newHistory)
+                () -> simplify(historyDao.getAllList()),
+                simplify(historyFakeDao.dummyStatusAfterCreate(newHistory))
         );
     }
 
@@ -151,17 +156,37 @@ public class HistoryDaoTest extends DaoTest {
             String universityCode, String departmentCode,
             String stuffName, int itemNum, int historyNum, HistoryDto newHistory) {
         TestHelper.objectCompareTest(
-                () -> historyDao.update(universityCode, departmentCode, stuffName,
-                        itemNum, historyNum, newHistory),
-                newHistory
+                () -> simplify(historyDao.update(universityCode, departmentCode, stuffName,
+                        itemNum, historyNum, newHistory)),
+                simplify(newHistory)
         );
 
         HistoryDto targetOnDummy =
                 getHistoryDummy(universityCode, departmentCode, stuffName,
                         itemNum, historyNum);
         TestHelper.listCompareTest(
-                () -> historyDao.getAllList(),
-                historyFakeDao.dummyStatusAfterUpdate(targetOnDummy, newHistory)
+                () -> simplify(historyDao.getAllList()),
+                simplify(historyFakeDao.dummyStatusAfterUpdate(targetOnDummy, newHistory))
         );
+    }
+
+    public HistoryDto simplify(HistoryDto result) {
+        if(result == null) {
+            return null;
+        }
+        StuffDto simplifiedStuff = result.item().stuff().withItems(List.of());
+        ItemDto simplifiedItem = result.item()
+                .withStuff(simplifiedStuff)
+                .withLastHistory(HistoryDto.nestedEndpoint);
+        return result.withItem(simplifiedItem);
+    }
+
+    public List<HistoryDto> simplify(List<HistoryDto> historyDtoList) {
+        List<HistoryDto> output = new ArrayList<>();
+        for(HistoryDto historyDto : historyDtoList) {
+            output.add(simplify(historyDto));
+        }
+
+        return output;
     }
 }
