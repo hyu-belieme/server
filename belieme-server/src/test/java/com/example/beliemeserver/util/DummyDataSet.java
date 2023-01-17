@@ -68,8 +68,8 @@ public class DummyDataSet {
         ));
 
         authorityDummies = new ArrayList<>();
-        for(int i = 0; i < departmentDummies.size() - 1; i++) {
-            for(AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+        for (int i = 0; i < departmentDummies.size() - 1; i++) {
+            for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
                 authorityDummies.add(new AuthorityDto(departmentDummies.get(i), permission));
             }
         }
@@ -89,7 +89,7 @@ public class DummyDataSet {
                         List.of(majorDummies.get(5)), new ArrayList<>()),
                 new UserDto(universityDummies.get(1), "2018008887", "이석환",
                         "TEST5", 1673155358, 1673155358,
-                       List.of(majorDummies.get(7)), new ArrayList<>())
+                        List.of(majorDummies.get(7)), new ArrayList<>())
         ));
 
         userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(0 * 5 + 3)));
@@ -143,54 +143,102 @@ public class DummyDataSet {
                 new HistoryDto(itemDummies.get(16), 1, userDummies.get(0), null, null, null, userDummies.get(0), 1673172221, 0, 0, 0, 1673172521)
         ));
 
-        { // TODO Try to extract method
-            List<ItemDto> itemDummiesBuffer = new ArrayList<>(itemDummies);
-            for (HistoryDto history : historyDummies) {
-                HistoryDto nestedHistory = history.withItem(ItemDto.nestedEndpoint);
 
-                ItemDto parentItem = history.item();
-                ItemDto newParentItem = parentItem.withLastHistory(nestedHistory);
+        setLastHistoryOnItemDummies();
+        setItemOnHistoryDummies();
 
-                int itemIndex = itemDummies.indexOf(parentItem);
-                itemDummiesBuffer.set(itemIndex, newParentItem);
-            }
-
-            for (int i = 0; i < historyDummies.size(); i++) {
-                HistoryDto history = historyDummies.get(i);
-
-                int itemIndex = itemDummies.indexOf(history.item());
-                HistoryDto newHistory = history.withItem(itemDummiesBuffer.get(itemIndex));
-                historyDummies.set(i, newHistory);
-            }
-            itemDummies = itemDummiesBuffer;
-        }
-
-        { // TODO Try to extract method
-            List<StuffDto> stuffDummiesBuffer = new ArrayList<>(stuffDummies);
-            for (ItemDto item : itemDummies) {
-                ItemDto nestedItem = item.withStuff(StuffDto.nestedEndpoint);
-
-                int stuffIndex = stuffDummies.indexOf(item.stuff());
-                stuffDummiesBuffer.set(stuffIndex, stuffDummiesBuffer.get(stuffIndex).withItemAdd(nestedItem));
-            }
-
-            for (int i = 0; i < itemDummies.size(); i++) {
-                ItemDto item = itemDummies.get(i);
-
-                int stuffIndex = stuffDummies.indexOf(item.stuff());
-                ItemDto newItem = item.withStuff(stuffDummiesBuffer.get(stuffIndex));
-                itemDummies.set(i, newItem);
-            }
-            stuffDummies = stuffDummiesBuffer;
-        }
-
+        setItemsOnStuffDummies();
+        setStuffOnItemDummies();
+        setItemOnHistoryDummies();
 
         initSampleData();
+    }
+
+    private static void setStuffOnItemDummies() {
+        for (int i = 0; i < itemDummies.size(); i++) {
+            ItemDto item = itemDummies.get(i);
+
+            int stuffIndex = getIndexByUniqueKey(item.stuff());
+            ItemDto newItem = item.withStuff(stuffDummies.get(stuffIndex));
+            itemDummies.set(i, newItem);
+        }
+    }
+
+    private static void setItemsOnStuffDummies() {
+        for (ItemDto item : itemDummies) {
+            ItemDto nestedItem = item.withStuff(StuffDto.nestedEndpoint);
+
+            int stuffIndex = getIndexByUniqueKey(item.stuff());
+            stuffDummies.set(stuffIndex, stuffDummies.get(stuffIndex).withItemAdd(nestedItem));
+        }
+    }
+
+    private static void setItemOnHistoryDummies() {
+        for (int i = 0; i < historyDummies.size(); i++) {
+            HistoryDto history = historyDummies.get(i);
+
+            int itemIndex = getIndexByUniqueKey(history.item());
+            HistoryDto newHistory = history.withItem(itemDummies.get(itemIndex));
+            historyDummies.set(i, newHistory);
+        }
+    }
+
+    private static void setLastHistoryOnItemDummies() {
+        for (HistoryDto history : historyDummies) {
+            HistoryDto nestedHistory = history.withItem(ItemDto.nestedEndpoint);
+
+            ItemDto parentItem = history.item();
+            ItemDto newParentItem = parentItem.withLastHistory(nestedHistory);
+
+            int itemIndex = getIndexByUniqueKey(parentItem);
+            itemDummies.set(itemIndex, newParentItem);
+        }
     }
 
     private static void initSampleData() {
         notFoundUniversity = new UniversityDto("HANYANG", "한양대학교", null);
         notFoundDepartment = DepartmentDto.init(DummyDataSet.universityDummies.get(0), "COMPUTER", "컴퓨터소프트웨어학부");
         notFoundMajor = new MajorDto(DummyDataSet.universityDummies.get(0), "DOESNT_EXIST");
+    }
+
+    private static int getIndexByUniqueKey(StuffDto stuff) {
+        for (int i = 0; i < stuffDummies.size(); i++) {
+            StuffDto dummy = stuffDummies.get(i);
+            if (matchUniqueKey(stuff, dummy)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static int getIndexByUniqueKey(ItemDto item) {
+        for (int i = 0; i < itemDummies.size(); i++) {
+            ItemDto dummy = itemDummies.get(i);
+            if (matchUniqueKey(dummy, item)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static boolean matchUniqueKey(StuffDto stuff, StuffDto oth) {
+        String universityCode = oth.department().university().code();
+        String departmentCode = oth.department().code();
+        String stuffName = oth.name();
+        return universityCode.equals(stuff.department().university().code())
+                && departmentCode.equals(stuff.department().code())
+                && stuffName.equals(stuff.name());
+    }
+
+    private static boolean matchUniqueKey(ItemDto item, ItemDto oth) {
+        String universityCode = item.stuff().department().university().code();
+        String departmentCode = item.stuff().department().code();
+        String stuffName = item.stuff().name();
+        int itemNum = item.num();
+
+        return universityCode.equals(oth.stuff().department().university().code())
+                && departmentCode.equals(oth.stuff().department().code())
+                && stuffName.equals(oth.stuff().name())
+                && itemNum == oth.num();
     }
 }
