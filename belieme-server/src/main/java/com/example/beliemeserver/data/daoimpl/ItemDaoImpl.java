@@ -32,7 +32,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
 
     @Override
     public List<ItemDto> getListByStuff(String universityCode, String departmentCode, String stuffName) throws NotFoundException, FormatDoesNotMatchException {
-        StuffEntity targetStuff = getStuffEntity(universityCode, departmentCode, stuffName);
+        StuffEntity targetStuff = findStuffEntity(universityCode, departmentCode, stuffName);
         List<ItemDto> output = new ArrayList<>();
         for(ItemEntity itemEntity : itemRepository.findByStuffId(targetStuff.getId())) {
             output.add(itemEntity.toItemDto());
@@ -42,12 +42,12 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
 
     @Override
     public ItemDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum) throws NotFoundException, FormatDoesNotMatchException {
-        return getItemEntity(universityCode, departmentCode, stuffName, itemNum).toItemDto();
+        return findItemEntity(universityCode, departmentCode, stuffName, itemNum).toItemDto();
     }
 
     @Override
     public ItemDto create(ItemDto newItem) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
-        StuffEntity stuffOfNewItem  = getStuffEntity(newItem.stuff());
+        StuffEntity stuffOfNewItem  = findStuffEntity(newItem.stuff());
 
         checkItemConflict(stuffOfNewItem.getId(), newItem.num());
 
@@ -61,8 +61,8 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
 
     @Override
     public ItemDto update(String universityCode, String departmentCode, String stuffName, int itemNum, ItemDto newItem) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
-        ItemEntity target = getItemEntity(universityCode, departmentCode, stuffName, itemNum);
-        StuffEntity stuffOfNewItem  = getStuffEntity(newItem.stuff());
+        ItemEntity target = findItemEntity(universityCode, departmentCode, stuffName, itemNum);
+        StuffEntity stuffOfNewItem  = findStuffEntity(newItem.stuff());
         HistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
 
         if(doesIndexChange(target, newItem)) {
@@ -79,7 +79,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
         if(historyDto == null) {
             return null;
         }
-        return getHistoryEntity(historyDto);
+        return findHistoryEntity(historyDto);
     }
 
     private boolean doesIndexChange(ItemEntity target, ItemDto newItem) {

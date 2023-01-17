@@ -27,7 +27,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     @Override
     public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) throws NotFoundException, FormatDoesNotMatchException {
         List<HistoryDto> output = new ArrayList<>();
-        DepartmentEntity targetDepartment = getDepartmentEntity(universityCode, departmentCode);
+        DepartmentEntity targetDepartment = findDepartmentEntity(universityCode, departmentCode);
 
         for(StuffEntity stuff : stuffRepository.findByDepartmentId(targetDepartment.getId())) {
             for(ItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
@@ -40,8 +40,8 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     @Override
     public List<HistoryDto> getListByDepartmentAndRequester(String universityCodeForDepartment, String departmentCode, String universityCodeForUser, String requesterStudentId) throws NotFoundException, FormatDoesNotMatchException {
         List<HistoryDto> output = new ArrayList<>();
-        DepartmentEntity targetDepartment = getDepartmentEntity(universityCodeForDepartment, departmentCode);
-        UserEntity targetRequester = getUserEntity(universityCodeForUser, requesterStudentId);
+        DepartmentEntity targetDepartment = findDepartmentEntity(universityCodeForDepartment, departmentCode);
+        UserEntity targetRequester = findUserEntity(universityCodeForUser, requesterStudentId);
 
         for(HistoryEntity historyEntity : historyRepository.findByRequesterId(targetRequester.getId())) {
             if(historyEntity.getItem().getStuff().getDepartment().getId() == targetDepartment.getId()) {
@@ -54,12 +54,12 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
 
     @Override
     public HistoryDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) throws NotFoundException, FormatDoesNotMatchException {
-        return getHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum).toHistoryDto();
+        return findHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum).toHistoryDto();
     }
 
     @Override
     public HistoryDto create(HistoryDto newHistory) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
-        ItemEntity itemOfNewHistory = getItemEntity(newHistory.item());
+        ItemEntity itemOfNewHistory = findItemEntity(newHistory.item());
 
         checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
 
@@ -82,8 +82,8 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
 
     @Override
     public HistoryDto update(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum, HistoryDto newHistory) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
-        HistoryEntity target = getHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum);
-        ItemEntity itemOfNewHistory = getItemEntity(newHistory.item());
+        HistoryEntity target = findHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum);
+        ItemEntity itemOfNewHistory = findItemEntity(newHistory.item());
 
         if(doesIndexChange(target, newHistory)) {
             checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
@@ -137,6 +137,6 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         if(userDto == null) {
             return null;
         }
-        return getUserEntity(userDto);
+        return findUserEntity(userDto);
     }
 }

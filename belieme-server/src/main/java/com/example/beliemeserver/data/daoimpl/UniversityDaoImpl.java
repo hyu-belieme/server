@@ -32,7 +32,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
 
     @Override
     public UniversityDto getUniversityByCodeData(String universityCode) throws NotFoundException {
-        UniversityEntity targetUniversity = getUniversityEntity(universityCode);
+        UniversityEntity targetUniversity = findUniversityEntity(universityCode);
         return targetUniversity.toUniversityDto();
     }
 
@@ -52,7 +52,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
 
     @Override
     public UniversityDto updateUniversityData(String universityCode, UniversityDto newUniversity) throws NotFoundException, ConflictException {
-        UniversityEntity target = getUniversityEntity(universityCode);
+        UniversityEntity target = findUniversityEntity(universityCode);
         if (doesIndexOfUniversityChange(target, newUniversity)) {
             checkUniversityConflict(newUniversity.code());
         }

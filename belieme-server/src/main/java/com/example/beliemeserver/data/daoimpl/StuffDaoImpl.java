@@ -30,7 +30,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
 
     @Override
     public List<StuffDto> getListByDepartment(String universityCode, String departmentCode) throws NotFoundException, FormatDoesNotMatchException {
-        DepartmentEntity departmentOfTarget = getDepartmentEntity(universityCode, departmentCode);
+        DepartmentEntity departmentOfTarget = findDepartmentEntity(universityCode, departmentCode);
 
         List<StuffDto> output = new ArrayList<>();
         for(StuffEntity stuffEntity : stuffRepository.findByDepartmentId(departmentOfTarget.getId())) {
@@ -41,12 +41,12 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
 
     @Override
     public StuffDto getByIndex(String universityCode, String departmentCode, String stuffName) throws NotFoundException, FormatDoesNotMatchException {
-        return getStuffEntity(universityCode, departmentCode, stuffName).toStuffDto();
+        return findStuffEntity(universityCode, departmentCode, stuffName).toStuffDto();
     }
 
     @Override
     public StuffDto create(StuffDto newStuff) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
-        DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department());
+        DepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department());
 
         checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
 
@@ -60,8 +60,8 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
 
     @Override
     public StuffDto update(String universityCode, String departmentCode, String stuffName, StuffDto newStuff) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
-        StuffEntity target = getStuffEntity(universityCode, departmentCode, stuffName);
-        DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department());
+        StuffEntity target = findStuffEntity(universityCode, departmentCode, stuffName);
+        DepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department());
 
         if(doesIndexChange(target, newStuff)) {
             checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());

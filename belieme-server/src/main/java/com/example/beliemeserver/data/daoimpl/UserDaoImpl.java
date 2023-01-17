@@ -36,7 +36,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     public List<UserDto> getListByUniversity(String universityCode) throws NotFoundException, FormatDoesNotMatchException {
         List<UserDto> output = new ArrayList<>();
 
-        int universityId = getUniversityEntity(universityCode).getId();
+        int universityId = findUniversityEntity(universityCode).getId();
         for(UserEntity userEntity : userRepository.findByUniversityId(universityId)) {
             output.add(userEntity.toUserDto());
         }
@@ -45,12 +45,12 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
     @Override
     public UserDto getByToken(String token) throws NotFoundException, FormatDoesNotMatchException {
-        return getUserEntityByToken(token).toUserDto();
+        return findUserEntityByToken(token).toUserDto();
     }
 
     @Override
     public UserDto getByIndex(String universityCode, String studentId) throws NotFoundException, FormatDoesNotMatchException {
-        return getUserEntity(universityCode, studentId).toUserDto();
+        return findUserEntity(universityCode, studentId).toUserDto();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
     @Override
     public UserDto update(String universityCode, String studentId, UserDto newUser) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
-        UserEntity target = getUserEntity(universityCode, studentId);
+        UserEntity target = findUserEntity(universityCode, studentId);
         updateUserOnly(target, newUser);
 
         removeAllMajorJoins(target);
@@ -76,7 +76,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     private UserEntity saveUserOnly(UserDto newUser) throws NotFoundException, ConflictException {
-        UniversityEntity universityEntity = getUniversityEntity(newUser.university());
+        UniversityEntity universityEntity = findUniversityEntity(newUser.university());
 
         checkUserConflict(universityEntity.getId(), newUser.studentId());
 
@@ -92,7 +92,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     private void updateUserOnly(UserEntity target, UserDto newUser) throws NotFoundException, ConflictException {
-        UniversityEntity newUniversity = getUniversityEntity(newUser.university());
+        UniversityEntity newUniversity = findUniversityEntity(newUser.university());
 
         if(doesIndexChange(target, newUser)) {
             checkUserConflict(newUniversity.getId(), newUser.studentId());
@@ -108,7 +108,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
     private void saveMajorJoins(UserEntity newUserEntity, List<MajorDto> majors) throws NotFoundException {
         for(MajorDto major: majors) {
-            MajorEntity baseMajorEntity = getMajorEntity(major);
+            MajorEntity baseMajorEntity = findMajorEntity(major);
             MajorUserJoinEntity newJoin = new MajorUserJoinEntity(
                     baseMajorEntity,
                     newUserEntity
@@ -119,7 +119,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
     private void saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) throws NotFoundException {
         for(AuthorityDto authority: authorities) {
-            AuthorityEntity authorityEntity = getAuthorityEntity(authority);
+            AuthorityEntity authorityEntity = findAuthorityEntity(authority);
             AuthorityUserJoinEntity newJoin = new AuthorityUserJoinEntity(
                     authorityEntity,
                     newUserEntity

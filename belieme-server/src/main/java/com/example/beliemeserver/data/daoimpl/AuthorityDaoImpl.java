@@ -31,7 +31,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
 
     @Override
     public AuthorityDto create(AuthorityDto authority) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
-        DepartmentEntity departmentOfAuthority = getDepartmentEntity(authority.department());
+        DepartmentEntity departmentOfAuthority = findDepartmentEntity(authority.department());
 
         checkAuthorityConflict(departmentOfAuthority.getId(), authority.permission().name());
 
@@ -45,8 +45,8 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
 
     @Override
     public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto newAuthority) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
-        AuthorityEntity target = getAuthorityEntity(universityCode, departmentCode, permission.name());
-        DepartmentEntity departmentOfAuthority = getDepartmentEntity(newAuthority.department());
+        AuthorityEntity target = findAuthorityEntity(universityCode, departmentCode, permission.name());
+        DepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department());
 
         if(doesIndexChange(target, newAuthority)) {
             checkAuthorityConflict(departmentOfAuthority.getId(), newAuthority.permission().name());
