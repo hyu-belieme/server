@@ -12,7 +12,7 @@ public interface ItemDao {
 
     List<ItemDto> getListByStuff(
             String universityCode, String departmentCode, String stuffName)
-            throws DataException;
+            throws DataException, NotFoundException;
 
     ItemDto getByIndex(
             String universityCode, String departmentCode,

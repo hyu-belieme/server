@@ -5,6 +5,7 @@ import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
@@ -18,6 +19,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
+@Accessors(chain = true)
 public class ItemEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,14 +56,16 @@ public class ItemEntity extends DataEntity {
         this.lastHistoryId = getIdOrElse(lastHistory, null);
     }
 
-    public void setStuff(@NonNull StuffEntity stuff) {
+    public ItemEntity setStuff(@NonNull StuffEntity stuff) {
         this.stuff = stuff;
         this.stuffId = stuff.getId();
+        return this;
     }
 
-    public void setLastHistory(HistoryEntity lastHistory) {
+    public ItemEntity setLastHistory(HistoryEntity lastHistory) {
         this.lastHistory = lastHistory;
         this.lastHistoryId = getIdOrElse(lastHistory, null);
+        return this;
     }
 
     public int getAndIncrementNextHistoryNum() {
