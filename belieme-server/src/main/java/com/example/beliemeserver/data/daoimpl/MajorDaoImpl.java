@@ -31,8 +31,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
 
     @Override
     public MajorDto addMajorData(MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
-        String universityCode = newMajor.university().code();
-        UniversityEntity university = getUniversityEntity(universityCode);
+        UniversityEntity university = getUniversityEntity(newMajor.university());
 
         checkMajorConflict(university.getId(), newMajor.code());
 
@@ -49,7 +48,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     public MajorDto updateMajorData(String universityCode, String majorCode, MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
         MajorEntity target = getMajorEntity(universityCode, majorCode);
 
-        UniversityEntity newUniversity = getUniversityEntity(newMajor.university().code());
+        UniversityEntity newUniversity = getUniversityEntity(newMajor.university());
 
         checkMajorConflict(newUniversity.getId(), newMajor.code());
 

@@ -10,7 +10,6 @@ import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,27 +21,24 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    @Transactional
     public List<HistoryDto> getAllList() throws DataException {
-        return toHistoryDto(historyRepository.findAll());
+        return toHistoryDtoList(historyRepository.findAll());
     }
 
     @Override
-    @Transactional
     public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) throws DataException, NotFoundException {
         List<HistoryDto> output = new ArrayList<>();
         DepartmentEntity targetDepartment = getDepartmentEntity(universityCode, departmentCode);
 
         for(StuffEntity stuff : stuffRepository.findByDepartmentId(targetDepartment.getId())) {
             for(ItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
-                output.addAll(toHistoryDto(historyRepository.findByItemId(item.getId())));
+                output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
             }
         }
         return output;
     }
 
     @Override
-    @Transactional
     public List<HistoryDto> getListByDepartmentAndRequester(String universityCodeForDepartment, String departmentCode, String universityCodeForUser, String requesterStudentId) throws DataException, NotFoundException {
         List<HistoryDto> output = new ArrayList<>();
         DepartmentEntity targetDepartment = getDepartmentEntity(universityCodeForDepartment, departmentCode);
@@ -58,13 +54,11 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    @Transactional
     public HistoryDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) throws NotFoundException, DataException {
         return getHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum).toHistoryDto();
     }
 
     @Override
-    @Transactional
     public HistoryDto create(HistoryDto newHistory) throws ConflictException, NotFoundException, DataException {
         ItemEntity itemOfNewHistory = getItemEntity(newHistory.item());
 
@@ -88,7 +82,6 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    @Transactional
     public HistoryDto update(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum, HistoryDto newHistory) throws NotFoundException, DataException, ConflictException {
         HistoryEntity target = getHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum);
         ItemEntity itemOfNewHistory = getItemEntity(newHistory.item());
@@ -112,6 +105,29 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         return target.toHistoryDto();
     }
 
+    private List<HistoryDto> toHistoryDtoList(Iterable<HistoryEntity> historyEntities) throws FormatDoesNotMatchException {
+        ArrayList<HistoryDto> output = new ArrayList<>();
+
+        for(HistoryEntity historyEntity : historyEntities) {
+            output.add(historyEntity.toHistoryDto());
+        }
+        return output;
+    }
+
+    private boolean doesIndexChange(HistoryEntity target, HistoryDto newHistory) {
+        String oldUniversityCode = target.getItem().getStuff().getDepartment().getUniversity().getCode();
+        String oldDepartmentCode = target.getItem().getStuff().getDepartment().getCode();
+        String oldStuffName = target.getItem().getStuff().getName();
+        int oldItemNum = target.getItem().getNum();
+        int oldHistoryNum = target.getNum();
+
+        return !(oldUniversityCode.equals(newHistory.item().stuff().department().university().code())
+                && oldDepartmentCode.equals(newHistory.item().stuff().department().code())
+                && oldStuffName.equals(newHistory.item().stuff().name())
+                && oldItemNum == newHistory.item().num()
+                && oldHistoryNum == newHistory.num());
+    }
+
     private void checkHistoryConflict(int itemId, int historyNum) throws ConflictException {
         if(historyRepository.existsByItemIdAndNum(itemId, historyNum)) {
             throw new ConflictException();
@@ -123,34 +139,5 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
             return null;
         }
         return getUserEntity(userDto);
-    }
-
-    private boolean doesIndexChange(HistoryEntity target, HistoryDto newHistory) {
-        String oldUniversityCode = target.getItem().getStuff().getDepartment().getUniversity().getCode();
-        String oldDepartmentCode = target.getItem().getStuff().getDepartment().getCode();
-        String oldStuffName = target.getItem().getStuff().getName();
-        int oldItemNum = target.getItem().getNum();
-        int oldHistoryNum = target.getNum();
-
-        String newUniversityCode = newHistory.item().stuff().department().university().code();
-        String newDepartmentCode = newHistory.item().stuff().department().code();
-        String newName = newHistory.item().stuff().name();
-        int newItemNum = newHistory.item().num();
-        int newHistoryNum = newHistory.num();
-
-        return !(oldUniversityCode.equals(newUniversityCode)
-                && oldDepartmentCode.equals(newDepartmentCode)
-                && oldStuffName.equals(newName)
-                && oldItemNum == newItemNum
-                && oldHistoryNum == newHistoryNum);
-    }
-
-    private List<HistoryDto> toHistoryDto(Iterable<HistoryEntity> historyEntities) throws FormatDoesNotMatchException {
-        ArrayList<HistoryDto> output = new ArrayList<>();
-
-        for(HistoryEntity historyEntity : historyEntities) {
-            output.add(historyEntity.toHistoryDto());
-        }
-        return output;
     }
 }

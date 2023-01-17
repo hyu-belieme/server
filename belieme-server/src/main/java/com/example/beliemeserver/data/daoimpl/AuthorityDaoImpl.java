@@ -31,7 +31,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
 
     @Override
     public AuthorityDto create(AuthorityDto authority) throws ConflictException, DataException, NotFoundException {
-        DepartmentEntity departmentOfAuthority = getDepartmentEntity(authority.department().university().code(), authority.department().code());
+        DepartmentEntity departmentOfAuthority = getDepartmentEntity(authority.department());
 
         checkAuthorityConflict(departmentOfAuthority.getId(), authority.permission().name());
 
@@ -46,7 +46,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     @Override
     public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto newAuthority) throws DataException, NotFoundException, ConflictException {
         AuthorityEntity target = getAuthorityEntity(universityCode, departmentCode, permission.name());
-        DepartmentEntity departmentOfAuthority = getDepartmentEntity(newAuthority.department().university().code(), newAuthority.department().code());
+        DepartmentEntity departmentOfAuthority = getDepartmentEntity(newAuthority.department());
 
         if(doesIndexChange(target, newAuthority)) {
             checkAuthorityConflict(departmentOfAuthority.getId(), newAuthority.permission().name());
@@ -62,13 +62,9 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
         String oldDepartmentCode = target.getDepartment().getCode();
         String oldPermission = target.getPermission();
 
-        String newUniversityCode = newAuthority.department().university().code();
-        String newDepartmentCode = newAuthority.department().code();
-        String newPermission = newAuthority.permission().name();
-
-        return !(oldUniversityCode.equals(newUniversityCode) &&
-                oldDepartmentCode.equals(newDepartmentCode) &&
-                oldPermission.equals(newPermission));
+        return !(oldUniversityCode.equals(newAuthority.department().university().code()) &&
+                oldDepartmentCode.equals(newAuthority.department().code()) &&
+                oldPermission.equals(newAuthority.permission().name()));
     }
 
     private void checkAuthorityConflict(int departmentId, String permission) throws ConflictException {

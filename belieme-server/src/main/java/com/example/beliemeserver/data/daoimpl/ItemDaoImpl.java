@@ -5,6 +5,7 @@ import com.example.beliemeserver.data.entity.ItemEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.ItemDao;
+import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
@@ -62,7 +63,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
     public ItemDto update(String universityCode, String departmentCode, String stuffName, int itemNum, ItemDto newItem) throws ConflictException, NotFoundException, DataException {
         ItemEntity target = getItemEntity(universityCode, departmentCode, stuffName, itemNum);
         StuffEntity stuffOfNewItem  = getStuffEntity(newItem.stuff());
-        HistoryEntity lastHistoryOfNewItem = getHistoryEntity(newItem.lastHistory());
+        HistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
 
         if(doesIndexChange(target, newItem)) {
             checkItemConflict(stuffOfNewItem.getId(), newItem.num());
@@ -74,10 +75,11 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
         return target.toItemDto();
     }
 
-    private void checkItemConflict(int stuffId, int num) throws ConflictException {
-        if(itemRepository.existsByStuffIdAndNum(stuffId, num))  {
-            throw new ConflictException();
+    private HistoryEntity toHistoryEntityOrNull(HistoryDto historyDto) throws NotFoundException {
+        if(historyDto == null) {
+            return null;
         }
+        return getHistoryEntity(historyDto);
     }
 
     private boolean doesIndexChange(ItemEntity target, ItemDto newItem) {
@@ -86,14 +88,15 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
         String oldStuffName = target.getStuff().getName();
         int oldItemNum = target.getNum();
 
-        String newUniversityCode = newItem.stuff().department().university().code();
-        String newDepartmentCode = newItem.stuff().department().code();
-        String newStuffName = newItem.stuff().name();
-        int newItemNum = newItem.num();
+        return !(oldUniversityCode.equals(newItem.stuff().department().university().code())
+                && oldDepartmentCode.equals(newItem.stuff().department().code())
+                && oldStuffName.equals(newItem.stuff().name())
+                && oldItemNum == newItem.num());
+    }
 
-        return !(oldUniversityCode.equals(newUniversityCode)
-                && oldDepartmentCode.equals(newDepartmentCode)
-                && oldStuffName.equals(newStuffName)
-                && oldItemNum == newItemNum);
+    private void checkItemConflict(int stuffId, int num) throws ConflictException {
+        if(itemRepository.existsByStuffIdAndNum(stuffId, num))  {
+            throw new ConflictException();
+        }
     }
 }

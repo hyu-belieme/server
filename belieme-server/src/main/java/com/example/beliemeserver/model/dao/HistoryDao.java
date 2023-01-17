@@ -4,29 +4,36 @@ import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface HistoryDao {
+    @Transactional
     List<HistoryDto> getAllList() throws DataException;
 
+    @Transactional
     List<HistoryDto> getListByDepartment(
             String universityCode, String departmentCode)
             throws DataException, NotFoundException;
 
+    @Transactional
     List<HistoryDto> getListByDepartmentAndRequester(
             String universityCodeForDepartment, String departmentCode,
             String universityCodeForUser, String requesterStudentId)
             throws DataException, NotFoundException;
 
+    @Transactional
     HistoryDto getByIndex(
             String universityCode, String departmentCode,
             String stuffName, int itemNum, int historyNum)
             throws NotFoundException, DataException;
 
+    @Transactional
     HistoryDto create(HistoryDto newHistory)
             throws ConflictException, NotFoundException, DataException;
 
+    @Transactional
     HistoryDto update(
             String universityCode, String departmentCode, String stuffName,
             int itemNum, int historyNum, HistoryDto newHistory)

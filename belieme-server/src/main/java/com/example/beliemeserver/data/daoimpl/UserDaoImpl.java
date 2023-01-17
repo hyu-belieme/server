@@ -11,7 +11,6 @@ import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,6 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    @Transactional
     public List<UserDto> getAllList() throws DataException {
         List<UserDto> output = new ArrayList<>();
 
@@ -35,7 +33,6 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    @Transactional
     public List<UserDto> getListByUniversity(String universityCode) throws NotFoundException, DataException {
         List<UserDto> output = new ArrayList<>();
 
@@ -47,19 +44,16 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    @Transactional
     public UserDto getByToken(String token) throws NotFoundException, DataException {
         return getUserEntityByToken(token).toUserDto();
     }
 
     @Override
-    @Transactional
     public UserDto getByIndex(String universityCode, String studentId) throws NotFoundException, DataException {
         return getUserEntity(universityCode, studentId).toUserDto();
     }
 
     @Override
-    @Transactional
     public UserDto create(UserDto user) throws ConflictException, DataException, NotFoundException {
         UserEntity newUserEntity = saveUserOnly(user);
         saveMajorJoins(newUserEntity, user.majors());
@@ -69,7 +63,6 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    @Transactional
     public UserDto update(String universityCode, String studentId, UserDto newUser) throws NotFoundException, DataException, ConflictException {
         UserEntity target = getUserEntity(universityCode, studentId);
         updateUserOnly(target, newUser);
@@ -80,12 +73,6 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
         saveMajorJoins(target, newUser.majors());
         saveAuthorityJoins(target, newUser.authorities());
         return target.toUserDto();
-    }
-
-    private void checkUserConflict(int universityId, String studentId) throws ConflictException {
-        if(userRepository.existsByUniversityIdAndStudentId(universityId, studentId)) {
-            throw new ConflictException();
-        }
     }
 
     private UserEntity saveUserOnly(UserDto newUser) throws NotFoundException, ConflictException {
@@ -105,7 +92,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     private void updateUserOnly(UserEntity target, UserDto newUser) throws NotFoundException, ConflictException {
-        UniversityEntity newUniversity = getUniversityEntity(newUser.university().code());
+        UniversityEntity newUniversity = getUniversityEntity(newUser.university());
 
         if(doesIndexChange(target, newUser)) {
             checkUserConflict(newUniversity.getId(), newUser.studentId());
@@ -156,9 +143,14 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     private boolean doesIndexChange(UserEntity target, UserDto newUser) {
         String oldUniversityCode = target.getUniversity().getCode();
         String oldStudentId = target.getStudentId();
-        String newUniversityCode = newUser.university().code();
-        String newStudentId = newUser.studentId();
 
-        return !(oldUniversityCode.equals(newUniversityCode) && oldStudentId.equals(newStudentId));
+        return !(oldUniversityCode.equals(newUser.university().code())
+                && oldStudentId.equals(newUser.studentId()));
+    }
+
+    private void checkUserConflict(int universityId, String studentId) throws ConflictException {
+        if(userRepository.existsByUniversityIdAndStudentId(universityId, studentId)) {
+            throw new ConflictException();
+        }
     }
 }

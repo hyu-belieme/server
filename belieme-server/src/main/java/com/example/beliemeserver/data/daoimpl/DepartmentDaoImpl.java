@@ -12,7 +12,6 @@ import com.example.beliemeserver.model.exception.ConflictException;
 import com.example.beliemeserver.model.exception.DataException;
 import com.example.beliemeserver.model.exception.NotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +51,6 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    @Transactional
     public DepartmentDto addDepartmentData(DepartmentDto newDepartment) throws DataException, NotFoundException, ConflictException {
         DepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
         saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
@@ -61,7 +59,6 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    @Transactional
     public DepartmentDto updateDepartmentData(String universityCode, String departmentCode, DepartmentDto newDepartment) throws DataException, NotFoundException, ConflictException {
         DepartmentEntity target = getDepartmentEntity(universityCode, departmentCode);
         updateDepartmentOnly(target, newDepartment);
@@ -73,7 +70,6 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    @Transactional
     public DepartmentDto putBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto newBaseMajor) throws NotFoundException, ConflictException {
         DepartmentEntity targetEntity = getDepartmentEntity(universityCode, departmentCode);
         MajorEntity newMajorEntity = getMajorEntity(newBaseMajor);
@@ -90,7 +86,6 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    @Transactional
     public DepartmentDto removeBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto targetBaseMajor) throws NotFoundException {
         DepartmentEntity targetEntity = getDepartmentEntity(universityCode, departmentCode);
         MajorEntity targetBaseMajorEntity = getMajorEntity(targetBaseMajor);
@@ -106,8 +101,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     private DepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
-        String universityCode = newDepartment.university().code();
-        UniversityEntity university = getUniversityEntity(universityCode);
+        UniversityEntity university = getUniversityEntity(newDepartment.university());
 
         checkDepartmentConflict(university.getId(), newDepartment.code());
 
@@ -121,13 +115,10 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     private void updateDepartmentOnly(DepartmentEntity target, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
-        String targetUniversityCode = target.getUniversity().getCode();
-        String targetDepartmentCode = target.getCode();
-
         String newUniversityCode = newDepartment.university().code();
         UniversityEntity newUniversityEntity = getUniversityEntity(newUniversityCode);
 
-        if(doesIndexOfDepartmentChange(targetUniversityCode, targetDepartmentCode, newDepartment)) {
+        if(doesIndexOfDepartmentChange(target, newDepartment)) {
             checkDepartmentConflict(newUniversityEntity.getId(), newDepartment.code());
         }
 
@@ -153,10 +144,11 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
         }
     }
 
-    private boolean doesIndexOfDepartmentChange(String targetUniversityCode, String targetDepartmentCode, DepartmentDto newDepartment) {
-        String newUniversityCode = newDepartment.university().code();
-        String newDepartmentCode = newDepartment.code();
-        return !(targetUniversityCode.equals(newUniversityCode) && targetDepartmentCode.equals(newDepartmentCode));
+    private boolean doesIndexOfDepartmentChange(DepartmentEntity target, DepartmentDto newDepartment) {
+        String oldUniversityCode = target.getUniversity().getCode();
+        String oldDepartmentCode = target.getCode();
+        return !(oldUniversityCode.equals(newDepartment.university().code())
+                && oldDepartmentCode.equals(newDepartment.code()));
     }
 
     private void checkDepartmentConflict(int universityId, String departmentCode) throws ConflictException {

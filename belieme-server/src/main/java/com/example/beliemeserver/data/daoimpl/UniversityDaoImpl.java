@@ -54,7 +54,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     @Override
     public UniversityDto updateUniversityData(String universityCode, UniversityDto newUniversity) throws DataException, NotFoundException, ConflictException {
         UniversityEntity target = getUniversityEntity(universityCode);
-        if (doesIndexOfUniversityChange(universityCode, newUniversity)) {
+        if (doesIndexOfUniversityChange(target, newUniversity)) {
             checkUniversityConflict(newUniversity.code());
         }
 
@@ -65,8 +65,8 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
         return target.toUniversityDto();
     }
 
-    private boolean doesIndexOfUniversityChange(String oldUniversityCode, UniversityDto newUniversity) {
-        return !oldUniversityCode.equals(newUniversity.code());
+    private boolean doesIndexOfUniversityChange(UniversityEntity oldUniversity, UniversityDto newUniversity) {
+        return !oldUniversity.getCode().equals(newUniversity.code());
     }
 
     private void checkUniversityConflict(String universityCode) throws ConflictException {

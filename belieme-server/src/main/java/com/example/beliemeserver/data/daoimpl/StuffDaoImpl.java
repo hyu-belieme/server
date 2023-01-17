@@ -46,7 +46,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
 
     @Override
     public StuffDto create(StuffDto newStuff) throws ConflictException, NotFoundException, DataException {
-        DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department().university().code(), newStuff.department().code());
+        DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department());
 
         checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
 
@@ -61,7 +61,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     @Override
     public StuffDto update(String universityCode, String departmentCode, String stuffName, StuffDto newStuff) throws NotFoundException, DataException, ConflictException {
         StuffEntity target = getStuffEntity(universityCode, departmentCode, stuffName);
-        DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department().university().code(), newStuff.department().code());
+        DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department());
 
         if(doesIndexChange(target, newStuff)) {
             checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
@@ -73,23 +73,19 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
         return target.toStuffDto();
     }
 
-    private void checkStuffConflict(int departmentId, String name) throws ConflictException {
-        if(stuffRepository.existsByDepartmentIdAndName(departmentId, name)) {
-            throw new ConflictException();
-        }
-    }
-
     private boolean doesIndexChange(StuffEntity target, StuffDto newStuff) {
         String oldUniversityCode = target.getDepartment().getUniversity().getCode();
         String oldDepartmentCode = target.getDepartment().getCode();
         String oldName = target.getName();
 
-        String newUniversityCode = newStuff.department().university().code();
-        String newDepartmentCode = newStuff.department().code();
-        String newName = newStuff.name();
+        return !(oldUniversityCode.equals(newStuff.department().university().code())
+                && oldDepartmentCode.equals(newStuff.department().code())
+                && oldName.equals(newStuff.name()));
+    }
 
-        return !(oldUniversityCode.equals(newUniversityCode)
-                && oldDepartmentCode.equals(newDepartmentCode)
-                && oldName.equals(newName));
+    private void checkStuffConflict(int departmentId, String name) throws ConflictException {
+        if(stuffRepository.existsByDepartmentIdAndName(departmentId, name)) {
+            throw new ConflictException();
+        }
     }
 }
