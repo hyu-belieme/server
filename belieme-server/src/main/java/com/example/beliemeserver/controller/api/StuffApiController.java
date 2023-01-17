@@ -5,9 +5,10 @@ import com.example.beliemeserver.controller.requestbody.StuffRequest;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
 import com.example.beliemeserver.common.Globals;
 
-import com.example.beliemeserver.model.exception.*;
+import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.service.StuffService;
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.old.OldStuffDto;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class StuffApiController {
 
     @GetMapping("/")
     public ResponseEntity<List<StuffResponse>> getAllStuffs(@RequestHeader("user-token") String userToken) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
-        List<StuffDto> stuffList;
+        List<OldStuffDto> stuffList;
         try {
             stuffList = stuffService.getStuffs(userToken);
         } catch (DataException e) {
@@ -45,7 +46,7 @@ public class StuffApiController {
 
     @GetMapping("/{name}")
     public ResponseEntity<StuffResponse> getStuffResponse(@RequestHeader("user-token") String userToken, @PathVariable("name") String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
-        StuffDto target;
+        OldStuffDto target;
         try {
             target = stuffService.getStuffByName(userToken, name);
         } catch (DataException e) {
@@ -73,7 +74,7 @@ public class StuffApiController {
 
         URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + requestBody.getName());
 
-        List<StuffDto> updatedList;
+        List<OldStuffDto> updatedList;
         try {
             updatedList = stuffService.addStuff(userToken, requestBody.getName(), requestBody.getEmoji(), requestBody.getAmount());
         } catch (DataException | ItCannotBeException e) {
@@ -106,7 +107,7 @@ public class StuffApiController {
             URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + requestBody.getName());
         }
 
-        StuffDto newAndSavedStuff;
+        OldStuffDto newAndSavedStuff;
         try {
             newAndSavedStuff = stuffService.updateStuff(userToken, name, requestBody.getName(), requestBody.getEmoji());
         } catch (DataException e) {
@@ -129,7 +130,7 @@ public class StuffApiController {
         return ResponseEntity.ok(StuffResponse.from(newAndSavedStuff));
     }
 
-    private List<StuffResponse> toStuffResponseList(List<StuffDto> allStuffDtoList) {
+    private List<StuffResponse> toStuffResponseList(List<OldStuffDto> allStuffDtoList) {
         List<StuffResponse> allStuffResponseList = new ArrayList<>();
         for(int i = 0; i < allStuffDtoList.size(); i++) {
             allStuffResponseList.add(StuffResponse.from(allStuffDtoList.get(i)).toStuffResponseWithoutItemList());

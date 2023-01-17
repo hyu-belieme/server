@@ -1,11 +1,23 @@
 package com.example.beliemeserver.model.dao;
 
 import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.ConflictException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface AuthorityDao {
-    public AuthorityDto addAuthorityData(AuthorityDto authorityDto) throws ConflictException, DataException;
+    @Transactional
+    List<AuthorityDto> getAllList() throws FormatDoesNotMatchException;
 
-    public AuthorityDto updateAuthorityData(String studentId, AuthorityDto authorityDto) throws DataException;
+    @Transactional
+    AuthorityDto create(AuthorityDto authority)
+            throws ConflictException, NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    AuthorityDto update(String universityCode, String departmentCode,
+                        AuthorityDto.Permission permission, AuthorityDto authority)
+            throws NotFoundException, ConflictException, FormatDoesNotMatchException;
 }

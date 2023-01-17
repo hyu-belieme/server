@@ -1,105 +1,102 @@
 package com.example.beliemeserver.data.daoimpl;
 
+import com.example.beliemeserver.data.entity.HistoryEntity;
 import com.example.beliemeserver.data.entity.ItemEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
-import com.example.beliemeserver.data.entity.id.ItemId;
-import com.example.beliemeserver.data.repository.ItemRepository;
-import com.example.beliemeserver.data.repository.StuffRepository;
+import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.ItemDao;
+import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
-import com.example.beliemeserver.model.exception.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class ItemDaoImpl implements ItemDao {
-    @Autowired
-    StuffRepository stuffRepository;
-
-    @Autowired
-    ItemRepository itemRepository;
-
-    @Override
-    public List<ItemDto> getItemsByStuffNameData(String stuffName) throws DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
-        if(stuffEntity == null) {
-            return new ArrayList<>();
-        }
-
-        List<ItemDto> itemDtoList = new ArrayList<>();
-        Iterator<ItemEntity> iterator = itemRepository.findByStuffId(stuffEntity.getId()).iterator();
-        while(iterator.hasNext()) {
-            itemDtoList.add(iterator.next().toItemDto());
-        }
-        return itemDtoList;
+public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
+    public ItemDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorUserJoinRepository majorUserJoinRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+        super(universityRepository, departmentRepository, userRepository, majorRepository, majorUserJoinRepository, majorDepartmentJoinRepository, authorityRepository, authorityUserJoinRepository, stuffRepository, itemRepository, historyRepository);
     }
 
     @Override
-    public ItemDto getItemByStuffNameAndItemNumData(String stuffName, int itemNum) throws NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
-        if(stuffEntity == null) {
-            throw new NotFoundException();
+    public List<ItemDto> getAllList() throws FormatDoesNotMatchException {
+        List<ItemDto> output = new ArrayList<>();
+        for(ItemEntity itemEntity : itemRepository.findAll()) {
+            output.add(itemEntity.toItemDto());
         }
-
-        ItemId itemId = new ItemId(stuffEntity.getId(), itemNum);
-
-        ItemEntity itemEntity = itemRepository.findById(itemId).orElse(null);
-        if(itemEntity == null) {
-            throw new NotFoundException();
-        }
-        return itemEntity.toItemDto();
+        return output;
     }
 
     @Override
-    public ItemDto addItemData(ItemDto newItem) throws ConflictException, NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(newItem.getStuff().getName()).orElse(null);
-        if(stuffEntity == null) {
-            throw new NotFoundException();
+    public List<ItemDto> getListByStuff(String universityCode, String departmentCode, String stuffName) throws NotFoundException, FormatDoesNotMatchException {
+        StuffEntity targetStuff = findStuffEntity(universityCode, departmentCode, stuffName);
+        List<ItemDto> output = new ArrayList<>();
+        for(ItemEntity itemEntity : itemRepository.findByStuffId(targetStuff.getId())) {
+            output.add(itemEntity.toItemDto());
+        }
+        return output;
+    }
+
+    @Override
+    public ItemDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum) throws NotFoundException, FormatDoesNotMatchException {
+        return findItemEntity(universityCode, departmentCode, stuffName, itemNum).toItemDto();
+    }
+
+    @Override
+    public ItemDto create(ItemDto newItem) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+        StuffEntity stuffOfNewItem  = findStuffEntity(newItem.stuff());
+
+        checkItemConflict(stuffOfNewItem.getId(), newItem.num());
+
+        ItemEntity newItemEntity = new ItemEntity(
+                stuffOfNewItem,
+                newItem.num(),
+                null
+        );
+        return itemRepository.save(newItemEntity).toItemDto();
+    }
+
+    @Override
+    public ItemDto update(String universityCode, String departmentCode, String stuffName, int itemNum, ItemDto newItem) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+        ItemEntity target = findItemEntity(universityCode, departmentCode, stuffName, itemNum);
+        StuffEntity stuffOfNewItem  = findStuffEntity(newItem.stuff());
+        HistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
+
+        if(doesIndexChange(target, newItem)) {
+            checkItemConflict(stuffOfNewItem.getId(), newItem.num());
         }
 
-        int newItemNum = stuffEntity.getAndIncrementNextItemNum();
-        ItemId itemId = new ItemId(stuffEntity.getId(), newItemNum);
-        if(itemRepository.existsById(itemId)) {
+        target.setStuff(stuffOfNewItem)
+                .setNum(newItem.num())
+                .setLastHistory(lastHistoryOfNewItem);
+        return target.toItemDto();
+    }
+
+    private HistoryEntity toHistoryEntityOrNull(HistoryDto historyDto) throws NotFoundException {
+        if(historyDto == null) {
+            return null;
+        }
+        return findHistoryEntity(historyDto);
+    }
+
+    private boolean doesIndexChange(ItemEntity target, ItemDto newItem) {
+        String oldUniversityCode = target.getStuff().getDepartment().getUniversity().getCode();
+        String oldDepartmentCode = target.getStuff().getDepartment().getCode();
+        String oldStuffName = target.getStuff().getName();
+        int oldItemNum = target.getNum();
+
+        return !(oldUniversityCode.equals(newItem.stuff().department().university().code())
+                && oldDepartmentCode.equals(newItem.stuff().department().code())
+                && oldStuffName.equals(newItem.stuff().name())
+                && oldItemNum == newItem.num());
+    }
+
+    private void checkItemConflict(int stuffId, int num) throws ConflictException {
+        if(itemRepository.existsByStuffIdAndNum(stuffId, num))  {
             throw new ConflictException();
         }
-
-        ItemEntity newItemEntity = ItemEntity.builder()
-                .stuffId(stuffEntity.getId())
-                .num(newItemNum)
-                .lastHistoryNum(null)
-                .nextHistoryNum(1)
-                .build();
-
-        ItemEntity savedItemEntity = itemRepository.save(newItemEntity);
-        stuffRepository.save(stuffEntity);
-        itemRepository.refresh(savedItemEntity);
-        stuffRepository.refresh(stuffEntity);
-        return savedItemEntity.toItemDto();
-    }
-
-    @Override
-    public ItemDto updateItemData(String stuffName, int itemNum, ItemDto itemDto) throws NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
-        if(stuffEntity == null) {
-            throw new NotFoundException();
-        }
-
-        ItemId itemId = new ItemId(stuffEntity.getId(), itemNum);
-
-        ItemEntity target = itemRepository.findById(itemId).orElse(null);
-        if(target == null) {
-            throw new NotFoundException();
-        }
-        target.setLastHistoryNum(itemDto.getLastHistoryNum());
-
-        ItemEntity savedItemEntity = itemRepository.save(target);
-        itemRepository.refresh(savedItemEntity);
-        stuffRepository.refresh(stuffEntity);
-        return savedItemEntity.toItemDto();
     }
 }

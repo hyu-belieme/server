@@ -1,42 +1,29 @@
 package com.example.beliemeserver.data.daoimpl;
 
-import com.example.beliemeserver.data.daoimpl.util.IndexAdapter;
 import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.entity.MajorDepartmentJoinEntity;
 import com.example.beliemeserver.data.entity.MajorEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
-import com.example.beliemeserver.data.repository.DepartmentRepository;
-import com.example.beliemeserver.data.repository.MajorDepartmentJoinRepository;
-import com.example.beliemeserver.data.repository.MajorRepository;
-import com.example.beliemeserver.data.repository.UniversityRepository;
+import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.DepartmentDao;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class DepartmentDaoImpl implements DepartmentDao {
-    private final UniversityRepository universityRepository;
-    private final MajorRepository majorRepository;
-    private final DepartmentRepository departmentRepository;
-    private final MajorDepartmentJoinRepository majorDepartmentJoinRepository;
+public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
 
-    public DepartmentDaoImpl(UniversityRepository universityRepository, MajorRepository majorRepository, DepartmentRepository departmentRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository) {
-        this.universityRepository = universityRepository;
-        this.majorRepository = majorRepository;
-        this.departmentRepository = departmentRepository;
-        this.majorDepartmentJoinRepository = majorDepartmentJoinRepository;
+    public DepartmentDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorUserJoinRepository majorUserJoinRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+        super(universityRepository, departmentRepository, userRepository, majorRepository, majorUserJoinRepository, majorDepartmentJoinRepository, authorityRepository, authorityUserJoinRepository, stuffRepository, itemRepository, historyRepository);
     }
 
     @Override
-    public List<DepartmentDto> getAllDepartmentsData() throws DataException {
+    public List<DepartmentDto> getAllDepartmentsData() {
         List<DepartmentDto> output = new ArrayList<>();
 
         for(DepartmentEntity departmentEntity : departmentRepository.findAll()) {
@@ -46,10 +33,10 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<DepartmentDto> getAllDepartmentsByUniversityCodeData(String universityCode) throws DataException, NotFoundException {
+    public List<DepartmentDto> getAllDepartmentsByUniversityCodeData(String universityCode) throws NotFoundException {
         List<DepartmentDto> output = new ArrayList<>();
 
-        int universityId = getUniversityEntity(universityCode).getId();
+        int universityId = findUniversityEntity(universityCode).getId();
         for(DepartmentEntity departmentEntity : departmentRepository.findByUniversityId(universityId)) {
             output.add(departmentEntity.toDepartmentDto());
         }
@@ -57,37 +44,34 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto getDepartmentByUniversityCodeAndDepartmentCodeData(String universityCode, String departmentCode) throws DataException, NotFoundException {
-        DepartmentEntity targetEntity = getDepartmentEntity(universityCode, departmentCode);
+    public DepartmentDto getDepartmentByUniversityCodeAndDepartmentCodeData(String universityCode, String departmentCode) throws NotFoundException {
+        DepartmentEntity targetEntity = findDepartmentEntity(universityCode, departmentCode);
         return targetEntity.toDepartmentDto();
     }
 
     @Override
-    @Transactional
-    public DepartmentDto addDepartmentData(DepartmentDto newDepartment) throws DataException, NotFoundException, ConflictException {
+    public DepartmentDto addDepartmentData(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
         DepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
-        saveBaseMajorJoins(newDepartmentEntity, newDepartment.getBaseMajors());
+        saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
 
         return newDepartmentEntity.toDepartmentDto();
     }
 
     @Override
-    @Transactional
-    public DepartmentDto updateDepartmentData(String universityCode, String departmentCode, DepartmentDto newDepartment) throws DataException, NotFoundException, ConflictException {
-        DepartmentEntity target = getDepartmentEntity(universityCode, departmentCode);
+    public DepartmentDto updateDepartmentData(String universityCode, String departmentCode, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
+        DepartmentEntity target = findDepartmentEntity(universityCode, departmentCode);
         updateDepartmentOnly(target, newDepartment);
 
         removeAllBaseMajorJoins(target);
-        saveBaseMajorJoins(target, newDepartment.getBaseMajors());
+        saveBaseMajorJoins(target, newDepartment.baseMajors());
 
         return target.toDepartmentDto();
     }
 
     @Override
-    @Transactional
     public DepartmentDto putBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto newBaseMajor) throws NotFoundException, ConflictException {
-        DepartmentEntity targetEntity = getDepartmentEntity(universityCode, departmentCode);
-        MajorEntity newMajorEntity = getMajorEntityFromDto(newBaseMajor);
+        DepartmentEntity targetEntity = findDepartmentEntity(universityCode, departmentCode);
+        MajorEntity newMajorEntity = findMajorEntity(newBaseMajor);
 
         checkBaseMajorConflict(targetEntity, newMajorEntity);
 
@@ -101,10 +85,9 @@ public class DepartmentDaoImpl implements DepartmentDao {
     }
 
     @Override
-    @Transactional
     public DepartmentDto removeBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto targetBaseMajor) throws NotFoundException {
-        DepartmentEntity targetEntity = getDepartmentEntity(universityCode, departmentCode);
-        MajorEntity targetBaseMajorEntity = getMajorEntityFromDto(targetBaseMajor);
+        DepartmentEntity targetEntity = findDepartmentEntity(universityCode, departmentCode);
+        MajorEntity targetBaseMajorEntity = findMajorEntity(targetBaseMajor);
 
         for(MajorDepartmentJoinEntity majorDepartmentJoin : targetEntity.getBaseMajorJoin()) {
             if(majorDepartmentJoin.getMajorId() == targetBaseMajorEntity.getId()) {
@@ -116,58 +99,36 @@ public class DepartmentDaoImpl implements DepartmentDao {
         return targetEntity.toDepartmentDto();
     }
 
-    private UniversityEntity getUniversityEntity(String universityCode) throws NotFoundException {
-        return IndexAdapter.getUniversityEntityByCode(universityRepository, universityCode);
-    }
-
-    private DepartmentEntity getDepartmentEntity(String universityCode, String departmentCode) throws NotFoundException {
-        int universityId = getUniversityEntity(universityCode).getId();
-
-        return IndexAdapter.getDepartmentEntity(departmentRepository, universityId, departmentCode);
-    }
-
-    private MajorEntity getMajorEntityFromDto(MajorDto majorDto) throws NotFoundException {
-        String universityCode = majorDto.getUniversity().getCode();
-        String majorCode = majorDto.getCode();
-        int universityId = getUniversityEntity(universityCode).getId();
-
-        return IndexAdapter.getMajorEntity(majorRepository, universityId, majorCode);
-    }
-
     private DepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
-        String universityCode = newDepartment.getUniversity().getCode();
-        UniversityEntity university = getUniversityEntity(universityCode);
+        UniversityEntity university = findUniversityEntity(newDepartment.university());
 
-        checkDepartmentConflict(university.getId(), newDepartment.getCode());
+        checkDepartmentConflict(university.getId(), newDepartment.code());
 
         DepartmentEntity newDepartmentEntity = new DepartmentEntity(
                 university,
-                newDepartment.getCode(),
-                newDepartment.getName()
+                newDepartment.code(),
+                newDepartment.name()
         );
 
         return departmentRepository.save(newDepartmentEntity);
     }
 
     private void updateDepartmentOnly(DepartmentEntity target, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
-        String targetUniversityCode = target.getUniversity().getCode();
-        String targetDepartmentCode = target.getCode();
+        String newUniversityCode = newDepartment.university().code();
+        UniversityEntity newUniversityEntity = findUniversityEntity(newUniversityCode);
 
-        String newUniversityCode = newDepartment.getUniversity().getCode();
-        UniversityEntity newUniversityEntity = getUniversityEntity(newUniversityCode);
-
-        if(doesIndexOfDepartmentChange(targetUniversityCode, targetDepartmentCode, newDepartment)) {
-            checkDepartmentConflict(newUniversityEntity.getId(), newDepartment.getCode());
+        if(doesIndexOfDepartmentChange(target, newDepartment)) {
+            checkDepartmentConflict(newUniversityEntity.getId(), newDepartment.code());
         }
 
-        target.setCode(newDepartment.getCode())
-                .setName(newDepartment.getName())
+        target.setCode(newDepartment.code())
+                .setName(newDepartment.name())
                 .setUniversity(newUniversityEntity);
     }
 
     private void saveBaseMajorJoins(DepartmentEntity newDepartmentEntity, List<MajorDto> baseMajors) throws NotFoundException {
         for(MajorDto baseMajor: baseMajors) {
-            MajorEntity baseMajorEntity = getMajorEntityFromDto(baseMajor);
+            MajorEntity baseMajorEntity = findMajorEntity(baseMajor);
             MajorDepartmentJoinEntity newJoin = new MajorDepartmentJoinEntity(
                     baseMajorEntity,
                     newDepartmentEntity
@@ -182,10 +143,11 @@ public class DepartmentDaoImpl implements DepartmentDao {
         }
     }
 
-    private boolean doesIndexOfDepartmentChange(String targetUniversityCode, String targetDepartmentCode, DepartmentDto newDepartment) {
-        String newUniversityCode = newDepartment.getUniversity().getCode();
-        String newDepartmentCode = newDepartment.getCode();
-        return !(targetUniversityCode.equals(newUniversityCode) && targetDepartmentCode.equals(newDepartmentCode));
+    private boolean doesIndexOfDepartmentChange(DepartmentEntity target, DepartmentDto newDepartment) {
+        String oldUniversityCode = target.getUniversity().getCode();
+        String oldDepartmentCode = target.getCode();
+        return !(oldUniversityCode.equals(newDepartment.university().code())
+                && oldDepartmentCode.equals(newDepartment.code()));
     }
 
     private void checkDepartmentConflict(int universityId, String departmentCode) throws ConflictException {

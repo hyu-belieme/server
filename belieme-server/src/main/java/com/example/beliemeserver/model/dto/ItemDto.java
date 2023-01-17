@@ -1,30 +1,39 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
 
-@Getter
-@Setter
-@ToString
-@Builder
-@Accessors(chain = true)
-public class ItemDto {
-    public enum ItemStatus {
-        USABLE, UNUSABLE, INACTIVE, ERROR
+public record ItemDto(
+        @NonNull StuffDto stuff, int num, HistoryDto lastHistory
+) {
+    public static final ItemDto nestedEndpoint = new ItemDto(StuffDto.nestedEndpoint, 0, null);
+
+    public static ItemDto init(@NonNull StuffDto stuff, int itemNum) {
+        return new ItemDto(stuff, itemNum, null);
     }
 
-    private StuffDto stuff;
-    private int num;
-    private HistoryDto lastHistory;
+    public ItemDto withStuff(@NonNull StuffDto stuff) {
+        return new ItemDto(stuff, num, lastHistory);
+    }
 
-    public Integer getLastHistoryNum() {
-        if(lastHistory == null) {
-            return null;
+    public ItemDto withNum(int num) {
+        return new ItemDto(stuff, num, lastHistory);
+    }
+
+    public ItemDto withLastHistory(HistoryDto lastHistory) {
+        return new ItemDto(stuff, num, lastHistory);
+    }
+
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
         }
-        return lastHistory.getNum();
+
+        return "ItemDto{" +
+                "stuff=" + stuff +
+                ", num=" + num +
+                ", lastHistory=" + lastHistory +
+                '}';
     }
 
     public ItemStatus getStatus() {
@@ -32,20 +41,15 @@ public class ItemDto {
             return ItemStatus.USABLE;
         }
 
-        switch (lastHistory.getStatus()) {
-            case REQUESTED:
-            case USING:
-            case DELAYED:
-                return ItemStatus.UNUSABLE;
-            case RETURNED:
-            case EXPIRED:
-            case FOUND:
-                return ItemStatus.USABLE;
-            case LOST:
-                return ItemStatus.INACTIVE;
-            case ERROR:
-            default:
-                return ItemStatus.ERROR;
-        }
+        return switch (lastHistory.status()) {
+            case REQUESTED, USING, DELAYED -> ItemStatus.UNUSABLE;
+            case RETURNED, EXPIRED, FOUND -> ItemStatus.USABLE;
+            case LOST -> ItemStatus.INACTIVE;
+            default -> ItemStatus.ERROR;
+        };
+    }
+
+    public enum ItemStatus {
+        USABLE, UNUSABLE, INACTIVE, ERROR
     }
 }

@@ -1,82 +1,156 @@
 package com.example.beliemeserver.data.daoimpl;
 
-import com.example.beliemeserver.data.entity.UserEntity;
-import com.example.beliemeserver.data.entity.id.UserId;
-import com.example.beliemeserver.data.repository.UserRepository;
+import com.example.beliemeserver.data.entity.*;
+import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.UserDao;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UserDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class UserDaoImpl implements UserDao {
+public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     @Autowired
-    UserRepository userRepository;
-
-    @Override
-    public List<UserDto> getUsersData() throws DataException {
-        Iterator<UserEntity> iterator = userRepository.findAll().iterator();
-
-        ArrayList<UserDto> userDtoList = new ArrayList<>();
-        while(iterator.hasNext()) {
-            userDtoList.add(iterator.next().toUserDto());
-        }
-        return userDtoList;
+    public UserDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorUserJoinRepository majorUserJoinRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+        super(universityRepository, departmentRepository, userRepository, majorRepository, majorUserJoinRepository, majorDepartmentJoinRepository, authorityRepository, authorityUserJoinRepository, stuffRepository, itemRepository, historyRepository);
     }
 
     @Override
-    public UserDto getUserByTokenData(String token) throws NotFoundException, DataException {
-        UserEntity userEntity = userRepository.findWithAuthoritiesByToken(token).orElse(null);
-        if(userEntity == null) {
-            throw new NotFoundException();
+    public List<UserDto> getAllList() throws FormatDoesNotMatchException {
+        List<UserDto> output = new ArrayList<>();
+
+        for(UserEntity userEntity : userRepository.findAll()) {
+            output.add(userEntity.toUserDto());
         }
-        return userEntity.toUserDto();
+        return output;
     }
 
     @Override
-    public UserDto getUserByStudentIdData(String studentId) throws NotFoundException, DataException {
-        UserEntity userEntity = userRepository.findWithAuthoritiesByStudentId(studentId).orElse(null);
-        if(userEntity == null) {
-            throw new NotFoundException();
+    public List<UserDto> getListByUniversity(String universityCode) throws NotFoundException, FormatDoesNotMatchException {
+        List<UserDto> output = new ArrayList<>();
+
+        int universityId = findUniversityEntity(universityCode).getId();
+        for(UserEntity userEntity : userRepository.findByUniversityId(universityId)) {
+            output.add(userEntity.toUserDto());
         }
-        return userEntity.toUserDto();
+        return output;
     }
 
     @Override
-    public UserDto addUserData(UserDto user) throws ConflictException, DataException {
-        if(userRepository.existsById(new UserId(user.getStudentId()))) {
+    public UserDto getByToken(String token) throws NotFoundException, FormatDoesNotMatchException {
+        return findUserEntityByToken(token).toUserDto();
+    }
+
+    @Override
+    public UserDto getByIndex(String universityCode, String studentId) throws NotFoundException, FormatDoesNotMatchException {
+        return findUserEntity(universityCode, studentId).toUserDto();
+    }
+
+    @Override
+    public UserDto create(UserDto user) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+        UserEntity newUserEntity = saveUserOnly(user);
+        saveMajorJoins(newUserEntity, user.majors());
+        saveAuthorityJoins(newUserEntity, user.authorities());
+
+        return newUserEntity.toUserDto();
+    }
+
+    @Override
+    public UserDto update(String universityCode, String studentId, UserDto newUser) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
+        UserEntity target = findUserEntity(universityCode, studentId);
+        updateUserOnly(target, newUser);
+
+        removeAllMajorJoins(target);
+        removeAllAuthorityJoins(target);
+
+        saveMajorJoins(target, newUser.majors());
+        saveAuthorityJoins(target, newUser.authorities());
+        return target.toUserDto();
+    }
+
+    private UserEntity saveUserOnly(UserDto newUser) throws NotFoundException, ConflictException {
+        UniversityEntity universityEntity = findUniversityEntity(newUser.university());
+
+        checkUserConflict(universityEntity.getId(), newUser.studentId());
+
+        UserEntity newUserEntity = new UserEntity(
+                universityEntity,
+                newUser.studentId(),
+                newUser.name(),
+                newUser.token(),
+                newUser.createTimeStamp(),
+                newUser.approvalTimeStamp()
+        );
+        return userRepository.save(newUserEntity);
+    }
+
+    private void updateUserOnly(UserEntity target, UserDto newUser) throws NotFoundException, ConflictException {
+        UniversityEntity newUniversity = findUniversityEntity(newUser.university());
+
+        if(doesIndexChange(target, newUser)) {
+            checkUserConflict(newUniversity.getId(), newUser.studentId());
+        }
+
+        target.setUniversity(newUniversity)
+                .setStudentId(newUser.studentId())
+                .setName(newUser.name())
+                .setToken(newUser.token())
+                .setCreateTimeStamp(newUser.createTimeStamp())
+                .setApprovalTimeStamp(newUser.approvalTimeStamp());
+    }
+
+    private void saveMajorJoins(UserEntity newUserEntity, List<MajorDto> majors) throws NotFoundException {
+        for(MajorDto major: majors) {
+            MajorEntity baseMajorEntity = findMajorEntity(major);
+            MajorUserJoinEntity newJoin = new MajorUserJoinEntity(
+                    baseMajorEntity,
+                    newUserEntity
+            );
+            majorUserJoinRepository.save(newJoin);
+        }
+    }
+
+    private void saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) throws NotFoundException {
+        for(AuthorityDto authority: authorities) {
+            AuthorityEntity authorityEntity = findAuthorityEntity(authority);
+            AuthorityUserJoinEntity newJoin = new AuthorityUserJoinEntity(
+                    authorityEntity,
+                    newUserEntity
+            );
+            authorityUserJoinRepository.save(newJoin);
+        }
+    }
+
+    private void removeAllMajorJoins(UserEntity user) {
+        while (user.getMajorJoin().size() > 0) {
+            majorUserJoinRepository.delete(user.getMajorJoin().get(0));
+        }
+    }
+
+    private void removeAllAuthorityJoins(UserEntity user) {
+        while (user.getAuthorityJoin().size() > 0) {
+            authorityUserJoinRepository.delete(user.getAuthorityJoin().get(0));
+        }
+    }
+
+    private boolean doesIndexChange(UserEntity target, UserDto newUser) {
+        String oldUniversityCode = target.getUniversity().getCode();
+        String oldStudentId = target.getStudentId();
+
+        return !(oldUniversityCode.equals(newUser.university().code())
+                && oldStudentId.equals(newUser.studentId()));
+    }
+
+    private void checkUserConflict(int universityId, String studentId) throws ConflictException {
+        if(userRepository.existsByUniversityIdAndStudentId(universityId, studentId)) {
             throw new ConflictException();
         }
-
-        UserEntity savedUser = userRepository.save(UserEntity.from(user));
-        userRepository.refresh(savedUser);
-
-        return savedUser.toUserDto();
-    }
-
-    @Override
-    public UserDto updateUserData(String studentId, UserDto user) throws NotFoundException, DataException {
-        UserEntity target = userRepository.findWithAuthoritiesByStudentId(studentId).orElse(null);
-        UserEntity newUserEntity = UserEntity.from(user);
-        if(target == null) {
-            throw new NotFoundException();
-        }
-        target.setStudentId(newUserEntity.getStudentId());
-        target.setName(newUserEntity.getName());
-        target.setToken(newUserEntity.getToken());
-        target.setCreateTimeStamp(newUserEntity.getCreateTimeStamp());
-        target.setApprovalTimeStamp(newUserEntity.getApprovalTimeStamp());
-
-        UserEntity savedUser = userRepository.save(target);
-        userRepository.refresh(savedUser);
-
-        return savedUser.toUserDto();
     }
 }

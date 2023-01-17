@@ -1,74 +1,70 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.data.entity.id.*;
-
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
-@Table(name = "stuff",
-        uniqueConstraints={
+@Table(name = "stuff", uniqueConstraints = {
         @UniqueConstraint(
-                name = "stuff_name",
-                columnNames={"name"}
+                name = "stuff_index",
+                columnNames = {"department_id", "name"}
         )
 })
-@Getter
-@Setter
+@NoArgsConstructor
 @ToString
-@Builder
+@Getter
 @Accessors(chain = true)
-@IdClass(StuffId.class)
-public class StuffEntity implements DataEntity {
-    private static final AtomicInteger counter = new AtomicInteger(1);
-
-    public static void setCounter(int initVal) {
-        counter.set(initVal);
-    }
-
-    public static int getNextId() {
-        return counter.getAndIncrement();
-    }
-
+public class StuffEntity extends DataEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
+    @Column(name = "department_id")
+    private int departmentId;
+
+    @NonNull
+    @Setter
     @Column(name = "name")
     private String name;
 
+    @NonNull
+    @Setter
     @Column(name = "emoji")
     private String emoji;
 
     @Column(name = "next_item_num")
     private int nextItemNum;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "stuff")
+    @NonNull
+    @ManyToOne
+    @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private DepartmentEntity department;
+
+    @NonNull
+    @OneToMany(mappedBy = "stuff")
     private List<ItemEntity> items;
 
-    private StuffEntity(int id, String name, String emoji, int nextItemNum, List<ItemEntity> items) {
-        this.items = new ArrayList<>();
-        this.id = id;
+    public StuffEntity(@NonNull DepartmentEntity department, @NonNull String name, @NonNull String emoji) {
+        this.department = department;
+        this.departmentId = department.getId();
         this.name = name;
         this.emoji = emoji;
-        this.nextItemNum = nextItemNum;
-
-        if(items != null) {
-            this.items = items;
-        }
+        this.nextItemNum = 1;
+        this.items = new ArrayList<>();
     }
 
-    public StuffEntity() {
-        items = new ArrayList<>();
+    public StuffEntity setDepartment(@NonNull DepartmentEntity department) {
+        this.department = department;
+        this.departmentId = department.getId();
+        return this;
     }
 
     public int getAndIncrementNextItemNum() {
@@ -77,16 +73,15 @@ public class StuffEntity implements DataEntity {
 
     public StuffDto toStuffDto() throws FormatDoesNotMatchException {
         List<ItemDto> itemDtoList = new ArrayList<>();
-        Iterator<ItemEntity> iterator = items.iterator();
-        while (iterator.hasNext()) {
-            itemDtoList.add(iterator.next().toItemDtoNestedToStuff());
+        for(ItemEntity item : items) {
+            itemDtoList.add(item.toItemDtoNestedToStuff());
         }
 
-        return StuffDto.builder()
-                .name(name)
-                .emoji(emoji)
-                .items(itemDtoList)
-                .nextItemNum(nextItemNum)
-                .build();
+        return new StuffDto(
+                department.toDepartmentDto(),
+                name,
+                emoji,
+                itemDtoList
+        );
     }
 }

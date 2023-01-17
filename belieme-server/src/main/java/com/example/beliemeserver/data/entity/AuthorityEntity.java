@@ -1,44 +1,59 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.data.entity.id.*;
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Entity
-@Table(name = "authority")
-@Getter
-@Setter
+@Table(name = "authority", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "authority_index",
+                columnNames = {"department_id", "permission"}
+        )
+})
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Accessors(chain = true)
-@IdClass(AuthorityId.class)
-public class AuthorityEntity implements Serializable, DataEntity {
+@ToString
+@Getter
+public class AuthorityEntity extends DataEntity {
     @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
+    @Column(name = "department_id")
+    private int departmentId;
+
+    @NonNull
     @Column(name = "permission", length = 20)
     private String permission;
 
+    @ManyToOne
+    @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private DepartmentEntity department;
 
-    public AuthorityDto toAuthorityDto() throws FormatDoesNotMatchException {
-        return AuthorityDto.builder()
-                .userDto(user.toUserDto())
-                .permission(AuthorityDto.Permission.from(permission))
-                .build();
+    public AuthorityEntity(DepartmentEntity department, String permission) {
+        this.department = department;
+        this.departmentId = department.getId();
+        this.permission = permission; // TODO : validate Permission String
     }
 
-    public AuthorityDto toAuthorityDtoNestedToUser() throws FormatDoesNotMatchException {
-        return AuthorityDto.builder()
-                .userDto(null)
-                .permission(AuthorityDto.Permission.from(permission))
-                .build();
+    public AuthorityEntity setDepartment(DepartmentEntity department) {
+        this.department = department;
+        this.departmentId = department.getId();
+        return this;
+    }
+
+    public AuthorityEntity setPermission(String permission) {
+        this.permission = permission; // TODO : validate Permission String
+        return this;
+    }
+
+    public AuthorityDto toAuthorityDto() throws FormatDoesNotMatchException {
+        return new AuthorityDto(
+                department.toDepartmentDto(),
+                AuthorityDto.Permission.create(permission)
+        );
     }
 }

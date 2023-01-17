@@ -1,6 +1,7 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.MajorDto;
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Getter
-public class DepartmentEntity implements DataEntity {
+public class DepartmentEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -67,15 +68,16 @@ public class DepartmentEntity implements DataEntity {
     }
 
     public DepartmentDto toDepartmentDto() {
-        DepartmentDto output = new DepartmentDto(
+        List<MajorDto> baseMajorDtoList = new ArrayList<>();
+        for(MajorDepartmentJoinEntity major : baseMajorJoin) {
+            baseMajorDtoList.add(major.getMajor().toMajorDto());
+        }
+
+        return new DepartmentDto(
                 university.toUniversityDto(),
                 code,
-                name
+                name,
+                baseMajorDtoList
         );
-
-        for(MajorDepartmentJoinEntity major : baseMajorJoin) {
-            output.addBaseMajor(major.getMajor().toMajorDto());
-        }
-        return output;
     }
 }

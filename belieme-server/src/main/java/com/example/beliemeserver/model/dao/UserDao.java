@@ -1,16 +1,34 @@
 package com.example.beliemeserver.model.dao;
 
 import com.example.beliemeserver.model.dto.UserDto;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface UserDao {
-    public List<UserDto> getUsersData() throws DataException;
-    public UserDto getUserByTokenData(String token) throws NotFoundException, DataException;
-    public UserDto getUserByStudentIdData(String studentId) throws NotFoundException, DataException;
-    public UserDto addUserData(UserDto user) throws ConflictException, DataException;
-    public UserDto updateUserData(String studentId, UserDto user) throws NotFoundException, DataException;
+    @Transactional
+    List<UserDto> getAllList() throws FormatDoesNotMatchException;
+
+    @Transactional
+    List<UserDto> getListByUniversity(String universityCode)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    UserDto getByToken(String token)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    UserDto getByIndex(String universityCode, String studentId)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    UserDto create(UserDto user)
+            throws ConflictException, NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    UserDto update(String universityCode, String studentId, UserDto newUser)
+            throws NotFoundException, ConflictException, FormatDoesNotMatchException;
 }

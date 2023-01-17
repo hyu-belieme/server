@@ -1,104 +1,77 @@
 package com.example.beliemeserver.model.dto;
 
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
-import lombok.*;
-import lombok.experimental.Accessors;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import lombok.NonNull;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@Accessors(chain = true)
-public class AuthorityDto {
-    private Permission permission;
-    private UserDto userDto;
+public record AuthorityDto(
+        @NonNull DepartmentDto department, @NonNull Permission permission
+) {
+    public static final AuthorityDto nestedEndpoint = new AuthorityDto(DepartmentDto.nestedEndpoint, Permission.BANNED);
+
+    public AuthorityDto withDepartment(@NonNull DepartmentDto department) {
+        return new AuthorityDto(department, permission);
+    }
+
+    public AuthorityDto withPermission(@NonNull Permission permission) {
+        return new AuthorityDto(department, permission);
+    }
+
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "AuthorityDto{" +
+                "department=" + department +
+                ", permission=" + permission +
+                '}';
+    }
 
     public enum Permission {
         BANNED, USER, STAFF, MASTER, DEVELOPER;
 
+        public static Permission create(String string) throws FormatDoesNotMatchException {
+            return switch (string) {
+                case "BANNED" -> BANNED;
+                case "USER" -> USER;
+                case "STAFF" -> STAFF;
+                case "MASTER" -> MASTER;
+                case "DEVELOPER" -> DEVELOPER;
+                default -> throw new FormatDoesNotMatchException();
+            };
+        }
+
         public boolean hasUserPermission() {
-            switch (this) {
-                case DEVELOPER:
-                case MASTER:
-                case STAFF:
-                case USER:
-                    return true;
-                case BANNED:
-                default:
-                    return false;
-            }
+            return switch (this) {
+                case DEVELOPER, MASTER, STAFF, USER -> true;
+                default -> false;
+            };
         }
 
         public boolean hasStaffPermission() {
-            switch (this) {
-                case DEVELOPER:
-                case MASTER:
-                case STAFF:
-                    return true;
-                case USER:
-                case BANNED:
-                default:
-                    return false;
-            }
+            return switch (this) {
+                case DEVELOPER, MASTER, STAFF -> true;
+                default -> false;
+            };
         }
 
         public boolean hasMasterPermission() {
-            switch (this) {
-                case DEVELOPER:
-                case MASTER:
-                    return true;
-                case STAFF:
-                case USER:
-                case BANNED:
-                default:
-                    return false;
-            }
+            return this == DEVELOPER || this == MASTER;
         }
 
         public boolean hasDeveloperPermission() {
-            switch (this) {
-                case DEVELOPER:
-                    return true;
-                case MASTER:
-                case STAFF:
-                case USER:
-                case BANNED:
-                default:
-                    return false;
-            }
+            return this == DEVELOPER;
         }
 
         public boolean hasMorePermission(Permission other) {
-            switch (this) {
-                case BANNED:
-                    return true;
-                case USER:
-                    return other != BANNED && other != USER;
-                case STAFF:
-                    return other == MASTER || other == DEVELOPER;
-                case MASTER:
-                    return other == DEVELOPER;
-                default:
-                    return false;
-            }
-        }
-
-        public static Permission from(String string) throws FormatDoesNotMatchException {
-            switch (string) {
-                case "BANNED":
-                    return BANNED;
-                case "USER":
-                    return USER;
-                case "STAFF":
-                    return STAFF;
-                case "MASTER":
-                    return MASTER;
-                case "DEVELOPER":
-                    return DEVELOPER;
-                default:
-                    throw new FormatDoesNotMatchException();
-            }
+            return switch (this) {
+                case BANNED -> true;
+                case USER -> other != BANNED && other != USER;
+                case STAFF -> other == MASTER || other == DEVELOPER;
+                case MASTER -> other == DEVELOPER;
+                default -> false;
+            };
         }
     }
 }

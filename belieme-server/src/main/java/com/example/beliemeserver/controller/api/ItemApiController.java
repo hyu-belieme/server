@@ -6,9 +6,13 @@ import com.example.beliemeserver.controller.responsebody.ItemResponse;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
 import com.example.beliemeserver.common.Globals;
 
-import com.example.beliemeserver.model.dto.ItemDto;
-import com.example.beliemeserver.model.exception.*;
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.exception.UnauthorizedException;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
+import com.example.beliemeserver.model.dto.old.OldStuffDto;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.service.ItemService;
 
 import org.springframework.http.ResponseEntity;
@@ -29,7 +33,7 @@ public class ItemApiController {
 
     @GetMapping("/")
     public ResponseEntity<List<ItemResponse>> getItemsByStuffName(@RequestHeader("user-token") String userToken, @PathVariable String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
-        List<ItemDto> itemDtoList;
+        List<OldItemDto> itemDtoList;
         try {
             itemDtoList = itemService.getItems(userToken, name);
         } catch (DataException e) {
@@ -50,7 +54,7 @@ public class ItemApiController {
     public ResponseEntity<StuffResponse> postOneItem(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest request) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, NotFoundHttpException, ConflictHttpException {
         URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + name + "/items");
 
-        StuffDto updatedStuff;
+        OldStuffDto updatedStuff;
         try {
             if (request == null) {
                 updatedStuff = itemService.postItem(userToken, name, null);
@@ -77,7 +81,7 @@ public class ItemApiController {
         return ResponseEntity.created(location).body(StuffResponse.from(updatedStuff));
     }
 
-    private List<ItemResponse> toItemResponseList(List<ItemDto> allItemDtoList) {
+    private List<ItemResponse> toItemResponseList(List<OldItemDto> allItemDtoList) {
         List<ItemResponse> allItemResponseList = new ArrayList<>();
         for(int i = 0; i < allItemDtoList.size(); i++) {
             allItemResponseList.add(ItemResponse.from(allItemDtoList.get(i)));

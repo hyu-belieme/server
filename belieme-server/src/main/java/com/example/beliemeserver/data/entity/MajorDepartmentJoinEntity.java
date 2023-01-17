@@ -9,7 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @ToString
-public class MajorDepartmentJoinEntity implements DataEntity {
+public class MajorDepartmentJoinEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

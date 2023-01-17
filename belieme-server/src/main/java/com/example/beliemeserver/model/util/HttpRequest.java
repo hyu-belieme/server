@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.util;
 
-import com.example.beliemeserver.model.exception.BadGateWayException;
+import com.example.beliemeserver.exception.BadGateWayException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
