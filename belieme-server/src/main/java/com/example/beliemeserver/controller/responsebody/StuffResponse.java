@@ -1,7 +1,7 @@
 package com.example.beliemeserver.controller.responsebody;
 
-import com.example.beliemeserver.model.dto.ItemDto;
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
+import com.example.beliemeserver.model.dto.old.OldStuffDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
@@ -51,10 +51,10 @@ public class StuffResponse extends JSONResponse {
         return new StuffResponse(false);
     }
 
-    public static StuffResponse from(StuffDto stuffDto) {
+    public static StuffResponse from(OldStuffDto stuffDto) {
         List<ItemResponse> itemResponseList = new ArrayList<>();
 
-        List<ItemDto> itemDtoList = stuffDto.getItems();
+        List<OldItemDto> itemDtoList = stuffDto.getItems();
         for(int i = 0; i < itemDtoList.size(); i++) {
             itemResponseList.add(ItemResponse.from(itemDtoList.get(i)));
         }

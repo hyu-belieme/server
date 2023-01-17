@@ -1,18 +1,31 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.*;
+import lombok.NonNull;
 
-@Getter
-@Setter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode
-public class UniversityDto {
-    @NonNull
-    private String code;
+public record UniversityDto(@NonNull String code, @NonNull String name, String apiUrl) {
+    public static final UniversityDto nestedEndpoint = new UniversityDto("-", "-", "-");
 
-    @NonNull
-    private String name;
+    public UniversityDto withCode(@NonNull String code) {
+        return new UniversityDto(code, name, apiUrl);
+    }
 
-    private String apiUrl;
+    public UniversityDto withName(@NonNull String name) {
+        return new UniversityDto(code, name, apiUrl);
+    }
+
+    public UniversityDto withApiUrl(String apiUrl) {
+        return new UniversityDto(code, name, apiUrl);
+    }
+
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+        return "UniversityDto{" +
+                "code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", apiUrl='" + apiUrl + '\'' +
+                '}';
+    }
 }

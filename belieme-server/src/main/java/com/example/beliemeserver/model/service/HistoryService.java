@@ -1,8 +1,13 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.model.exception.*;
+import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.model.dao.old.HistoryDao;
+import com.example.beliemeserver.model.dao.old.ItemDao;
+import com.example.beliemeserver.model.dao.old.UserDao;
+import com.example.beliemeserver.model.dto.old.OldHistoryDto;
+import com.example.beliemeserver.model.dto.old.OldItemDto;
+import com.example.beliemeserver.model.dto.old.OldUserDto;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.util.AuthCheck;
 import org.springframework.stereotype.Service;
 
@@ -21,8 +26,8 @@ public class HistoryService {
         this.authCheck = new AuthCheck(userDao);
     }
 
-    public List<HistoryDto> getHistories(String userToken, String studentId) throws DataException, UnauthorizedException, ForbiddenException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public List<OldHistoryDto> getHistories(String userToken, String studentId) throws DataException, UnauthorizedException, ForbiddenException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
 
         checkIfRequesterHasPermissionToStudentId(requester, studentId);
 
@@ -33,23 +38,23 @@ public class HistoryService {
         }
     }
 
-    public HistoryDto getHistoryByStuffNameAndItemNumAndHistoryNum(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, NotFoundException, ForbiddenException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
+    public OldHistoryDto getHistoryByStuffNameAndItemNumAndHistoryNum(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, NotFoundException, ForbiddenException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
+        OldHistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
         checkIfRequesterHasPermissionToStudentId(requester, target.getRequesterId());
 
         return target;
     }
 
-    public HistoryDto addReserveHistory(String userToken, String stuffName, Integer itemNum) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, MethodNotAllowedException, ConflictException, ItCannotBeException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldHistoryDto addReserveHistory(String userToken, String stuffName, Integer itemNum) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, MethodNotAllowedException, ConflictException, ItCannotBeException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasUserPermission(requester);
 
         if(stuffName == null) {
             throw new BadRequestException("정보가 부족합니다.\n필요한 정보 : stuffName(String), itemNum(Int)(Optional)");
         }
 
-        ItemDto target;
+        OldItemDto target;
         if(itemNum == null) {
             target = getUsableItem(stuffName);
         } else {
@@ -61,7 +66,7 @@ public class HistoryService {
             }
         }
 
-        HistoryDto newHistoryDto = HistoryDto.builder()
+        OldHistoryDto newHistoryDto = OldHistoryDto.builder()
                 .item(target)
                 .requester(requester)
                 .reservedTimeStamp(System.currentTimeMillis()/1000)
@@ -75,13 +80,13 @@ public class HistoryService {
         }
     }
 
-    private ItemDto getUsableItem(String stuffName) throws DataException, MethodNotAllowedException {
-        List<ItemDto> itemsByStuffName = itemDao.getItemsByStuffNameData(stuffName);
+    private OldItemDto getUsableItem(String stuffName) throws DataException, MethodNotAllowedException {
+        List<OldItemDto> itemsByStuffName = itemDao.getItemsByStuffNameData(stuffName);
 
-        ItemDto target = null;
+        OldItemDto target = null;
         for(int i = 0; i < itemsByStuffName.size(); i++) {
             target = itemsByStuffName.get(i);
-            if(target.getStatus() == ItemDto.ItemStatus.USABLE) {
+            if(target.getStatus() == OldItemDto.ItemStatus.USABLE) {
                 break;
             }
             target = null;
@@ -92,23 +97,23 @@ public class HistoryService {
         return target;
     }
 
-    public HistoryDto addOrEditToLostHistory(String userToken, String stuffName, int itemNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ItCannotBeException, MethodNotAllowedException, ConflictException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldHistoryDto addOrEditToLostHistory(String userToken, String stuffName, int itemNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ItCannotBeException, MethodNotAllowedException, ConflictException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasStaffPermission(requester);
 
-        ItemDto targetItem = itemDao.getItemByStuffNameAndItemNumData(stuffName, itemNum);
+        OldItemDto targetItem = itemDao.getItemByStuffNameAndItemNumData(stuffName, itemNum);
 
         boolean shouldPostNewHistory;
-        HistoryDto targetHistory;
-        if(targetItem.getStatus() == ItemDto.ItemStatus.UNUSABLE) {
+        OldHistoryDto targetHistory;
+        if(targetItem.getStatus() == OldItemDto.ItemStatus.UNUSABLE) {
             try {
                 targetHistory = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, targetItem.getLastHistoryNum());
             } catch (NotFoundException e) {
                 throw new ItCannotBeException();
             }
             shouldPostNewHistory = false;
-        } else if(targetItem.getStatus() == ItemDto.ItemStatus.USABLE) {
-            targetHistory = HistoryDto.builder()
+        } else if(targetItem.getStatus() == OldItemDto.ItemStatus.USABLE) {
+            targetHistory = OldHistoryDto.builder()
                     .item(targetItem)
                     .build();
             shouldPostNewHistory = true;
@@ -136,10 +141,10 @@ public class HistoryService {
         }
     }
 
-    public HistoryDto editToCanceledHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, NotFoundException, ForbiddenException, MethodNotAllowedException, ItCannotBeException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldHistoryDto editToCanceledHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, NotFoundException, ForbiddenException, MethodNotAllowedException, ItCannotBeException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
 
-        HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
+        OldHistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
 
         checkIfRequesterHasPermissionToStudentId(requester, target.getRequesterId());
         checkIfStatusOfHistoryIsReserved(target);
@@ -157,11 +162,11 @@ public class HistoryService {
         }
     }
 
-    public HistoryDto editToApprovedHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldHistoryDto editToApprovedHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasStaffPermission(requester);
 
-        HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
+        OldHistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
 
         checkIfStatusOfHistoryIsReserved(target);
 
@@ -176,11 +181,11 @@ public class HistoryService {
         }
     }
 
-    public HistoryDto editToReturnedHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldHistoryDto editToReturnedHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasStaffPermission(requester);
 
-        HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
+        OldHistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
 
         checkIfStatusOfHistoryIsUsingOrDelayed(target);
 
@@ -195,11 +200,11 @@ public class HistoryService {
         }
     }
 
-    public HistoryDto editToFoundHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
-        UserDto requester = authCheck.checkTokenAndGetUser(userToken);
+    public OldHistoryDto editToFoundHistory(String userToken, String stuffName, int itemNum, int historyNum) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, MethodNotAllowedException, ItCannotBeException {
+        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
         authCheck.checkIfRequesterHasStaffPermission(requester);
 
-        HistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
+        OldHistoryDto target = historyDao.getHistoryByStuffNameAndItemNumAndHistoryNumData(stuffName, itemNum, historyNum);
 
         checkIfStatusOfHistoryIsLost(target);
 
@@ -213,27 +218,27 @@ public class HistoryService {
         }
     }
 
-    private void checkIfRequesterHasPermissionToStudentId(UserDto requester, String studentId) throws ForbiddenException {
+    private void checkIfRequesterHasPermissionToStudentId(OldUserDto requester, String studentId) throws ForbiddenException {
         authCheck.checkIfRequesterHasUserPermission(requester);
         if(!requester.getStudentId().equals(studentId)) {
             authCheck.checkIfRequesterHasStaffPermission(requester);
         }
     }
 
-    private void checkIfStatusOfHistoryIsReserved(HistoryDto history) throws MethodNotAllowedException {
-        if(history.getStatus() != HistoryDto.HistoryStatus.REQUESTED) {
+    private void checkIfStatusOfHistoryIsReserved(OldHistoryDto history) throws MethodNotAllowedException {
+        if(history.getStatus() != OldHistoryDto.HistoryStatus.REQUESTED) {
             throw new MethodNotAllowedException("'예약됨'기록이 아닙니다.");
         }
     }
 
-    private void checkIfStatusOfHistoryIsUsingOrDelayed(HistoryDto history) throws MethodNotAllowedException {
-        if(history.getStatus() != HistoryDto.HistoryStatus.USING && history.getStatus() != HistoryDto.HistoryStatus.DELAYED) {
+    private void checkIfStatusOfHistoryIsUsingOrDelayed(OldHistoryDto history) throws MethodNotAllowedException {
+        if(history.getStatus() != OldHistoryDto.HistoryStatus.USING && history.getStatus() != OldHistoryDto.HistoryStatus.DELAYED) {
             throw new MethodNotAllowedException("'사용중' 또는 '연체됨'기록이 아닙니다.");
         }
     }
 
-    private void checkIfStatusOfHistoryIsLost(HistoryDto history) throws MethodNotAllowedException {
-        if(history.getStatus() != HistoryDto.HistoryStatus.LOST) {
+    private void checkIfStatusOfHistoryIsLost(OldHistoryDto history) throws MethodNotAllowedException {
+        if(history.getStatus() != OldHistoryDto.HistoryStatus.LOST) {
             throw new MethodNotAllowedException("'분실됨'기록이 아닙니다.");
         }
     }

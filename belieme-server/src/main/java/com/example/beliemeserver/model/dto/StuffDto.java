@@ -1,38 +1,91 @@
 package com.example.beliemeserver.model.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
-@Builder
-@Accessors(chain = true)
-public class StuffDto {
-    private String name;
-    private String emoji;
-    private List<ItemDto> items;
-    private int nextItemNum;
+public record StuffDto(
+        @NonNull DepartmentDto department, @NonNull String name,
+        String emoji, @NonNull List<ItemDto> items
+) {
+    public static final StuffDto nestedEndpoint = new StuffDto(DepartmentDto.nestedEndpoint, "-", "-", new ArrayList<>());
 
-    public int getAmount() {
+    public StuffDto(@NonNull DepartmentDto department, @NonNull String name, String emoji, @NonNull List<ItemDto> items) {
+        this.department = department;
+        this.name = name;
+        this.emoji = emoji;
+        this.items = new ArrayList<>(items);
+    }
+
+    public static StuffDto init(@NonNull DepartmentDto department, @NonNull String name, String emoji) {
+        return new StuffDto(department, name, emoji, new ArrayList<>());
+    }
+
+    @Override
+    public List<ItemDto> items() {
+        return new ArrayList<>(items);
+    }
+
+    public StuffDto withDepartment(@NonNull DepartmentDto department) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withName(@NonNull String name) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withEmoji(String emoji) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withItems(@NonNull List<ItemDto> items) {
+        return new StuffDto(department, name, emoji, items);
+    }
+
+    public StuffDto withItemAdd(ItemDto itemDto) {
+        StuffDto output = new StuffDto(department, name, emoji, items);
+        output.items.add(itemDto);
+
+        return output;
+    }
+
+    public StuffDto withItemRemove(ItemDto itemDto) {
+        StuffDto output = new StuffDto(department, name, emoji, items);
+        output.items.remove(itemDto);
+
+        return output;
+    }
+
+    @Override
+    public String toString() {
+        if(this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+
+        return "StuffDto{" +
+                "department=" + department +
+                ", name='" + name + '\'' +
+                ", emoji='" + emoji + '\'' +
+                ", items=" + items +
+                '}';
+    }
+
+    public int amount() {
         int amount = 0;
-        for(int i = 0; i < items.size(); i++) {
-            if(items.get(i).getStatus() == ItemDto.ItemStatus.USABLE || items.get(i).getStatus() == ItemDto.ItemStatus.UNUSABLE) {
+        for (ItemDto item : items) {
+            if (item.getStatus() == ItemDto.ItemStatus.USABLE
+                    || item.getStatus() == ItemDto.ItemStatus.UNUSABLE) {
                 amount++;
             }
         }
         return amount;
     }
 
-    public int getCount() {
+    public int count() {
         int count = 0;
-        for(int i = 0; i < items.size(); i++) {
-            if(items.get(i).getStatus() == ItemDto.ItemStatus.USABLE) {
+        for (ItemDto item : items) {
+            if (item.getStatus() == ItemDto.ItemStatus.USABLE) {
                 count++;
             }
         }

@@ -6,7 +6,11 @@ logging:
   level:
     org.hibernate.SQL: debug
 
+
 spring:
+  data:
+    jdbc:
+      repositories.enabled: false
   jpa:
     database: mysql
     show-sql: true

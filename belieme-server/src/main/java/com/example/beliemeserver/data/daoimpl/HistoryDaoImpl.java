@@ -1,144 +1,142 @@
 package com.example.beliemeserver.data.daoimpl;
 
-import com.example.beliemeserver.data.entity.HistoryEntity;
-import com.example.beliemeserver.data.entity.ItemEntity;
-import com.example.beliemeserver.data.entity.StuffEntity;
-import com.example.beliemeserver.data.entity.id.HistoryId;
-import com.example.beliemeserver.data.entity.id.ItemId;
-import com.example.beliemeserver.data.repository.HistoryRepository;
-import com.example.beliemeserver.data.repository.ItemRepository;
-import com.example.beliemeserver.data.repository.StuffRepository;
+import com.example.beliemeserver.data.entity.*;
+import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.HistoryDao;
 import com.example.beliemeserver.model.dto.HistoryDto;
-import com.example.beliemeserver.model.exception.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class HistoryDaoImpl implements HistoryDao {
-    @Autowired
-    StuffRepository stuffRepository;
-
-    @Autowired
-    ItemRepository itemRepository;
-
-    @Autowired
-    HistoryRepository historyRepository;
-
-    @Override
-    public List<HistoryDto> getHistoriesData() throws DataException {
-        List<HistoryDto> historyDtoList = new ArrayList<>();
-
-        Iterator<HistoryEntity> iterator = historyRepository.findAll().iterator();
-        while(iterator.hasNext()) {
-            HistoryEntity tmp = iterator.next();
-            historyDtoList.add(tmp.toHistoryDto());
-        }
-        return historyDtoList;
+public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
+    public HistoryDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorUserJoinRepository majorUserJoinRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+        super(universityRepository, departmentRepository, userRepository, majorRepository, majorUserJoinRepository, majorDepartmentJoinRepository, authorityRepository, authorityUserJoinRepository, stuffRepository, itemRepository, historyRepository);
     }
 
     @Override
-    public List<HistoryDto> getHistoriesByRequesterIdData(String requesterId) throws DataException {
-        List<HistoryDto> historyDtoList = new ArrayList<>();
-
-        Iterator<HistoryEntity> iterator = historyRepository.findByRequesterId(requesterId).iterator();
-        while(iterator.hasNext()) {
-            historyDtoList.add(iterator.next().toHistoryDto());
-        }
-        return historyDtoList;
+    public List<HistoryDto> getAllList() throws FormatDoesNotMatchException {
+        return toHistoryDtoList(historyRepository.findAll());
     }
 
     @Override
-    public HistoryDto getHistoryByStuffNameAndItemNumAndHistoryNumData(String stuffName, int itemNum, int historyNum) throws NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
-        if(stuffEntity == null) {
-            throw new NotFoundException();
-        }
+    public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) throws NotFoundException, FormatDoesNotMatchException {
+        List<HistoryDto> output = new ArrayList<>();
+        DepartmentEntity targetDepartment = findDepartmentEntity(universityCode, departmentCode);
 
-        HistoryId historyId = new HistoryId(stuffEntity.getId(), itemNum, historyNum);
-        HistoryEntity historyEntity = historyRepository.findById(historyId).orElse(null);
-        if(historyEntity == null) {
-            throw new NotFoundException();
+        for(StuffEntity stuff : stuffRepository.findByDepartmentId(targetDepartment.getId())) {
+            for(ItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
+                output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
+            }
         }
-        return historyEntity.toHistoryDto();
+        return output;
     }
 
     @Override
-    public HistoryDto addHistoryData(HistoryDto newHistory) throws ConflictException, NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(newHistory.getItem().getStuff().getName()).orElse(null);
-        if(stuffEntity == null) {
-            throw new NotFoundException();
+    public List<HistoryDto> getListByDepartmentAndRequester(String universityCodeForDepartment, String departmentCode, String universityCodeForUser, String requesterStudentId) throws NotFoundException, FormatDoesNotMatchException {
+        List<HistoryDto> output = new ArrayList<>();
+        DepartmentEntity targetDepartment = findDepartmentEntity(universityCodeForDepartment, departmentCode);
+        UserEntity targetRequester = findUserEntity(universityCodeForUser, requesterStudentId);
+
+        for(HistoryEntity historyEntity : historyRepository.findByRequesterId(targetRequester.getId())) {
+            if(historyEntity.getItem().getStuff().getDepartment().getId() == targetDepartment.getId()) {
+                output.add(historyEntity.toHistoryDto());
+            }
         }
 
-        ItemId itemId = new ItemId(stuffEntity.getId(), newHistory.getItem().getNum());
-        ItemEntity itemEntity = itemRepository.findById(itemId).orElse(null);
-        if(itemEntity == null) {
-            throw new NotFoundException();
+        return output;
+    }
+
+    @Override
+    public HistoryDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) throws NotFoundException, FormatDoesNotMatchException {
+        return findHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum).toHistoryDto();
+    }
+
+    @Override
+    public HistoryDto create(HistoryDto newHistory) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+        ItemEntity itemOfNewHistory = findItemEntity(newHistory.item());
+
+        checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
+
+        HistoryEntity newHistoryEntity = new HistoryEntity(
+                itemOfNewHistory,
+                newHistory.num(),
+                toUserEntityOrNull(newHistory.requester()),
+                toUserEntityOrNull(newHistory.approveManager()),
+                toUserEntityOrNull(newHistory.returnManager()),
+                toUserEntityOrNull(newHistory.lostManager()),
+                toUserEntityOrNull(newHistory.cancelManager()),
+                newHistory.reservedTimeStamp(),
+                newHistory.approveTimeStamp(),
+                newHistory.returnTimeStamp(),
+                newHistory.lostTimeStamp(),
+                newHistory.cancelTimeStamp()
+        );
+        return historyRepository.save(newHistoryEntity).toHistoryDto();
+    }
+
+    @Override
+    public HistoryDto update(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum, HistoryDto newHistory) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
+        HistoryEntity target = findHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum);
+        ItemEntity itemOfNewHistory = findItemEntity(newHistory.item());
+
+        if(doesIndexChange(target, newHistory)) {
+            checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
         }
 
-        int newHistoryNum = itemEntity.getAndIncrementNextHistoryNum();
-        HistoryId historyId = new HistoryId(stuffEntity.getId(), newHistory.getItem().getNum(), newHistoryNum);
-        if(historyRepository.existsById(historyId)) {
+        target.setItem(itemOfNewHistory)
+                .setNum(newHistory.num())
+                .setRequester(toUserEntityOrNull(newHistory.requester()))
+                .setApproveManager(toUserEntityOrNull(newHistory.approveManager()))
+                .setReturnManager(toUserEntityOrNull(newHistory.returnManager()))
+                .setLostManager(toUserEntityOrNull(newHistory.lostManager()))
+                .setCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
+                .setReservedTimeStamp(newHistory.reservedTimeStamp())
+                .setApproveTimeStamp(newHistory.approveTimeStamp())
+                .setReturnTimeStamp(newHistory.returnTimeStamp())
+                .setLostTimeStamp(newHistory.lostTimeStamp())
+                .setCancelTimeStamp(newHistory.cancelTimeStamp());
+        return target.toHistoryDto();
+    }
+
+    private List<HistoryDto> toHistoryDtoList(Iterable<HistoryEntity> historyEntities) throws FormatDoesNotMatchException {
+        ArrayList<HistoryDto> output = new ArrayList<>();
+
+        for(HistoryEntity historyEntity : historyEntities) {
+            output.add(historyEntity.toHistoryDto());
+        }
+        return output;
+    }
+
+    private boolean doesIndexChange(HistoryEntity target, HistoryDto newHistory) {
+        String oldUniversityCode = target.getItem().getStuff().getDepartment().getUniversity().getCode();
+        String oldDepartmentCode = target.getItem().getStuff().getDepartment().getCode();
+        String oldStuffName = target.getItem().getStuff().getName();
+        int oldItemNum = target.getItem().getNum();
+        int oldHistoryNum = target.getNum();
+
+        return !(oldUniversityCode.equals(newHistory.item().stuff().department().university().code())
+                && oldDepartmentCode.equals(newHistory.item().stuff().department().code())
+                && oldStuffName.equals(newHistory.item().stuff().name())
+                && oldItemNum == newHistory.item().num()
+                && oldHistoryNum == newHistory.num());
+    }
+
+    private void checkHistoryConflict(int itemId, int historyNum) throws ConflictException {
+        if(historyRepository.existsByItemIdAndNum(itemId, historyNum)) {
             throw new ConflictException();
         }
-
-        HistoryEntity newHistoryEntity = HistoryEntity.builder()
-                .stuffId(itemEntity.getStuffId())
-                .itemNum(itemEntity.getNum())
-                .num(newHistoryNum)
-                .requesterId(newHistory.getRequesterId())
-                .approveManagerId(newHistory.getApproveManagerId())
-                .returnManagerId(newHistory.getReturnManagerId())
-                .lostManagerId(newHistory.getLostManagerId())
-                .cancelManagerId(newHistory.getCancelManagerId())
-                .reservedTimeStamp(newHistory.getReservedTimeStamp())
-                .approveTimeStamp(newHistory.getApproveTimeStamp())
-                .returnTimeStamp(newHistory.getReturnTimeStamp())
-                .lostTimeStamp(newHistory.getLostTimeStamp())
-                .cancelTimeStamp(newHistory.getCancelTimeStamp())
-                .build();
-
-        HistoryEntity savedHistoryEntity = historyRepository.save(newHistoryEntity);
-        historyRepository.refresh(savedHistoryEntity);
-
-        itemEntity.setLastHistoryNum(savedHistoryEntity.getNum());
-        ItemEntity savedItem = itemRepository.save(itemEntity);
-        itemRepository.refresh(savedItem);
-
-        return savedHistoryEntity.toHistoryDto();
     }
 
-    @Override
-    public HistoryDto updateHistoryData(String stuffName, int itemNum, int historyNum, HistoryDto newHistory) throws NotFoundException, DataException {
-        StuffEntity stuffEntity = stuffRepository.findByName(stuffName).orElse(null);
-        if(stuffEntity == null) {
-            throw new NotFoundException();
+    private UserEntity toUserEntityOrNull(UserDto userDto) throws NotFoundException {
+        if(userDto == null) {
+            return null;
         }
-
-        HistoryId historyId = new HistoryId(stuffEntity.getId(), itemNum, historyNum);
-        HistoryEntity target = historyRepository.findById(historyId).orElse(null);
-        if(target == null) {
-            throw new NotFoundException();
-        }
-
-        target.setRequesterId(newHistory.getRequesterId());
-        target.setApproveManagerId(newHistory.getApproveManagerId());
-        target.setReturnManagerId(newHistory.getReturnManagerId());
-        target.setLostManagerId(newHistory.getLostManagerId());
-        target.setCancelManagerId(newHistory.getCancelManagerId());
-        target.setReservedTimeStamp(newHistory.getReservedTimeStamp());
-        target.setApproveTimeStamp(newHistory.getApproveTimeStamp());
-        target.setReturnTimeStamp(newHistory.getReturnTimeStamp());
-        target.setLostTimeStamp(newHistory.getLostTimeStamp());
-        target.setCancelTimeStamp(newHistory.getCancelTimeStamp());
-
-        HistoryEntity savedHistoryEntity = historyRepository.save(target);
-        historyRepository.refresh(savedHistoryEntity);
-        return savedHistoryEntity.toHistoryDto();
+        return findUserEntity(userDto);
     }
 }

@@ -1,18 +1,14 @@
 package com.example.beliemeserver.data.repository;
 
 import com.example.beliemeserver.data.entity.UserEntity;
-import com.example.beliemeserver.data.entity.id.UserId;
 import com.example.beliemeserver.data.repository.custom.RefreshRepository;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface UserRepository extends RefreshRepository<UserEntity, UserId> {
-    @EntityGraph(attributePaths = "authorities")
-    Optional<UserEntity> findWithAuthoritiesByToken(String token);
-
-    @Query("select u from UserEntity u where u.studentId = ?1")
-    @EntityGraph(attributePaths = "authorities")
-    Optional<UserEntity> findWithAuthoritiesByStudentId(String studentId);
+public interface UserRepository extends RefreshRepository<UserEntity, Integer> {
+    List<UserEntity> findByUniversityId(int universityId);
+    Optional<UserEntity> findByUniversityIdAndStudentId(int universityId, String studentId);
+    Optional<UserEntity> findByToken(String token);
+    boolean existsByUniversityIdAndStudentId(int universityId, String studentId);
 }

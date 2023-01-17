@@ -1,16 +1,41 @@
 package com.example.beliemeserver.model.dao;
 
 import com.example.beliemeserver.model.dto.HistoryDto;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface HistoryDao {
-    public List<HistoryDto> getHistoriesData() throws DataException;
-    public List<HistoryDto> getHistoriesByRequesterIdData(String requesterId) throws DataException;
-    HistoryDto getHistoryByStuffNameAndItemNumAndHistoryNumData(String stuffName, int itemNum, int historyNum) throws NotFoundException, DataException;
-    public HistoryDto addHistoryData(HistoryDto newItem) throws ConflictException, NotFoundException, DataException;
-    public HistoryDto updateHistoryData(String stuffName, int itemNum, int historyNum, HistoryDto itemDto) throws NotFoundException, DataException;
+    @Transactional
+    List<HistoryDto> getAllList() throws FormatDoesNotMatchException;
+
+    @Transactional
+    List<HistoryDto> getListByDepartment(
+            String universityCode, String departmentCode)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    List<HistoryDto> getListByDepartmentAndRequester(
+            String universityCodeForDepartment, String departmentCode,
+            String universityCodeForUser, String requesterStudentId)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    HistoryDto getByIndex(
+            String universityCode, String departmentCode,
+            String stuffName, int itemNum, int historyNum)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    HistoryDto create(HistoryDto newHistory)
+            throws ConflictException, NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    HistoryDto update(
+            String universityCode, String departmentCode, String stuffName,
+            int itemNum, int historyNum, HistoryDto newHistory)
+            throws NotFoundException, ConflictException, FormatDoesNotMatchException;
 }

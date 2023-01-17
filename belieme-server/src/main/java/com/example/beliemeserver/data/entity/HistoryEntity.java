@@ -1,168 +1,194 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.data.entity.id.*;
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "history")
-@Getter
-@Setter
+@Table(name = "history", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "history_index",
+                columnNames = {"item_id", "num"}
+        )
+})
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
-@Builder
+@Getter
 @Accessors(chain = true)
-@IdClass(HistoryId.class)
-public class HistoryEntity implements DataEntity{
+public class HistoryEntity extends DataEntity {
     @Id
-    @Column(name = "stuff_id")
-    private int stuffId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
 
-    @Id
-    @Column(name = "item_num")
-    private int itemNum;
+    @Column(name = "item_id")
+    private int itemId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumns({
-            @JoinColumn(name = "stuff_id", referencedColumnName = "stuff_id", insertable = false, updatable = false),
-            @JoinColumn(name = "item_num", referencedColumnName = "num", insertable = false, updatable = false)
-    })
-    private ItemEntity item;
-
-    @Id
+    @Setter
     @Column(name = "num")
     private int num;
 
     @Column(name = "requester_id")
-    private String requesterId;
+    private Integer requesterId;
 
     @Column(name = "approve_manager_id")
-    private String approveManagerId;
+    private Integer approveManagerId;
 
     @Column(name = "return_manager_id")
-    private String returnManagerId;
+    private Integer returnManagerId;
 
     @Column(name = "lost_manager_id")
-    private String lostManagerId;
+    private Integer lostManagerId;
 
     @Column(name = "cancel_manager_id")
-    private String cancelManagerId;
+    private Integer cancelManagerId;
 
-    @ManyToOne
-    @JoinColumn(name = "requester_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity requester;
-
-    @ManyToOne
-    @JoinColumn(name = "approve_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity approveManager;
-
-    @ManyToOne
-    @JoinColumn(name = "return_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity returnManager;
-
-    @ManyToOne
-    @JoinColumn(name = "lost_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity lostManager;
-
-    @ManyToOne
-    @JoinColumn(name = "cancel_manager_id", referencedColumnName = "student_id", insertable = false, updatable = false)
-    private UserEntity cancelManager;
-
+    @Setter
     @Column(name = "reserved_time_stamp")
     private long reservedTimeStamp;
 
+    @Setter
     @Column(name = "approve_time_stamp")
     private long approveTimeStamp;
 
+    @Setter
     @Column(name = "return_time_stamp")
     private long returnTimeStamp;
 
+    @Setter
     @Column(name = "lost_time_stamp")
     private long lostTimeStamp;
 
+    @Setter
     @Column(name = "cancel_time_stamp")
     private long cancelTimeStamp;
 
+    @NonNull
+    @ManyToOne
+    @JoinColumn(name = "item_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private ItemEntity item;
+
+    @ManyToOne
+    @JoinColumn(name = "requester_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserEntity requester;
+
+    @ManyToOne
+    @JoinColumn(name = "approve_manager_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserEntity approveManager;
+
+    @ManyToOne
+    @JoinColumn(name = "return_manager_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserEntity returnManager;
+
+    @ManyToOne
+    @JoinColumn(name = "lost_manager_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserEntity lostManager;
+
+    @ManyToOne
+    @JoinColumn(name = "cancel_manager_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserEntity cancelManager;
+
+    public HistoryEntity(
+            @NonNull ItemEntity item, int num, UserEntity requester, UserEntity approveManager,
+            UserEntity returnManager, UserEntity lostManager, UserEntity cancelManager,
+            long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp,
+            long lostTimeStamp, long cancelTimeStamp
+    ) {
+        setItem(item);
+        setNum(num);
+
+        setRequester(requester);
+        setApproveManager(approveManager);
+        setReturnManager(returnManager);
+        setLostManager(lostManager);
+        setCancelManager(cancelManager);
+
+        setReservedTimeStamp(reservedTimeStamp);
+        setApproveTimeStamp(approveTimeStamp);
+        setReturnTimeStamp(returnTimeStamp);
+        setLostTimeStamp(lostTimeStamp);
+        setCancelTimeStamp(cancelTimeStamp);
+    }
+
+    public HistoryEntity setItem(@NonNull ItemEntity item) {
+        this.item = item;
+        this.itemId = item.getId();
+        return this;
+    }
+
+    public HistoryEntity setRequester(UserEntity requester) {
+        this.requester = requester;
+        this.requesterId = requester.getId();
+        return this;
+    }
+
+    public HistoryEntity setApproveManager(UserEntity approveManager) {
+        this.approveManager = approveManager;
+        this.approveManagerId = getIdOrElse(approveManager, null);
+        return this;
+    }
+
+    public HistoryEntity setReturnManager(UserEntity returnManager) {
+        this.returnManager = returnManager;
+        this.returnManagerId = getIdOrElse(returnManager, null);
+        return this;
+    }
+
+    public HistoryEntity setLostManager(UserEntity lostManager) {
+        this.lostManager = lostManager;
+        this.lostManagerId = getIdOrElse(lostManager, null);
+        return this;
+    }
+
+    public HistoryEntity setCancelManager(UserEntity cancelManager) {
+        this.cancelManager = cancelManager;
+        this.cancelManagerId = getIdOrElse(cancelManager, null);
+        return this;
+    }
+
     public HistoryDto toHistoryDto() throws FormatDoesNotMatchException {
-        UserDto requesterDto = null;
-        UserDto approveManagerDto = null;
-        UserDto returnManagerDto = null;
-        UserDto lostManagerDto = null;
-        UserDto cancelManagerDto = null;
-
-        if(requester != null) {
-            requesterDto = requester.toUserDto();
-        }
-        if(approveManager != null) {
-            approveManagerDto = approveManager.toUserDto();
-        }
-        if(returnManager != null) {
-            returnManagerDto = returnManager.toUserDto();
-        }
-        if(lostManager != null) {
-            lostManagerDto = lostManager.toUserDto();
-        }
-        if(cancelManager != null) {
-            cancelManagerDto = cancelManager.toUserDto();
-        }
-
-        return HistoryDto.builder()
-                .item(item.toItemDto())
-                .num(num)
-                .requester(requesterDto)
-                .approveManager(approveManagerDto)
-                .returnManager(returnManagerDto)
-                .lostManager(lostManagerDto)
-                .cancelManager(cancelManagerDto)
-                .reservedTimeStamp(reservedTimeStamp)
-                .approveTimeStamp(approveTimeStamp)
-                .returnTimeStamp(returnTimeStamp)
-                .lostTimeStamp(lostTimeStamp)
-                .cancelTimeStamp(cancelTimeStamp)
-                .build();
+        return new HistoryDto(
+                item.toItemDto(),
+                num,
+                getUserDtoOrNull(requester),
+                getUserDtoOrNull(approveManager),
+                getUserDtoOrNull(returnManager),
+                getUserDtoOrNull(lostManager),
+                getUserDtoOrNull(cancelManager),
+                reservedTimeStamp,
+                approveTimeStamp,
+                returnTimeStamp,
+                lostTimeStamp,
+                cancelTimeStamp
+        );
     }
 
     public HistoryDto toHistoryDtoNestedToItem() throws FormatDoesNotMatchException {
-        UserDto requesterDto = null;
-        UserDto approveManagerDto = null;
-        UserDto returnManagerDto = null;
-        UserDto lostManagerDto = null;
-        UserDto cancelManagerDto = null;
+        return new HistoryDto(
+                ItemDto.nestedEndpoint,
+                num,
+                getUserDtoOrNull(requester),
+                getUserDtoOrNull(approveManager),
+                getUserDtoOrNull(returnManager),
+                getUserDtoOrNull(lostManager),
+                getUserDtoOrNull(cancelManager),
+                reservedTimeStamp,
+                approveTimeStamp,
+                returnTimeStamp,
+                lostTimeStamp,
+                cancelTimeStamp
+        );
+    }
 
-        if(requester != null) {
-            requesterDto = requester.toUserDto();
+    private static UserDto getUserDtoOrNull(UserEntity user) throws FormatDoesNotMatchException {
+        if(user == null) {
+            return null;
         }
-        if(approveManager != null) {
-            approveManagerDto = approveManager.toUserDto();
-        }
-        if(returnManager != null) {
-            returnManagerDto = returnManager.toUserDto();
-        }
-        if(lostManager != null) {
-            lostManagerDto = lostManager.toUserDto();
-        }
-        if(cancelManager != null) {
-            cancelManagerDto = cancelManager.toUserDto();
-        }
-        return HistoryDto.builder()
-                .item(null)
-                .num(num)
-                .requester(requesterDto)
-                .approveManager(approveManagerDto)
-                .returnManager(returnManagerDto)
-                .lostManager(lostManagerDto)
-                .cancelManager(cancelManagerDto)
-                .reservedTimeStamp(reservedTimeStamp)
-                .approveTimeStamp(approveTimeStamp)
-                .returnTimeStamp(returnTimeStamp)
-                .lostTimeStamp(lostTimeStamp)
-                .cancelTimeStamp(cancelTimeStamp)
-                .build();
+        return user.toUserDto();
     }
 }

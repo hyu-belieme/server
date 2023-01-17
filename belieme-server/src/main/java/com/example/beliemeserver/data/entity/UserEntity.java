@@ -1,80 +1,125 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.data.entity.id.UserId;
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
-@Getter
-@Setter
-@AllArgsConstructor
+@Table(name = "user", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "user_index",
+                columnNames = {"university_id", "student_id"}
+        )
+})
+@NoArgsConstructor
 @ToString
-@Builder
+@Getter
 @Accessors(chain = true)
-@IdClass(UserId.class)
-public class UserEntity implements Serializable, DataEntity {
+public class UserEntity extends DataEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "university_id")
+    private int universityId;
+
+    @NonNull
+    @Setter
     @Column(name = "student_id")
     private String studentId;
 
+    @NonNull
+    @Setter
     @Column(name = "name")
     private String name;
 
+    @NonNull
+    @Setter
     @Column(name = "token")
     private String token;
 
+    @Setter
     @Column(name = "create_time_stamp")
     private long createTimeStamp;
 
+    @Setter
     @Column(name = "approval_time_stamp")
     private long approvalTimeStamp;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    private List<AuthorityEntity> authorities;
+    @ManyToOne
+    @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UniversityEntity university;
 
-    public UserEntity() {
-        authorities = new ArrayList<>();
+    @NonNull
+    @OneToMany(mappedBy = "user")
+    private List<MajorUserJoinEntity> majorJoin;
+
+    @NonNull
+    @OneToMany(mappedBy = "userId") // TODO 실험
+    private List<AuthorityUserJoinEntity> authorityJoin;
+
+    public UserEntity(UniversityEntity university, String studentId, String name, String token, long createTimeStamp, long approvalTimeStamp) {
+        this.university = university;
+        this.universityId = university.getId();
+        this.studentId = studentId;
+        this.name = name;
+        this.token = token;
+        this.createTimeStamp = createTimeStamp;
+        this.approvalTimeStamp = approvalTimeStamp;
+        this.majorJoin = new ArrayList<>();
+        this.authorityJoin = new ArrayList<>();
+    }
+
+    public UserEntity setUniversity(UniversityEntity university) {
+        this.university = university;
+        this.universityId = university.getId();
+        return this;
+    }
+
+    public void addAuthority(AuthorityUserJoinEntity authority) {
+        this.authorityJoin.add(authority);
+    }
+
+    public void removeAuthority(AuthorityUserJoinEntity authority) {
+        this.authorityJoin.remove(authority);
+    }
+
+    public void addMajor(MajorUserJoinEntity major) {
+        this.majorJoin.add(major);
+    }
+
+    public void removeMajor(MajorUserJoinEntity major) {
+        this.majorJoin.remove(major);
     }
 
     public UserDto toUserDto() throws FormatDoesNotMatchException {
+        List<MajorDto> majorDtoList = new ArrayList<>();
+        for(MajorUserJoinEntity major : majorJoin) {
+            majorDtoList.add(major.getMajor().toMajorDto());
+        }
+
         List<AuthorityDto> authorityDtoList = new ArrayList<>();
-        if(authorities != null) {
-            Iterator<AuthorityEntity> iterator = authorities.iterator();
-            while (iterator.hasNext()) {
-                authorityDtoList.add(iterator.next().toAuthorityDtoNestedToUser());
-            }
+        for(AuthorityUserJoinEntity authority : authorityJoin) {
+            authorityDtoList.add(authority.getAuthority().toAuthorityDto());
         }
 
         return new UserDto(
+                university.toUniversityDto(),
                 studentId,
                 name,
                 token,
                 createTimeStamp,
                 approvalTimeStamp,
+                majorDtoList,
                 authorityDtoList
         );
-    }
-
-    public static UserEntity from(UserDto userDto) {
-        if(userDto == null) {
-            return null;
-        }
-        return UserEntity.builder()
-                .studentId(userDto.getStudentId())
-                .name(userDto.getName())
-                .token(userDto.getToken())
-                .createTimeStamp(userDto.getCreateTimeStamp())
-                .approvalTimeStamp(userDto.getApprovalTimeStamp())
-                .build();
     }
 }
