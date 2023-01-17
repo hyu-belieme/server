@@ -2,14 +2,13 @@ package com.example.beliemeserver.data.entity.old;
 
 import com.example.beliemeserver.data.entity.DataEntity;
 import com.example.beliemeserver.data.entity.id.OldUserId;
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.old.OldFormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -47,7 +46,7 @@ public class OldUserEntity extends DataEntity {
         authorities = new ArrayList<>();
     }
 
-    public OldUserDto toUserDto() throws FormatDoesNotMatchException {
+    public OldUserDto toUserDto() throws OldFormatDoesNotMatchException {
         List<OldAuthorityDto> authorityDtoList = new ArrayList<>();
         if(authorities != null) {
             Iterator<OldAuthorityEntity> iterator = authorities.iterator();

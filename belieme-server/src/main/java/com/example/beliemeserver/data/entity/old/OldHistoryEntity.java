@@ -2,7 +2,7 @@ package com.example.beliemeserver.data.entity.old;
 
 import com.example.beliemeserver.data.entity.DataEntity;
 import com.example.beliemeserver.data.entity.id.*;
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.old.OldFormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.old.OldHistoryDto;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 import lombok.*;
@@ -90,7 +90,7 @@ public class OldHistoryEntity extends DataEntity {
     @Column(name = "cancel_time_stamp")
     private long cancelTimeStamp;
 
-    public OldHistoryDto toHistoryDto() throws FormatDoesNotMatchException {
+    public OldHistoryDto toHistoryDto() throws OldFormatDoesNotMatchException {
         OldUserDto requesterDto = null;
         OldUserDto approveManagerDto = null;
         OldUserDto returnManagerDto = null;
@@ -129,7 +129,7 @@ public class OldHistoryEntity extends DataEntity {
                 .build();
     }
 
-    public OldHistoryDto toHistoryDtoNestedToItem() throws FormatDoesNotMatchException {
+    public OldHistoryDto toHistoryDtoNestedToItem() throws OldFormatDoesNotMatchException {
         OldUserDto requesterDto = null;
         OldUserDto approveManagerDto = null;
         OldUserDto returnManagerDto = null;

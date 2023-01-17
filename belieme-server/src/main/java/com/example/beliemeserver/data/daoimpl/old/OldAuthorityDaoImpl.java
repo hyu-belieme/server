@@ -7,8 +7,8 @@ import com.example.beliemeserver.data.entity.id.OldUserId;
 import com.example.beliemeserver.data.repository.old.OldAuthorityRepository;
 import com.example.beliemeserver.model.dao.old.AuthorityDao;
 import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.model.exception.old.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

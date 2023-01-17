@@ -6,9 +6,9 @@ import com.example.beliemeserver.model.dao.UserDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UserDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public List<UserDto> getAllList() throws DataException {
+    public List<UserDto> getAllList() throws FormatDoesNotMatchException {
         List<UserDto> output = new ArrayList<>();
 
         for(UserEntity userEntity : userRepository.findAll()) {
@@ -33,7 +33,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public List<UserDto> getListByUniversity(String universityCode) throws NotFoundException, DataException {
+    public List<UserDto> getListByUniversity(String universityCode) throws NotFoundException, FormatDoesNotMatchException {
         List<UserDto> output = new ArrayList<>();
 
         int universityId = getUniversityEntity(universityCode).getId();
@@ -44,17 +44,17 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto getByToken(String token) throws NotFoundException, DataException {
+    public UserDto getByToken(String token) throws NotFoundException, FormatDoesNotMatchException {
         return getUserEntityByToken(token).toUserDto();
     }
 
     @Override
-    public UserDto getByIndex(String universityCode, String studentId) throws NotFoundException, DataException {
+    public UserDto getByIndex(String universityCode, String studentId) throws NotFoundException, FormatDoesNotMatchException {
         return getUserEntity(universityCode, studentId).toUserDto();
     }
 
     @Override
-    public UserDto create(UserDto user) throws ConflictException, DataException, NotFoundException {
+    public UserDto create(UserDto user) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
         UserEntity newUserEntity = saveUserOnly(user);
         saveMajorJoins(newUserEntity, user.majors());
         saveAuthorityJoins(newUserEntity, user.authorities());
@@ -63,7 +63,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto update(String universityCode, String studentId, UserDto newUser) throws NotFoundException, DataException, ConflictException {
+    public UserDto update(String universityCode, String studentId, UserDto newUser) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
         UserEntity target = getUserEntity(universityCode, studentId);
         updateUserOnly(target, newUser);
 

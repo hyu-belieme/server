@@ -2,10 +2,12 @@ package com.example.beliemeserver.data.daoimpl.old;
 
 import com.example.beliemeserver.data.entity.old.OldStuffEntity;
 import com.example.beliemeserver.data.repository.old.OldStuffRepository;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.old.StuffDao;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
-import com.example.beliemeserver.model.exception.*;
 
+import com.example.beliemeserver.model.exception.old.DataException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

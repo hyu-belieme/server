@@ -2,7 +2,7 @@ package com.example.beliemeserver.data.daoimpl.util;
 
 import com.example.beliemeserver.data.entity.*;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.NotFoundException;
 
 public class IndexAdapter {
     public static UniversityEntity getUniversityEntity(UniversityRepository universityRepository, String code) throws NotFoundException {

@@ -5,9 +5,9 @@ import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.StuffDao;
 import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     }
 
     @Override
-    public List<StuffDto> getAllList() throws DataException {
+    public List<StuffDto> getAllList() throws FormatDoesNotMatchException {
         List<StuffDto> output = new ArrayList<>();
         for(StuffEntity stuffEntity : stuffRepository.findAll()) {
             output.add(stuffEntity.toStuffDto());
@@ -29,7 +29,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     }
 
     @Override
-    public List<StuffDto> getListByDepartment(String universityCode, String departmentCode) throws DataException, NotFoundException {
+    public List<StuffDto> getListByDepartment(String universityCode, String departmentCode) throws NotFoundException, FormatDoesNotMatchException {
         DepartmentEntity departmentOfTarget = getDepartmentEntity(universityCode, departmentCode);
 
         List<StuffDto> output = new ArrayList<>();
@@ -40,12 +40,12 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     }
 
     @Override
-    public StuffDto getByIndex(String universityCode, String departmentCode, String stuffName) throws NotFoundException, DataException {
+    public StuffDto getByIndex(String universityCode, String departmentCode, String stuffName) throws NotFoundException, FormatDoesNotMatchException {
         return getStuffEntity(universityCode, departmentCode, stuffName).toStuffDto();
     }
 
     @Override
-    public StuffDto create(StuffDto newStuff) throws ConflictException, NotFoundException, DataException {
+    public StuffDto create(StuffDto newStuff) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
         DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department());
 
         checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
@@ -59,7 +59,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     }
 
     @Override
-    public StuffDto update(String universityCode, String departmentCode, String stuffName, StuffDto newStuff) throws NotFoundException, DataException, ConflictException {
+    public StuffDto update(String universityCode, String departmentCode, String stuffName, StuffDto newStuff) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
         StuffEntity target = getStuffEntity(universityCode, departmentCode, stuffName);
         DepartmentEntity departmentOfNewStuff = getDepartmentEntity(newStuff.department());
 

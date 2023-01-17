@@ -1,12 +1,13 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dao.old.ItemDao;
 import com.example.beliemeserver.model.dao.old.StuffDao;
 import com.example.beliemeserver.model.dao.old.UserDao;
 import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
-import com.example.beliemeserver.model.exception.*;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.util.AuthCheck;
 
 import org.springframework.stereotype.Service;

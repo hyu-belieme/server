@@ -1,9 +1,9 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
 

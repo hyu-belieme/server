@@ -8,9 +8,8 @@ import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.DepartmentDao;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<DepartmentDto> getAllDepartmentsData() throws DataException {
+    public List<DepartmentDto> getAllDepartmentsData() {
         List<DepartmentDto> output = new ArrayList<>();
 
         for(DepartmentEntity departmentEntity : departmentRepository.findAll()) {
@@ -34,7 +33,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<DepartmentDto> getAllDepartmentsByUniversityCodeData(String universityCode) throws DataException, NotFoundException {
+    public List<DepartmentDto> getAllDepartmentsByUniversityCodeData(String universityCode) throws NotFoundException {
         List<DepartmentDto> output = new ArrayList<>();
 
         int universityId = getUniversityEntity(universityCode).getId();
@@ -45,13 +44,13 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto getDepartmentByUniversityCodeAndDepartmentCodeData(String universityCode, String departmentCode) throws DataException, NotFoundException {
+    public DepartmentDto getDepartmentByUniversityCodeAndDepartmentCodeData(String universityCode, String departmentCode) throws NotFoundException {
         DepartmentEntity targetEntity = getDepartmentEntity(universityCode, departmentCode);
         return targetEntity.toDepartmentDto();
     }
 
     @Override
-    public DepartmentDto addDepartmentData(DepartmentDto newDepartment) throws DataException, NotFoundException, ConflictException {
+    public DepartmentDto addDepartmentData(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
         DepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
         saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
 
@@ -59,7 +58,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto updateDepartmentData(String universityCode, String departmentCode, DepartmentDto newDepartment) throws DataException, NotFoundException, ConflictException {
+    public DepartmentDto updateDepartmentData(String universityCode, String departmentCode, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
         DepartmentEntity target = getDepartmentEntity(universityCode, departmentCode);
         updateDepartmentOnly(target, newDepartment);
 

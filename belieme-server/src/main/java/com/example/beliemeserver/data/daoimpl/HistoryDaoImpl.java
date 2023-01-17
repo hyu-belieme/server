@@ -1,14 +1,13 @@
 package com.example.beliemeserver.data.daoimpl;
 
 import com.example.beliemeserver.data.entity.*;
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.HistoryDao;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.UserDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,12 +20,12 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getAllList() throws DataException {
+    public List<HistoryDto> getAllList() throws FormatDoesNotMatchException {
         return toHistoryDtoList(historyRepository.findAll());
     }
 
     @Override
-    public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) throws DataException, NotFoundException {
+    public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) throws NotFoundException, FormatDoesNotMatchException {
         List<HistoryDto> output = new ArrayList<>();
         DepartmentEntity targetDepartment = getDepartmentEntity(universityCode, departmentCode);
 
@@ -39,7 +38,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByDepartmentAndRequester(String universityCodeForDepartment, String departmentCode, String universityCodeForUser, String requesterStudentId) throws DataException, NotFoundException {
+    public List<HistoryDto> getListByDepartmentAndRequester(String universityCodeForDepartment, String departmentCode, String universityCodeForUser, String requesterStudentId) throws NotFoundException, FormatDoesNotMatchException {
         List<HistoryDto> output = new ArrayList<>();
         DepartmentEntity targetDepartment = getDepartmentEntity(universityCodeForDepartment, departmentCode);
         UserEntity targetRequester = getUserEntity(universityCodeForUser, requesterStudentId);
@@ -54,12 +53,12 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public HistoryDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) throws NotFoundException, DataException {
+    public HistoryDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) throws NotFoundException, FormatDoesNotMatchException {
         return getHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum).toHistoryDto();
     }
 
     @Override
-    public HistoryDto create(HistoryDto newHistory) throws ConflictException, NotFoundException, DataException {
+    public HistoryDto create(HistoryDto newHistory) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
         ItemEntity itemOfNewHistory = getItemEntity(newHistory.item());
 
         checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
@@ -82,7 +81,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public HistoryDto update(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum, HistoryDto newHistory) throws NotFoundException, DataException, ConflictException {
+    public HistoryDto update(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum, HistoryDto newHistory) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
         HistoryEntity target = getHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum);
         ItemEntity itemOfNewHistory = getItemEntity(newHistory.item());
 

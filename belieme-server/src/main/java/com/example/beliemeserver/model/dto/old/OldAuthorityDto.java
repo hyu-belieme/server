@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.dto.old;
 
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.old.OldFormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -84,7 +84,7 @@ public class OldAuthorityDto {
             }
         }
 
-        public static Permission from(String string) throws FormatDoesNotMatchException {
+        public static Permission from(String string) throws OldFormatDoesNotMatchException {
             switch (string) {
                 case "BANNED":
                     return BANNED;
@@ -97,7 +97,7 @@ public class OldAuthorityDto {
                 case "DEVELOPER":
                     return DEVELOPER;
                 default:
-                    throw new FormatDoesNotMatchException();
+                    throw new OldFormatDoesNotMatchException();
             }
         }
     }

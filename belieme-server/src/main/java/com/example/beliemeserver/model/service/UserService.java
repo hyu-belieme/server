@@ -1,6 +1,8 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.util.AuthCheck;
 import com.example.beliemeserver.model.util.HttpRequest;
 
@@ -10,7 +12,6 @@ import com.example.beliemeserver.model.dao.old.UserDao;
 import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 
-import com.example.beliemeserver.model.exception.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

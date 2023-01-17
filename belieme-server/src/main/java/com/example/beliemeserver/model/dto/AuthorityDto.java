@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.dto;
 
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.NonNull;
 
 public record AuthorityDto(

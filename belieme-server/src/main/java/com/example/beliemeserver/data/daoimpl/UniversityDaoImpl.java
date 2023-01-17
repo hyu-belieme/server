@@ -4,9 +4,8 @@ import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.UniversityDao;
 import com.example.beliemeserver.model.dto.UniversityDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public List<UniversityDto> getAllUniversitiesData() throws DataException {
+    public List<UniversityDto> getAllUniversitiesData() {
         List<UniversityDto> output = new ArrayList<>();
 
         for (UniversityEntity universityEntity : universityRepository.findAll()) {
@@ -32,13 +31,13 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto getUniversityByCodeData(String universityCode) throws DataException, NotFoundException {
+    public UniversityDto getUniversityByCodeData(String universityCode) throws NotFoundException {
         UniversityEntity targetUniversity = getUniversityEntity(universityCode);
         return targetUniversity.toUniversityDto();
     }
 
     @Override
-    public UniversityDto addUniversityData(UniversityDto newUniversity) throws DataException, ConflictException {
+    public UniversityDto addUniversityData(UniversityDto newUniversity) throws ConflictException {
         checkUniversityConflict(newUniversity.code());
 
         UniversityEntity newUniversityEntity = new UniversityEntity(
@@ -52,7 +51,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto updateUniversityData(String universityCode, UniversityDto newUniversity) throws DataException, NotFoundException, ConflictException {
+    public UniversityDto updateUniversityData(String universityCode, UniversityDto newUniversity) throws NotFoundException, ConflictException {
         UniversityEntity target = getUniversityEntity(universityCode);
         if (doesIndexOfUniversityChange(target, newUniversity)) {
             checkUniversityConflict(newUniversity.code());

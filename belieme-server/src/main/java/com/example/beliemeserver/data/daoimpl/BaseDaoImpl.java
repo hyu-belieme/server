@@ -4,7 +4,7 @@ import com.example.beliemeserver.data.daoimpl.util.IndexAdapter;
 import com.example.beliemeserver.data.entity.*;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

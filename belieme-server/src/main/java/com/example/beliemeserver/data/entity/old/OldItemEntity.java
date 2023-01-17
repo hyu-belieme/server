@@ -2,7 +2,7 @@ package com.example.beliemeserver.data.entity.old;
 
 import com.example.beliemeserver.data.entity.DataEntity;
 import com.example.beliemeserver.data.entity.id.*;
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.old.OldFormatDoesNotMatchException;
 
 import com.example.beliemeserver.model.dto.old.OldHistoryDto;
 import com.example.beliemeserver.model.dto.old.OldItemDto;
@@ -52,7 +52,7 @@ public class OldItemEntity extends DataEntity {
         return nextHistoryNum++;
     }
 
-    public OldItemDto toItemDto() throws FormatDoesNotMatchException {
+    public OldItemDto toItemDto() throws OldFormatDoesNotMatchException {
         OldHistoryDto lastHistoryDto = null;
         if(lastHistory != null) {
             lastHistoryDto = lastHistory.toHistoryDtoNestedToItem();
@@ -65,7 +65,7 @@ public class OldItemEntity extends DataEntity {
                 .build();
     }
 
-    public OldItemDto toItemDtoNestedToStuff() throws FormatDoesNotMatchException {
+    public OldItemDto toItemDtoNestedToStuff() throws OldFormatDoesNotMatchException {
         OldHistoryDto lastHistoryDto = null;
         if(lastHistory != null) {
             lastHistoryDto = lastHistory.toHistoryDtoNestedToItem();

@@ -1,9 +1,9 @@
 package com.example.beliemeserver.model.dao.old;
 
 import com.example.beliemeserver.model.dto.old.OldItemDto;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.model.exception.old.DataException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 
 import java.util.List;
 

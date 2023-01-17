@@ -5,7 +5,8 @@ import com.example.beliemeserver.controller.requestbody.StuffRequest;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
 import com.example.beliemeserver.common.Globals;
 
-import com.example.beliemeserver.model.exception.*;
+import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.service.StuffService;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
 

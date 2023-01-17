@@ -1,4 +1,4 @@
-package com.example.beliemeserver.model.exception;
+package com.example.beliemeserver.exception;
 
 public class MethodNotAllowedException extends InternalServerException {
     public MethodNotAllowedException() {

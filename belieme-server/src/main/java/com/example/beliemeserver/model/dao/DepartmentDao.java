@@ -2,39 +2,38 @@ package com.example.beliemeserver.model.dao;
 
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface DepartmentDao {
     @Transactional
-    List<DepartmentDto> getAllDepartmentsData() throws DataException;
+    List<DepartmentDto> getAllDepartmentsData();
 
     @Transactional
     List<DepartmentDto> getAllDepartmentsByUniversityCodeData(
             String universityCode
-    ) throws DataException, NotFoundException;
+    ) throws NotFoundException;
 
     @Transactional
     DepartmentDto getDepartmentByUniversityCodeAndDepartmentCodeData(
             String universityCode,
             String departmentCode
-    ) throws DataException, NotFoundException;
+    ) throws NotFoundException;
 
     @Transactional
     DepartmentDto addDepartmentData(
             DepartmentDto newDepartment
-    ) throws DataException, NotFoundException, ConflictException;
+    ) throws NotFoundException, ConflictException;
 
     @Transactional
     DepartmentDto updateDepartmentData(
             String universityCode,
             String departmentCode,
             DepartmentDto newDepartment
-    ) throws DataException, NotFoundException, ConflictException;
+    ) throws NotFoundException, ConflictException;
 
     @Transactional
     DepartmentDto putBaseMajorOnDepartmentData(

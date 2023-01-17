@@ -5,9 +5,9 @@ import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.AuthorityDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public List<AuthorityDto> getAllList() throws DataException {
+    public List<AuthorityDto> getAllList() throws FormatDoesNotMatchException {
         List<AuthorityDto> output = new ArrayList<>();
 
         for(AuthorityEntity authorityEntity : authorityRepository.findAll()) {
@@ -30,7 +30,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public AuthorityDto create(AuthorityDto authority) throws ConflictException, DataException, NotFoundException {
+    public AuthorityDto create(AuthorityDto authority) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
         DepartmentEntity departmentOfAuthority = getDepartmentEntity(authority.department());
 
         checkAuthorityConflict(departmentOfAuthority.getId(), authority.permission().name());
@@ -44,7 +44,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto newAuthority) throws DataException, NotFoundException, ConflictException {
+    public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto newAuthority) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
         AuthorityEntity target = getAuthorityEntity(universityCode, departmentCode, permission.name());
         DepartmentEntity departmentOfAuthority = getDepartmentEntity(newAuthority.department());
 

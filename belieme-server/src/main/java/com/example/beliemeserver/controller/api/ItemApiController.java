@@ -6,9 +6,13 @@ import com.example.beliemeserver.controller.responsebody.ItemResponse;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
 import com.example.beliemeserver.common.Globals;
 
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.old.OldItemDto;
-import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.service.ItemService;
 
 import org.springframework.http.ResponseEntity;

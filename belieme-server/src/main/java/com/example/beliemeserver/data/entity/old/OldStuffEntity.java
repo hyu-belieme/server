@@ -3,7 +3,7 @@ package com.example.beliemeserver.data.entity.old;
 import com.example.beliemeserver.data.entity.DataEntity;
 import com.example.beliemeserver.data.entity.id.*;
 
-import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.old.OldFormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
 import lombok.*;
@@ -76,7 +76,7 @@ public class OldStuffEntity extends DataEntity {
         return nextItemNum++;
     }
 
-    public OldStuffDto toStuffDto() throws FormatDoesNotMatchException {
+    public OldStuffDto toStuffDto() throws OldFormatDoesNotMatchException {
         List<OldItemDto> itemDtoList = new ArrayList<>();
         Iterator<OldItemEntity> iterator = items.iterator();
         while (iterator.hasNext()) {

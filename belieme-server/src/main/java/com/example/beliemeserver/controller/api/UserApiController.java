@@ -4,8 +4,9 @@ import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.LoginInfoRequest;
 import com.example.beliemeserver.controller.responsebody.UserResponse;
 
+import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
-import com.example.beliemeserver.model.exception.*;
+import com.example.beliemeserver.model.exception.old.DataException;
 import com.example.beliemeserver.model.service.UserService;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 

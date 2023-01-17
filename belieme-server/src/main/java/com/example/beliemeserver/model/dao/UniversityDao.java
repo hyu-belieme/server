@@ -1,26 +1,25 @@
 package com.example.beliemeserver.model.dao;
 
 import com.example.beliemeserver.model.dto.UniversityDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface UniversityDao {
     @Transactional
-    List<UniversityDto> getAllUniversitiesData() throws DataException;
+    List<UniversityDto> getAllUniversitiesData();
 
     @Transactional
     UniversityDto getUniversityByCodeData(String code)
-            throws DataException, NotFoundException;
+            throws NotFoundException;
 
     @Transactional
     UniversityDto addUniversityData(UniversityDto newUniversity)
-            throws DataException, ConflictException;
+            throws ConflictException;
 
     @Transactional
     UniversityDto updateUniversityData(String code, UniversityDto newUniversityDto)
-            throws DataException, NotFoundException, ConflictException;
+            throws NotFoundException, ConflictException;
 }

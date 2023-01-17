@@ -5,9 +5,9 @@ import com.example.beliemeserver.data.entity.id.OldUserId;
 import com.example.beliemeserver.data.repository.old.OldUserRepository;
 import com.example.beliemeserver.model.dao.old.UserDao;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.model.exception.old.DataException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

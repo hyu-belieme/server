@@ -5,9 +5,8 @@ import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.model.dao.MajorDao;
 import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.exception.ConflictException;
-import com.example.beliemeserver.model.exception.DataException;
-import com.example.beliemeserver.model.exception.NotFoundException;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public List<MajorDto> getAllMajorsData() throws DataException {
+    public List<MajorDto> getAllMajorsData() {
         List<MajorDto> output = new ArrayList<>();
         for(MajorEntity majorEntity : majorRepository.findAll()) {
             output.add(majorEntity.toMajorDto());
@@ -30,7 +29,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto addMajorData(MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
+    public MajorDto addMajorData(MajorDto newMajor) throws NotFoundException, ConflictException {
         UniversityEntity university = getUniversityEntity(newMajor.university());
 
         checkMajorConflict(university.getId(), newMajor.code());
@@ -45,7 +44,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto updateMajorData(String universityCode, String majorCode, MajorDto newMajor) throws DataException, NotFoundException, ConflictException {
+    public MajorDto updateMajorData(String universityCode, String majorCode, MajorDto newMajor) throws NotFoundException, ConflictException {
         MajorEntity target = getMajorEntity(universityCode, majorCode);
 
         UniversityEntity newUniversity = getUniversityEntity(newMajor.university());
