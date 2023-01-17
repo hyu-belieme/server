@@ -116,15 +116,15 @@ public class AuthorityDaoTest extends DaoTest {
         );
     }
 
-    private void testUpdatingAuthority(String universityCodeForDepartment, String departmentCode,
+    private void testUpdatingAuthority(String universityCode, String departmentCode,
                                        AuthorityDto.Permission permission, AuthorityDto newAuthority) {
         TestHelper.objectCompareTest(
-                () -> authorityDao.update(universityCodeForDepartment, departmentCode, permission, newAuthority),
+                () -> authorityDao.update(universityCode, departmentCode, permission, newAuthority),
                 newAuthority
         );
 
         AuthorityDto targetOnDummy =
-                getAuthorityDummy(universityCodeForDepartment, departmentCode);
+                getAuthorityDummy(universityCode, departmentCode, permission);
         TestHelper.listCompareTest(
                 () -> authorityDao.getAllList(),
                 authorityFakeDao.dummyStatusAfterUpdate(targetOnDummy, newAuthority)

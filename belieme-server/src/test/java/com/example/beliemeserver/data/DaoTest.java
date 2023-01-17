@@ -72,12 +72,13 @@ public abstract class DaoTest {
     }
 
     protected AuthorityDto getAuthorityDummy(
-            String universityCodeForDepartment, String departmentCode) {
+            String universityCodeForDepartment, String departmentCode, AuthorityDto.Permission permission) {
         FakeDao.FilterMethod<AuthorityDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(AuthorityDto target) {
                 return universityCodeForDepartment.equals(target.department().university().code())
-                        && departmentCode.equals(target.department().code());
+                        && departmentCode.equals(target.department().code())
+                        && permission.equals(target.permission());
             }
         };
 
