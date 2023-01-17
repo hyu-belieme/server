@@ -12,12 +12,12 @@ public interface HistoryDao {
 
     List<HistoryDto> getListByDepartment(
             String universityCode, String departmentCode)
-            throws DataException;
+            throws DataException, NotFoundException;
 
     List<HistoryDto> getListByDepartmentAndRequester(
             String universityCodeForDepartment, String departmentCode,
             String universityCodeForUser, String requesterStudentId)
-            throws DataException;
+            throws DataException, NotFoundException;
 
     HistoryDto getByIndex(
             String universityCode, String departmentCode,
@@ -30,5 +30,5 @@ public interface HistoryDao {
     HistoryDto update(
             String universityCode, String departmentCode, String stuffName,
             int itemNum, int historyNum, HistoryDto newHistory)
-            throws NotFoundException, DataException;
+            throws NotFoundException, DataException, ConflictException;
 }

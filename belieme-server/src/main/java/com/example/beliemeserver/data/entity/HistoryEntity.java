@@ -5,6 +5,7 @@ import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
@@ -18,6 +19,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
+@Accessors(chain = true)
 public class HistoryEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -113,34 +115,40 @@ public class HistoryEntity extends DataEntity {
         setCancelTimeStamp(cancelTimeStamp);
     }
 
-    public void setItem(@NonNull ItemEntity item) {
+    public HistoryEntity setItem(@NonNull ItemEntity item) {
         this.item = item;
         this.itemId = item.getId();
+        return this;
     }
 
-    public void setRequester(UserEntity requester) {
+    public HistoryEntity setRequester(UserEntity requester) {
         this.requester = requester;
         this.requesterId = requester.getId();
+        return this;
     }
 
-    public void setApproveManager(UserEntity approveManager) {
+    public HistoryEntity setApproveManager(UserEntity approveManager) {
         this.approveManager = approveManager;
         this.approveManagerId = getIdOrElse(approveManager, null);
+        return this;
     }
 
-    public void setReturnManager(UserEntity returnManager) {
+    public HistoryEntity setReturnManager(UserEntity returnManager) {
         this.returnManager = returnManager;
         this.returnManagerId = getIdOrElse(returnManager, null);
+        return this;
     }
 
-    public void setLostManager(UserEntity lostManager) {
+    public HistoryEntity setLostManager(UserEntity lostManager) {
         this.lostManager = lostManager;
         this.lostManagerId = getIdOrElse(lostManager, null);
+        return this;
     }
 
-    public void setCancelManager(UserEntity cancelManager) {
+    public HistoryEntity setCancelManager(UserEntity cancelManager) {
         this.cancelManager = cancelManager;
         this.cancelManagerId = getIdOrElse(cancelManager, null);
+        return this;
     }
 
     public HistoryDto toHistoryDto() throws FormatDoesNotMatchException {
