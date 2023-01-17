@@ -4,6 +4,7 @@ import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @Getter
+@Accessors(chain = true)
 public class StuffEntity extends DataEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,14 +43,16 @@ public class StuffEntity extends DataEntity {
     @Column(name = "next_item_num")
     private int nextItemNum;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
     private DepartmentEntity department;
 
+    @NonNull
     @OneToMany(mappedBy = "stuff")
     private List<ItemEntity> items;
 
-    public StuffEntity(DepartmentEntity department, String name, String emoji) {
+    public StuffEntity(@NonNull DepartmentEntity department, @NonNull String name, @NonNull String emoji) {
         this.department = department;
         this.departmentId = department.getId();
         this.name = name;
@@ -57,9 +61,10 @@ public class StuffEntity extends DataEntity {
         this.items = new ArrayList<>();
     }
 
-    public void setDepartment(DepartmentEntity department) {
+    public StuffEntity setDepartment(@NonNull DepartmentEntity department) {
         this.department = department;
         this.departmentId = department.getId();
+        return this;
     }
 
     public int getAndIncrementNextItemNum() {

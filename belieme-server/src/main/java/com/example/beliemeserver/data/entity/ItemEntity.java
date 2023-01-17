@@ -3,10 +3,8 @@ package com.example.beliemeserver.data.entity;
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import com.example.beliemeserver.model.dto.StuffDto;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -34,11 +32,12 @@ public class ItemEntity extends DataEntity {
     private int num;
 
     @Column(name = "last_history_id")
-    private int lastHistoryId;
+    private Integer lastHistoryId;
 
     @Column(name = "next_history_num")
     private int nextHistoryNum;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "stuff_id", referencedColumnName = "id", insertable = false, updatable = false)
     private StuffEntity stuff;
@@ -47,22 +46,22 @@ public class ItemEntity extends DataEntity {
     @JoinColumn(name = "last_history_id", referencedColumnName = "id", insertable = false, updatable = false)
     private HistoryEntity lastHistory;
 
-    public ItemEntity(StuffEntity stuff, int num, HistoryEntity lastHistory) {
+    public ItemEntity(@NonNull StuffEntity stuff, int num, HistoryEntity lastHistory) {
         this.stuff = stuff;
         this.stuffId = stuff.getId();
         this.num = num;
         this.lastHistory = lastHistory;
-        this.lastHistoryId = getIdOrElse(lastHistory, 0);
+        this.lastHistoryId = getIdOrElse(lastHistory, null);
     }
 
-    public void setStuff(StuffEntity stuff) {
+    public void setStuff(@NonNull StuffEntity stuff) {
         this.stuff = stuff;
         this.stuffId = stuff.getId();
     }
 
     public void setLastHistory(HistoryEntity lastHistory) {
         this.lastHistory = lastHistory;
-        this.lastHistoryId = getIdOrElse(lastHistory, 0);
+        this.lastHistoryId = getIdOrElse(lastHistory, null);
     }
 
     public int getAndIncrementNextHistoryNum() {
@@ -81,7 +80,7 @@ public class ItemEntity extends DataEntity {
     public ItemDto toItemDtoNestedToStuff() throws FormatDoesNotMatchException {
         HistoryDto lastHistoryDto = getLastHistoryDto();
         return new ItemDto(
-                null,
+                StuffDto.nestedEndpoint,
                 num,
                 lastHistoryDto
         );

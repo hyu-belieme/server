@@ -11,7 +11,7 @@ public interface StuffDao {
     List<StuffDto> getAllList()  throws DataException;
 
     List<StuffDto> getListByDepartment(String universityCode, String departmentCode)
-            throws DataException;
+            throws DataException, NotFoundException;
 
     StuffDto getByIndex(
             String universityCode, String departmentCode, String stuffName)
@@ -23,5 +23,5 @@ public interface StuffDao {
     StuffDto update(
             String universityCode, String departmentCode,
             String stuffName, StuffDto newStuff)
-            throws NotFoundException, DataException;
+            throws NotFoundException, DataException, ConflictException;
 }

@@ -2,11 +2,9 @@ package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.UserDto;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -34,19 +32,19 @@ public class HistoryEntity extends DataEntity {
     private int num;
 
     @Column(name = "requester_id")
-    private int requesterId;
+    private Integer requesterId;
 
     @Column(name = "approve_manager_id")
-    private int approveManagerId;
+    private Integer approveManagerId;
 
     @Column(name = "return_manager_id")
-    private int returnManagerId;
+    private Integer returnManagerId;
 
     @Column(name = "lost_manager_id")
-    private int lostManagerId;
+    private Integer lostManagerId;
 
     @Column(name = "cancel_manager_id")
-    private int cancelManagerId;
+    private Integer cancelManagerId;
 
     @Setter
     @Column(name = "reserved_time_stamp")
@@ -68,6 +66,7 @@ public class HistoryEntity extends DataEntity {
     @Column(name = "cancel_time_stamp")
     private long cancelTimeStamp;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "item_id", referencedColumnName = "id", insertable = false, updatable = false)
     private ItemEntity item;
@@ -93,7 +92,7 @@ public class HistoryEntity extends DataEntity {
     private UserEntity cancelManager;
 
     public HistoryEntity(
-            ItemEntity item, int num, UserEntity requester, UserEntity approveManager,
+            @NonNull ItemEntity item, int num, UserEntity requester, UserEntity approveManager,
             UserEntity returnManager, UserEntity lostManager, UserEntity cancelManager,
             long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp,
             long lostTimeStamp, long cancelTimeStamp
@@ -114,9 +113,9 @@ public class HistoryEntity extends DataEntity {
         setCancelTimeStamp(cancelTimeStamp);
     }
 
-    public void setItem(ItemEntity item) {
+    public void setItem(@NonNull ItemEntity item) {
         this.item = item;
-        this.itemId = getIdOrElse(item, 0);
+        this.itemId = item.getId();
     }
 
     public void setRequester(UserEntity requester) {
@@ -126,22 +125,22 @@ public class HistoryEntity extends DataEntity {
 
     public void setApproveManager(UserEntity approveManager) {
         this.approveManager = approveManager;
-        this.approveManagerId = getIdOrElse(approveManager, 0);
+        this.approveManagerId = getIdOrElse(approveManager, null);
     }
 
     public void setReturnManager(UserEntity returnManager) {
         this.returnManager = returnManager;
-        this.returnManagerId = getIdOrElse(returnManager, 0);
+        this.returnManagerId = getIdOrElse(returnManager, null);
     }
 
     public void setLostManager(UserEntity lostManager) {
         this.lostManager = lostManager;
-        this.lostManagerId = getIdOrElse(lostManager, 0);
+        this.lostManagerId = getIdOrElse(lostManager, null);
     }
 
     public void setCancelManager(UserEntity cancelManager) {
         this.cancelManager = cancelManager;
-        this.cancelManagerId = getIdOrElse(cancelManager, 0);
+        this.cancelManagerId = getIdOrElse(cancelManager, null);
     }
 
     public HistoryDto toHistoryDto() throws FormatDoesNotMatchException {
@@ -163,7 +162,7 @@ public class HistoryEntity extends DataEntity {
 
     public HistoryDto toHistoryDtoNestedToItem() throws FormatDoesNotMatchException {
         return new HistoryDto(
-                null,
+                ItemDto.nestedEndpoint,
                 num,
                 getUserDtoOrNull(requester),
                 getUserDtoOrNull(approveManager),
