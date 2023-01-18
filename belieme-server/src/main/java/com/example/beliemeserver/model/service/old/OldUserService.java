@@ -1,10 +1,10 @@
-package com.example.beliemeserver.model.service;
+package com.example.beliemeserver.model.service.old;
 
 import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.util.AuthCheck;
-import com.example.beliemeserver.model.util.HttpRequest;
+import com.example.beliemeserver.model.util.old.OldAuthCheck;
+import com.example.beliemeserver.model.util.old.OldHttpRequest;
 
 import com.example.beliemeserver.model.dao.old.AuthorityDao;
 import com.example.beliemeserver.model.dao.old.UserDao;
@@ -20,18 +20,18 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class UserService {
+public class OldUserService {
     private static final String client_id = "a4b1abe746f384c3d43fa82a17f222";
     private static final Set<String> CSE_SOSOK_ID = new HashSet<>(Arrays.asList("FH04067"));
 
     private final UserDao userDao;
     private final AuthorityDao authorityDao;
-    private final AuthCheck authCheck;
+    private final OldAuthCheck authCheck;
 
-    public UserService(UserDao userDao, AuthorityDao authorityDao) {
+    public OldUserService(UserDao userDao, AuthorityDao authorityDao) {
         this.userDao = userDao;
         this.authorityDao = authorityDao;
-        this.authCheck = new AuthCheck(userDao);
+        this.authCheck = new OldAuthCheck(userDao);
     }
 
     public OldUserDto getUserInfoFromUnivApiByApiToken(String apiToken) throws DataException, ConflictException, NotFoundException, ForbiddenException, BadGateWayException {
@@ -89,7 +89,7 @@ public class UserService {
         headers.put("swap_key", Long.toString(System.currentTimeMillis()/1000));
         headers.put("access_token", apiToken);
         String responseString = null;
-        responseString = HttpRequest.sendGetRequest("https://api.hanyang.ac.kr/rs/user/loginInfo.json", headers);
+        responseString = OldHttpRequest.sendGetRequest("https://api.hanyang.ac.kr/rs/user/loginInfo.json", headers);
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonResponse;

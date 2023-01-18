@@ -7,7 +7,7 @@ import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.service.HistoryService;
+import com.example.beliemeserver.model.service.old.OldHistoryService;
 import com.example.beliemeserver.model.dto.old.OldHistoryDto;
 
 import org.springframework.http.ResponseEntity;
@@ -19,9 +19,9 @@ import java.util.List;
 
 @RestController
 public class HistoryApiController {
-    private final HistoryService historyService;
+    private final OldHistoryService historyService;
 
-    public HistoryApiController(HistoryService historyService) {
+    public HistoryApiController(OldHistoryService historyService) {
         this.historyService = historyService;
     }
 

@@ -1,4 +1,4 @@
-package com.example.beliemeserver.model.service;
+package com.example.beliemeserver.model.service.old;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dao.old.ItemDao;
@@ -8,24 +8,24 @@ import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.util.AuthCheck;
+import com.example.beliemeserver.model.util.old.OldAuthCheck;
 
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class StuffService {
+public class OldStuffService {
     private final StuffDao stuffDao;
 
     private final ItemDao itemDao;
 
-    private final AuthCheck authCheck;
+    private final OldAuthCheck authCheck;
 
-    public StuffService(StuffDao stuffDao, ItemDao itemDao, UserDao userDao) {
+    public OldStuffService(StuffDao stuffDao, ItemDao itemDao, UserDao userDao) {
         this.stuffDao = stuffDao;
         this.itemDao = itemDao;
-        this.authCheck = new AuthCheck(userDao);
+        this.authCheck = new OldAuthCheck(userDao);
     }
 
     public List<OldStuffDto> getStuffs(String userToken) throws DataException, UnauthorizedException, ForbiddenException {

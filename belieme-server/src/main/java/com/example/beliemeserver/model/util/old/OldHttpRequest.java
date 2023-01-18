@@ -1,4 +1,4 @@
-package com.example.beliemeserver.model.util;
+package com.example.beliemeserver.model.util.old;
 
 import com.example.beliemeserver.exception.BadGateWayException;
 
@@ -8,7 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
 
-public class HttpRequest {
+public class OldHttpRequest {
     public static String sendGetRequest(String urlString, Map<String, String> requestHeader) throws BadGateWayException {
         String output;
         try {
