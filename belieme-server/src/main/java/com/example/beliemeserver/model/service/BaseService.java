@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public abstract class BaseService {
-    private final UniversityDao universityDao;
-    private final DepartmentDao departmentDao;
-    private final UserDao userDao;
-    private final MajorDao majorDao;
-    private final AuthorityDao authorityDao;
-    private final StuffDao stuffDao;
-    private final ItemDao itemDao;
-    private final HistoryDao historyDao;
+    protected final UniversityDao universityDao;
+    protected final DepartmentDao departmentDao;
+    protected final UserDao userDao;
+    protected final MajorDao majorDao;
+    protected final AuthorityDao authorityDao;
+    protected final StuffDao stuffDao;
+    protected final ItemDao itemDao;
+    protected final HistoryDao historyDao;
 
     public BaseService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         this.universityDao = universityDao;
