@@ -1,4 +1,4 @@
-package com.example.beliemeserver.model.service;
+package com.example.beliemeserver.model.service.old;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dao.old.HistoryDao;
@@ -8,22 +8,22 @@ import com.example.beliemeserver.model.dto.old.OldHistoryDto;
 import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.util.AuthCheck;
+import com.example.beliemeserver.model.util.old.OldAuthCheck;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class HistoryService {
+public class OldHistoryService {
     private final ItemDao itemDao;
     private final HistoryDao historyDao;
-    private final AuthCheck authCheck;
+    private final OldAuthCheck authCheck;
 
-    public HistoryService(ItemDao itemDao, HistoryDao historyDao, UserDao userDao) {
+    public OldHistoryService(ItemDao itemDao, HistoryDao historyDao, UserDao userDao) {
         this.itemDao = itemDao;
         this.historyDao = historyDao;
 
-        this.authCheck = new AuthCheck(userDao);
+        this.authCheck = new OldAuthCheck(userDao);
     }
 
     public List<OldHistoryDto> getHistories(String userToken, String studentId) throws DataException, UnauthorizedException, ForbiddenException {

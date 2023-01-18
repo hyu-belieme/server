@@ -7,7 +7,7 @@ import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.service.StuffService;
+import com.example.beliemeserver.model.service.old.OldStuffService;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
 
 import org.springframework.http.ResponseEntity;
@@ -20,9 +20,9 @@ import java.util.List;
 @RestController
 @RequestMapping(path="/stuffs")
 public class StuffApiController {
-    private final StuffService stuffService;
+    private final OldStuffService stuffService;
 
-    public StuffApiController(StuffService stuffService) {
+    public StuffApiController(OldStuffService stuffService) {
         this.stuffService = stuffService;
     }
 

@@ -7,7 +7,7 @@ import com.example.beliemeserver.controller.responsebody.UserResponse;
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
 import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.service.UserService;
+import com.example.beliemeserver.model.service.old.OldUserService;
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/")
 public class UserApiController {
-    private final UserService userService;
+    private final OldUserService userService;
 
-    public UserApiController(UserService userService) {
+    public UserApiController(OldUserService userService) {
         this.userService = userService;
     }
 

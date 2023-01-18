@@ -13,7 +13,7 @@ import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
 import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.service.ItemService;
+import com.example.beliemeserver.model.service.old.OldItemService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +25,9 @@ import java.util.List;
 @RestController
 @RequestMapping(path="/stuffs/{name}/items")
 public class ItemApiController {
-    private final ItemService itemService;
+    private final OldItemService itemService;
 
-    public ItemApiController(ItemService itemService) {
+    public ItemApiController(OldItemService itemService) {
         this.itemService = itemService;
     }
 

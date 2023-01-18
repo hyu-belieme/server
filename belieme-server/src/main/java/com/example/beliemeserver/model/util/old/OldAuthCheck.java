@@ -1,4 +1,4 @@
-package com.example.beliemeserver.model.util;
+package com.example.beliemeserver.model.util.old;
 
 import com.example.beliemeserver.model.dao.old.UserDao;
 import com.example.beliemeserver.model.exception.old.DataException;
@@ -9,7 +9,7 @@ import com.example.beliemeserver.model.dto.old.OldUserDto;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class AuthCheck {
+public class OldAuthCheck {
     UserDao userDao;
 
     public OldUserDto checkTokenAndGetUser(String token) throws UnauthorizedException, DataException {
