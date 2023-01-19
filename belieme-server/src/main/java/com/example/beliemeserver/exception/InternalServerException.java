@@ -1,6 +1,6 @@
 package com.example.beliemeserver.exception;
 
-public abstract class InternalServerException extends Exception {
+public abstract class InternalServerException extends RuntimeException {
     String message;
 
     public InternalServerException() {
