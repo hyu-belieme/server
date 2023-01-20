@@ -113,10 +113,11 @@ public class UniversityServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[ERROR]_[해당 code가 이미 존재할 시]_[ConflictException]")
         public void universityConflict_ConflictException() {
+            String universityCode = ""; String name = ""; String apiUrl = "";
             when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.addUniversityData(new UniversityDto(any(), any(), any()))).thenThrow(ConflictException.class);
+            when(universityDao.addUniversityData(new UniversityDto(universityCode, name, apiUrl))).thenThrow(ConflictException.class);
 
-            Assertions.assertThrows(ConflictException.class, () -> universityService.create(userToken, any(), any(), any()));
+            Assertions.assertThrows(ConflictException.class, () -> universityService.create(userToken, universityCode, name, apiUrl));
         }
 
         @Test
@@ -138,7 +139,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(StubHelper.masterOfDepartment1);
 
             Assertions.assertThrows(
-                    UnauthorizedException.class,
+                    ForbiddenException.class,
                     () -> universityService.create(userToken, universityCode, name, apiUrl)
             );
         }
@@ -165,7 +166,7 @@ public class UniversityServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[newUniversityCode, newName이 null일 때]_[-]")
         public void success_newUniversityCodeIsNull() {
             UniversityDto target = StubHelper.basicUniversity1;
-            String newApiUrl = any();
+            String newApiUrl = "";
             when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
             when(universityDao.getUniversityByCodeData(target.code())).thenReturn(target);
 
@@ -178,7 +179,7 @@ public class UniversityServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[newApiUrl이 null일 때]_[-]")
         public void success_newApiUrlIsNull() {
             UniversityDto target = StubHelper.basicUniversity1;
-            String newUniversityCode = any(); String newName = any();
+            String newUniversityCode = ""; String newName = "";
             when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
             when(universityDao.getUniversityByCodeData(target.code())).thenReturn(target);
 
@@ -196,17 +197,17 @@ public class UniversityServiceTest extends BaseServiceTest {
 
             universityService.update(userToken, target.code(), null, null, null);
 
-            verify(universityDao, never()).updateUniversityData(target.code(), any());
+
+            verify(universityDao, never()).updateUniversityData(target.code(), target);
         }
 
         @Test
         @DisplayName("[ERROR]_[target이 존재하지 않을 시]_[NotFoundException]")
         public void universityNotFound_NotFoundException() {
-            String targetUniversityCode = "";
             when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.updateUniversityData(targetUniversityCode, any())).thenThrow(NotFoundException.class);
+            when(universityDao.updateUniversityData(any(), any())).thenThrow(NotFoundException.class);
 
-            Assertions.assertThrows(NotFoundException.class, () -> universityService.update(userToken, targetUniversityCode, any(), any(), any()));
+            Assertions.assertThrows(NotFoundException.class, () -> universityService.update(userToken, "", "", "", ""));
         }
 
         @Test
@@ -215,7 +216,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
             when(universityDao.updateUniversityData(any(), any())).thenThrow(ConflictException.class);
 
-            Assertions.assertThrows(ConflictException.class, () -> universityService.update(userToken, any(), any(), any(), any()));
+            Assertions.assertThrows(ConflictException.class, () -> universityService.update(userToken, "", "", "", ""));
         }
 
 
@@ -226,7 +227,7 @@ public class UniversityServiceTest extends BaseServiceTest {
 
             Assertions.assertThrows(
                     UnauthorizedException.class,
-                    () -> universityService.update(userToken, any(), any(), any(), any())
+                    () -> universityService.update(userToken, "", "", "", "")
             );
         }
 
@@ -236,8 +237,8 @@ public class UniversityServiceTest extends BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(StubHelper.masterOfDepartment1);
 
             Assertions.assertThrows(
-                    UnauthorizedException.class,
-                    () -> universityService.update(userToken, any(), any(), any(), any())
+                    ForbiddenException.class,
+                    () -> universityService.update(userToken, "", "", "", "")
             );
         }
     }
