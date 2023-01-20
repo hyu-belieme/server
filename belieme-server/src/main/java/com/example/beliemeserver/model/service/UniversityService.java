@@ -15,23 +15,26 @@ public class UniversityService extends BaseService {
     }
 
     public List<UniversityDto> getAllList(@NonNull String userToken) {
-        // TODO Need to implements.
-        return new ArrayList<>();
+        checkDeveloperPermission(userToken);
+
+        return universityDao.getAllUniversitiesData();
     }
 
     public UniversityDto getByIndex(
             @NonNull String userToken, @NonNull String universityCode
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+        return universityDao.getUniversityByCodeData(universityCode);
     }
 
     public UniversityDto create(
             @NonNull String userToken, @NonNull String universityCode,
             @NonNull String name, String apiUrl
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+
+        UniversityDto newUniversity = new UniversityDto(universityCode, name, apiUrl);
+        return universityDao.addUniversityData(newUniversity);
     }
 
     public UniversityDto update(
@@ -39,7 +42,16 @@ public class UniversityService extends BaseService {
             @NonNull String universityCode,
             String newUniversityCode, String newName, String newApiUrl
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+
+        UniversityDto oldUniversity = universityDao.getUniversityByCodeData(universityCode);
+        if(newUniversityCode == null && newName == null && newApiUrl == null) return oldUniversity;
+
+        if(newUniversityCode == null) newUniversityCode = oldUniversity.code();
+        if(newName == null) newName = oldUniversity.name();
+        if(newApiUrl == null) newApiUrl = oldUniversity.apiUrl();
+        UniversityDto newUniversity = new UniversityDto(newUniversityCode, newName, newApiUrl);
+
+        return universityDao.updateUniversityData(universityCode, newUniversity);
     }
 }

@@ -120,9 +120,50 @@ public record UserDto(
                 '}';
     }
 
-    public AuthorityDto.Permission getMaxPermission(DepartmentDto departmentDto) {
-        // TODO Needs implement
-        return AuthorityDto.Permission.USER;
+    public boolean matchUniqueKey(String universityCode, String studentId) {
+        if (universityCode == null || studentId == null) {
+            return false;
+        }
+        return universityCode.equals(this.university().code())
+                && studentId.equals(this.studentId());
+    }
+
+    public boolean matchUniqueKey(UserDto oth) {
+        if(oth == null) {
+            return false;
+        }
+        String universityCode = oth.university().code();
+        String studentId = oth.studentId();
+        return universityCode.equals(this.university().code())
+                && studentId.equals(this.studentId());
+    }
+
+    public boolean isDeveloper() {
+        for(AuthorityDto authority : authorities) {
+            if(authority.permission().hasDeveloperPermission()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public AuthorityDto.Permission getMaxPermission(DepartmentDto department) {
+        AuthorityDto.Permission maxPermission = AuthorityDto.Permission.BANNED;
+        List<MajorDto> baseMajors = department.baseMajors();
+        for(MajorDto major : majors) {
+            if (baseMajors.contains(major)) {
+                maxPermission = AuthorityDto.Permission.USER;
+                break;
+            }
+        }
+
+        for(AuthorityDto authority : authorities) {
+            if(department.equals(authority.department())) {
+                maxPermission = authority.permission();
+                break;
+            }
+        }
+        return maxPermission;
     }
 
     private static long currentTimeStamp() {

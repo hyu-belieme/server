@@ -28,6 +28,27 @@ public record AuthorityDto(
                 '}';
     }
 
+    public boolean matchUniqueKey(String universityCode, String departmentCode, Permission permission) {
+        if(universityCode == null || departmentCode == null || permission == null) {
+            return false;
+        }
+        return universityCode.equals(this.department().university().code())
+                && departmentCode.equals(this.department().code())
+                && permission.equals(this.permission());
+    }
+
+    public boolean matchUniqueKey(AuthorityDto oth) {
+        if(oth == null) {
+            return false;
+        }
+        String universityCode = oth.department().university().code();
+        String departmentCode = oth.department().code();
+        Permission permission = oth.permission();
+        return universityCode.equals(this.department().university().code())
+                && departmentCode.equals(this.department().code())
+                && permission.equals(this.permission());
+    }
+
     public enum Permission {
         BANNED, USER, STAFF, MASTER, DEVELOPER;
 
