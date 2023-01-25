@@ -29,6 +29,12 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
+    public MajorDto getMajorByIndex(String universityCode, String majorCode) {
+        MajorEntity targetEntity = findMajorEntity(universityCode, majorCode);
+        return targetEntity.toMajorDto();
+    }
+
+    @Override
     public MajorDto addMajorData(MajorDto newMajor) throws NotFoundException, ConflictException {
         UniversityEntity university = findUniversityEntity(newMajor.university());
 

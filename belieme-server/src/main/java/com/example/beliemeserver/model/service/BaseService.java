@@ -30,6 +30,14 @@ public abstract class BaseService {
         this.historyDao = historyDao;
     }
 
+    protected UserDto checkTokenAndGetUser(String token) {
+        try {
+            return userDao.getByToken(token);
+        } catch (NotFoundException e) {
+            throw new UnauthorizedException();
+        }
+    }
+
     protected void checkUserPermission(String token, DepartmentDto department) {
         UserDto requester = checkTokenAndGetUser(token);
         if(!requester.getMaxPermission(department).hasUserPermission()) {
@@ -55,14 +63,6 @@ public abstract class BaseService {
         UserDto requester = checkTokenAndGetUser(token);
         if(!requester.isDeveloper()) {
             throw new ForbiddenException();
-        }
-    }
-
-    private UserDto checkTokenAndGetUser(String token) {
-        try {
-            return userDao.getByToken(token);
-        } catch (NotFoundException e) {
-            throw new UnauthorizedException();
         }
     }
 }

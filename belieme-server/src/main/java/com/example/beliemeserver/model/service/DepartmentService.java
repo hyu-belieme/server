@@ -1,7 +1,9 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.*;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -15,16 +17,25 @@ public class DepartmentService extends BaseService {
     }
 
     public List<DepartmentDto> getAccessibleList(@NonNull String userToken) {
-        // TODO Need to implements.
-        return new ArrayList<>();
+        List<DepartmentDto> output = new ArrayList<>();
+
+        UserDto requester = checkTokenAndGetUser(userToken);
+        List<DepartmentDto> allDepartment = departmentDao.getAllDepartmentsData();
+        for(DepartmentDto department : allDepartment) {
+            if(requester.getMaxPermission(department).hasUserPermission()) {
+                output.add(department);
+            }
+        }
+
+        return output;
     }
 
     public DepartmentDto getByIndex(
             @NonNull String userToken, @NonNull String universityCode,
             @NonNull String departmentCode
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+        return departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
     }
 
     public DepartmentDto create(
@@ -32,15 +43,57 @@ public class DepartmentService extends BaseService {
             @NonNull String departmentCode, @NonNull String name,
             @NonNull List<String> majorCodes
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+
+        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
+        List<MajorDto> baseMajors = new ArrayList<>();
+        for(String majorCode : majorCodes) {
+            baseMajors.add(getMajorOrCreate(university, majorCode));
+        }
+
+        DepartmentDto newDepartment = new DepartmentDto(university, departmentCode, name, baseMajors);
+        return departmentDao.addDepartmentData(newDepartment);
     }
 
     public DepartmentDto update(
             @NonNull String userToken, @NonNull String universityCode, @NonNull String departmentCode,
-            String newDepartmentCode, String newName, List<String> majorCodes
+            String newDepartmentCode, String newName, List<String> newMajorCodes
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+
+        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
+        DepartmentDto oldDepartment = departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
+
+        if(newDepartmentCode == null && newName == null && newMajorCodes == null) return oldDepartment;
+
+        if(newDepartmentCode == null) newDepartmentCode = oldDepartment.code();
+        if(newName == null) newName = oldDepartment.name();
+        List<MajorDto> newBaseMajors = oldDepartment.baseMajors();
+
+        if(newMajorCodes != null) {
+            newBaseMajors = new ArrayList<>();
+            for(String majorCode : newMajorCodes) {
+                newBaseMajors.add(getMajorOrCreate(university, majorCode));
+            }
+        }
+
+        DepartmentDto newDepartment = new DepartmentDto(university, newDepartmentCode, newName, newBaseMajors);
+        return departmentDao.updateDepartmentData(universityCode, departmentCode, newDepartment);
+    }
+
+    private UniversityDto getUniversityOrThrowInvalidIndexException(String universityCode) {
+        try {
+            return universityDao.getUniversityByCodeData(universityCode);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    private MajorDto getMajorOrCreate(UniversityDto university, String majorCode) {
+        try {
+            return majorDao.getMajorByIndex(university.code(), majorCode);
+        } catch (NotFoundException e) {
+            return majorDao.addMajorData(new MajorDto(university, majorCode));
+        }
     }
 }
