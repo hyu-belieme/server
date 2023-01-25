@@ -4,6 +4,7 @@ import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
+import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,14 @@ public abstract class BaseService {
         this.stuffDao = stuffDao;
         this.itemDao = itemDao;
         this.historyDao = historyDao;
+    }
+
+    protected UserDto checkTokenAndGetUser(String token) {
+        try {
+            return userDao.getByToken(token);
+        } catch (NotFoundException e) {
+            throw new UnauthorizedException();
+        }
     }
 
     protected void checkUserPermission(String token, DepartmentDto department) {
@@ -55,14 +64,6 @@ public abstract class BaseService {
         UserDto requester = checkTokenAndGetUser(token);
         if(!requester.isDeveloper()) {
             throw new ForbiddenException();
-        }
-    }
-
-    private UserDto checkTokenAndGetUser(String token) {
-        try {
-            return userDao.getByToken(token);
-        } catch (NotFoundException e) {
-            throw new UnauthorizedException();
         }
     }
 }

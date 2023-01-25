@@ -1,7 +1,9 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.model.dao.*;
+import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +17,17 @@ public class DepartmentService extends BaseService {
     }
 
     public List<DepartmentDto> getAccessibleList(@NonNull String userToken) {
-        // TODO Need to implements.
-        return new ArrayList<>();
+        List<DepartmentDto> output = new ArrayList<>();
+
+        UserDto requester = checkTokenAndGetUser(userToken);
+        List<DepartmentDto> allDepartment = departmentDao.getAllDepartmentsData();
+        for(DepartmentDto department : allDepartment) {
+            if(requester.getMaxPermission(department).hasUserPermission()) {
+                output.add(department);
+            }
+        }
+
+        return output;
     }
 
     public DepartmentDto getByIndex(

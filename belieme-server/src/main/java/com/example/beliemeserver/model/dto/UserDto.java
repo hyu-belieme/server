@@ -148,6 +148,8 @@ public record UserDto(
     }
 
     public AuthorityDto.Permission getMaxPermission(DepartmentDto department) {
+        if(isDeveloper()) return AuthorityDto.Permission.DEVELOPER;
+
         AuthorityDto.Permission maxPermission = AuthorityDto.Permission.BANNED;
         List<MajorDto> baseMajors = department.baseMajors();
         for(MajorDto major : majors) {
