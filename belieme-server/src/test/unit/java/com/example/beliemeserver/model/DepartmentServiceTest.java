@@ -1,9 +1,6 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.exception.UnauthorizedException;
+import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UserDto;
@@ -159,10 +156,12 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUp(HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            // TODO majorDao.getMajorByIndex() 필요함
-            for(String majorCode : newBaseMajorCodes) {
-//                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
-//                        .thenReturn(baseMajors.get(i));
+            when(universityDao.getUniversityByCodeData(newUniversityCode))
+                    .thenReturn(wannaCreate.university());
+            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
+                String majorCode = newBaseMajorCodes.get(i);
+                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
+                        .thenReturn(newBaseMajors.get(i));
             }
 
             execMethod();
@@ -177,16 +176,19 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUp(HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            // TODO majorDao.getMajorByIndex() 필요함
+            when(universityDao.getUniversityByCodeData(newUniversityCode))
+                    .thenReturn(wannaCreate.university());
             for(int i = 0; i < newBaseMajorCodes.size(); i++) {
                 String majorCode = newBaseMajorCodes.get(i);
                 if(i == 0) {
-//                    when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
-//                            .thenThrow(NotFoundException.class);
+                    when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
+                            .thenThrow(NotFoundException.class);
+                    when(majorDao.addMajorData(new MajorDto(wannaCreate.university(), majorCode)))
+                            .thenReturn(newBaseMajors.get(i));
                     continue;
                 }
-//                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
-//                        .thenReturn(baseMajors.get(i));
+                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
+                        .thenReturn(newBaseMajors.get(i));
             }
 
             execMethod();
@@ -201,12 +203,10 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUp(HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            // TODO InvalidException 필요
-//            when(universityDao.getUniversityByCodeData(newUniversityCode))
-//                    .thenThrow(InvalidIndexException.class);
+            when(universityDao.getUniversityByCodeData(newUniversityCode))
+                    .thenThrow(InvalidIndexException.class);
 
-            // TODO InvalidException 필요
-//            assertThrows(InvalidIndexException.class, this::execMethod);
+            assertThrows(InvalidIndexException.class, this::execMethod);
         }
 
         @Test
@@ -215,10 +215,12 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUp(HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            // TODO majorDao.getMajorByIndex() 필요함
-            for(String majorCode : newBaseMajorCodes) {
-//                when(majorDao.getMajorByIndex(universityCode, majorCode))
-//                        .thenReturn(baseMajors.get(i));
+            when(universityDao.getUniversityByCodeData(newUniversityCode))
+                    .thenReturn(wannaCreate.university());
+            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
+                String majorCode = newBaseMajorCodes.get(i);
+                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
+                        .thenReturn(newBaseMajors.get(i));
             }
             when(departmentDao.addDepartmentData(wannaCreate)).thenThrow(ConflictException.class);
 
@@ -278,7 +280,6 @@ public class DepartmentServiceTest extends BaseServiceTest {
                     newDepartmentCode, newName, newBaseMajorCodes);
         }
 
-        // TODO new Department 세팅에 유의해야 함
         @Test
         @DisplayName("[SUCCESS]_[모든 멤버 변경하고 `major_code`가 모두 기존의 것일 시]_[-]")
         public void SUCCESS_allMemberIsNotNullWithNoMajorAdd() {
@@ -288,10 +289,10 @@ public class DepartmentServiceTest extends BaseServiceTest {
                     .thenReturn(DEV_USER);
             when(universityDao.getUniversityByCodeData(targetUniversityCode))
                     .thenReturn(newDepartment.university());
-            // TODO majorDao.getMajorByIndex() 필요함
-            for(String majorCode : newBaseMajorCodes) {
-//                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-//                        .thenReturn(baseMajors.get(i));
+            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
+                String majorCode = newBaseMajorCodes.get(i);
+                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
+                        .thenReturn(newBaseMajors.get(i));
             }
 
             execMethod();
@@ -308,16 +309,18 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
             when(universityDao.getUniversityByCodeData(targetUniversityCode))
                     .thenReturn(newDepartment.university());
-            // TODO majorDao.getMajorByIndex() 필요함
+
             for(int i = 0; i < newBaseMajorCodes.size(); i++) {
                 String majorCode = newBaseMajorCodes.get(i);
                 if(i == 0) {
-//                    when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-//                            .thenThrow(NotFoundException.class);
+                    when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
+                            .thenThrow(NotFoundException.class);
+                    when(majorDao.addMajorData(new MajorDto(newDepartment.university(), majorCode)))
+                            .thenReturn(newBaseMajors.get(i));
                     continue;
                 }
-//                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-//                        .thenReturn(baseMajors.get(i));
+                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
+                        .thenReturn(newBaseMajors.get(i));
             }
 
             execMethod();
@@ -355,10 +358,10 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUp(targetUniversityCode, targetDepartmentCode, HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            // TODO majorDao.getMajorByIndex() 필요함
-            for(String majorCode : newBaseMajorCodes) {
-//                when(majorDao.getMajorByIndex(universityCode, majorCode))
-//                        .thenReturn(baseMajors.get(i));
+            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
+                String majorCode = newBaseMajorCodes.get(i);
+                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
+                        .thenReturn(newBaseMajors.get(i));
             }
             when(departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment))
                     .thenThrow(ConflictException.class);
@@ -372,10 +375,10 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUp(targetUniversityCode, targetDepartmentCode, HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            // TODO majorDao.getMajorByIndex() 필요함
-            for(String majorCode : newBaseMajorCodes) {
-//                when(majorDao.getMajorByIndex(universityCode, majorCode))
-//                        .thenReturn(baseMajors.get(i));
+            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
+                String majorCode = newBaseMajorCodes.get(i);
+                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
+                        .thenReturn(newBaseMajors.get(i));
             }
             when(departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment))
                     .thenThrow(NotFoundException.class);

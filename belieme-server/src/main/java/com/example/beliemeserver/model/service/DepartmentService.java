@@ -1,9 +1,9 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +43,17 @@ public class DepartmentService extends BaseService {
             @NonNull String departmentCode, @NonNull String name,
             @NonNull List<String> majorCodes
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+
+        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
+
+        List<MajorDto> baseMajors = new ArrayList<>();
+        for(String majorCode : majorCodes) {
+            baseMajors.add(getMajorOrCreate(university, majorCode));
+        }
+
+        DepartmentDto newDepartment = new DepartmentDto(university, departmentCode, name, baseMajors);
+        return departmentDao.addDepartmentData(newDepartment);
     }
 
     public DepartmentDto update(
@@ -53,5 +62,21 @@ public class DepartmentService extends BaseService {
     ) {
         // TODO Need to implements.
         return null;
+    }
+
+    private UniversityDto getUniversityOrThrowInvalidIndexException(String universityCode) {
+        try {
+            return universityDao.getUniversityByCodeData(universityCode);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    private MajorDto getMajorOrCreate(UniversityDto university, String majorCode) {
+        try {
+            return majorDao.getMajorByIndex(university.code(), majorCode);
+        } catch (NotFoundException e) {
+            return majorDao.addMajorData(new MajorDto(university, majorCode));
+        }
     }
 }

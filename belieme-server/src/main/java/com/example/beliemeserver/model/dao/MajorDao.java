@@ -12,6 +12,9 @@ public interface MajorDao {
     List<MajorDto> getAllMajorsData();
 
     @Transactional
+    MajorDto getMajorByIndex(String universityCode, String majorCode);
+
+    @Transactional
     MajorDto addMajorData(MajorDto newMajor) throws NotFoundException, ConflictException;
 
     @Transactional
