@@ -283,12 +283,18 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[SUCCESS]_[모든 멤버 변경하고 `major_code`가 모두 기존의 것일 시]_[-]")
         public void SUCCESS_allMemberIsNotNullWithNoMajorAdd() {
-            setUp("", "", HYU_CSE_DEPT);
+            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken))
                     .thenReturn(DEV_USER);
             when(universityDao.getUniversityByCodeData(targetUniversityCode))
                     .thenReturn(newDepartment.university());
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
+                    .thenReturn(newDepartment
+                            .withName(newName+"AAA")
+                            .withCode(newDepartmentCode + "AAA")
+                            .withBaseMajors(new ArrayList<>()));
+
             for(int i = 0; i < newBaseMajorCodes.size(); i++) {
                 String majorCode = newBaseMajorCodes.get(i);
                 when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
@@ -304,11 +310,16 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[SUCCESS]_[모든 멤버 변경하고 새로운 `major_code`가 존재할 시]_[-]")
         public void SUCCESS_allMemberIsNotNullWithMajorAdd() {
-            setUp("", "", HYU_CSE_DEPT);
+            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
             when(universityDao.getUniversityByCodeData(targetUniversityCode))
                     .thenReturn(newDepartment.university());
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
+                    .thenReturn(newDepartment
+                            .withName(newName+"AAA")
+                            .withCode(newDepartmentCode + "AAA")
+                            .withBaseMajors(new ArrayList<>()));
 
             for(int i = 0; i < newBaseMajorCodes.size(); i++) {
                 String majorCode = newBaseMajorCodes.get(i);
@@ -332,7 +343,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[SUCCESS]_[`newDepartmentCode`, `baseMajor`가 `null`일 시]_[-]")
         public void SUCCESS_someMemberIsNull() {
-            setUp("", "", HYU_CSE_DEPT);
+            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
             newDepartmentCode = null;
             newBaseMajors = null;
             newBaseMajorCodes = null;
@@ -341,7 +352,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(universityDao.getUniversityByCodeData(targetUniversityCode))
                     .thenReturn(newDepartment.university());
             when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
-                    .thenReturn(newDepartment.withName(newName+"AAA"));
+                    .thenReturn(newDepartment.withName(newName).withCode(targetDepartmentCode));
 
             execMethod();
 
@@ -355,9 +366,16 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[ERROR]_[변경하고자 하는 `department`를 제외한 새로운 `index`의 `department`가 이미 존재할 시]_[ConflictException]")
         public void departmentConflict_ConflictException() {
-            setUp(targetUniversityCode, targetDepartmentCode, HYU_CSE_DEPT);
+            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
+            when(universityDao.getUniversityByCodeData(targetUniversityCode))
+                    .thenReturn(newDepartment.university());
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
+                    .thenReturn(newDepartment
+                            .withName(newName+"AAA")
+                            .withCode(newDepartmentCode + "AAA")
+                            .withBaseMajors(new ArrayList<>()));
             for(int i = 0; i < newBaseMajorCodes.size(); i++) {
                 String majorCode = newBaseMajorCodes.get(i);
                 when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
@@ -372,9 +390,16 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[ERROR]_[변경하고자 하는 `department`가 존재하지 않을 시]_[NotFoundException]")
         public void targetDepartmentNotFound_NotFoundException() {
-            setUp(targetUniversityCode, targetDepartmentCode, HYU_CSE_DEPT);
+            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
+            when(universityDao.getUniversityByCodeData(targetUniversityCode))
+                    .thenReturn(newDepartment.university());
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
+                    .thenReturn(newDepartment
+                            .withName(newName+"AAA")
+                            .withCode(newDepartmentCode + "AAA")
+                            .withBaseMajors(new ArrayList<>()));
             for(int i = 0; i < newBaseMajorCodes.size(); i++) {
                 String majorCode = newBaseMajorCodes.get(i);
                 when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))

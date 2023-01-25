@@ -46,7 +46,6 @@ public class DepartmentService extends BaseService {
         checkDeveloperPermission(userToken);
 
         UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
-
         List<MajorDto> baseMajors = new ArrayList<>();
         for(String majorCode : majorCodes) {
             baseMajors.add(getMajorOrCreate(university, majorCode));
@@ -58,10 +57,28 @@ public class DepartmentService extends BaseService {
 
     public DepartmentDto update(
             @NonNull String userToken, @NonNull String universityCode, @NonNull String departmentCode,
-            String newDepartmentCode, String newName, List<String> majorCodes
+            String newDepartmentCode, String newName, List<String> newMajorCodes
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+
+        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
+        DepartmentDto oldDepartment = departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
+
+        if(newDepartmentCode == null && newName == null && newMajorCodes == null) return oldDepartment;
+
+        if(newDepartmentCode == null) newDepartmentCode = oldDepartment.code();
+        if(newName == null) newName = oldDepartment.name();
+        List<MajorDto> newBaseMajors = oldDepartment.baseMajors();
+
+        if(newMajorCodes != null) {
+            newBaseMajors = new ArrayList<>();
+            for(String majorCode : newMajorCodes) {
+                newBaseMajors.add(getMajorOrCreate(university, majorCode));
+            }
+        }
+
+        DepartmentDto newDepartment = new DepartmentDto(university, newDepartmentCode, newName, newBaseMajors);
+        return departmentDao.updateDepartmentData(universityCode, departmentCode, newDepartment);
     }
 
     private UniversityDto getUniversityOrThrowInvalidIndexException(String universityCode) {
