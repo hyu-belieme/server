@@ -99,12 +99,11 @@ public class DepartmentServiceTest extends BaseServiceTest {
             String targetDepartmentCode = "CSE";
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(
-                    departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode)
-            ).thenThrow(NotFoundException.class);
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
+                    .thenThrow(NotFoundException.class);
 
             assertThrows(NotFoundException.class,
-                    () -> departmentService.getByIndex(userToken, "", "")
+                    () -> departmentService.getByIndex(userToken, targetUniversityCode, targetDepartmentCode)
             );
         }
 

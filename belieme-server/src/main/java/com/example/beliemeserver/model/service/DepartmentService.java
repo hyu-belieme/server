@@ -34,8 +34,8 @@ public class DepartmentService extends BaseService {
             @NonNull String userToken, @NonNull String universityCode,
             @NonNull String departmentCode
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+        return departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
     }
 
     public DepartmentDto create(
