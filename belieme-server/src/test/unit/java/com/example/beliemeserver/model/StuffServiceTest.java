@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.beliemeserver.util.StubHelper.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,17 +59,6 @@ public class StuffServiceTest extends BaseServiceTest {
                     this::execMethod,
                     expected
             );
-        }
-
-        @Test
-        @DisplayName("[ERROR]_[해당 `index`의 `department`가 존재하지 않을 시]_[InvalidIndexException]")
-        public void ERROR_getInvalidIndex_InvalidIndexException() {
-            setUpDefault();
-
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenThrow(NotFoundException.class);
-
-            assertThrows(InvalidIndexException.class, this::execMethod);
         }
 
         private List<StuffDto> getStuffListByDepartmentFromStub(DepartmentDto department) {
@@ -161,6 +149,17 @@ public class StuffServiceTest extends BaseServiceTest {
         }
 
         @Test
+        @DisplayName("[ERROR]_[해당 `index`의 `department`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_getInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @Test
         @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
         public void ERROR_isUnauthorizedToken_UnauthorizedException() {
             setUpDefault();
@@ -169,7 +168,7 @@ public class StuffServiceTest extends BaseServiceTest {
                     .thenReturn(department);
             when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
 
-            assertThrows(UnauthorizedException.class, this::execMethod);
+            TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
         }
 
         @Test
@@ -182,7 +181,7 @@ public class StuffServiceTest extends BaseServiceTest {
                     .thenReturn(department);
             when(userDao.getByToken(userToken)).thenReturn(requester);
 
-            assertThrows(ForbiddenException.class, this::execMethod);
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
 
         @Test
@@ -195,7 +194,7 @@ public class StuffServiceTest extends BaseServiceTest {
                     .thenReturn(department);
             when(userDao.getByToken(userToken)).thenReturn(requester);
 
-            assertThrows(ForbiddenException.class, this::execMethod);
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
     }
 }
