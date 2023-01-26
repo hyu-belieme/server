@@ -84,6 +84,64 @@ public class StuffServiceTest extends BaseServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("getByIndex()")
+    public class TestGetByIndex extends BaseNestedTestClass {
+        private StuffDto stuff;
+        private String stuffName;
+
+        @Override
+        protected void setUpDefault() {
+            department = HYU_CSE_DEPT;
+            universityCode = department.university().code();
+            departmentCode = department.code();
+
+            requester = HYU_CSE_NORMAL_1_USER;
+
+            stuff = ALL_STUFFS.get(0);
+            stuffName = stuff.name();
+        }
+
+        @Override
+        protected StuffDto execMethod() {
+            return stuffService.getByIndex(userToken, universityCode, departmentCode, stuffName);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName))
+                    .thenReturn(stuff);
+
+            TestHelper.objectCompareTest(
+                    this::execMethod,
+                    stuff
+            );
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[해당 `index`에 `stuff`가 존재하지 않을 시]_[NotFoundException")
+        public void ERROR_stuffNotFound_NotFoundException() {
+            setUpDefault();
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(
+                    this::execMethod,
+                    NotFoundException.class
+            );
+        }
+    }
+
     private abstract class BaseNestedTestClass {
         protected DepartmentDto department;
         protected String universityCode;
