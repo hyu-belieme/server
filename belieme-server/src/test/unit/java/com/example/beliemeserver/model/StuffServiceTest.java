@@ -2,11 +2,9 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.service.StuffService;
-import com.example.beliemeserver.util.StubHelper;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -29,15 +27,11 @@ public class StuffServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getListByDepartment()")
-    public class TestGetListByDepartment {
-        private DepartmentDto department;
-        private String universityCode;
-        private String departmentCode;
-
-        private UserDto requester;
+    public final class TestGetListByDepartment extends BaseNestedTestClass {
         private List<StuffDto> expected;
 
-        private void setUpDefault() {
+        @Override
+        protected void setUpDefault() {
             department = HYU_CSE_DEPT;
             universityCode = department.university().code();
             departmentCode = department.code();
@@ -47,17 +41,8 @@ public class StuffServiceTest extends BaseServiceTest {
             expected = getStuffListByDepartmentFromStub(department);
         }
 
-        private void setUp(DepartmentDto department, UserDto requester) {
-            this.department = department;
-            this.universityCode = department.university().code();
-            this.departmentCode = department.code();
-
-            this.requester = requester;
-
-            expected = getStuffListByDepartmentFromStub(department);
-        }
-
-        private List<StuffDto> execMethod() {
+        @Override
+        protected List<StuffDto> execMethod() {
             return stuffService.getListByDepartment(userToken, universityCode, departmentCode);
         }
 
@@ -88,6 +73,35 @@ public class StuffServiceTest extends BaseServiceTest {
             assertThrows(InvalidIndexException.class, this::execMethod);
         }
 
+        private List<StuffDto> getStuffListByDepartmentFromStub(DepartmentDto department) {
+            List<StuffDto> output = new ArrayList<>();
+            for(StuffDto stuff : ALL_STUFFS) {
+                if(stuff.department().matchUniqueKey(department)) {
+                    output.add(stuff);
+                }
+            }
+            return output;
+        }
+    }
+
+    private abstract class BaseNestedTestClass {
+        protected DepartmentDto department;
+        protected String universityCode;
+        protected String departmentCode;
+
+        protected UserDto requester;
+
+        protected abstract void setUpDefault();
+        protected abstract Object execMethod();
+
+        protected void setRequesterAccessDenied1() {
+            requester = HYU_CSE_BANNED_USER;
+        }
+
+        protected void setRequesterAccessDenied2() {
+            requester = CKU_DUMMY_USER_2;
+        }
+
         @Test
         @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
         public void ERROR_isUnauthorizedToken_UnauthorizedException() {
@@ -104,7 +118,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
         public void ERROR_accessDenied_ForbiddenException() {
             setUpDefault();
-            requester = HYU_CSE_BANNED_USER;
+            setRequesterAccessDenied1();
 
             when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
                     .thenReturn(department);
@@ -117,23 +131,13 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`가 다른 학과의 권한만 갖고 있을 시]_[ForbiddenException]")
         public void ERROR_accessDenied2_ForbiddenException() {
             setUpDefault();
-            requester = CKU_DUMMY_USER_2;
+            setRequesterAccessDenied2();
 
             when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
                     .thenReturn(department);
             when(userDao.getByToken(userToken)).thenReturn(requester);
 
             assertThrows(ForbiddenException.class, this::execMethod);
-        }
-
-        private List<StuffDto> getStuffListByDepartmentFromStub(DepartmentDto department) {
-            List<StuffDto> output = new ArrayList<>();
-            for(StuffDto stuff : ALL_STUFFS) {
-                if(stuff.department().matchUniqueKey(department)) {
-                    output.add(stuff);
-                }
-            }
-            return output;
         }
     }
 }
