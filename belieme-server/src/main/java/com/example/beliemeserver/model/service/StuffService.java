@@ -1,9 +1,11 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,9 @@ import java.util.List;
 
 @Service
 public class StuffService extends BaseService {
+
+    public static final int CREATE_AMOUNT_UPPER_BOUND = 50;
+
     public StuffService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
@@ -41,8 +46,21 @@ public class StuffService extends BaseService {
             @NonNull String universityCode, @NonNull String departmentCode,
             @NonNull String name, @NonNull String emoji, Integer amount
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
+
+        StuffDto newStuff = StuffDto.init(department, name, emoji);
+        StuffDto output = newStuff;
+        newStuff = stuffDao.create(newStuff);
+
+        if(amount == null) return output;
+        if(amount < 0 || amount > CREATE_AMOUNT_UPPER_BOUND) throw new MethodNotAllowedException();
+
+        for(int i = 0; i < amount; i++) {
+            ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i+1));
+            output = output.withItemAdd(newItem);
+        }
+        return output;
     }
 
     public StuffDto update(

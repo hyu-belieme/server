@@ -2,6 +2,7 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.service.StuffService;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.beliemeserver.util.StubHelper.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class StuffServiceTest extends BaseServiceTest {
@@ -31,11 +32,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            department = HYU_CSE_DEPT;
-            universityCode = department.university().code();
-            departmentCode = department.code();
-
-            requester = HYU_CSE_NORMAL_2_USER;
+            super.setUp(HYU_CSE_DEPT, HYU_CSE_NORMAL_2_USER);
 
             expected = getStuffListByDepartmentFromStub(department);
         }
@@ -80,11 +77,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            department = HYU_CSE_DEPT;
-            universityCode = department.university().code();
-            departmentCode = department.code();
-
-            requester = HYU_CSE_NORMAL_1_USER;
+            super.setUp(HYU_CSE_DEPT, HYU_CSE_NORMAL_1_USER);
 
             stuff = ALL_STUFFS.get(0);
             stuffName = stuff.name();
@@ -130,6 +123,122 @@ public class StuffServiceTest extends BaseServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("create()")
+    public final class TestCreate extends BaseNestedTestClass {
+        private StuffDto newStuff;
+        private String newStuffName;
+        private String newStuffEmoji;
+
+        private Integer newStuffAmount;
+
+        @Override
+        protected void setUpDefault() {
+            newStuff = ALL_STUFFS.get(0).withItems(new ArrayList<>());
+            newStuffName = newStuff.name();
+            newStuffEmoji = newStuff.emoji();
+            newStuffAmount = 5;
+
+            super.setUp(newStuff.department(), HYU_CSE_STAFF_USER);
+        }
+
+        @Override
+        protected Object execMethod() {
+            return stuffService.create(
+                    userToken, universityCode, departmentCode,
+                    newStuffName, newStuffEmoji, newStuffAmount
+            );
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = HYU_CSE_NORMAL_2_USER;
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[`amount`가 `null`일 시]")
+        public void SUCCESS_amountIsZero() {
+            setUpDefault();
+            newStuffAmount = null;
+            StuffDto expected = newStuff;
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.create(newStuff)).thenReturn(newStuff);
+
+            TestHelper.objectCompareTest(this::execMethod, expected);
+
+            verify(stuffDao).create(newStuff);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[`amount`가 0이 아닐 시]")
+        public void SUCCESS_amountIsNotZero() {
+            setUpDefault();
+            StuffDto expected = newStuff;
+            for(int i = 0; i < newStuffAmount; i++) {
+                ItemDto newItem = ItemDto.init(newStuff, i+1);
+                expected = expected.withItemAdd(newItem);
+            }
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.create(newStuff)).thenReturn(newStuff);
+            for(int i = 0; i < newStuffAmount; i++) {
+                ItemDto newItem = ItemDto.init(newStuff, i+1);
+                when(itemDao.create(newItem)).thenReturn(newItem);
+            }
+
+            TestHelper.objectCompareTest(this::execMethod, expected);
+
+            verify(stuffDao).create(newStuff);
+            for(int i = 0; i < newStuffAmount; i++) {
+                verify(itemDao).create(ItemDto.init(newStuff, i+1));
+            }
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[해당 `index`의 `stuff`가 이미 존재할 시]_[ConflictException]")
+        public void ERROR_stuffConflict_ConflictException() {
+            setUpDefault();
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.create(newStuff)).thenThrow(ConflictException.class);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`amount`가 음수일 시]_[======]")
+        public void ERROR_amountIsNegative_() {
+            setUpDefault();
+            newStuffAmount = -1;
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`amount`가 50을 초과할 시]_[======]")
+        public void ERROR_amountIsUpperThanBound_() {
+            setUpDefault();
+            newStuffAmount = 51;
+
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+    }
+
     private abstract class BaseNestedTestClass {
         protected DepartmentDto department;
         protected String universityCode;
@@ -140,12 +249,16 @@ public class StuffServiceTest extends BaseServiceTest {
         protected abstract void setUpDefault();
         protected abstract Object execMethod();
 
-        protected void setRequesterAccessDenied1() {
-            requester = HYU_CSE_BANNED_USER;
+        protected void setUp(DepartmentDto department, UserDto requester) {
+            this.department = department;
+            this.universityCode = department.university().code();
+            this.departmentCode = department.code();
+
+            this.requester = requester;
         }
 
-        protected void setRequesterAccessDenied2() {
-            requester = CKU_DUMMY_USER_2;
+        protected void setRequesterAccessDenied() {
+            requester = HYU_CSE_BANNED_USER;
         }
 
         @Test
@@ -175,20 +288,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
         public void ERROR_accessDenied_ForbiddenException() {
             setUpDefault();
-            setRequesterAccessDenied1();
-
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
-
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
-        }
-
-        @Test
-        @DisplayName("[ERROR]_[`requester`가 다른 학과의 권한만 갖고 있을 시]_[ForbiddenException]")
-        public void ERROR_accessDenied2_ForbiddenException() {
-            setUpDefault();
-            setRequesterAccessDenied2();
+            setRequesterAccessDenied();
 
             when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
                     .thenReturn(department);
