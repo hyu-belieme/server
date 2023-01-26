@@ -1,11 +1,13 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
+import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,8 +20,10 @@ public class StuffService extends BaseService {
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode
     ) {
-       // TODO Need to implements.
-       return new ArrayList<>();
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkUserPermission(userToken, department);
+
+        return stuffDao.getListByDepartment(universityCode, departmentCode);
     }
 
     public StuffDto getByIndex(
@@ -46,5 +50,13 @@ public class StuffService extends BaseService {
     ) {
         // TODO Need to implements.
         return null;
+    }
+
+    private DepartmentDto getDepartmentOrThrowInvalidIndexException(String universityCode, String departmentCode) {
+        try {
+            return departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
     }
 }
