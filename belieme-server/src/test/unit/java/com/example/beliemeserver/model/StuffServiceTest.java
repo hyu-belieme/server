@@ -46,9 +46,8 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[-]_[-]")
         public void SUCCESS() {
             setUpDefault();
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+
+            mockDepartmentAndRequester();
             when(stuffDao.getListByDepartment(universityCode, departmentCode))
                     .thenReturn(expected);
 
@@ -93,9 +92,7 @@ public class StuffServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
             when(stuffDao.getByIndex(universityCode, departmentCode, stuffName))
                     .thenReturn(stuff);
 
@@ -110,9 +107,7 @@ public class StuffServiceTest extends BaseServiceTest {
         public void ERROR_stuffNotFound_NotFoundException() {
             setUpDefault();
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
             when(stuffDao.getByIndex(universityCode, departmentCode, stuffName))
                     .thenThrow(NotFoundException.class);
 
@@ -160,13 +155,11 @@ public class StuffServiceTest extends BaseServiceTest {
         public void SUCCESS_amountIsZero() {
             setUpDefault();
             newStuffAmount = null;
-            StuffDto expected = newStuff;
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
             when(stuffDao.create(newStuff)).thenReturn(newStuff);
 
+            StuffDto expected = newStuff;
             TestHelper.objectCompareTest(this::execMethod, expected);
 
             verify(stuffDao).create(newStuff);
@@ -176,21 +169,19 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[`amount`가 0이 아닐 시]")
         public void SUCCESS_amountIsNotZero() {
             setUpDefault();
-            StuffDto expected = newStuff;
-            for(int i = 0; i < newStuffAmount; i++) {
-                ItemDto newItem = ItemDto.init(newStuff, i+1);
-                expected = expected.withItemAdd(newItem);
-            }
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
             when(stuffDao.create(newStuff)).thenReturn(newStuff);
             for(int i = 0; i < newStuffAmount; i++) {
                 ItemDto newItem = ItemDto.init(newStuff, i+1);
                 when(itemDao.create(newItem)).thenReturn(newItem);
             }
 
+            StuffDto expected = newStuff;
+            for(int i = 0; i < newStuffAmount; i++) {
+                ItemDto newItem = ItemDto.init(newStuff, i+1);
+                expected = expected.withItemAdd(newItem);
+            }
             TestHelper.objectCompareTest(this::execMethod, expected);
 
             verify(stuffDao).create(newStuff);
@@ -204,38 +195,146 @@ public class StuffServiceTest extends BaseServiceTest {
         public void ERROR_stuffConflict_ConflictException() {
             setUpDefault();
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
             when(stuffDao.create(newStuff)).thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
 
         @Test
-        @DisplayName("[ERROR]_[`amount`가 음수일 시]_[======]")
+        @DisplayName("[ERROR]_[`amount`가 음수일 시]_[MethodNotAllowedException]")
         public void ERROR_amountIsNegative_() {
             setUpDefault();
             newStuffAmount = -1;
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
 
             TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
         }
 
         @Test
-        @DisplayName("[ERROR]_[`amount`가 50을 초과할 시]_[======]")
+        @DisplayName("[ERROR]_[`amount`가 50을 초과할 시]_[MethodNotAllowedException]")
         public void ERROR_amountIsUpperThanBound_() {
             setUpDefault();
             newStuffAmount = 51;
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
 
             TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("update()")
+    public final class TestUpdate extends BaseNestedTestClass {
+        private StuffDto targetStuff;
+        private String targetStuffName;
+
+        private String newStuffName;
+        private String newStuffEmoji;
+
+        @Override
+        protected void setUpDefault() {
+            targetStuff = ALL_STUFFS.get(0).withItems(new ArrayList<>());
+            targetStuffName = targetStuff.name();
+            newStuffName = "changed";
+            newStuffEmoji = "𝌡";
+
+            super.setUp(targetStuff.department(), HYU_CSE_STAFF_USER);
+        }
+
+        @Override
+        protected Object execMethod() {
+            return stuffService.update(
+                    userToken, universityCode, departmentCode,
+                    targetStuffName, newStuffName, newStuffEmoji
+            );
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = HYU_CSE_NORMAL_2_USER;
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffEmoji`가 모두 `null`이 아닐 시]")
+        public void SUCCESS_allMemberIsNotNull() {
+            setUpDefault();
+            StuffDto newStuff = targetStuff
+                    .withName(newStuffName)
+                    .withEmoji(newStuffEmoji);
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, targetStuffName))
+                    .thenReturn(targetStuff);
+            when(stuffDao.update(universityCode, departmentCode, targetStuffName, newStuff))
+                    .thenReturn(newStuff);
+
+            TestHelper.objectCompareTest(this::execMethod, newStuff);
+
+            verify(stuffDao).update(universityCode, departmentCode, targetStuffName, newStuff);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffEmoji`가 모두 `null`일 시]")
+        public void SUCCESS_allMemberIsNull() {
+            setUpDefault();
+            newStuffName = null;
+            newStuffEmoji = null;
+            StuffDto newStuff = targetStuff;
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, targetStuffName))
+                    .thenReturn(targetStuff);
+
+            TestHelper.objectCompareTest(this::execMethod, newStuff);
+
+            verify(stuffDao, never()).update(any(), any(), any(), any());
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[`newStuffName`만 `null`일 시]")
+        public void SUCCESS_someMemberIsNull() {
+            setUpDefault();
+            newStuffName = null;
+            StuffDto newStuff = targetStuff.withEmoji(newStuffEmoji);
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, targetStuffName))
+                    .thenReturn(targetStuff);
+            when(stuffDao.update(universityCode, departmentCode, targetStuffName, newStuff))
+                    .thenReturn(newStuff);
+
+            TestHelper.objectCompareTest(this::execMethod, newStuff);
+
+            verify(stuffDao).update(universityCode, departmentCode, targetStuffName, newStuff);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[해당 `index`의 `stuff`가 존재하지 않을 시]_[NotFoundException]")
+        public void ERROR_stuffNotFound_NotFoundException() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, targetStuffName))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[해당 `index`의 `stuff`가 이미 존재할 시]_[ConflictException]")
+        public void ERROR_stuffConflict_ConflictException() {
+            setUpDefault();
+            StuffDto newStuff = targetStuff
+                    .withName(newStuffName)
+                    .withEmoji(newStuffEmoji);
+
+            mockDepartmentAndRequester();
+            when(stuffDao.update(universityCode, departmentCode, targetStuffName, newStuff))
+                    .thenThrow(ConflictException.class);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
     }
 
@@ -259,6 +358,12 @@ public class StuffServiceTest extends BaseServiceTest {
 
         protected void setRequesterAccessDenied() {
             requester = HYU_CSE_BANNED_USER;
+        }
+
+        protected void mockDepartmentAndRequester() {
+            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
+                    .thenReturn(department);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
         }
 
         @Test
@@ -290,9 +395,7 @@ public class StuffServiceTest extends BaseServiceTest {
             setUpDefault();
             setRequesterAccessDenied();
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode))
-                    .thenReturn(department);
-            when(userDao.getByToken(userToken)).thenReturn(requester);
+            mockDepartmentAndRequester();
 
             TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }

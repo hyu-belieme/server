@@ -68,8 +68,17 @@ public class StuffService extends BaseService {
             @NonNull String universityCode, @NonNull String departmentCode, @NonNull String name,
             String newName, String newEmoji
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
+
+        StuffDto oldStuff = stuffDao.getByIndex(universityCode, departmentCode, name);
+
+        if(newName == null && newEmoji == null) return oldStuff;
+        if(newName == null) newName = oldStuff.name();
+        if(newEmoji == null) newEmoji = oldStuff.emoji();
+
+        StuffDto newStuff = StuffDto.init(department, newName, newEmoji);
+        return stuffDao.update(universityCode, departmentCode, name, newStuff);
     }
 
     private DepartmentDto getDepartmentOrThrowInvalidIndexException(String universityCode, String departmentCode) {
