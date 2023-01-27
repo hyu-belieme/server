@@ -64,6 +64,21 @@ public class HistoryService extends BaseService {
         return historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, userUniversityCode, userStudentId);
     }
 
+    public HistoryDto getByIndex(@NonNull String userToken,
+                                 @NonNull String universityCode, @NonNull String departmentCode,
+                                 @NonNull String stuffName, int itemNum, int historyNum) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        UserDto requester = checkTokenAndGetUser(userToken);
+
+        HistoryDto target = historyDao.getByIndex(universityCode, departmentCode, stuffName, itemNum, historyNum);
+        if(!requester.matchUniqueKey(target.requester())) {
+            checkStaffPermission(department, requester);
+        }
+        checkUserPermission(department, requester);
+
+        return target;
+    }
+
     public HistoryDto createReservation(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,

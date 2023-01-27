@@ -82,9 +82,9 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_STAFF_USER);
             stuff = ALL_STUFFS.get(0);
             stuffName = stuff.name();
+            setUp(stuff.department(), HYU_CSE_STAFF_USER);
 
             historyList = getHistoryListByStuffFromStub();
         }
@@ -149,10 +149,11 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_STAFF_USER);
             item = ALL_ITEMS.get(0);
             stuffName = item.stuff().name();
             itemNum = item.num();
+
+            setUp(item.stuff().department(), HYU_CSE_STAFF_USER);
 
             historyList = getHistoryListByItemFromStub();
         }
@@ -180,7 +181,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
             TestHelper.listCompareTest(
                     this::execMethod,
-                    execMethod()
+                    historyList
             );
         }
 
@@ -246,7 +247,7 @@ public class HistoryServiceTest extends BaseServiceTest {
                     historyRequester.studentId())
             ).thenReturn(historyList);
 
-            TestHelper.listCompareTest(this::execMethod, execMethod());
+            TestHelper.listCompareTest(this::execMethod, historyList);
         }
 
         @Test
@@ -267,7 +268,7 @@ public class HistoryServiceTest extends BaseServiceTest {
                     historyRequester.studentId())
             ).thenReturn(historyList);
 
-            TestHelper.listCompareTest(this::execMethod, execMethod());
+            TestHelper.listCompareTest(this::execMethod, historyList);
         }
 
         @Test
@@ -325,6 +326,109 @@ public class HistoryServiceTest extends BaseServiceTest {
                 }
             }
             return output;
+        }
+    }
+
+    @Nested
+    @DisplayName("getByIndex()")
+    public final class TestGetByIndex extends BaseNestedTestClass {
+
+        private HistoryDto history;
+        private String stuffName;
+        private int itemNum;
+        private int historyNum;
+
+        @Override
+        protected void setUpDefault() {
+            history = ALL_HISTORIES.get(0);
+            stuffName = history.item().stuff().name();
+            itemNum = history.item().num();
+            historyNum = history.num();
+
+            setUp(history.item().stuff().department(), HYU_CSE_NORMAL_1_USER);
+        }
+
+        @Override
+        protected HistoryDto execMethod() {
+            return historyService.getByIndex(
+                    userToken, universityCode, departmentCode,
+                    stuffName, itemNum, historyNum
+            );
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[본인의 `History`에 대한 `request`일 시]_[-]")
+        public void SUCCESS_getHistoryListHerSelf() {
+            setUpDefault();
+            requester = history.requester();
+
+            mockDepartmentAndRequester();
+            when(historyDao.getByIndex(
+                    universityCode, departmentCode,
+                    stuffName, itemNum, historyNum)
+            ).thenReturn(history);
+
+            TestHelper.objectCompareTest(this::execMethod, history);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[타인의 `History`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
+        public void SUCCESS_getHistoryListOfOthers() {
+            setUpDefault();
+            requester = HYU_CSE_MASTER_USER;
+
+            mockDepartmentAndRequester();
+            when(historyDao.getByIndex(
+                    universityCode, departmentCode,
+                    stuffName, itemNum, historyNum)
+            ).thenReturn(history);
+
+            TestHelper.objectCompareTest(this::execMethod, history);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
+        @Override
+        public void ERROR_accessDenied_ForbiddenException() {
+            setUpDefault();
+            requester = HYU_CSE_BANNED_USER;
+
+            mockDepartmentAndRequester();
+            when(historyDao.getByIndex(
+                    universityCode, departmentCode,
+                    stuffName, itemNum, historyNum)
+            ).thenReturn(history);
+
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
+        public void ERROR_getHistoryListOfOthers_ForbiddenException() {
+            setUpDefault();
+            requester = HYU_CSE_NORMAL_2_USER;
+
+            mockDepartmentAndRequester();
+            when(historyDao.getByIndex(
+                    universityCode, departmentCode,
+                    stuffName, itemNum, historyNum)
+            ).thenReturn(history);
+
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`index`에 해당하는 `History`가 존재하지 않을 시]_[NotFoundException]")
+        public void ERROR_userInvalidIndex_InvalidException() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(historyDao.getByIndex(
+                    universityCode, departmentCode,
+                    stuffName, itemNum, historyNum)
+            ).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
     }
 
