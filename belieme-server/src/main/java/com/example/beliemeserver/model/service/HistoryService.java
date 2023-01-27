@@ -27,6 +27,26 @@ public class HistoryService extends BaseService {
         return historyDao.getListByDepartment(universityCode, departmentCode);
     }
 
+    public List<HistoryDto> getListByStuff(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode,
+            @NonNull String stuffName
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
+        return getHistoryListByStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
+    }
+
+    public List<HistoryDto> getListByItem(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode,
+            @NonNull String stuffName, int itemNum
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
+        return getHistoryListByItemOrThrowInvalidIndexException(universityCode, departmentCode, stuffName, itemNum);
+    }
+
     public List<HistoryDto> getListByDepartmentAndRequester(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
@@ -42,24 +62,6 @@ public class HistoryService extends BaseService {
         checkUserPermission(department, requester);
 
         return historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, userUniversityCode, userStudentId);
-    }
-
-    public List<HistoryDto> getListByStuff(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName
-    ) {
-        // TODO Need to implements.
-        return new ArrayList<>();
-    }
-
-    public List<HistoryDto> getListByItem(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum
-    ) {
-        // TODO Need to implements.
-        return new ArrayList<>();
     }
 
     public HistoryDto createReservation(
@@ -122,6 +124,26 @@ public class HistoryService extends BaseService {
     ) {
         // TODO Need to implements.
         return null;
+    }
+
+    private List<HistoryDto> getHistoryListByStuffOrThrowInvalidIndexException(
+            String universityCode, String departmentCode, String stuffName
+    ) {
+        try {
+            return historyDao.getListByStuff(universityCode, departmentCode, stuffName);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    private List<HistoryDto> getHistoryListByItemOrThrowInvalidIndexException(
+            String universityCode, String departmentCode, String stuffName, int itemNum
+    ) {
+        try {
+            return historyDao.getListByItem(universityCode, departmentCode, stuffName, itemNum);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
     }
 
     private UserDto getUserOrThrowInvalidIndexException(String universityCode, String studentId) {

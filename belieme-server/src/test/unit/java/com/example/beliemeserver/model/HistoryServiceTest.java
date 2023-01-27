@@ -4,9 +4,7 @@ import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.InvalidIndexException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.HistoryDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.service.HistoryService;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -68,6 +66,140 @@ public class HistoryServiceTest extends BaseServiceTest {
             List<HistoryDto> output = new ArrayList<>();
             for(HistoryDto history : ALL_HISTORIES) {
                 if(department.matchUniqueKey(history.item().stuff().department())) {
+                    output.add(history);
+                }
+            }
+            return output;
+        }
+    }
+
+    @Nested
+    @DisplayName("getListByStuff()")
+    public final class TestGetListByStuff extends BaseNestedTestClass {
+        private StuffDto stuff;
+        private String stuffName;
+        private List<HistoryDto> historyList;
+
+        @Override
+        protected void setUpDefault() {
+            setUp(HYU_CSE_DEPT, HYU_CSE_STAFF_USER);
+            stuff = ALL_STUFFS.get(0);
+            stuffName = stuff.name();
+
+            historyList = getHistoryListByStuffFromStub();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = HYU_CSE_NORMAL_1_USER;
+        }
+
+        @Override
+        protected List<HistoryDto> execMethod() {
+            return historyService.getListByStuff(
+                    userToken, universityCode, departmentCode, stuffName);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(historyDao.getListByStuff(universityCode, departmentCode, stuffName))
+                    .thenReturn(historyList);
+
+            TestHelper.listCompareTest(
+                    this::execMethod,
+                    execMethod()
+            );
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[해당 `index`의 `stuff`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_stuffInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(historyDao.getListByStuff(universityCode, departmentCode, stuffName))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        private List<HistoryDto> getHistoryListByStuffFromStub() {
+            List<HistoryDto> output = new ArrayList<>();
+            for(HistoryDto history : ALL_HISTORIES) {
+                if(stuff.matchUniqueKey(history.item().stuff())) {
+                    output.add(history);
+                }
+            }
+            return output;
+        }
+    }
+
+    @Nested
+    @DisplayName("getListByItem()")
+    public final class TestGetListByItem extends BaseNestedTestClass {
+        private ItemDto item;
+        private String stuffName;
+        private int itemNum;
+
+        private List<HistoryDto> historyList;
+
+        @Override
+        protected void setUpDefault() {
+            setUp(HYU_CSE_DEPT, HYU_CSE_STAFF_USER);
+            item = ALL_ITEMS.get(0);
+            stuffName = item.stuff().name();
+            itemNum = item.num();
+
+            historyList = getHistoryListByItemFromStub();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = HYU_CSE_NORMAL_1_USER;
+        }
+
+        @Override
+        protected List<HistoryDto> execMethod() {
+            return historyService.getListByItem(
+                    userToken, universityCode,
+                    departmentCode, stuffName, itemNum);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(historyDao.getListByItem(universityCode, departmentCode, stuffName, itemNum))
+                    .thenReturn(historyList);
+
+            TestHelper.listCompareTest(
+                    this::execMethod,
+                    execMethod()
+            );
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[해당 `index`의 `item`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_itemInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(historyDao.getListByItem(universityCode, departmentCode, stuffName, itemNum))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        private List<HistoryDto> getHistoryListByItemFromStub() {
+            List<HistoryDto> output = new ArrayList<>();
+            for(HistoryDto history : ALL_HISTORIES) {
+                if(item.matchUniqueKey(history.item())) {
                     output.add(history);
                 }
             }
