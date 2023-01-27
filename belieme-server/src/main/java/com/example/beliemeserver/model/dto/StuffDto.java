@@ -27,6 +27,10 @@ public record StuffDto(
         return new ArrayList<>(items);
     }
 
+    public int itemsSize() {
+        return items.size();
+    }
+
     public StuffDto withDepartment(@NonNull DepartmentDto department) {
         return new StuffDto(department, name, emoji, items);
     }

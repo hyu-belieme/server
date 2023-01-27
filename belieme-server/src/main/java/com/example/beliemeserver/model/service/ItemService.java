@@ -1,6 +1,7 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
@@ -14,6 +15,8 @@ import java.util.List;
 
 @Service
 public class ItemService extends BaseService {
+    public static final int MAX_ITEM_NUM = 50;
+
     public ItemService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
@@ -42,8 +45,24 @@ public class ItemService extends BaseService {
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode, @NonNull String stuffName
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
+
+        StuffDto stuff = getStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
+        ItemDto newItem = ItemDto.init(stuff, stuff.nextItemNum());
+
+        if(newItem.num() > MAX_ITEM_NUM) {
+            throw new MethodNotAllowedException();
+        }
+        return itemDao.create(newItem);
+    }
+
+    protected StuffDto getStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
+        try {
+            return stuffDao.getByIndex(universityCode, departmentCode, stuffName);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
     }
 
     protected List<ItemDto> getItemListByStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
