@@ -38,6 +38,23 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
+    public List<HistoryDto> getListByStuff(String universityCode, String departmentCode, String stuffName) throws NotFoundException, FormatDoesNotMatchException {
+        List<HistoryDto> output = new ArrayList<>();
+        StuffEntity targetStuff = findStuffEntity(universityCode, departmentCode, stuffName);
+
+        for(ItemEntity item : itemRepository.findByStuffId(targetStuff.getId())) {
+            output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
+        }
+        return output;
+    }
+
+    @Override
+    public List<HistoryDto> getListByItem(String universityCode, String departmentCode, String stuffName, int itemNum) throws NotFoundException, FormatDoesNotMatchException {
+        ItemEntity targetItem = findItemEntity(universityCode, departmentCode, stuffName, itemNum);
+        return toHistoryDtoList(historyRepository.findByItemId(targetItem.getId()));
+    }
+
+    @Override
     public List<HistoryDto> getListByDepartmentAndRequester(String universityCodeForDepartment, String departmentCode, String universityCodeForUser, String requesterStudentId) throws NotFoundException, FormatDoesNotMatchException {
         List<HistoryDto> output = new ArrayList<>();
         DepartmentEntity targetDepartment = findDepartmentEntity(universityCodeForDepartment, departmentCode);

@@ -57,6 +57,44 @@ public class HistoryDaoTest extends DaoTest {
     }
 
     @Test
+    public void getListByStuffTest() {
+        String universityCode = "HYU";
+        String departmentCode = "CSE";
+        String stuffName = "우산";
+
+        TestHelper.listCompareTest(
+                () -> historyDao.getListByStuff(universityCode, departmentCode, stuffName),
+                historyFakeDao.getAllByCondition(
+                        (target) -> {
+                            return universityCode.equals(target.item().stuff().department().university().code())
+                                    && departmentCode.equals(target.item().stuff().department().code())
+                                    && stuffName.equals(target.item().stuff().name());
+                        }
+                )
+        );
+    }
+
+    @Test
+    public void getListByItem() {
+        String universityCode = "HYU";
+        String departmentCode = "CSE";
+        String stuffName = "우산";
+        int itemNum = 2;
+
+        TestHelper.listCompareTest(
+                () -> historyDao.getListByItem(universityCode, departmentCode, stuffName, itemNum),
+                historyFakeDao.getAllByCondition(
+                        (target) -> {
+                            return universityCode.equals(target.item().stuff().department().university().code())
+                                    && departmentCode.equals(target.item().stuff().department().code())
+                                    && stuffName.equals(target.item().stuff().name())
+                                    && itemNum == target.item().num();
+                        }
+                )
+        );
+    }
+
+    @Test
     public void getListByDepartmentAndRequesterTest() {
         String universityCode = "HYU";
         String departmentCode = "CSE";
