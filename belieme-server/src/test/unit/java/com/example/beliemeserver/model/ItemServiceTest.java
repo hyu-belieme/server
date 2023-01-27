@@ -80,6 +80,65 @@ public class ItemServiceTest extends BaseServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("getByIndex()")
+    public final class TestGetByIndex extends BaseNestedTestClass {
+        private int itemNum;
+
+        private ItemDto expected;
+        @Override
+        protected void setUpDefault() {
+            setUp(ALL_STUFFS.get(0), HYU_CSE_NORMAL_1_USER);
+            itemNum = 1;
+
+            expected = getItemByIndexFromStub();
+        }
+
+        @Override
+        protected ItemDto execMethod() {
+            return itemService.getByIndex(userToken, universityCode, departmentCode, stuffName, itemNum);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum))
+                    .thenReturn(expected);
+
+            TestHelper.objectCompareTest(
+                    this::execMethod,
+                    expected
+            );
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[해당 `index`에 `item`이 존재하지 않을 시]_[NotFoundException]")
+        public void ERROR_itemNotFound_NotFoundException() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(
+                    this::execMethod,
+                    NotFoundException.class
+            );
+        }
+
+        private ItemDto getItemByIndexFromStub() {
+            for(ItemDto item : ALL_ITEMS) {
+                if(item.matchUniqueKey(universityCode, departmentCode, stuffName, itemNum)) {
+                    return item;
+                }
+            }
+            return null;
+        }
+    }
+
     private abstract class BaseNestedTestClass {
         protected StuffDto stuff;
         protected String universityCode;

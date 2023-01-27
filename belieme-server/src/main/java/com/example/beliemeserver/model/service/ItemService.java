@@ -33,8 +33,9 @@ public class ItemService extends BaseService {
             @NonNull String universityCode, @NonNull String departmentCode,
             @NonNull String stuffName, int itemNum
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkUserPermission(userToken, department);
+        return itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum);
     }
 
     public ItemDto create(
