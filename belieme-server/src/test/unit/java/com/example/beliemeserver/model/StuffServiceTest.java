@@ -138,7 +138,7 @@ public class StuffServiceTest extends BaseServiceTest {
         }
 
         @Override
-        protected Object execMethod() {
+        protected StuffDto execMethod() {
             return stuffService.create(
                     userToken, universityCode, departmentCode,
                     newStuffName, newStuffEmoji, newStuffAmount
@@ -244,7 +244,7 @@ public class StuffServiceTest extends BaseServiceTest {
         }
 
         @Override
-        protected Object execMethod() {
+        protected StuffDto execMethod() {
             return stuffService.update(
                     userToken, universityCode, departmentCode,
                     targetStuffName, newStuffName, newStuffEmoji

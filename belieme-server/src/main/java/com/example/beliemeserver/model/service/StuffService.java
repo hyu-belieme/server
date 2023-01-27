@@ -1,8 +1,6 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.exception.InvalidIndexException;
 import com.example.beliemeserver.exception.MethodNotAllowedException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
@@ -79,13 +77,5 @@ public class StuffService extends BaseService {
 
         StuffDto newStuff = StuffDto.init(department, newName, newEmoji);
         return stuffDao.update(universityCode, departmentCode, name, newStuff);
-    }
-
-    private DepartmentDto getDepartmentOrThrowInvalidIndexException(String universityCode, String departmentCode) {
-        try {
-            return departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
-        } catch (NotFoundException e) {
-            throw new InvalidIndexException();
-        }
     }
 }
