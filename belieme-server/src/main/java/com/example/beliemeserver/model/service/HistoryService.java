@@ -1,8 +1,11 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -29,8 +32,16 @@ public class HistoryService extends BaseService {
             @NonNull String universityCode, @NonNull String departmentCode,
             @NonNull String userUniversityCode, @NonNull String userStudentId
     ) {
-        // TODO Need to implements.
-        return new ArrayList<>();
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto historyRequester = getUserOrThrowInvalidIndexException(userUniversityCode, userStudentId);
+
+        if(!requester.matchUniqueKey(historyRequester)) {
+            checkStaffPermission(department, requester);
+        }
+        checkUserPermission(department, requester);
+
+        return historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, userUniversityCode, userStudentId);
     }
 
     public List<HistoryDto> getListByStuff(
@@ -111,5 +122,13 @@ public class HistoryService extends BaseService {
     ) {
         // TODO Need to implements.
         return null;
+    }
+
+    private UserDto getUserOrThrowInvalidIndexException(String universityCode, String studentId) {
+        try {
+            return userDao.getByIndex(universityCode, studentId);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
     }
 }

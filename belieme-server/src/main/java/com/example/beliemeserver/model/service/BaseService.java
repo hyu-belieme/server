@@ -6,7 +6,6 @@ import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +63,24 @@ public abstract class BaseService {
     protected void checkDeveloperPermission(String token) {
         UserDto requester = checkTokenAndGetUser(token);
         if(!requester.isDeveloper()) {
+            throw new ForbiddenException();
+        }
+    }
+
+    protected void checkUserPermission(DepartmentDto department, UserDto requester) {
+        if(!requester.getMaxPermission(department).hasUserPermission()) {
+            throw new ForbiddenException();
+        }
+    }
+
+    protected void checkStaffPermission(DepartmentDto department, UserDto requester) {
+        if(!requester.getMaxPermission(department).hasStaffPermission()) {
+            throw new ForbiddenException();
+        }
+    }
+
+    protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
+        if(!requester.getMaxPermission(department).hasMasterPermission()) {
             throw new ForbiddenException();
         }
     }
