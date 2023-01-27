@@ -1,6 +1,7 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.model.dao.*;
+import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,9 @@ public class HistoryService extends BaseService {
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode
     ) {
-        // TODO Need to implements.
-        return new ArrayList<>();
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
+        return historyDao.getListByDepartment(universityCode, departmentCode);
     }
 
     public List<HistoryDto> getListByDepartmentAndRequester(
