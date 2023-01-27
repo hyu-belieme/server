@@ -45,16 +45,31 @@ public record StuffDto(
 
     public StuffDto withItemAdd(ItemDto itemDto) {
         StuffDto output = new StuffDto(department, name, emoji, items);
-        output.items.add(itemDto);
+        output.items.add(itemDto.withStuff(nestedEndpoint));
 
         return output;
     }
 
     public StuffDto withItemRemove(ItemDto itemDto) {
         StuffDto output = new StuffDto(department, name, emoji, items);
-        output.items.remove(itemDto);
+        output.items.removeIf(item -> item.matchUniqueKey(itemDto));
 
         return output;
+    }
+
+    public boolean matchUniqueKey(String universityCode, String departmentCode, String name) {
+        if(name == null) return false;
+        return department().matchUniqueKey(universityCode, departmentCode)
+                && name.equals(this.name());
+    }
+
+    public boolean matchUniqueKey(StuffDto oth) {
+        if(oth == null) return false;
+        return matchUniqueKey(
+                oth.department().university().code(),
+                oth.department().code(),
+                oth.name()
+        );
     }
 
     @Override
@@ -69,6 +84,16 @@ public record StuffDto(
                 ", emoji='" + emoji + '\'' +
                 ", items=" + items +
                 '}';
+    }
+
+    public int nextItemNum() {
+        int nextItemNum = 0;
+        for(ItemDto item : items) {
+            if(item.num() > nextItemNum) {
+                nextItemNum = item.num();
+            }
+        }
+        return ++nextItemNum;
     }
 
     public int amount() {

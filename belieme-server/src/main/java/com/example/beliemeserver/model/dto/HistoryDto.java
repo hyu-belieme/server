@@ -98,6 +98,21 @@ public record HistoryDto(
                 lostTimeStamp, cancelTimeStamp);
     }
 
+    public boolean matchUniqueKey(
+            String universityCode, String departmentCode,
+            String stuffName, int itemNum, int num
+    ) {
+        return this.item().matchUniqueKey(
+                universityCode, departmentCode, stuffName, itemNum)
+                && this.num() == num;
+    }
+
+    public boolean matchUniqueKey(HistoryDto oth) {
+        if(oth == null) return false;
+        return this.item().matchUniqueKey(oth.item())
+                && this.num == oth.num;
+    }
+
     @Override
     public String toString() {
         if(this.equals(nestedEndpoint)) {

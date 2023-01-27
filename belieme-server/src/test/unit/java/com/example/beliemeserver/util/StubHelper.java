@@ -143,4 +143,149 @@ public class StubHelper {
             HYU_DUMMY_USER_3, HYU_DUMMY_USER_4, CKU_DUMMY_USER_1, CKU_DUMMY_USER_2,
             CKU_DUMMY_USER_3, CKU_DUMMY_USER_4, CKU_DUMMY_USER_5
     );
+
+    // Stuffs Init
+    private static StuffDto TMP_SPEAKER_HYU_CSE = StuffDto.init(HYU_CSE_DEPT, "블루투스 스피커", "📻");
+    private static StuffDto TMP_UMBRELLA_HYU_CSE = StuffDto.init(HYU_CSE_DEPT, "우산", "🌂");
+    private static StuffDto TMP_PEN_HYU_CSE = StuffDto.init(HYU_CSE_DEPT, "볼펜", "🖋️");
+    private static StuffDto TMP_SCISSORS_HYU_CSE = StuffDto.init(HYU_CSE_DEPT, "가위", "✂️");
+    private static StuffDto TMP_SKATEBOARD_HYU_CSE = StuffDto.init(HYU_CSE_DEPT, "스케이트보드", "🛹");
+
+    private static StuffDto TMP_UMBRELLA_HYU_ME = StuffDto.init(HYU_ME_DEPT, "우산", "🌂");
+    private static StuffDto TMP_SCISSORS_HYU_ME = StuffDto.init(HYU_ME_DEPT, "가위", "✂️");
+    private static StuffDto TMP_HAMMER_HYU_ME = StuffDto.init(HYU_ME_DEPT, "망치", "🔨");
+
+    private static StuffDto TMP_UMBRELLA_HYU_ENG = StuffDto.init(HYU_ENG_DEPT, "우산", "🌂");
+    private static StuffDto TMP_PEN_HYU_ENG = StuffDto.init(HYU_ENG_DEPT, "볼펜", "🖋️");
+    private static StuffDto TMP_SCISSORS_HYU_ENG = StuffDto.init(HYU_ENG_DEPT, "가위", "✂️");
+    private static StuffDto TMP_CALCULATOR_HYU_ENG = StuffDto.init(HYU_ENG_DEPT, "계산기", "🧮️");
+
+    private static StuffDto TMP_PEN_CKU_MED = StuffDto.init(CKU_MED_DEPT, "볼펜", "🖋️");
+    private static StuffDto TMP_SCISSORS_CKU_MED = StuffDto.init(CKU_MED_DEPT, "가위", "✂️");
+    private static StuffDto TMP_SOCCER_BALL_CKU_MED = StuffDto.init(CKU_MED_DEPT, "축구공", "⚽️️");
+
+    // Items Init
+    private static ItemDto TMP_SPEAKER_1_HYU_CSE = ItemDto.init(TMP_SPEAKER_HYU_CSE, 1);
+    private static ItemDto TMP_SPEAKER_2_HYU_CSE = ItemDto.init(TMP_SPEAKER_HYU_CSE, 2);
+
+    private static ItemDto TMP_UMBRELLA_1_HYU_CSE = ItemDto.init(TMP_UMBRELLA_HYU_CSE, 1);
+    private static ItemDto TMP_UMBRELLA_2_HYU_CSE = ItemDto.init(TMP_UMBRELLA_HYU_CSE, 2);
+    private static ItemDto TMP_UMBRELLA_3_HYU_CSE = ItemDto.init(TMP_UMBRELLA_HYU_CSE, 3);
+    private static ItemDto TMP_UMBRELLA_4_HYU_CSE = ItemDto.init(TMP_UMBRELLA_HYU_CSE, 4);
+
+    private static ItemDto TMP_PEN_1_HYU_CSE = ItemDto.init(TMP_PEN_HYU_CSE, 1);
+    private static ItemDto TMP_PEN_2_HYU_CSE = ItemDto.init(TMP_PEN_HYU_CSE, 2);
+    private static ItemDto TMP_PEN_3_HYU_CSE = ItemDto.init(TMP_PEN_HYU_CSE, 3);
+    private static ItemDto TMP_PEN_4_HYU_CSE = ItemDto.init(TMP_PEN_HYU_CSE, 4);
+    private static ItemDto TMP_PEN_5_HYU_CSE = ItemDto.init(TMP_PEN_HYU_CSE, 5);
+    private static ItemDto TMP_PEN_6_HYU_CSE = ItemDto.init(TMP_PEN_HYU_CSE, 6);
+
+    private static ItemDto TMP_SCISSORS_1_HYU_CSE = ItemDto.init(TMP_SCISSORS_HYU_CSE, 1);
+    private static ItemDto TMP_SCISSORS_2_HYU_CSE = ItemDto.init(TMP_SCISSORS_HYU_CSE, 2);
+    private static ItemDto TMP_SCISSORS_3_HYU_CSE = ItemDto.init(TMP_SCISSORS_HYU_CSE, 3);
+
+    private static ItemDto TMP_SKATEBOARD_1_HYU_CSE = ItemDto.init(TMP_SKATEBOARD_HYU_CSE, 1);
+
+    // Histories Init
+    private static HistoryDto TMP_SPEAKER_1_1_EXPIRED_HYU_CSE = new HistoryDto(
+            TMP_SPEAKER_1_HYU_CSE, 1, HYU_CSE_NORMAL_1_USER,
+            null, null, null,
+            null, 1673155356, 0,
+            0, 0, 0
+    );
+
+    private static HistoryDto TMP_SPEAKER_1_2_USING_HYU_CSE = new HistoryDto(
+            TMP_SPEAKER_1_HYU_CSE, 2, HYU_CSE_NORMAL_1_USER,
+            HYU_CSE_MASTER_USER, null, null,
+            null, 1673155193, 1673155275,
+            0, 0, 0
+    );
+
+    private static HistoryDto TMP_SPEAKER_2_1_LOST_HYU_CSE = new HistoryDto(
+            TMP_SPEAKER_2_HYU_CSE, 1, HYU_CSE_NORMAL_2_USER,
+            HYU_CSE_STAFF_USER, null, HYU_CSE_MASTER_USER,
+            null, 1673195193, 1673195275,
+            0, 1673209275, 0
+    );
+
+    public final static List<StuffDto> ALL_STUFFS = new ArrayList<>(List.of(
+            TMP_SPEAKER_HYU_CSE, TMP_UMBRELLA_HYU_CSE, TMP_PEN_HYU_CSE,
+            TMP_SCISSORS_HYU_CSE, TMP_SKATEBOARD_HYU_CSE, TMP_UMBRELLA_HYU_ME,
+            TMP_SCISSORS_HYU_ME, TMP_HAMMER_HYU_ME, TMP_UMBRELLA_HYU_ENG,
+            TMP_PEN_HYU_ENG, TMP_SCISSORS_HYU_ENG, TMP_CALCULATOR_HYU_ENG,
+            TMP_PEN_CKU_MED, TMP_SCISSORS_CKU_MED, TMP_SOCCER_BALL_CKU_MED
+    ));
+
+    public final static List<ItemDto> ALL_ITEMS = new ArrayList<>(List.of(
+            TMP_SPEAKER_1_HYU_CSE, TMP_SPEAKER_2_HYU_CSE, TMP_UMBRELLA_1_HYU_CSE,
+            TMP_UMBRELLA_2_HYU_CSE, TMP_UMBRELLA_3_HYU_CSE, TMP_UMBRELLA_4_HYU_CSE,
+            TMP_PEN_1_HYU_CSE, TMP_PEN_2_HYU_CSE, TMP_PEN_3_HYU_CSE, TMP_PEN_4_HYU_CSE,
+            TMP_PEN_5_HYU_CSE, TMP_PEN_6_HYU_CSE, TMP_SCISSORS_1_HYU_CSE,
+            TMP_SCISSORS_2_HYU_CSE, TMP_SCISSORS_3_HYU_CSE, TMP_SKATEBOARD_1_HYU_CSE
+    ));
+
+    public final static List<HistoryDto> ALL_HISTORIES = new ArrayList<>(List.of(
+            TMP_SPEAKER_1_1_EXPIRED_HYU_CSE, TMP_SPEAKER_1_2_USING_HYU_CSE,
+            TMP_SPEAKER_2_1_LOST_HYU_CSE
+    ));
+
+    public static void init() {
+        for(HistoryDto history : ALL_HISTORIES) {
+            HistoryDto newLastHistory = history.withItem(ItemDto.nestedEndpoint);
+            for(int i = 0; i < ALL_ITEMS.size(); i++) {
+                ItemDto item = ALL_ITEMS.get(i);
+                if(matchUniqueKey(item, history.item())) {
+                    ALL_ITEMS.set(i, item.withLastHistory(newLastHistory));
+                }
+            }
+        }
+
+        for(ItemDto item : ALL_ITEMS) {
+            for(int i = 0; i < ALL_STUFFS.size(); i++) {
+                StuffDto stuff = ALL_STUFFS.get(i);
+                if(matchUniqueKey(stuff, item.stuff())) {
+                    ALL_STUFFS.set(i, stuff.withItemAdd(item));
+                }
+            }
+        }
+
+        for(StuffDto stuff : ALL_STUFFS) {
+            for(int i = 0; i < ALL_ITEMS.size(); i++) {
+                ItemDto item = ALL_ITEMS.get(i);
+                if(matchUniqueKey(stuff, item.stuff())) {
+                    ALL_ITEMS.set(i, item.withStuff(stuff));
+                }
+            }
+        }
+
+        for(ItemDto item : ALL_ITEMS) {
+            for(int i = 0; i < ALL_HISTORIES.size(); i++) {
+                HistoryDto history = ALL_HISTORIES.get(i);
+                if(matchUniqueKey(item, history.item())) {
+                    ALL_HISTORIES.set(i, history.withItem(item));
+                }
+            }
+        }
+    }
+
+    private static boolean matchUniqueKey(StuffDto stuff, StuffDto oth) {
+        String universityCode = oth.department().university().code();
+        String departmentCode = oth.department().code();
+        String stuffName = oth.name();
+        return universityCode.equals(stuff.department().university().code())
+                && departmentCode.equals(stuff.department().code())
+                && stuffName.equals(stuff.name());
+    }
+
+    private static boolean matchUniqueKey(ItemDto item, ItemDto oth) {
+        String universityCode = item.stuff().department().university().code();
+        String departmentCode = item.stuff().department().code();
+        String stuffName = item.stuff().name();
+        int itemNum = item.num();
+
+        return universityCode.equals(oth.stuff().department().university().code())
+                && departmentCode.equals(oth.stuff().department().code())
+                && stuffName.equals(oth.stuff().name())
+                && itemNum == oth.num();
+    }
 }

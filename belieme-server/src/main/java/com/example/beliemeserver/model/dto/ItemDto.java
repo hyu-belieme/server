@@ -23,6 +23,17 @@ public record ItemDto(
         return new ItemDto(stuff, num, lastHistory);
     }
 
+    public boolean matchUniqueKey(String universityCode, String departmentCode, String stuffName, int num) {
+        return this.stuff().matchUniqueKey(universityCode, departmentCode, stuffName)
+                && num == this.num();
+    }
+
+    public boolean matchUniqueKey(ItemDto oth) {
+        if(oth == null) return false;
+        return this.stuff().matchUniqueKey(oth.stuff())
+                && this.num() == oth.num();
+    }
+
     @Override
     public String toString() {
         if(this.equals(nestedEndpoint)) {
