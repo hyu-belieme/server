@@ -6,22 +6,31 @@ import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.service.HistoryService;
+import com.example.beliemeserver.util.NewStubHelper;
 import com.example.beliemeserver.util.TestHelper;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.beliemeserver.util.StubHelper.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class HistoryServiceTest extends BaseServiceTest {
+    public static final String HYU = "HYU";
+    public static final String CSE = "CSE";
+    NewStubHelper stub = new NewStubHelper();
+
     @InjectMocks
     private HistoryService historyService;
 
@@ -32,14 +41,17 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_STAFF_USER);
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.STAFF));
 
             historyList = getHistoryListByDepartmentFromStub();
         }
 
         @Override
         protected void setRequesterAccessDenied() {
-            requester = HYU_CSE_NORMAL_1_USER;
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER));
         }
 
         @Override
@@ -64,7 +76,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByDepartmentFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : ALL_HISTORIES) {
+            for(HistoryDto history : stub.ALL_HISTORIES) {
                 if(department.matchUniqueKey(history.item().stuff().department())) {
                     output.add(history);
                 }
@@ -82,16 +94,19 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            stuff = ALL_STUFFS.get(0);
+            stuff = stub.ALL_STUFFS.get(0);
             stuffName = stuff.name();
-            setUp(stuff.department(), HYU_CSE_STAFF_USER);
+            setDepartment(stuff.department());
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.STAFF));
 
             historyList = getHistoryListByStuffFromStub();
         }
 
         @Override
         protected void setRequesterAccessDenied() {
-            requester = HYU_CSE_NORMAL_1_USER;
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER));
         }
 
         @Override
@@ -129,7 +144,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByStuffFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : ALL_HISTORIES) {
+            for(HistoryDto history : stub.ALL_HISTORIES) {
                 if(stuff.matchUniqueKey(history.item().stuff())) {
                     output.add(history);
                 }
@@ -149,18 +164,21 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            item = ALL_ITEMS.get(0);
+            item = stub.ALL_ITEMS.get(0);
             stuffName = item.stuff().name();
             itemNum = item.num();
 
-            setUp(item.stuff().department(), HYU_CSE_STAFF_USER);
+            setDepartment(item.stuff().department());
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.STAFF));
 
             historyList = getHistoryListByItemFromStub();
         }
 
         @Override
         protected void setRequesterAccessDenied() {
-            requester = HYU_CSE_NORMAL_1_USER;
+            setRequester(stub.getUserByDeptAndAuthWithExclude(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER, requester));
         }
 
         @Override
@@ -199,7 +217,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByItemFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : ALL_HISTORIES) {
+            for(HistoryDto history : stub.ALL_HISTORIES) {
                 if(item.matchUniqueKey(history.item())) {
                     output.add(history);
                 }
@@ -217,9 +235,11 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_NORMAL_1_USER);
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER));
 
-            historyRequester = HYU_CSE_NORMAL_1_USER;
+            historyRequester = requester;
             historyList = getHistoryListByDepartmentAndRequesterFromStub();
         }
 
@@ -253,8 +273,11 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[SUCCESS]_[타인의 `History List`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
         public void SUCCESS_getHistoryListOfOthers() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_STAFF_USER);
-            historyRequester = HYU_CSE_NORMAL_2_USER;
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.STAFF));
+            historyRequester = stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER);
             historyList = getHistoryListByDepartmentAndRequesterFromStub();
 
             mockDepartmentAndRequester();
@@ -275,8 +298,11 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
         @Override
         public void ERROR_accessDenied_ForbiddenException() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_BANNED_USER);
-            historyRequester = HYU_CSE_NORMAL_2_USER;
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.BANNED));
+            historyRequester = stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER);
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -290,8 +316,11 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
         public void ERROR_getHistoryListOfOthers_ForbiddenException() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_NORMAL_1_USER);
-            historyRequester = HYU_CSE_NORMAL_2_USER;
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER));
+            historyRequester = stub.getUserByDeptAndAuthWithExclude(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER, requester);
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -305,8 +334,11 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[ERROR]_[`History Requester`의 `index`가 유효하지 않을 시]_[InvalidException]")
         public void ERROR_userInvalidIndex_InvalidException() {
-            setUp(HYU_CSE_DEPT, HYU_CSE_NORMAL_1_USER);
-            historyRequester = HYU_CSE_NORMAL_2_USER;
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.STAFF));
+            historyRequester = stub.getUserByDeptAndAuthWithExclude(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER, requester);
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -319,7 +351,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByDepartmentAndRequesterFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : ALL_HISTORIES) {
+            for(HistoryDto history : stub.ALL_HISTORIES) {
                 if(department.matchUniqueKey(history.item().stuff().department())
                         && historyRequester.matchUniqueKey(history.requester()) ) {
                     output.add(history);
@@ -332,7 +364,6 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Nested
     @DisplayName("getByIndex()")
     public final class TestGetByIndex extends BaseNestedTestClass {
-
         private HistoryDto history;
         private String stuffName;
         private int itemNum;
@@ -340,12 +371,14 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setUpDefault() {
-            history = ALL_HISTORIES.get(0);
+            history = stub.ALL_HISTORIES.get(0);
             stuffName = history.item().stuff().name();
             itemNum = history.item().num();
             historyNum = history.num();
 
-            setUp(history.item().stuff().department(), HYU_CSE_NORMAL_1_USER);
+            setDepartment(history.item().stuff().department());
+            setRequester(stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER));
         }
 
         @Override
@@ -375,7 +408,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[타인의 `History`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
         public void SUCCESS_getHistoryListOfOthers() {
             setUpDefault();
-            requester = HYU_CSE_MASTER_USER;
+            requester = stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.STAFF);
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -391,7 +425,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         public void ERROR_accessDenied_ForbiddenException() {
             setUpDefault();
-            requester = HYU_CSE_BANNED_USER;
+            requester = stub.getUserByDeptAndAuth(
+                    universityCode, departmentCode, AuthorityDto.Permission.BANNED);
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -406,7 +441,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
         public void ERROR_getHistoryListOfOthers_ForbiddenException() {
             setUpDefault();
-            requester = HYU_CSE_NORMAL_2_USER;
+            requester = stub.getUserByDeptAndAuthWithExclude(
+                    universityCode, departmentCode, AuthorityDto.Permission.USER, history.requester());
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -450,8 +486,18 @@ public class HistoryServiceTest extends BaseServiceTest {
             this.requester = requester;
         }
 
+        protected void setDepartment(DepartmentDto department) {
+            this.department = department;
+            this.universityCode = department.university().code();
+            this.departmentCode = department.code();
+        }
+
+        protected void setRequester(UserDto requester) {
+            this.requester = requester;
+        }
+
         protected void setRequesterAccessDenied() {
-            requester = HYU_CSE_BANNED_USER;
+            requester = stub.HYU_CSE_BANNED_USER;
         }
 
         protected void mockDepartmentAndRequester() {
