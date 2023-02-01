@@ -1,9 +1,6 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.InvalidIndexException;
-import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.exception.UnauthorizedException;
+import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.service.HistoryService;
 import com.example.beliemeserver.util.NewStubHelper;
@@ -76,8 +73,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByDepartmentFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : stub.ALL_HISTORIES) {
-                if(department.matchUniqueKey(history.item().stuff().department())) {
+            for (HistoryDto history : stub.ALL_HISTORIES) {
+                if (department.matchUniqueKey(history.item().stuff().department())) {
                     output.add(history);
                 }
             }
@@ -144,8 +141,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByStuffFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : stub.ALL_HISTORIES) {
-                if(stuff.matchUniqueKey(history.item().stuff())) {
+            for (HistoryDto history : stub.ALL_HISTORIES) {
+                if (stuff.matchUniqueKey(history.item().stuff())) {
                     output.add(history);
                 }
             }
@@ -217,8 +214,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByItemFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : stub.ALL_HISTORIES) {
-                if(item.matchUniqueKey(history.item())) {
+            for (HistoryDto history : stub.ALL_HISTORIES) {
+                if (item.matchUniqueKey(history.item())) {
                     output.add(history);
                 }
             }
@@ -351,9 +348,9 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private List<HistoryDto> getHistoryListByDepartmentAndRequesterFromStub() {
             List<HistoryDto> output = new ArrayList<>();
-            for(HistoryDto history : stub.ALL_HISTORIES) {
-                if(department.matchUniqueKey(history.item().stuff().department())
-                        && historyRequester.matchUniqueKey(history.requester()) ) {
+            for (HistoryDto history : stub.ALL_HISTORIES) {
+                if (department.matchUniqueKey(history.item().stuff().department())
+                        && historyRequester.matchUniqueKey(history.requester())) {
                     output.add(history);
                 }
             }
@@ -465,6 +462,205 @@ public class HistoryServiceTest extends BaseServiceTest {
             ).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("createReservation()")
+    public final class TestCreateReservation extends BaseNestedTestClass {
+        @Captor
+        private ArgumentCaptor<HistoryDto> historyCaptor;
+
+        @Captor
+        private ArgumentCaptor<ItemDto> itemCaptor;
+
+        private String stuffName;
+        private Integer itemNum;
+        private ItemDto item;
+        private StuffDto stuff;
+
+        @Override
+        protected void setUpDefault() {
+            setUp(stub.HYU_CSE_DEPT, stub.HYU_CSE_NORMAL_1_USER);
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(universityCode, departmentCode, AuthorityDto.Permission.USER));
+            setItem(stub.getNthUsableItem(HYU, CSE, "우산", 2));
+        }
+
+        private void setItem(ItemDto item) {
+            this.item = item;
+            this.stuff = item.stuff();
+            this.itemNum = item.num();
+            this.stuffName = stuff.name();
+        }
+
+        @Override
+        protected Object execMethod() {
+            return historyService.createReservation(userToken, universityCode, departmentCode, stuffName, itemNum);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[본인의 `itemNum`이 `null`이 아닐 시]_[-]")
+        public void SUCCESS_itemNumIsNotNull() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName)).thenReturn(stuff);
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).create(historyCaptor.capture());
+            verify(itemDao).update(eq(universityCode), eq(departmentCode), eq(stuffName), eq(itemNum), itemCaptor.capture());
+
+            ItemDto historyItem = historyCaptor.getValue().item();
+            UserDto historyRequester = historyCaptor.getValue().requester();
+
+            Assertions.assertThat(historyItem).isEqualTo(item);
+            Assertions.assertThat(historyRequester).isEqualTo(requester);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[본인의 `itemNum`이 `null`일 시]_[-]")
+        public void SUCCESS_itemNumIsNull() {
+            setUpDefault();
+            setItem(stub.getNthUsableItem(universityCode, departmentCode, "우산", 1));
+            itemNum = null;
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName)).thenReturn(stuff);
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, stuff.firstUsableItemNum())).thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).create(historyCaptor.capture());
+            verify(itemDao).update(eq(universityCode), eq(departmentCode), eq(stuffName), eq(stuff.firstUsableItemNum()), itemCaptor.capture());
+
+            ItemDto historyItem = historyCaptor.getValue().item();
+            UserDto historyRequester = historyCaptor.getValue().requester();
+
+            Assertions.assertThat(historyItem).isEqualTo(item);
+            Assertions.assertThat(historyRequester).isEqualTo(requester);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 1]_[MethodNotAllowedException]")
+        public void ERROR_itemIsUnusable_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getNthUnusableItem(universityCode, departmentCode, "블루투스 스피커", 1));
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName)).thenReturn(stuff);
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 2]_[MethodNotAllowedException]")
+        public void ERROR_itemIsInactive_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getNthInactiveItem(universityCode, departmentCode, "블루투스 스피커", 1));
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName)).thenReturn(stuff);
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`itemNum`이 `null`이고 대여가능 한 `item`이 존재하지 않을 시]_[MethodNotAllowedException]")
+        public void ERROR_noUsableItem_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getNthUnusableItem(universityCode, departmentCode, "블루투스 스피커", 1));
+            itemNum = null;
+
+            mockDepartmentAndRequester();
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName)).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`requester`가 이미 해당 물품을 " + HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF + "개 사용 중일 시]_[MethodNotAllowedException]")
+        public void ERROR_requesterAlreadyRequestStuff_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getNthUsableItem(universityCode, departmentCode, "우산", 1));
+
+            mockDepartmentAndRequester();
+            when(historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, requester.university().code(), requester.studentId()))
+                    .thenReturn(makeListWithSameStuffHistory());
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName)).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`requester`가 이미 " + HistoryService.MAX_LENTAL_COUNT + "개 이상에 대한 대여가 진행 중일 시]_[MethodNotAllowedException]")
+        public void ERROR_requesterHasTooManyRequest_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getNthUsableItem(universityCode, departmentCode, "우산", 1));
+
+            mockDepartmentAndRequester();
+            when(historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, requester.university().code(), requester.studentId()))
+                    .thenReturn(makeListWithSameRequester());
+            when(stuffDao.getByIndex(universityCode, departmentCode, stuffName)).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        private ArrayList<HistoryDto> makeListWithSameStuffHistory() {
+            return new ArrayList<>(List.of(
+                    new HistoryDto(
+                            stub.getAnotherItemWithSameStuff(item),
+                            item.nextHistoryNum(),
+                            requester,
+                            requester,
+                            null,
+                            null,
+                            null,
+                            1,
+                            1,
+                            0,
+                            0,
+                            0
+                    )
+            ));
+        }
+
+        private List<HistoryDto> makeListWithSameRequester() {
+            List<HistoryDto> output = new ArrayList<>();
+            for(int i = 0; i < HistoryService.MAX_LENTAL_COUNT; i++) {
+                StuffDto tmpStuff = stub.getNthAnotherStuffWithSameDepartment(item.stuff(), i+1);
+                ItemDto tmpItem = stub.getItemByIndex(
+                        tmpStuff.department().university().code(),
+                        tmpStuff.department().code(),
+                        tmpStuff.name(),
+                        1
+                );
+                HistoryDto tmpHistory = new HistoryDto(
+                        stub.getItemByIndex(
+                                stub.getNthAnotherStuffWithSameDepartment(item.stuff(), 1).department().university().code(),
+                                stub.getNthAnotherStuffWithSameDepartment(item.stuff(), 1).department().code(),
+                                stub.getNthAnotherStuffWithSameDepartment(item.stuff(), 1).name(),
+                                1
+                        ),
+                        item.nextHistoryNum(),
+                        requester,
+                        requester,
+                        null,
+                        null,
+                        null,
+                        1,
+                        1,
+                        0,
+                        0,
+                        0
+                );
+                output.add(tmpHistory);
+            }
+            return output;
         }
     }
 

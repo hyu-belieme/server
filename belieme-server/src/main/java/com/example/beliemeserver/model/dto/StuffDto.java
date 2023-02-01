@@ -90,6 +90,14 @@ public record StuffDto(
                 '}';
     }
 
+    public int firstUsableItemNum() {
+        for(ItemDto item : items) {
+            if (item.status() == ItemDto.ItemStatus.USABLE)
+                return item.num();
+        }
+        return 0;
+    }
+
     public int nextItemNum() {
         int nextItemNum = 0;
         for(ItemDto item : items) {
@@ -103,8 +111,8 @@ public record StuffDto(
     public int amount() {
         int amount = 0;
         for (ItemDto item : items) {
-            if (item.getStatus() == ItemDto.ItemStatus.USABLE
-                    || item.getStatus() == ItemDto.ItemStatus.UNUSABLE) {
+            if (item.status() == ItemDto.ItemStatus.USABLE
+                    || item.status() == ItemDto.ItemStatus.UNUSABLE) {
                 amount++;
             }
         }
@@ -114,7 +122,7 @@ public record StuffDto(
     public int count() {
         int count = 0;
         for (ItemDto item : items) {
-            if (item.getStatus() == ItemDto.ItemStatus.USABLE) {
+            if (item.status() == ItemDto.ItemStatus.USABLE) {
                 count++;
             }
         }

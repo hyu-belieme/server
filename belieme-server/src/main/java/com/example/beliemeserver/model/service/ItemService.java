@@ -57,14 +57,6 @@ public class ItemService extends BaseService {
         return itemDao.create(newItem);
     }
 
-    protected StuffDto getStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
-        try {
-            return stuffDao.getByIndex(universityCode, departmentCode, stuffName);
-        } catch (NotFoundException e) {
-            throw new InvalidIndexException();
-        }
-    }
-
     protected List<ItemDto> getItemListByStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
         try {
             return itemDao.getListByStuff(universityCode, departmentCode, stuffName);

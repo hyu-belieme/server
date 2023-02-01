@@ -275,6 +275,78 @@ public class NewStubHelper {
         return null;
     }
 
+    public StuffDto getStuffByIndex(String univCode, String deptCode, String stuffName) {
+        for(StuffDto stuff : ALL_STUFFS) {
+            if(stuff.matchUniqueKey(univCode, deptCode, stuffName)) return stuff;
+        }
+        return null;
+    }
+
+    public StuffDto getNthAnotherStuffWithSameDepartment(StuffDto target, int nth) {
+        for(StuffDto stuff : ALL_STUFFS) {
+            if(stuff.department().matchUniqueKey(target.department())
+                    && !stuff.name().equals(target.name())
+                    && --nth == 0) {
+                return stuff;
+            }
+        }
+        return null;
+    }
+
+    public ItemDto getItemByIndex(String univCode, String deptCode, String stuffName, int itemNum) {
+        for(ItemDto item : ALL_ITEMS) {
+            if(item.matchUniqueKey(univCode, deptCode, stuffName, itemNum)) return item;
+        }
+        return null;
+    }
+
+    public ItemDto getNthUsableItem(String univCode, String deptCode, String stuffName, int nth) {
+        for(ItemDto item : ALL_ITEMS) {
+            if(item.stuff().matchUniqueKey(univCode, deptCode, stuffName)
+                    && item.status() == ItemDto.ItemStatus.USABLE &&--nth == 0) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public ItemDto getNthUnusableItem(String univCode, String deptCode, String stuffName, int nth) {
+        for(ItemDto item : ALL_ITEMS) {
+            if(item.stuff().matchUniqueKey(univCode, deptCode, stuffName)
+                    && item.status() == ItemDto.ItemStatus.UNUSABLE && --nth == 0) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public ItemDto getNthInactiveItem(String univCode, String deptCode, String stuffName, int nth) {
+        for(ItemDto item : ALL_ITEMS) {
+            if(item.stuff().matchUniqueKey(univCode, deptCode, stuffName)
+                    && item.status() == ItemDto.ItemStatus.INACTIVE && --nth == 0) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public ItemDto getAnotherItemWithSameStuff(ItemDto item) {
+        for(ItemDto piece : ALL_ITEMS) {
+            if(piece.stuff().matchUniqueKey(item.stuff())
+                    && piece.num() != item.num()) {
+                return piece;
+            }
+        }
+        return null;
+    }
+
+    public HistoryDto getHistoryByIndex(String univCode, String deptCode, String stuffName, int itemNum, int historyNum) {
+        for(HistoryDto history : ALL_HISTORIES) {
+            if(history.matchUniqueKey(univCode, deptCode, stuffName, itemNum, historyNum)) return history;
+        }
+        return null;
+    }
+
     private void setUpRelations(List<StuffDto> stuffs, List<ItemDto> items, List<HistoryDto> histories) {
         setLastHistoryOfItem(items, histories);
         setItemsOfStuff(stuffs, items);

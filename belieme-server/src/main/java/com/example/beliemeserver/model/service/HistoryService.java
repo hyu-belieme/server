@@ -1,19 +1,21 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.HistoryDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class HistoryService extends BaseService {
+
+    public static final int MAX_LENTAL_COUNT = 3;
+    public static final int MAX_LENTAL_COUNT_ON_SAME_STUFF = 1;
+
     public HistoryService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
@@ -84,8 +86,53 @@ public class HistoryService extends BaseService {
             @NonNull String universityCode, @NonNull String departmentCode,
             @NonNull String stuffName, Integer itemNum
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        UserDto requester = checkTokenAndGetUser(userToken);
+        checkUserPermission(department, requester);
+
+        StuffDto stuff = getStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
+        List<HistoryDto> requesterHistory = historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, requester.university().code(), requester.studentId());
+
+        int usingItemCount = 0;
+        int usingSameStuffCount = 0;
+        for(HistoryDto history : requesterHistory) {
+            if(history.status().isClosed()) continue;
+            if(history.item().stuff().matchUniqueKey(stuff)) usingSameStuffCount += 1;
+            usingItemCount += 1;
+            if(usingItemCount >= MAX_LENTAL_COUNT) throw new MethodNotAllowedException();
+            if(usingSameStuffCount >= MAX_LENTAL_COUNT_ON_SAME_STUFF) throw new MethodNotAllowedException();
+        }
+
+        if(itemNum == null) {
+            itemNum = stuff.firstUsableItemNum();
+        }
+        if(itemNum == 0) throw new MethodNotAllowedException();
+
+        ItemDto item = getItemOrThrowInvalidIndexException(
+                universityCode, departmentCode, stuffName, itemNum);
+
+        if(item.status() != ItemDto.ItemStatus.USABLE) throw new MethodNotAllowedException();
+
+        HistoryDto newHistory = new HistoryDto(
+                item,
+                item.nextHistoryNum(),
+                requester,
+                null,
+                null,
+                null,
+                null,
+                System.currentTimeMillis()/1000,
+                0,
+                0,
+                0,
+                0
+        );
+        historyDao.create(newHistory);
+        itemDao.update(universityCode, departmentCode,
+                stuffName, itemNum, item.withLastHistory(newHistory));
+
+        return historyDao.getByIndex(universityCode, departmentCode,
+                stuffName, itemNum, newHistory.num());
     }
 
     public HistoryDto createLost(

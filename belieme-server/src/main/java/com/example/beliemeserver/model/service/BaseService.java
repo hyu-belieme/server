@@ -6,6 +6,8 @@ import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.stereotype.Service;
 
@@ -88,6 +90,22 @@ public abstract class BaseService {
     protected DepartmentDto getDepartmentOrThrowInvalidIndexException(String universityCode, String departmentCode) {
         try {
             return departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    protected StuffDto getStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
+        try {
+            return stuffDao.getByIndex(universityCode, departmentCode, stuffName);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    protected ItemDto getItemOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName, int itemNum) {
+        try {
+            return itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum);
         } catch (NotFoundException e) {
             throw new InvalidIndexException();
         }
