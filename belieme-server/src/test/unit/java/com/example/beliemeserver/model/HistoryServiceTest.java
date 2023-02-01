@@ -785,7 +785,85 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`item`이 존재하지 않을 시]_[InvalidIndexException]")
         public void ERROR_itemInvalidIndex_InvalidIndexException() {
             setUpDefault();
-            setItem(stub.getNthInactiveItem(universityCode, departmentCode, "블루투스 스피커", 1));
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("makeItemUsing()")
+    public final class TestMakeItemUsing extends BaseNestedTestClass {
+        @Captor
+        private ArgumentCaptor<Integer> integerCaptor;
+
+        @Captor
+        private ArgumentCaptor<HistoryDto> historyCaptor;
+
+        @Captor
+        private ArgumentCaptor<ItemDto> itemCaptor;
+
+        private String stuffName;
+        private Integer itemNum;
+        private ItemDto item;
+
+        @Override
+        protected void setUpDefault() {
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(universityCode, departmentCode, AuthorityDto.Permission.STAFF));
+            setItem(stub.getReservedItem(department));
+        }
+
+        private void setItem(ItemDto item) {
+            this.item = item;
+            this.itemNum = item.num();
+            this.stuffName = item.stuff().name();
+        }
+
+        @Override
+        protected HistoryDto execMethod() {
+            return historyService.makeItemUsing(userToken, universityCode, departmentCode, stuffName, itemNum);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).update(eq(universityCode), eq(departmentCode), eq(stuffName), eq(itemNum), integerCaptor.capture(), historyCaptor.capture());
+
+            int historyNum = integerCaptor.getValue();
+            UserDto historyApprovalManage = historyCaptor.getValue().approveManager();
+            long approvalTimestamp = historyCaptor.getValue().approvalTimeStamp();
+
+            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
+            Assertions.assertThat(historyApprovalManage).isEqualTo(requester);
+            Assertions.assertThat(approvalTimestamp).isNotZero();
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 예약된 상태가 아닐 시]_[MethodNotAllowedException]")
+        public void ERROR_itemIsUnusable_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getUsableItem(department));
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_itemInvalidIndex_InvalidIndexException() {
+            setUpDefault();
 
             mockDepartmentAndRequester();
             when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenThrow(NotFoundException.class);

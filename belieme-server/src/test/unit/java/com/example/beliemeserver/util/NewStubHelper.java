@@ -232,9 +232,16 @@ public class NewStubHelper {
                 0, 1673209275, 0
         );
 
+        HistoryDto UMBRELLA_1_1_REQUESTED_HYU_CSE = new HistoryDto(
+                UMBRELLA_1_HYU_CSE, 1, HYU_CSE_NORMAL_2_USER,
+                null, null, null,
+                null, System.currentTimeMillis()/1000, 0,
+                0, 0, 0
+        );
+
         List<HistoryDto> tmpAllHistories = new ArrayList<>(List.of(
                 SPEAKER_1_1_EXPIRED_HYU_CSE, SPEAKER_1_2_USING_HYU_CSE,
-                SPEAKER_2_1_LOST_HYU_CSE
+                SPEAKER_2_1_LOST_HYU_CSE, UMBRELLA_1_1_REQUESTED_HYU_CSE
         ));
 
         setUpRelations(tmpAllStuffs, tmpAllItems, tmpAllHistories);
@@ -324,6 +331,26 @@ public class NewStubHelper {
         for(ItemDto item : ALL_ITEMS) {
             if(item.stuff().matchUniqueKey(univCode, deptCode, stuffName)
                     && item.status() == ItemDto.ItemStatus.INACTIVE && --nth == 0) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public ItemDto getUsableItem(DepartmentDto dept) {
+        for (ItemDto item : ALL_ITEMS) {
+            if(item.stuff().department().matchUniqueKey(dept)
+                    && item.status() == ItemDto.ItemStatus.USABLE) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public ItemDto getReservedItem(DepartmentDto dept) {
+        for (ItemDto item : ALL_ITEMS) {
+            if(item.stuff().department().matchUniqueKey(dept)
+                    && item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED) {
                 return item;
             }
         }

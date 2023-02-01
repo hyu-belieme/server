@@ -183,20 +183,32 @@ public class HistoryService extends BaseService {
     public HistoryDto makeItemUsing(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum,
-            @NonNull String managerUniversityCode,
-            @NonNull String managerStudentId
+            @NonNull String stuffName, int itemNum
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        UserDto requester = checkTokenAndGetUser(userToken);
+        checkStaffPermission(department, requester);
+
+        ItemDto item = getItemOrThrowInvalidIndexException(
+                universityCode, departmentCode, stuffName, itemNum);
+
+        HistoryDto lastHistory = item.lastHistory();
+        if(lastHistory == null
+                || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
+            throw new MethodNotAllowedException();
+        }
+
+        HistoryDto newHistory = lastHistory
+                .withApproveManager(requester)
+                .withApprovalTimeStamp(System.currentTimeMillis()/1000);
+
+        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
 
     public HistoryDto makeItemReturned(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum,
-            @NonNull String managerUniversityCode,
-            @NonNull String managerStudentId
+            @NonNull String stuffName, int itemNum
     ) {
         // TODO Need to implements.
         return null;
@@ -205,9 +217,7 @@ public class HistoryService extends BaseService {
     public HistoryDto makeItemCancel(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum,
-            @NonNull String managerUniversityCode,
-            @NonNull String managerStudentId
+            @NonNull String stuffName, int itemNum
     ) {
         // TODO Need to implements.
         return null;
