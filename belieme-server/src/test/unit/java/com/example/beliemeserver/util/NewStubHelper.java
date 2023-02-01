@@ -239,9 +239,17 @@ public class NewStubHelper {
                 0, 0, 0
         );
 
+        HistoryDto PEN_3_1_USING_HYU_CSE = new HistoryDto(
+                PEN_3_HYU_CSE, 1, HYU_CSE_NORMAL_2_USER,
+                HYU_CSE_STAFF_USER, null, null,
+                null, 1673195193, 1673195275,
+                0, 0, 0
+        );
+
         List<HistoryDto> tmpAllHistories = new ArrayList<>(List.of(
                 SPEAKER_1_1_EXPIRED_HYU_CSE, SPEAKER_1_2_USING_HYU_CSE,
-                SPEAKER_2_1_LOST_HYU_CSE, UMBRELLA_1_1_REQUESTED_HYU_CSE
+                SPEAKER_2_1_LOST_HYU_CSE, UMBRELLA_1_1_REQUESTED_HYU_CSE,
+                PEN_3_1_USING_HYU_CSE
         ));
 
         setUpRelations(tmpAllStuffs, tmpAllItems, tmpAllHistories);
@@ -350,11 +358,19 @@ public class NewStubHelper {
     public ItemDto getReservedItem(DepartmentDto dept) {
         for (ItemDto item : ALL_ITEMS) {
             if(item.stuff().department().matchUniqueKey(dept)
+                    && item.lastHistory() != null
                     && item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED) {
                 return item;
             }
         }
         return null;
+    }
+
+    public ItemDto getReturnAbleItem(DepartmentDto dept) {
+        return ALL_ITEMS.stream().filter(
+                (item) -> item.stuff().department().matchUniqueKey(dept)
+                        && (item.status() == ItemDto.ItemStatus.UNUSABLE || item.status() == ItemDto.ItemStatus.INACTIVE)
+        ).findAny().orElse(null);
     }
 
     public ItemDto getAnotherItemWithSameStuff(ItemDto item) {

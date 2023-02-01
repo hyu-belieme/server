@@ -802,9 +802,6 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Captor
         private ArgumentCaptor<HistoryDto> historyCaptor;
 
-        @Captor
-        private ArgumentCaptor<ItemDto> itemCaptor;
-
         private String stuffName;
         private Integer itemNum;
         private ItemDto item;
@@ -851,6 +848,170 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("[ERROR]_[`item`이 예약된 상태가 아닐 시]_[MethodNotAllowedException]")
         public void ERROR_itemIsUnusable_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getUsableItem(department));
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_itemInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("makeItemReturn()")
+    public final class TestMakeItemReturn extends BaseNestedTestClass {
+        @Captor
+        private ArgumentCaptor<Integer> integerCaptor;
+
+        @Captor
+        private ArgumentCaptor<HistoryDto> historyCaptor;
+
+        private String stuffName;
+        private Integer itemNum;
+        private ItemDto item;
+
+        @Override
+        protected void setUpDefault() {
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(universityCode, departmentCode, AuthorityDto.Permission.STAFF));
+            setItem(stub.getReturnAbleItem(department));
+        }
+
+        private void setItem(ItemDto item) {
+            this.item = item;
+            this.itemNum = item.num();
+            this.stuffName = item.stuff().name();
+        }
+
+        @Override
+        protected HistoryDto execMethod() {
+            return historyService.makeItemReturn(userToken, universityCode, departmentCode, stuffName, itemNum);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).update(eq(universityCode), eq(departmentCode), eq(stuffName), eq(itemNum), integerCaptor.capture(), historyCaptor.capture());
+
+            int historyNum = integerCaptor.getValue();
+            UserDto historyReturnManger = historyCaptor.getValue().returnManager();
+            long returnTimeStamp = historyCaptor.getValue().returnTimeStamp();
+
+            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
+            Assertions.assertThat(historyReturnManger).isEqualTo(requester);
+            Assertions.assertThat(returnTimeStamp).isNotZero();
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 1]_[MethodNotAllowedException]")
+        public void ERROR_itemIsUsable_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getUsableItem(department));
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 2]_[MethodNotAllowedException]")
+        public void ERROR_itemIsReserved_MethodNotAllowedException() {
+            setUpDefault();
+            setItem(stub.getReservedItem(department));
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_itemInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("makeItemCancel()")
+    public final class TestMakeItemCancel extends BaseNestedTestClass {
+        @Captor
+        private ArgumentCaptor<Integer> integerCaptor;
+
+        @Captor
+        private ArgumentCaptor<HistoryDto> historyCaptor;
+
+        private String stuffName;
+        private Integer itemNum;
+        private ItemDto item;
+
+        @Override
+        protected void setUpDefault() {
+            setDepartment(stub.getDeptByIdx(HYU, CSE));
+            setRequester(stub.getUserByDeptAndAuth(universityCode, departmentCode, AuthorityDto.Permission.STAFF));
+            setItem(stub.getReservedItem(department));
+        }
+
+        private void setItem(ItemDto item) {
+            this.item = item;
+            this.itemNum = item.num();
+            this.stuffName = item.stuff().name();
+        }
+
+        @Override
+        protected HistoryDto execMethod() {
+            return historyService.makeItemCancel(userToken, universityCode, departmentCode, stuffName, itemNum);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum)).thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).update(eq(universityCode), eq(departmentCode), eq(stuffName), eq(itemNum), integerCaptor.capture(), historyCaptor.capture());
+
+            int historyNum = integerCaptor.getValue();
+            UserDto historyCancelManager = historyCaptor.getValue().cancelManager();
+            long cancelTimeStamp = historyCaptor.getValue().cancelTimeStamp();
+
+            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
+            Assertions.assertThat(historyCancelManager).isEqualTo(requester);
+            Assertions.assertThat(cancelTimeStamp).isNotZero();
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 1]_[MethodNotAllowedException]")
+        public void ERROR_itemIsUsable_MethodNotAllowedException() {
             setUpDefault();
             setItem(stub.getUsableItem(department));
 

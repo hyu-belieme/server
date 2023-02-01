@@ -205,13 +205,31 @@ public class HistoryService extends BaseService {
         return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
 
-    public HistoryDto makeItemReturned(
+    public HistoryDto makeItemReturn(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
             @NonNull String stuffName, int itemNum
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        UserDto requester = checkTokenAndGetUser(userToken);
+        checkStaffPermission(department, requester);
+
+        ItemDto item = getItemOrThrowInvalidIndexException(
+                universityCode, departmentCode, stuffName, itemNum);
+
+        HistoryDto lastHistory = item.lastHistory();
+        if(lastHistory == null
+                || (lastHistory.status() != HistoryDto.HistoryStatus.USING
+                && lastHistory.status() != HistoryDto.HistoryStatus.DELAYED
+                && lastHistory.status() != HistoryDto.HistoryStatus.LOST)) {
+            throw new MethodNotAllowedException();
+        }
+
+        HistoryDto newHistory = lastHistory
+                .withReturnManager(requester)
+                .withReturnTimeStamp(System.currentTimeMillis()/1000);
+
+        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
 
     public HistoryDto makeItemCancel(
@@ -219,8 +237,24 @@ public class HistoryService extends BaseService {
             @NonNull String universityCode, @NonNull String departmentCode,
             @NonNull String stuffName, int itemNum
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        UserDto requester = checkTokenAndGetUser(userToken);
+        checkStaffPermission(department, requester);
+
+        ItemDto item = getItemOrThrowInvalidIndexException(
+                universityCode, departmentCode, stuffName, itemNum);
+
+        HistoryDto lastHistory = item.lastHistory();
+        if(lastHistory == null
+                || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
+            throw new MethodNotAllowedException();
+        }
+
+        HistoryDto newHistory = lastHistory
+                .withCancelManager(requester)
+                .withCancelTimeStamp(System.currentTimeMillis()/1000);
+
+        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
 
     private List<HistoryDto> getHistoryListByStuffOrThrowInvalidIndexException(
