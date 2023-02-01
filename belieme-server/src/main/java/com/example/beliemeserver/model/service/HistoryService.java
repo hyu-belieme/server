@@ -135,19 +135,55 @@ public class HistoryService extends BaseService {
                 stuffName, itemNum, newHistory.num());
     }
 
-    public HistoryDto createLost(
+    public HistoryDto makeItemLost(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
             @NonNull String stuffName, int itemNum
     ) {
-        // TODO Need to implements.
-        return null;
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        UserDto requester = checkTokenAndGetUser(userToken);
+        checkStaffPermission(department, requester);
+
+        ItemDto item = getItemOrThrowInvalidIndexException(
+                universityCode, departmentCode, stuffName, itemNum);
+
+        if(item.status() == ItemDto.ItemStatus.INACTIVE) throw new MethodNotAllowedException();
+
+        HistoryDto newHistory;
+        if(item.status() == ItemDto.ItemStatus.USABLE) {
+            newHistory = new HistoryDto(
+                    item,
+                    item.nextHistoryNum(),
+                    null,
+                    null,
+                    null,
+                    requester,
+                    null,
+                    0,
+                    0,
+                    0,
+                    System.currentTimeMillis()/1000,
+                    0
+            );
+            historyDao.create(newHistory);
+            itemDao.update(universityCode, departmentCode,
+                    stuffName, itemNum, item.withLastHistory(newHistory));
+            return historyDao.getByIndex(universityCode, departmentCode,
+                    stuffName, itemNum, newHistory.num());
+        }
+
+        newHistory = historyDao.getByIndex(universityCode, departmentCode, stuffName, itemNum, item.lastHistory().num());
+        newHistory = newHistory
+                .withLostManager(requester)
+                .withLostTimeStamp(System.currentTimeMillis()/1000);
+
+        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
 
-    public HistoryDto patchToApproved(
+    public HistoryDto makeItemUsing(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum, int historyNum,
+            @NonNull String stuffName, int itemNum,
             @NonNull String managerUniversityCode,
             @NonNull String managerStudentId
     ) {
@@ -155,10 +191,10 @@ public class HistoryService extends BaseService {
         return null;
     }
 
-    public HistoryDto patchToReturned(
+    public HistoryDto makeItemReturned(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum, int historyNum,
+            @NonNull String stuffName, int itemNum,
             @NonNull String managerUniversityCode,
             @NonNull String managerStudentId
     ) {
@@ -166,21 +202,10 @@ public class HistoryService extends BaseService {
         return null;
     }
 
-    public HistoryDto patchToLost(
+    public HistoryDto makeItemCancel(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum, int historyNum,
-            @NonNull String managerUniversityCode,
-            @NonNull String managerStudentId
-    ) {
-        // TODO Need to implements.
-        return null;
-    }
-
-    public HistoryDto patchToCancel(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum, int historyNum,
+            @NonNull String stuffName, int itemNum,
             @NonNull String managerUniversityCode,
             @NonNull String managerStudentId
     ) {
