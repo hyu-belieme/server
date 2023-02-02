@@ -47,7 +47,12 @@ public record ItemDto(
                 '}';
     }
 
-    public ItemStatus getStatus() {
+    public int nextHistoryNum() {
+        if(lastHistory == null) return 1;
+        return lastHistory.num() + 1;
+    }
+
+    public ItemStatus status() {
         if(lastHistory == null) {
             return ItemStatus.USABLE;
         }

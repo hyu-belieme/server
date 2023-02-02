@@ -18,6 +18,17 @@ public interface HistoryDao {
             throws NotFoundException, FormatDoesNotMatchException;
 
     @Transactional
+    List<HistoryDto> getListByStuff(
+            String universityCode, String departmentCode, String stuffName)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
+    List<HistoryDto> getListByItem(
+            String universityCode, String departmentCode,
+            String stuffName, int itemNum)
+            throws NotFoundException, FormatDoesNotMatchException;
+
+    @Transactional
     List<HistoryDto> getListByDepartmentAndRequester(
             String universityCodeForDepartment, String departmentCode,
             String universityCodeForUser, String requesterStudentId)
