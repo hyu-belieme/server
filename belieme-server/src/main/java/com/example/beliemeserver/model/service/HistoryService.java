@@ -172,8 +172,7 @@ public class HistoryService extends BaseService {
                     stuffName, itemNum, newHistory.num());
         }
 
-        newHistory = historyDao.getByIndex(universityCode, departmentCode, stuffName, itemNum, item.lastHistory().num());
-        newHistory = newHistory
+        newHistory = item.lastHistory()
                 .withLostManager(requester)
                 .withLostTimeStamp(System.currentTimeMillis()/1000);
 

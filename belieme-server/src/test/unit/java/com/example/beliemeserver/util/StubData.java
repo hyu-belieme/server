@@ -5,7 +5,7 @@ import com.example.beliemeserver.model.dto.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewStubHelper {
+public class StubData extends BaseStub {
     public final List<UniversityDto> ALL_UNIVS;
     public final List<MajorDto> ALL_MAJORS;
     public final List<DepartmentDto> ALL_DEPTS;
@@ -13,7 +13,7 @@ public class NewStubHelper {
     public final List<StuffDto> ALL_STUFFS;
     public final List<ItemDto> ALL_ITEMS;
     public final List<HistoryDto> ALL_HISTORIES;
-    
+
     // Universities
     public final UniversityDto DEV_UNIV;
     public final UniversityDto HYU_UNIV;
@@ -35,7 +35,7 @@ public class NewStubHelper {
     public final DepartmentDto HYU_ENG_DEPT;
     public final DepartmentDto CKU_MED_DEPT;
     public final DepartmentDto CKU_STU_DEPT;
-    
+
     // Users
     public final UserDto DEV_USER;
     public final UserDto HYU_CSE_MASTER_USER;
@@ -54,13 +54,21 @@ public class NewStubHelper {
     public final UserDto CKU_DUMMY_USER_4;
     public final UserDto CKU_DUMMY_USER_5;
 
-    public NewStubHelper() {
+    public StubData() {
+        List<UniversityDto> tmpAllUnivs;
+        List<MajorDto> tmpAllMajors;
+        List<DepartmentDto> tmpAllDepts;
+        List<UserDto> tmpAllUsers;
+        List<StuffDto> tmpAllStuffs;
+        List<ItemDto> tmpAllItems;
+        List<HistoryDto> tmpAllHistories;
+
         DEV_UNIV = new UniversityDto("DEV", "DEV_UNIV", null);
         HYU_UNIV = new UniversityDto("HYU", "한양대학교", "https://api.hanyang.ac.kr/oauth/authorize/");
         CKU_UNIV = new UniversityDto("CKU", "가톨릭관동대학교", null);
         SNU_UNIV = new UniversityDto("SNU", "서울대학교", null);
 
-        ALL_UNIVS = List.of(
+        tmpAllUnivs = List.of(
                 DEV_UNIV, HYU_UNIV, CKU_UNIV, SNU_UNIV
         );
 
@@ -72,7 +80,7 @@ public class NewStubHelper {
         CKU_A69_MAJOR = new MajorDto(CKU_UNIV, "A69");
         CKU_A70_MAJOR = new MajorDto(CKU_UNIV, "A70");
 
-        ALL_MAJORS = List.of(
+        tmpAllMajors = List.of(
                 HYU_FH04067_MAJOR, HYU_FH04068_MAJOR, HYU_FH04069_MAJOR, CKU_A68_MAJOR,
                 CKU_A69_MAJOR, CKU_A70_MAJOR
         );
@@ -95,7 +103,7 @@ public class NewStubHelper {
                 .withBaseMajorAdd(CKU_A69_MAJOR)
                 .withBaseMajorAdd(CKU_A70_MAJOR);
 
-        ALL_DEPTS = List.of(
+        tmpAllDepts = List.of(
                 DEV_DEPT, HYU_CSE_DEPT, HYU_ME_DEPT, HYU_ENG_DEPT,
                 CKU_MED_DEPT, CKU_STU_DEPT
         );
@@ -142,7 +150,7 @@ public class NewStubHelper {
         CKU_DUMMY_USER_5 = UserDto.init(CKU_UNIV, "C202201238", "전승용")
                 .withMajorAdd(CKU_A70_MAJOR);
 
-        ALL_USERS = List.of(
+        tmpAllUsers = List.of(
                 DEV_USER, HYU_CSE_MASTER_USER, HYU_CSE_STAFF_USER, HYU_CSE_NORMAL_1_USER,
                 HYU_CSE_NORMAL_2_USER, HYU_CSE_BANNED_USER, HYU_DUMMY_USER_1, HYU_DUMMY_USER_2,
                 HYU_DUMMY_USER_3, HYU_DUMMY_USER_4, CKU_DUMMY_USER_1, CKU_DUMMY_USER_2,
@@ -170,7 +178,7 @@ public class NewStubHelper {
         StuffDto SCISSORS_CKU_MED = StuffDto.init(CKU_MED_DEPT, "가위", "✂️");
         StuffDto SOCCER_BALL_CKU_MED = StuffDto.init(CKU_MED_DEPT, "축구공", "⚽️️");
 
-        List<StuffDto> tmpAllStuffs = new ArrayList<>(List.of(
+        tmpAllStuffs = new ArrayList<>(List.of(
                 SPEAKER_HYU_CSE, UMBRELLA_HYU_CSE, PEN_HYU_CSE,
                 SCISSORS_HYU_CSE, SKATEBOARD_HYU_CSE, UMBRELLA_HYU_ME,
                 SCISSORS_HYU_ME, HAMMER_HYU_ME, UMBRELLA_HYU_ENG,
@@ -201,7 +209,7 @@ public class NewStubHelper {
 
         ItemDto SKATEBOARD_1_HYU_CSE = ItemDto.init(SKATEBOARD_HYU_CSE, 1);
 
-        List<ItemDto> tmpAllItems = new ArrayList<>(List.of(
+        tmpAllItems = new ArrayList<>(List.of(
                 SPEAKER_1_HYU_CSE, SPEAKER_2_HYU_CSE, UMBRELLA_1_HYU_CSE,
                 UMBRELLA_2_HYU_CSE, UMBRELLA_3_HYU_CSE, UMBRELLA_4_HYU_CSE,
                 PEN_1_HYU_CSE, PEN_2_HYU_CSE, PEN_3_HYU_CSE, PEN_4_HYU_CSE,
@@ -235,7 +243,7 @@ public class NewStubHelper {
         HistoryDto UMBRELLA_1_1_REQUESTED_HYU_CSE = new HistoryDto(
                 UMBRELLA_1_HYU_CSE, 1, HYU_CSE_NORMAL_2_USER,
                 null, null, null,
-                null, System.currentTimeMillis()/1000, 0,
+                null, System.currentTimeMillis() / 1000, 0,
                 0, 0, 0
         );
 
@@ -246,7 +254,7 @@ public class NewStubHelper {
                 0, 0, 0
         );
 
-        List<HistoryDto> tmpAllHistories = new ArrayList<>(List.of(
+        tmpAllHistories = new ArrayList<>(List.of(
                 SPEAKER_1_1_EXPIRED_HYU_CSE, SPEAKER_1_2_USING_HYU_CSE,
                 SPEAKER_2_1_LOST_HYU_CSE, UMBRELLA_1_1_REQUESTED_HYU_CSE,
                 PEN_3_1_USING_HYU_CSE
@@ -254,212 +262,24 @@ public class NewStubHelper {
 
         setUpRelations(tmpAllStuffs, tmpAllItems, tmpAllHistories);
 
+        ALL_UNIVS = List.copyOf(tmpAllUnivs);
+        ALL_MAJORS = List.copyOf(tmpAllMajors);
+        ALL_DEPTS = List.copyOf(tmpAllDepts);
+        ALL_USERS = List.copyOf(tmpAllUsers);
         ALL_STUFFS = List.copyOf(tmpAllStuffs);
         ALL_ITEMS = List.copyOf(tmpAllItems);
         ALL_HISTORIES = List.copyOf(tmpAllHistories);
+
+        setUpSuper();
     }
 
-    public UniversityDto getUnivByIdx(String univCode) {
-        for(UniversityDto univ : ALL_UNIVS) {
-            if(univ.matchUniqueKey(univCode)) return univ;
-        }
-        return null;
-    }
-
-    public DepartmentDto getDeptByIdx(String univCode, String deptCode) {
-        for(DepartmentDto dept : ALL_DEPTS) {
-            if(dept.matchUniqueKey(univCode, deptCode)) return dept;
-        }
-        return null;
-    }
-
-    public UserDto getUserByDeptAndAuth(String univCode, String deptCode, AuthorityDto.Permission permission) {
-        DepartmentDto dept = getDeptByIdx(univCode, deptCode);
-        for(UserDto user : ALL_USERS) {
-            if(user.getMaxPermission(dept) == permission) return user;
-        }
-        return null;
-    }
-
-    public UserDto getUserByDeptAndAuthWithExclude(String univCode, String deptCode, AuthorityDto.Permission permission, UserDto exclude) {
-        DepartmentDto dept = getDeptByIdx(univCode, deptCode);
-        for(UserDto user : ALL_USERS) {
-            if(user.getMaxPermission(dept) == permission
-                    && !user.matchUniqueKey(exclude)) return user;
-        }
-        return null;
-    }
-
-    public StuffDto getStuffByIndex(String univCode, String deptCode, String stuffName) {
-        for(StuffDto stuff : ALL_STUFFS) {
-            if(stuff.matchUniqueKey(univCode, deptCode, stuffName)) return stuff;
-        }
-        return null;
-    }
-
-    public StuffDto getNthAnotherStuffWithSameDepartment(StuffDto target, int nth) {
-        for(StuffDto stuff : ALL_STUFFS) {
-            if(stuff.department().matchUniqueKey(target.department())
-                    && !stuff.name().equals(target.name())
-                    && --nth == 0) {
-                return stuff;
-            }
-        }
-        return null;
-    }
-
-    public ItemDto getItemByIndex(String univCode, String deptCode, String stuffName, int itemNum) {
-        for(ItemDto item : ALL_ITEMS) {
-            if(item.matchUniqueKey(univCode, deptCode, stuffName, itemNum)) return item;
-        }
-        return null;
-    }
-
-    public ItemDto getNthUsableItem(String univCode, String deptCode, String stuffName, int nth) {
-        for(ItemDto item : ALL_ITEMS) {
-            if(item.stuff().matchUniqueKey(univCode, deptCode, stuffName)
-                    && item.status() == ItemDto.ItemStatus.USABLE &&--nth == 0) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public ItemDto getNthUnusableItem(String univCode, String deptCode, String stuffName, int nth) {
-        for(ItemDto item : ALL_ITEMS) {
-            if(item.stuff().matchUniqueKey(univCode, deptCode, stuffName)
-                    && item.status() == ItemDto.ItemStatus.UNUSABLE && --nth == 0) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public ItemDto getNthInactiveItem(String univCode, String deptCode, String stuffName, int nth) {
-        for(ItemDto item : ALL_ITEMS) {
-            if(item.stuff().matchUniqueKey(univCode, deptCode, stuffName)
-                    && item.status() == ItemDto.ItemStatus.INACTIVE && --nth == 0) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public ItemDto getUsableItem(DepartmentDto dept) {
-        for (ItemDto item : ALL_ITEMS) {
-            if(item.stuff().department().matchUniqueKey(dept)
-                    && item.status() == ItemDto.ItemStatus.USABLE) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public ItemDto getReservedItem(DepartmentDto dept) {
-        for (ItemDto item : ALL_ITEMS) {
-            if(item.stuff().department().matchUniqueKey(dept)
-                    && item.lastHistory() != null
-                    && item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public ItemDto getReturnAbleItem(DepartmentDto dept) {
-        return ALL_ITEMS.stream().filter(
-                (item) -> item.stuff().department().matchUniqueKey(dept)
-                        && (item.status() == ItemDto.ItemStatus.UNUSABLE || item.status() == ItemDto.ItemStatus.INACTIVE)
-        ).findAny().orElse(null);
-    }
-
-    public ItemDto getAnotherItemWithSameStuff(ItemDto item) {
-        for(ItemDto piece : ALL_ITEMS) {
-            if(piece.stuff().matchUniqueKey(item.stuff())
-                    && piece.num() != item.num()) {
-                return piece;
-            }
-        }
-        return null;
-    }
-
-    public HistoryDto getHistoryByIndex(String univCode, String deptCode, String stuffName, int itemNum, int historyNum) {
-        for(HistoryDto history : ALL_HISTORIES) {
-            if(history.matchUniqueKey(univCode, deptCode, stuffName, itemNum, historyNum)) return history;
-        }
-        return null;
-    }
-
-    private void setUpRelations(List<StuffDto> stuffs, List<ItemDto> items, List<HistoryDto> histories) {
-        setLastHistoryOfItem(items, histories);
-        setItemsOfStuff(stuffs, items);
-        setStuffOfItem(stuffs, items);
-        setItemOfHistory(items, histories);
-    }
-
-    private void setLastHistoryOfItem(List<ItemDto> items, List<HistoryDto> histories) {
-        for(HistoryDto history : histories) {
-            HistoryDto newLastHistory = history.withItem(ItemDto.nestedEndpoint);
-            for(int i = 0; i < items.size(); i++) {
-                ItemDto item = items.get(i);
-                if(matchUniqueKey(item, history.item())) {
-                    items.set(i, item.withLastHistory(newLastHistory));
-                }
-            }
-        }
-    }
-
-    private void setItemsOfStuff(List<StuffDto> stuffs, List<ItemDto> items) {
-        for(ItemDto item : items) {
-            for(int i = 0; i < stuffs.size(); i++) {
-                StuffDto stuff = stuffs.get(i);
-                if(matchUniqueKey(stuff, item.stuff())) {
-                    stuffs.set(i, stuff.withItemAdd(item));
-                }
-            }
-        }
-    }
-
-    private void setStuffOfItem(List<StuffDto> stuffs, List<ItemDto> items) {
-        for(StuffDto stuff : stuffs) {
-            for(int i = 0; i < items.size(); i++) {
-                ItemDto item = items.get(i);
-                if(matchUniqueKey(stuff, item.stuff())) {
-                    items.set(i, item.withStuff(stuff));
-                }
-            }
-        }
-    }
-
-    private void setItemOfHistory(List<ItemDto> items, List<HistoryDto> histories) {
-        for(ItemDto item : items) {
-            for(int i = 0; i < histories.size(); i++) {
-                HistoryDto history = histories.get(i);
-                if(matchUniqueKey(item, history.item())) {
-                    histories.set(i, history.withItem(item));
-                }
-            }
-        }
-    }
-
-    private boolean matchUniqueKey(StuffDto stuff, StuffDto oth) {
-        String universityCode = oth.department().university().code();
-        String departmentCode = oth.department().code();
-        String stuffName = oth.name();
-        return universityCode.equals(stuff.department().university().code())
-                && departmentCode.equals(stuff.department().code())
-                && stuffName.equals(stuff.name());
-    }
-
-    private boolean matchUniqueKey(ItemDto item, ItemDto oth) {
-        String universityCode = item.stuff().department().university().code();
-        String departmentCode = item.stuff().department().code();
-        String stuffName = item.stuff().name();
-        int itemNum = item.num();
-
-        return universityCode.equals(oth.stuff().department().university().code())
-                && departmentCode.equals(oth.stuff().department().code())
-                && stuffName.equals(oth.stuff().name())
-                && itemNum == oth.num();
+    private void setUpSuper() {
+        super.ALL_UNIVS = this.ALL_UNIVS;
+        super.ALL_MAJORS = this.ALL_MAJORS;
+        super.ALL_DEPTS = this.ALL_DEPTS;
+        super.ALL_USERS = this.ALL_USERS;
+        super.ALL_STUFFS = this.ALL_STUFFS;
+        super.ALL_ITEMS = this.ALL_ITEMS;
+        super.ALL_HISTORIES = this.ALL_HISTORIES;
     }
 }
