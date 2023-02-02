@@ -204,7 +204,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
             when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
             when(universityDao.getUniversityByCodeData(newUniversityCode))
-                    .thenThrow(InvalidIndexException.class);
+                    .thenThrow(NotFoundException.class);
 
             assertThrows(InvalidIndexException.class, this::execMethod);
         }
