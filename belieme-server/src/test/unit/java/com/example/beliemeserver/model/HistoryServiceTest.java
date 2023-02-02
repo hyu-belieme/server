@@ -33,7 +33,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getListByDepartment")
-    public final class TestGetListByDepartment extends HistoryNestedTestClass {
+    public final class TestGetListByDepartment extends HistoryNestedTest {
         private List<HistoryDto> historyList;
 
         @Override
@@ -81,7 +81,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getListByStuff()")
-    public final class TestGetListByStuff extends HistoryNestedTestClass {
+    public final class TestGetListByStuff extends HistoryNestedTest {
         private StuffDto stuff;
         private String stuffName;
 
@@ -141,12 +141,6 @@ public class HistoryServiceTest extends BaseServiceTest {
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
-        private StuffDto randomStuffByDept(DepartmentDto dept) {
-            RandomFilter<StuffDto> randomFilter = RandomFilter.makeInstance(stub.ALL_STUFFS,
-                    (stuff) -> stuff.department().matchUniqueKey(dept));
-            return randomFilter.get().orElse(null);
-        }
-
         private List<HistoryDto> getHistoryListByStuff(StuffDto stuff) {
             return stub.ALL_HISTORIES.stream()
                     .filter((history) -> stuff.matchUniqueKey(history.item().stuff()))
@@ -156,7 +150,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getListByItem()")
-    public final class TestGetListByItem extends HistoryNestedTestClass {
+    public final class TestGetListByItem extends HistoryNestedTest {
         private ItemDto item;
         private String stuffName;
         private int itemNum;
@@ -218,12 +212,6 @@ public class HistoryServiceTest extends BaseServiceTest {
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
-        private ItemDto randomItemByDept(DepartmentDto dept) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().department().matchUniqueKey(dept));
-            return randomFilter.get().orElse(null);
-        }
-
         private List<HistoryDto> getHistoryListByItem(ItemDto item) {
             return stub.ALL_HISTORIES.stream()
                     .filter((history) -> item.matchUniqueKey(history.item()))
@@ -233,7 +221,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getListByDepartmentAndRequester()")
-    public final class TestGetListByDepartmentAndRequester extends HistoryNestedTestClass {
+    public final class TestGetListByDepartmentAndRequester extends HistoryNestedTest {
         private UserDto historyRequester;
         private String historyRequesterUnivCode;
         private String historyRequesterStudentId;
@@ -371,7 +359,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getByIndex()")
-    public final class TestGetByIndex extends HistoryNestedTestClass {
+    public final class TestGetByIndex extends HistoryNestedTest {
         private HistoryDto history;
         private String stuffName;
         private int itemNum;
@@ -489,7 +477,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("createReservation()")
-    public final class TestCreateReservation extends HistoryNestedTestClass {
+    public final class TestCreateReservation extends HistoryNestedTest {
         @Captor
         private ArgumentCaptor<HistoryDto> historyCaptor;
 
@@ -797,7 +785,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("makeItemLost()")
-    public final class TestMakeItemLost extends HistoryNestedTestClass {
+    public final class TestMakeItemLost extends HistoryNestedTest {
         @Captor
         private ArgumentCaptor<HistoryDto> historyCaptor;
 
@@ -909,7 +897,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("makeItemUsing()")
-    public final class TestMakeItemUsing extends HistoryNestedTestClass {
+    public final class TestMakeItemUsing extends HistoryNestedTest {
         @Captor
         private ArgumentCaptor<Integer> integerCaptor;
 
@@ -990,7 +978,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("makeItemReturn()")
-    public final class TestMakeItemReturn extends HistoryNestedTestClass {
+    public final class TestMakeItemReturn extends HistoryNestedTest {
         @Captor
         private ArgumentCaptor<Integer> integerCaptor;
 
@@ -1095,7 +1083,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("makeItemCancel()")
-    public final class TestMakeItemCancel extends HistoryNestedTestClass {
+    public final class TestMakeItemCancel extends HistoryNestedTest {
         @Captor
         private ArgumentCaptor<Integer> integerCaptor;
 
@@ -1174,7 +1162,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
     }
 
-    private abstract class HistoryNestedTestClass extends BaseNestedTestClass {
+    private abstract class HistoryNestedTest extends BaseNestedTest {
         protected ItemDto randomUsableItemByDept(DepartmentDto dept) {
             RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
                     (item) -> item.stuff().department().matchUniqueKey(dept)

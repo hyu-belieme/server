@@ -5,9 +5,7 @@ import com.example.beliemeserver.exception.InvalidIndexException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.util.RandomFilter;
 import com.example.beliemeserver.util.StubData;
 import com.example.beliemeserver.util.TestHelper;
@@ -42,7 +40,7 @@ public abstract class BaseServiceTest {
 
     public static final String userToken = "";
 
-    protected abstract class BaseNestedTestClass {
+    protected abstract class BaseNestedTest {
         protected String userToken = "";
 
         protected DepartmentDto dept;
@@ -88,6 +86,18 @@ public abstract class BaseServiceTest {
             RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
                     (user) -> user.getMaxPermission(dept) == permission
                             && !user.matchUniqueKey(exclude));
+            return randomFilter.get().orElse(null);
+        }
+
+        protected StuffDto randomStuffByDept(DepartmentDto dept) {
+            RandomFilter<StuffDto> randomFilter = RandomFilter.makeInstance(stub.ALL_STUFFS,
+                    (stuff) -> stuff.department().matchUniqueKey(dept));
+            return randomFilter.get().orElse(null);
+        }
+
+        protected ItemDto randomItemByDept(DepartmentDto dept) {
+            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
+                    (item) -> item.stuff().department().matchUniqueKey(dept));
             return randomFilter.get().orElse(null);
         }
 
