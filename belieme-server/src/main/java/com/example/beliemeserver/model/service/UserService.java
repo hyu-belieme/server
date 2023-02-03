@@ -37,15 +37,14 @@ public class UserService extends BaseService {
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String studentId
     ) {
-        // TODO Need to implements.
-        return null;
+        checkDeveloperPermission(userToken);
+        return userDao.getByIndex(universityCode, studentId);
     }
 
     public UserDto getByToken(
             @NonNull String userToken
     ) {
-        // TODO Need to implements.
-        return null;
+        return checkTokenAndGetUser(userToken);
     }
 
     public UserDto updateAuthority(
