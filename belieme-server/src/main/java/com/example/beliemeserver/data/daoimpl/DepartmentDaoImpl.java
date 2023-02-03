@@ -23,7 +23,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<DepartmentDto> getAllDepartmentsData() {
+    public List<DepartmentDto> getAllList() {
         List<DepartmentDto> output = new ArrayList<>();
 
         for(DepartmentEntity departmentEntity : departmentRepository.findAll()) {
@@ -33,7 +33,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<DepartmentDto> getAllDepartmentsByUniversityCodeData(String universityCode) throws NotFoundException {
+    public List<DepartmentDto> getListByUniversity(String universityCode) throws NotFoundException {
         List<DepartmentDto> output = new ArrayList<>();
 
         int universityId = findUniversityEntity(universityCode).getId();
@@ -44,13 +44,13 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto getDepartmentByUniversityCodeAndDepartmentCodeData(String universityCode, String departmentCode) throws NotFoundException {
+    public DepartmentDto getByIndex(String universityCode, String departmentCode) throws NotFoundException {
         DepartmentEntity targetEntity = findDepartmentEntity(universityCode, departmentCode);
         return targetEntity.toDepartmentDto();
     }
 
     @Override
-    public DepartmentDto addDepartmentData(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
+    public DepartmentDto create(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
         DepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
         saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
 
@@ -58,7 +58,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto updateDepartmentData(String universityCode, String departmentCode, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
+    public DepartmentDto update(String universityCode, String departmentCode, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
         DepartmentEntity target = findDepartmentEntity(universityCode, departmentCode);
         updateDepartmentOnly(target, newDepartment);
 
@@ -66,37 +66,6 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
         saveBaseMajorJoins(target, newDepartment.baseMajors());
 
         return target.toDepartmentDto();
-    }
-
-    @Override
-    public DepartmentDto putBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto newBaseMajor) throws NotFoundException, ConflictException {
-        DepartmentEntity targetEntity = findDepartmentEntity(universityCode, departmentCode);
-        MajorEntity newMajorEntity = findMajorEntity(newBaseMajor);
-
-        checkBaseMajorConflict(targetEntity, newMajorEntity);
-
-        MajorDepartmentJoinEntity newJoin = new MajorDepartmentJoinEntity(
-                newMajorEntity,
-                targetEntity
-        );
-        majorDepartmentJoinRepository.save(newJoin);
-
-        return targetEntity.toDepartmentDto();
-    }
-
-    @Override
-    public DepartmentDto removeBaseMajorOnDepartmentData(String universityCode, String departmentCode, MajorDto targetBaseMajor) throws NotFoundException {
-        DepartmentEntity targetEntity = findDepartmentEntity(universityCode, departmentCode);
-        MajorEntity targetBaseMajorEntity = findMajorEntity(targetBaseMajor);
-
-        for(MajorDepartmentJoinEntity majorDepartmentJoin : targetEntity.getBaseMajorJoin()) {
-            if(majorDepartmentJoin.getMajorId() == targetBaseMajorEntity.getId()) {
-                majorDepartmentJoinRepository.delete(majorDepartmentJoin);
-                break;
-            }
-        }
-
-        return targetEntity.toDepartmentDto();
     }
 
     private DepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) throws NotFoundException, ConflictException {

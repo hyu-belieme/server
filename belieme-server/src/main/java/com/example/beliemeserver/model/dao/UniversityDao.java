@@ -9,17 +9,17 @@ import java.util.List;
 
 public interface UniversityDao {
     @Transactional
-    List<UniversityDto> getAllUniversitiesData();
+    List<UniversityDto> getAllList();
 
     @Transactional
-    UniversityDto getUniversityByCodeData(String code)
+    UniversityDto getByIndex(String code)
             throws NotFoundException;
 
     @Transactional
-    UniversityDto addUniversityData(UniversityDto newUniversity)
+    UniversityDto create(UniversityDto newUniversity)
             throws ConflictException;
 
     @Transactional
-    UniversityDto updateUniversityData(String code, UniversityDto newUniversityDto)
+    UniversityDto update(String code, UniversityDto newUniversityDto)
             throws NotFoundException, ConflictException;
 }

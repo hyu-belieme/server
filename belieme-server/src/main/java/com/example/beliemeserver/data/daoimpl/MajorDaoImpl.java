@@ -20,7 +20,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public List<MajorDto> getAllMajorsData() {
+    public List<MajorDto> getAllList() {
         List<MajorDto> output = new ArrayList<>();
         for(MajorEntity majorEntity : majorRepository.findAll()) {
             output.add(majorEntity.toMajorDto());
@@ -29,13 +29,13 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto getMajorByIndex(String universityCode, String majorCode) {
+    public MajorDto getByIndex(String universityCode, String majorCode) {
         MajorEntity targetEntity = findMajorEntity(universityCode, majorCode);
         return targetEntity.toMajorDto();
     }
 
     @Override
-    public MajorDto addMajorData(MajorDto newMajor) throws NotFoundException, ConflictException {
+    public MajorDto create(MajorDto newMajor) throws NotFoundException, ConflictException {
         UniversityEntity university = findUniversityEntity(newMajor.university());
 
         checkMajorConflict(university.getId(), newMajor.code());
@@ -50,7 +50,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto updateMajorData(String universityCode, String majorCode, MajorDto newMajor) throws NotFoundException, ConflictException {
+    public MajorDto update(String universityCode, String majorCode, MajorDto newMajor) throws NotFoundException, ConflictException {
         MajorEntity target = findMajorEntity(universityCode, majorCode);
 
         UniversityEntity newUniversity = findUniversityEntity(newMajor.university());

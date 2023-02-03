@@ -20,7 +20,7 @@ public class DepartmentService extends BaseService {
         List<DepartmentDto> output = new ArrayList<>();
 
         UserDto requester = checkTokenAndGetUser(userToken);
-        List<DepartmentDto> allDepartment = departmentDao.getAllDepartmentsData();
+        List<DepartmentDto> allDepartment = departmentDao.getAllList();
         for(DepartmentDto department : allDepartment) {
             if(requester.getMaxPermission(department).hasUserPermission()) {
                 output.add(department);
@@ -35,7 +35,7 @@ public class DepartmentService extends BaseService {
             @NonNull String departmentCode
     ) {
         checkDeveloperPermission(userToken);
-        return departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
+        return departmentDao.getByIndex(universityCode, departmentCode);
     }
 
     public DepartmentDto create(
@@ -52,7 +52,7 @@ public class DepartmentService extends BaseService {
         }
 
         DepartmentDto newDepartment = new DepartmentDto(university, departmentCode, name, baseMajors);
-        return departmentDao.addDepartmentData(newDepartment);
+        return departmentDao.create(newDepartment);
     }
 
     public DepartmentDto update(
@@ -62,7 +62,7 @@ public class DepartmentService extends BaseService {
         checkDeveloperPermission(userToken);
 
         UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
-        DepartmentDto oldDepartment = departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
+        DepartmentDto oldDepartment = departmentDao.getByIndex(universityCode, departmentCode);
 
         if(newDepartmentCode == null && newName == null && newMajorCodes == null) return oldDepartment;
 
@@ -78,12 +78,12 @@ public class DepartmentService extends BaseService {
         }
 
         DepartmentDto newDepartment = new DepartmentDto(university, newDepartmentCode, newName, newBaseMajors);
-        return departmentDao.updateDepartmentData(universityCode, departmentCode, newDepartment);
+        return departmentDao.update(universityCode, departmentCode, newDepartment);
     }
 
     private UniversityDto getUniversityOrThrowInvalidIndexException(String universityCode) {
         try {
-            return universityDao.getUniversityByCodeData(universityCode);
+            return universityDao.getByIndex(universityCode);
         } catch (NotFoundException e) {
             throw new InvalidIndexException();
         }
@@ -91,9 +91,9 @@ public class DepartmentService extends BaseService {
 
     private MajorDto getMajorOrCreate(UniversityDto university, String majorCode) {
         try {
-            return majorDao.getMajorByIndex(university.code(), majorCode);
+            return majorDao.getByIndex(university.code(), majorCode);
         } catch (NotFoundException e) {
-            return majorDao.addMajorData(new MajorDto(university, majorCode));
+            return majorDao.create(new MajorDto(university, majorCode));
         }
     }
 }

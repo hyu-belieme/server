@@ -96,7 +96,7 @@ public abstract class BaseServiceTest {
         }
 
         protected void mockDepartmentAndRequester() {
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(univCode, deptCode))
+            when(departmentDao.getByIndex(univCode, deptCode))
                     .thenReturn(dept);
             when(userDao.getByToken(userToken)).thenReturn(requester);
         }
@@ -131,7 +131,7 @@ public abstract class BaseServiceTest {
         public void ERROR_getInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(univCode, deptCode))
+            when(departmentDao.getByIndex(univCode, deptCode))
                     .thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
@@ -142,7 +142,7 @@ public abstract class BaseServiceTest {
         public void ERROR_isUnauthorizedToken_UnauthorizedException() {
             setUpDefault();
 
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(univCode, deptCode))
+            when(departmentDao.getByIndex(univCode, deptCode))
                     .thenReturn(dept);
             when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
 

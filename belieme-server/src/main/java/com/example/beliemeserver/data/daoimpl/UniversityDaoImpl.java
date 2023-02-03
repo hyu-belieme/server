@@ -21,7 +21,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public List<UniversityDto> getAllUniversitiesData() {
+    public List<UniversityDto> getAllList() {
         List<UniversityDto> output = new ArrayList<>();
 
         for (UniversityEntity universityEntity : universityRepository.findAll()) {
@@ -31,13 +31,13 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto getUniversityByCodeData(String universityCode) throws NotFoundException {
+    public UniversityDto getByIndex(String universityCode) throws NotFoundException {
         UniversityEntity targetUniversity = findUniversityEntity(universityCode);
         return targetUniversity.toUniversityDto();
     }
 
     @Override
-    public UniversityDto addUniversityData(UniversityDto newUniversity) throws ConflictException {
+    public UniversityDto create(UniversityDto newUniversity) throws ConflictException {
         checkUniversityConflict(newUniversity.code());
 
         UniversityEntity newUniversityEntity = new UniversityEntity(
@@ -51,7 +51,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto updateUniversityData(String universityCode, UniversityDto newUniversity) throws NotFoundException, ConflictException {
+    public UniversityDto update(String universityCode, UniversityDto newUniversity) throws NotFoundException, ConflictException {
         UniversityEntity target = findUniversityEntity(universityCode);
         if (doesIndexOfUniversityChange(target, newUniversity)) {
             checkUniversityConflict(newUniversity.code());

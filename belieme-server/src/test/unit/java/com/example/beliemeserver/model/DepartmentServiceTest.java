@@ -44,7 +44,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(departmentDao.getAllDepartmentsData()).thenReturn(stub.ALL_DEPTS);
+            when(departmentDao.getAllList()).thenReturn(stub.ALL_DEPTS);
 
             TestHelper.listCompareTest(this::execMethod, stub.ALL_DEPTS);
         }
@@ -56,7 +56,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setRequester(randomNonDevUser());
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(departmentDao.getAllDepartmentsData()).thenReturn(stub.ALL_DEPTS);
+            when(departmentDao.getAllList()).thenReturn(stub.ALL_DEPTS);
 
             List<DepartmentDto> expected = new ArrayList<>();
             for(DepartmentDto department : stub.ALL_DEPTS) {
@@ -98,7 +98,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(univCode, deptCode))
+            when(departmentDao.getByIndex(univCode, deptCode))
                     .thenReturn(dept);
 
             TestHelper.objectCompareTest(this::execMethod, dept);
@@ -110,7 +110,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(univCode, deptCode))
+            when(departmentDao.getByIndex(univCode, deptCode))
                     .thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
@@ -167,14 +167,14 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(univCode))
+            when(universityDao.getByIndex(univCode))
                     .thenReturn(univ);
             mockGetMajors(baseMajors, univ, baseMajorCodes);
 
             execMethod();
 
-            verify(departmentDao).addDepartmentData(dept);
-            verify(majorDao, never()).addMajorData(any());
+            verify(departmentDao).create(dept);
+            verify(majorDao, never()).create(any());
         }
 
         @RepeatedTest(10)
@@ -184,14 +184,14 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setDept(randomDeptWithMajors());
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(univCode))
+            when(universityDao.getByIndex(univCode))
                     .thenReturn(univ);
             mockGetOrCreateMajors(baseMajors, univ, baseMajorCodes);
 
             execMethod();
 
-            verify(departmentDao).addDepartmentData(dept);
-            verify(majorDao, times(1)).addMajorData(baseMajors.get(0));
+            verify(departmentDao).create(dept);
+            verify(majorDao, times(1)).create(baseMajors.get(0));
         }
 
         @RepeatedTest(10)
@@ -200,7 +200,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(univCode))
+            when(universityDao.getByIndex(univCode))
                     .thenThrow(NotFoundException.class);
 
             assertThrows(InvalidIndexException.class, this::execMethod);
@@ -212,9 +212,9 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(univCode))
+            when(universityDao.getByIndex(univCode))
                     .thenReturn(univ);
-            when(departmentDao.addDepartmentData(dept)).thenThrow(ConflictException.class);
+            when(departmentDao.create(dept)).thenThrow(ConflictException.class);
             mockGetMajors(baseMajors, univ, baseMajorCodes);
 
             assertThrows(ConflictException.class, this::execMethod);
@@ -277,9 +277,9 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetUnivCode))
+            when(universityDao.getByIndex(targetUnivCode))
                     .thenReturn(targetUniv);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUnivCode, targetDeptCode))
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
                     .thenReturn(targetDept);
             mockGetMajors(newBaseMajors, targetUniv, newBaseMajorCodes);
 
@@ -289,8 +289,8 @@ public class DepartmentServiceTest extends BaseServiceTest {
                     .withCode(newDeptCode)
                     .withName(newName)
                     .withBaseMajors(newBaseMajors);
-            verify(departmentDao).updateDepartmentData(targetUnivCode, targetDeptCode, newDept);
-            verify(majorDao, never()).addMajorData(any());
+            verify(departmentDao).update(targetUnivCode, targetDeptCode, newDept);
+            verify(majorDao, never()).create(any());
         }
 
         @RepeatedTest(10)
@@ -300,9 +300,9 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setTargetDept(randomDeptWithMajors());
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetUnivCode))
+            when(universityDao.getByIndex(targetUnivCode))
                     .thenReturn(targetUniv);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUnivCode, targetDeptCode))
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
                     .thenReturn(targetDept);
             mockGetOrCreateMajors(newBaseMajors, targetUniv, newBaseMajorCodes);
 
@@ -312,8 +312,8 @@ public class DepartmentServiceTest extends BaseServiceTest {
                     .withCode(newDeptCode)
                     .withName(newName)
                     .withBaseMajors(newBaseMajors);
-            verify(departmentDao).updateDepartmentData(targetUnivCode, targetDeptCode, newDept);
-            verify(majorDao, times(1)).addMajorData(newBaseMajors.get(0));
+            verify(departmentDao).update(targetUnivCode, targetDeptCode, newDept);
+            verify(majorDao, times(1)).create(newBaseMajors.get(0));
         }
 
         @RepeatedTest(10)
@@ -325,16 +325,16 @@ public class DepartmentServiceTest extends BaseServiceTest {
             newBaseMajorCodes = null;
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetUnivCode))
+            when(universityDao.getByIndex(targetUnivCode))
                     .thenReturn(targetUniv);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUnivCode, targetDeptCode))
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
                     .thenReturn(targetDept);
 
             execMethod();
 
             DepartmentDto newDept = targetDept.withName(newName);
-            verify(departmentDao).updateDepartmentData(targetUnivCode, targetDeptCode, newDept);
-            verify(majorDao, never()).addMajorData(any());
+            verify(departmentDao).update(targetUnivCode, targetDeptCode, newDept);
+            verify(majorDao, never()).create(any());
         }
 
         @RepeatedTest(10)
@@ -343,13 +343,13 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetUnivCode))
+            when(universityDao.getByIndex(targetUnivCode))
                     .thenReturn(targetUniv);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUnivCode, targetDeptCode))
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
                     .thenReturn(targetDept);
             mockGetMajors(newBaseMajors, targetUniv, newBaseMajorCodes);
 
-            when(departmentDao.updateDepartmentData(eq(targetUnivCode), eq(targetDeptCode), any()))
+            when(departmentDao.update(eq(targetUnivCode), eq(targetDeptCode), any()))
                     .thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -361,7 +361,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetUnivCode))
+            when(universityDao.getByIndex(targetUnivCode))
                     .thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
@@ -373,9 +373,9 @@ public class DepartmentServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetUnivCode))
+            when(universityDao.getByIndex(targetUnivCode))
                     .thenReturn(targetUniv);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUnivCode, targetDeptCode))
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
                     .thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
@@ -408,7 +408,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
         protected void mockGetMajors(List<MajorDto> majors, UniversityDto univ, List<String> majorCodes) {
             for(int i = 0; i < majorCodes.size(); i++) {
                 String majorCode = majorCodes.get(i);
-                when(majorDao.getMajorByIndex(univ.code(), majorCode))
+                when(majorDao.getByIndex(univ.code(), majorCode))
                         .thenReturn(majors.get(i));
             }
         }
@@ -417,13 +417,13 @@ public class DepartmentServiceTest extends BaseServiceTest {
             for(int i = 0; i < majorCodes.size(); i++) {
                 String majorCode = majorCodes.get(i);
                 if(i == 0) {
-                    when(majorDao.getMajorByIndex(univ.code(), majorCode))
+                    when(majorDao.getByIndex(univ.code(), majorCode))
                             .thenThrow(NotFoundException.class);
-                    when(majorDao.addMajorData(new MajorDto(univ, majorCode)))
+                    when(majorDao.create(new MajorDto(univ, majorCode)))
                             .thenReturn(majors.get(i));
                     continue;
                 }
-                when(majorDao.getMajorByIndex(univ.code(), majorCode))
+                when(majorDao.getByIndex(univ.code(), majorCode))
                         .thenReturn(majors.get(i));
             }
         }

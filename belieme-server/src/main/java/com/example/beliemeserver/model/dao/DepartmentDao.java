@@ -10,42 +10,28 @@ import java.util.List;
 
 public interface DepartmentDao {
     @Transactional
-    List<DepartmentDto> getAllDepartmentsData();
+    List<DepartmentDto> getAllList();
 
     @Transactional
-    List<DepartmentDto> getAllDepartmentsByUniversityCodeData(
+    List<DepartmentDto> getListByUniversity(
             String universityCode
     ) throws NotFoundException;
 
     @Transactional
-    DepartmentDto getDepartmentByUniversityCodeAndDepartmentCodeData(
+    DepartmentDto getByIndex(
             String universityCode,
             String departmentCode
     ) throws NotFoundException;
 
     @Transactional
-    DepartmentDto addDepartmentData(
+    DepartmentDto create(
             DepartmentDto newDepartment
     ) throws NotFoundException, ConflictException;
 
     @Transactional
-    DepartmentDto updateDepartmentData(
+    DepartmentDto update(
             String universityCode,
             String departmentCode,
             DepartmentDto newDepartment
     ) throws NotFoundException, ConflictException;
-
-    @Transactional
-    DepartmentDto putBaseMajorOnDepartmentData(
-            String universityCode,
-            String departmentCode,
-            MajorDto newBaseMajor
-    ) throws NotFoundException, ConflictException;
-
-    @Transactional
-    DepartmentDto removeBaseMajorOnDepartmentData(
-            String universityCode,
-            String departmentCode,
-            MajorDto targetBaseMajor
-    ) throws NotFoundException;
 }

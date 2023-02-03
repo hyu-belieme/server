@@ -41,7 +41,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getAllUniversitiesData()).thenReturn(stub.ALL_UNIVS);
+            when(universityDao.getAllList()).thenReturn(stub.ALL_UNIVS);
 
             TestHelper.listCompareTest(this::execMethod, stub.ALL_UNIVS);
         }
@@ -75,7 +75,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(univCode)).thenReturn(univ);
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
 
             TestHelper.objectCompareTest(this::execMethod, univ);
         }
@@ -86,7 +86,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(univCode)).thenThrow(NotFoundException.class);
+            when(universityDao.getByIndex(univCode)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
@@ -128,7 +128,7 @@ public class UniversityServiceTest extends BaseServiceTest {
 
             execMethod();
 
-            verify(universityDao).addUniversityData(univ);
+            verify(universityDao).create(univ);
         }
 
         @RepeatedTest(10)
@@ -137,7 +137,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(randomDevUser());
-            when(universityDao.addUniversityData(univ)).thenThrow(ConflictException.class);
+            when(universityDao.create(univ)).thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
@@ -179,12 +179,12 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetCode)).thenReturn(targetUniv);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
             execMethod();
 
             UniversityDto newUniv = new UniversityDto(newCode, newName, newApiUrl);
-            verify(universityDao).updateUniversityData(targetCode, newUniv);
+            verify(universityDao).update(targetCode, newUniv);
         }
 
         @RepeatedTest(10)
@@ -195,12 +195,12 @@ public class UniversityServiceTest extends BaseServiceTest {
             newName = null;
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetCode)).thenReturn(targetUniv);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
             execMethod();
 
             UniversityDto newUniv = new UniversityDto(targetCode, targetUniv.name(), newApiUrl);
-            verify(universityDao).updateUniversityData(targetCode, newUniv);
+            verify(universityDao).update(targetCode, newUniv);
         }
 
         @RepeatedTest(10)
@@ -210,12 +210,12 @@ public class UniversityServiceTest extends BaseServiceTest {
             newApiUrl = null;
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetCode)).thenReturn(targetUniv);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
             execMethod();
 
             UniversityDto newUniv = new UniversityDto(newCode, newName, targetUniv.apiUrl());
-            verify(universityDao).updateUniversityData(targetCode, newUniv);
+            verify(universityDao).update(targetCode, newUniv);
         }
 
         @RepeatedTest(10)
@@ -227,11 +227,11 @@ public class UniversityServiceTest extends BaseServiceTest {
             newApiUrl = null;
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetCode)).thenReturn(targetUniv);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
             execMethod();
 
-            verify(universityDao, never()).updateUniversityData(eq(targetCode), any());
+            verify(universityDao, never()).update(eq(targetCode), any());
         }
 
         @RepeatedTest(10)
@@ -240,7 +240,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetCode)).thenThrow(NotFoundException.class);
+            when(universityDao.getByIndex(targetCode)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
@@ -252,8 +252,8 @@ public class UniversityServiceTest extends BaseServiceTest {
             UniversityDto newUniv = new UniversityDto(newCode, newName, newApiUrl);
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getUniversityByCodeData(targetCode)).thenReturn(targetUniv);
-            when(universityDao.updateUniversityData(targetCode, newUniv)).thenThrow(ConflictException.class);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
+            when(universityDao.update(targetCode, newUniv)).thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
