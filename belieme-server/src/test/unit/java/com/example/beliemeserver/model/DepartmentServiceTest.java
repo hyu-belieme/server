@@ -3,12 +3,13 @@ package com.example.beliemeserver.model;
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.service.DepartmentService;
+import com.example.beliemeserver.util.RandomFilter;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.beliemeserver.util.StubHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -27,222 +27,206 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getAccessibleList()")
-    public class TestGetAccessibleList {
-        @Test
-        @DisplayName("[SUCCESS]_[개발자는 모든 `Department`에 접근 가능하다]_[-]")
-        public void SUCCESS_developerGetAccessibleList() {
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(departmentDao.getAllDepartmentsData()).thenReturn(ALL_DEPTS);
-
-            TestHelper.listCompareTest(
-                    () -> departmentService.getAccessibleList(userToken),
-                    ALL_DEPTS
-            );
+    public class TestGetAccessibleList extends DeptNestedTest {
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
         }
 
-        @Test
+        @Override
+        protected List<DepartmentDto> execMethod() {
+            return departmentService.getAccessibleList(userToken);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[개발자는 모든 `Department`에 접근 가능하다]_[-]")
+        public void SUCCESS_developerGetAccessibleList() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getAllList()).thenReturn(stub.ALL_DEPTS);
+
+            TestHelper.listCompareTest(this::execMethod, stub.ALL_DEPTS);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[일반 유저는 일부 `Department`에만 접근 가능하다]_[-]")
         public void SUCCESS_userGetAccessibleList() {
-            UserDto requester = HYU_CSE_MASTER_USER;
+            setUpDefault();
+            setRequester(randomNonDevUser());
+
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(departmentDao.getAllDepartmentsData()).thenReturn(ALL_DEPTS);
+            when(departmentDao.getAllList()).thenReturn(stub.ALL_DEPTS);
 
             List<DepartmentDto> expected = new ArrayList<>();
-            for(DepartmentDto department : ALL_DEPTS) {
+            for(DepartmentDto department : stub.ALL_DEPTS) {
                 if(requester.getMaxPermission(department).hasUserPermission()) {
                     expected.add(department);
                 }
             }
-            TestHelper.listCompareTest(
-                    () -> departmentService.getAccessibleList(userToken),
-                    expected
-            );
-        }
-
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void ERROR_isUnauthorizedToken_UnauthorizedException() {
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
-
-            assertThrows(UnauthorizedException.class,
-                    () -> departmentService.getAccessibleList(userToken));
+            TestHelper.listCompareTest(this::execMethod, expected);
         }
     }
 
     @Nested
     @DisplayName("getByIndex()")
-    public class TestGetByIndex {
-        @Test
+    public class TestGetByIndex extends DeptNestedTest {
+        private DepartmentDto dept;
+        private String univCode;
+        private String deptCode;
+
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
+            setDept(randomDept());
+        }
+
+        private void setDept(DepartmentDto dept) {
+            this.dept = dept;
+            this.univCode = dept.university().code();
+            this.deptCode = dept.code();
+        }
+
+        @Override
+        protected DepartmentDto execMethod() {
+            return departmentService.getByIndex(userToken, univCode, deptCode);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[-]_[-]")
         public void SUCCESS() {
-            String targetUniversityCode = "HYU";
-            String targetDepartmentCode = "CSE";
+            setUpDefault();
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(
-                    departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode)
-            ).thenReturn(HYU_CSE_DEPT);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getByIndex(univCode, deptCode))
+                    .thenReturn(dept);
 
-            TestHelper.objectCompareTest(
-                    () -> departmentService.getByIndex(userToken, targetUniversityCode, targetDepartmentCode),
-                    HYU_CSE_DEPT
-            );
+            TestHelper.objectCompareTest(this::execMethod, dept);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[해당 `index`에 `department`가 존재하지 않을 시]_[NotFoundException]")
         public void ERROR_departmentNotFound_NotFoundException() {
-            String targetUniversityCode = "HYU";
-            String targetDepartmentCode = "CSE";
+            setUpDefault();
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getByIndex(univCode, deptCode))
                     .thenThrow(NotFoundException.class);
 
-            assertThrows(NotFoundException.class,
-                    () -> departmentService.getByIndex(userToken, targetUniversityCode, targetDepartmentCode)
-            );
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
 
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void ERROR_isUnauthorizedToken_UnauthorizedException() {
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
-
-            assertThrows(UnauthorizedException.class,
-                    () -> departmentService.getByIndex(userToken, "", "")
-            );
-        }
-
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
         public void ERROR_accessDenied_ForbiddenException() {
-            when(userDao.getByToken(userToken)).thenReturn(HYU_CSE_MASTER_USER);
+            setUpDefault();
+            setRequester(randomNonDevUser());
 
-            assertThrows(
-                    ForbiddenException.class,
-                    () -> departmentService.getByIndex(userToken, "", "")
-            );
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
     }
 
     @Nested
     @DisplayName("create()")
-    public class TestCreate {
-        private DepartmentDto wannaCreate;
-        private String newUniversityCode;
-        private String newDepartmentCode;
-        private String newName;
-        private List<MajorDto> newBaseMajors;
-        private List<String> newBaseMajorCodes;
+    public class TestCreate extends DeptNestedTest {
+        private DepartmentDto dept;
+        private UniversityDto univ;
+        private String univCode;
+        private String deptCode;
+        private String name;
+        private List<MajorDto> baseMajors;
+        private List<String> baseMajorCodes;
 
-        private void setUp(DepartmentDto wannaCreate) {
-            this.wannaCreate = wannaCreate;
-            this.newUniversityCode = wannaCreate.university().code();
-            this.newDepartmentCode = wannaCreate.code();
-            this.newName = wannaCreate.name();
-            this.newBaseMajors = wannaCreate.baseMajors();
-            this.newBaseMajorCodes = new ArrayList<>();
-            this.newBaseMajors.forEach((major)-> newBaseMajorCodes.add(major.code()));
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
+            setDept(randomDeptWithMajors());
         }
 
-        private void execMethod() {
-            departmentService.create(userToken, newUniversityCode, newDepartmentCode, newName, newBaseMajorCodes);
+        private void setDept(DepartmentDto dept) {
+            this.dept = dept;
+            this.univ = dept.university();
+            this.univCode = dept.university().code();
+            this.deptCode = dept.code();
+            this.name = dept.name();
+            this.baseMajors = dept.baseMajors();
+            this.baseMajorCodes = new ArrayList<>();
+            dept.baseMajors().forEach((major)-> baseMajorCodes.add(major.code()));
         }
 
-        @Test
+        protected DepartmentDto execMethod() {
+            return departmentService.create(
+                    userToken, univCode, deptCode, name, baseMajorCodes);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[`major code`가 모두 기존에 존재할 시]_[-]")
         public void SUCCESS_noNewMajorCode() {
-            setUp(HYU_CSE_DEPT);
+            setUpDefault();
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(newUniversityCode))
-                    .thenReturn(wannaCreate.university());
-            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
-                String majorCode = newBaseMajorCodes.get(i);
-                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
-                        .thenReturn(newBaseMajors.get(i));
-            }
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(univCode))
+                    .thenReturn(univ);
+            mockGetMajors(baseMajors, univ, baseMajorCodes);
 
             execMethod();
 
-            verify(departmentDao).addDepartmentData(wannaCreate);
-            verify(majorDao, never()).addMajorData(any());
+            verify(departmentDao).create(dept);
+            verify(majorDao, never()).create(any());
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[새로운 major_code 등장했을 시]_[-]")
         public void SUCCESS_hasNewMajorCode() {
-            setUp(HYU_CSE_DEPT);
+            setUpDefault();
+            setDept(randomDeptWithMajors());
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(newUniversityCode))
-                    .thenReturn(wannaCreate.university());
-            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
-                String majorCode = newBaseMajorCodes.get(i);
-                if(i == 0) {
-                    when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
-                            .thenThrow(NotFoundException.class);
-                    when(majorDao.addMajorData(new MajorDto(wannaCreate.university(), majorCode)))
-                            .thenReturn(newBaseMajors.get(i));
-                    continue;
-                }
-                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
-                        .thenReturn(newBaseMajors.get(i));
-            }
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(univCode))
+                    .thenReturn(univ);
+            mockGetOrCreateMajors(baseMajors, univ, baseMajorCodes);
 
             execMethod();
 
-            verify(departmentDao).addDepartmentData(wannaCreate);
-            verify(majorDao, times(1)).addMajorData(newBaseMajors.get(0));
+            verify(departmentDao).create(dept);
+            verify(majorDao, times(1)).create(baseMajors.get(0));
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[해당 `index`의 `university`가 존재하지 않을 시]_[InvalidIndexException]")
         public void ERROR_getInvalidIndex_InvalidIndexException() {
-            setUp(HYU_CSE_DEPT);
+            setUpDefault();
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(newUniversityCode))
-                    .thenThrow(InvalidIndexException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(univCode))
+                    .thenThrow(NotFoundException.class);
 
             assertThrows(InvalidIndexException.class, this::execMethod);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[해당 `index`의 `department`가 이미 존재할 시]_[ConflictException]")
         public void departmentConflict_ConflictException() {
-            setUp(HYU_CSE_DEPT);
+            setUpDefault();
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(newUniversityCode))
-                    .thenReturn(wannaCreate.university());
-            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
-                String majorCode = newBaseMajorCodes.get(i);
-                when(majorDao.getMajorByIndex(newUniversityCode, majorCode))
-                        .thenReturn(newBaseMajors.get(i));
-            }
-            when(departmentDao.addDepartmentData(wannaCreate)).thenThrow(ConflictException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(univCode))
+                    .thenReturn(univ);
+            when(departmentDao.create(dept)).thenThrow(ConflictException.class);
+            mockGetMajors(baseMajors, univ, baseMajorCodes);
 
             assertThrows(ConflictException.class, this::execMethod);
         }
 
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void ERROR_isUnauthorizedToken_UnauthorizedException() {
-            setUp(HYU_CSE_DEPT);
-
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
-
-            assertThrows(UnauthorizedException.class, this::execMethod);
-        }
-
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
         public void ERROR_accessDenied_ForbiddenException() {
-            setUp(HYU_CSE_DEPT);
+            setUpDefault();
+            setRequester(randomNonDevUser());
 
-            when(userDao.getByToken(userToken)).thenReturn(HYU_CSE_MASTER_USER);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
 
             assertThrows(ForbiddenException.class, this::execMethod);
         }
@@ -250,186 +234,198 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getUpdate()")
-    public class TestUpdate {
-        private String targetUniversityCode;
-        private String targetDepartmentCode;
+    public class TestUpdate extends DeptNestedTest {
+        private DepartmentDto targetDept;
+        private UniversityDto targetUniv;
+        private String targetUnivCode;
+        private String targetDeptCode;
 
-        private DepartmentDto newDepartment;
-        private String newDepartmentCode;
+        private String newDeptCode;
         private String newName;
         private List<MajorDto> newBaseMajors;
         private List<String> newBaseMajorCodes;
 
-        private void setUp(
-                String targetUniversityCode,
-                String targetDepartmentCode, DepartmentDto newDepartment
-        ) {
-            this.targetUniversityCode = targetUniversityCode;
-            this.targetDepartmentCode = targetDepartmentCode;
-            this.newDepartment = newDepartment;
-            this.newDepartmentCode = newDepartment.code();
-            this.newName = newDepartment.name();
-            this.newBaseMajors = newDepartment.baseMajors();
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
+            setTargetDept(randomDept());
+        }
+
+        private void setTargetDept(DepartmentDto dept) {
+            this.targetDept = dept;
+            this.targetUniv = dept.university();
+            this.targetUnivCode = dept.university().code();
+            this.targetDeptCode = dept.code();
+
+            this.newDeptCode = dept.code() + "AAA";
+            this.newName = dept.name() + "BBB";
+            this.newBaseMajors = dept.baseMajors();
             this.newBaseMajorCodes = new ArrayList<>();
-            this.newBaseMajors.forEach((major)-> newBaseMajorCodes.add(major.code()));
+            newBaseMajors.forEach((major) -> newBaseMajorCodes.add(major.code()));
         }
 
-        private void execMethod() {
-            departmentService.update(
-                    userToken, targetUniversityCode, targetDepartmentCode,
-                    newDepartmentCode, newName, newBaseMajorCodes);
+        @Override
+        protected DepartmentDto execMethod() {
+            return departmentService.update(
+                    userToken, targetUnivCode, targetDeptCode,
+                    newDeptCode, newName, newBaseMajorCodes);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[모든 멤버 변경하고 `major_code`가 모두 기존의 것일 시]_[-]")
         public void SUCCESS_allMemberIsNotNullWithNoMajorAdd() {
-            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
+            setUpDefault();
 
-            when(userDao.getByToken(userToken))
-                    .thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(targetUniversityCode))
-                    .thenReturn(newDepartment.university());
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
-                    .thenReturn(newDepartment
-                            .withName(newName+"AAA")
-                            .withCode(newDepartmentCode + "AAA")
-                            .withBaseMajors(new ArrayList<>()));
-
-            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
-                String majorCode = newBaseMajorCodes.get(i);
-                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-                        .thenReturn(newBaseMajors.get(i));
-            }
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetUnivCode))
+                    .thenReturn(targetUniv);
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
+                    .thenReturn(targetDept);
+            mockGetMajors(newBaseMajors, targetUniv, newBaseMajorCodes);
 
             execMethod();
 
-            verify(departmentDao).updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment);
-            verify(majorDao, never()).addMajorData(any());
+            DepartmentDto newDept = targetDept
+                    .withCode(newDeptCode)
+                    .withName(newName)
+                    .withBaseMajors(newBaseMajors);
+            verify(departmentDao).update(targetUnivCode, targetDeptCode, newDept);
+            verify(majorDao, never()).create(any());
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[모든 멤버 변경하고 새로운 `major_code`가 존재할 시]_[-]")
         public void SUCCESS_allMemberIsNotNullWithMajorAdd() {
-            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
+            setUpDefault();
+            setTargetDept(randomDeptWithMajors());
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(targetUniversityCode))
-                    .thenReturn(newDepartment.university());
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
-                    .thenReturn(newDepartment
-                            .withName(newName+"AAA")
-                            .withCode(newDepartmentCode + "AAA")
-                            .withBaseMajors(new ArrayList<>()));
-
-            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
-                String majorCode = newBaseMajorCodes.get(i);
-                if(i == 0) {
-                    when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-                            .thenThrow(NotFoundException.class);
-                    when(majorDao.addMajorData(new MajorDto(newDepartment.university(), majorCode)))
-                            .thenReturn(newBaseMajors.get(i));
-                    continue;
-                }
-                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-                        .thenReturn(newBaseMajors.get(i));
-            }
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetUnivCode))
+                    .thenReturn(targetUniv);
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
+                    .thenReturn(targetDept);
+            mockGetOrCreateMajors(newBaseMajors, targetUniv, newBaseMajorCodes);
 
             execMethod();
 
-            verify(departmentDao).updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment);
-            verify(majorDao, times(1)).addMajorData(newBaseMajors.get(0));
+            DepartmentDto newDept = targetDept
+                    .withCode(newDeptCode)
+                    .withName(newName)
+                    .withBaseMajors(newBaseMajors);
+            verify(departmentDao).update(targetUnivCode, targetDeptCode, newDept);
+            verify(majorDao, times(1)).create(newBaseMajors.get(0));
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[`newDepartmentCode`, `baseMajor`가 `null`일 시]_[-]")
         public void SUCCESS_someMemberIsNull() {
-            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
-            newDepartmentCode = null;
+            setUpDefault();
+            newDeptCode = null;
             newBaseMajors = null;
             newBaseMajorCodes = null;
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(targetUniversityCode))
-                    .thenReturn(newDepartment.university());
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
-                    .thenReturn(newDepartment.withName(newName).withCode(targetDepartmentCode));
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetUnivCode))
+                    .thenReturn(targetUniv);
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
+                    .thenReturn(targetDept);
 
             execMethod();
 
-            verify(departmentDao).updateDepartmentData(
-                    targetUniversityCode, targetDepartmentCode,
-                    newDepartment.withCode(targetDepartmentCode)
-            );
-            verify(majorDao, never()).addMajorData(any());
+            DepartmentDto newDept = targetDept.withName(newName);
+            verify(departmentDao).update(targetUnivCode, targetDeptCode, newDept);
+            verify(majorDao, never()).create(any());
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[변경하고자 하는 `department`를 제외한 새로운 `index`의 `department`가 이미 존재할 시]_[ConflictException]")
         public void departmentConflict_ConflictException() {
-            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
+            setUpDefault();
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(targetUniversityCode))
-                    .thenReturn(newDepartment.university());
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
-                    .thenReturn(newDepartment
-                            .withName(newName+"AAA")
-                            .withCode(newDepartmentCode + "AAA")
-                            .withBaseMajors(new ArrayList<>()));
-            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
-                String majorCode = newBaseMajorCodes.get(i);
-                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-                        .thenReturn(newBaseMajors.get(i));
-            }
-            when(departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetUnivCode))
+                    .thenReturn(targetUniv);
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
+                    .thenReturn(targetDept);
+            mockGetMajors(newBaseMajors, targetUniv, newBaseMajorCodes);
+
+            when(departmentDao.update(eq(targetUnivCode), eq(targetDeptCode), any()))
                     .thenThrow(ConflictException.class);
 
-            assertThrows(ConflictException.class, this::execMethod);
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
 
-        @Test
-        @DisplayName("[ERROR]_[변경하고자 하는 `department`가 존재하지 않을 시]_[NotFoundException]")
-        public void targetDepartmentNotFound_NotFoundException() {
-            setUp(HYU_CSE_DEPT.university().code(), "", HYU_CSE_DEPT);
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[해당 `index`의 `university`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void targetUniversityNotFound_NotFoundException() {
+            setUpDefault();
 
-            when(userDao.getByToken(userToken)).thenReturn(DEV_USER);
-            when(universityDao.getUniversityByCodeData(targetUniversityCode))
-                    .thenReturn(newDepartment.university());
-            when(departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode))
-                    .thenReturn(newDepartment
-                            .withName(newName+"AAA")
-                            .withCode(newDepartmentCode + "AAA")
-                            .withBaseMajors(new ArrayList<>()));
-            for(int i = 0; i < newBaseMajorCodes.size(); i++) {
-                String majorCode = newBaseMajorCodes.get(i);
-                when(majorDao.getMajorByIndex(targetUniversityCode, majorCode))
-                        .thenReturn(newBaseMajors.get(i));
-            }
-            when(departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetUnivCode))
                     .thenThrow(NotFoundException.class);
 
-            assertThrows(NotFoundException.class, this::execMethod);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void ERROR_isUnauthorizedToken_UnauthorizedException() {
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[변경하고자 하는 `department`가 존재하지 않을 시]_[NotFoundException]")
+        public void targetDepartmentNotFound_NotFoundException() {
+            setUpDefault();
 
-            assertThrows(UnauthorizedException.class,
-                    () -> departmentService.update(userToken, "", "", "", "", new ArrayList<>())
-            );
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetUnivCode))
+                    .thenReturn(targetUniv);
+            when(departmentDao.getByIndex(targetUnivCode, targetDeptCode))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
         public void ERROR_accessDenied_ForbiddenException() {
-            when(userDao.getByToken(userToken)).thenReturn(HYU_CSE_MASTER_USER);
+            setUpDefault();
+            setRequester(randomNonDevUser());
 
-            assertThrows(
-                    ForbiddenException.class,
-                    () -> departmentService.update(userToken, "", "", "", "", new ArrayList<>())
-            );
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+        }
+    }
+
+    private abstract class DeptNestedTest extends BaseNestedTest {
+        protected DepartmentDto randomDept() {
+            RandomFilter<DepartmentDto> randomFilter = RandomFilter.makeInstance(stub.ALL_DEPTS, (dept) -> true);
+            return randomFilter.get().orElse(null);
+        }
+
+        protected DepartmentDto randomDeptWithMajors() {
+            RandomFilter<DepartmentDto> randomFilter = RandomFilter.makeInstance(
+                    stub.ALL_DEPTS, (dept) -> dept.baseMajors().size() > 0);
+            return randomFilter.get().orElse(null);
+        }
+
+        protected void mockGetMajors(List<MajorDto> majors, UniversityDto univ, List<String> majorCodes) {
+            for(int i = 0; i < majorCodes.size(); i++) {
+                String majorCode = majorCodes.get(i);
+                when(majorDao.getByIndex(univ.code(), majorCode))
+                        .thenReturn(majors.get(i));
+            }
+        }
+
+        protected void mockGetOrCreateMajors(List<MajorDto> majors, UniversityDto univ, List<String> majorCodes) {
+            for(int i = 0; i < majorCodes.size(); i++) {
+                String majorCode = majorCodes.get(i);
+                if(i == 0) {
+                    when(majorDao.getByIndex(univ.code(), majorCode))
+                            .thenThrow(NotFoundException.class);
+                    when(majorDao.create(new MajorDto(univ, majorCode)))
+                            .thenReturn(majors.get(i));
+                    continue;
+                }
+                when(majorDao.getByIndex(univ.code(), majorCode))
+                        .thenReturn(majors.get(i));
+            }
         }
     }
 }

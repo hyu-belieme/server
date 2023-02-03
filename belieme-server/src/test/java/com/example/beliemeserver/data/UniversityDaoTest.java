@@ -15,7 +15,7 @@ public class UniversityDaoTest extends DaoTest {
     @Test
     public void getAllUniversitiesTest() {
         TestHelper.listCompareTest(
-                () -> universityDao.getAllUniversitiesData(),
+                () -> universityDao.getAllList(),
                 universityFakeDao.getAll()
         );
     }
@@ -24,7 +24,7 @@ public class UniversityDaoTest extends DaoTest {
     public void getUniversityByCodeTest() {
         String targetUniversityCode = "CKU";
         TestHelper.objectCompareTest(
-                () -> universityDao.getUniversityByCodeData(targetUniversityCode),
+                () -> universityDao.getByIndex(targetUniversityCode),
                 getUniversityDummy(targetUniversityCode)
         );
     }
@@ -33,7 +33,7 @@ public class UniversityDaoTest extends DaoTest {
     public void getUniversityByCodeFailTest() {
         String wrongCode = "HANYANG";
         TestHelper.exceptionTest(
-                () -> universityDao.getUniversityByCodeData(wrongCode),
+                () -> universityDao.getByIndex(wrongCode),
                 NotFoundException.class
         );
     }
@@ -50,7 +50,7 @@ public class UniversityDaoTest extends DaoTest {
         UniversityDto newUniversity = new UniversityDto("HYU", "한양대학교", null);
 
         TestHelper.exceptionTest(
-                () -> universityDao.addUniversityData(newUniversity),
+                () -> universityDao.create(newUniversity),
                 ConflictException.class
         );
     }
@@ -76,7 +76,7 @@ public class UniversityDaoTest extends DaoTest {
         UniversityDto newUniversity = new UniversityDto("HYU", "한양대학교", null);
 
         TestHelper.exceptionTest(
-                () -> universityDao.updateUniversityData("HYU2", newUniversity),
+                () -> universityDao.update("HYU2", newUniversity),
                 NotFoundException.class
         );
     }
@@ -86,33 +86,33 @@ public class UniversityDaoTest extends DaoTest {
         UniversityDto newUniversity = new UniversityDto("HYU", "한양대학교", null);
 
         TestHelper.exceptionTest(
-                () -> universityDao.updateUniversityData("SNU", newUniversity),
+                () -> universityDao.update("SNU", newUniversity),
                 ConflictException.class
         );
     }
 
     private void testCreatingUniversity(UniversityDto newUniversity) {
         TestHelper.objectCompareTest(
-                () -> universityDao.addUniversityData(newUniversity),
+                () -> universityDao.create(newUniversity),
                 newUniversity
         );
 
         TestHelper.listCompareTest(
-                () -> universityDao.getAllUniversitiesData(),
+                () -> universityDao.getAllList(),
                 universityFakeDao.dummyStatusAfterCreate(newUniversity)
         );
     }
 
     private void testUpdatingUniversity(String targetUniversityCode, UniversityDto newUniversity) {
         TestHelper.objectCompareTest(
-                () -> universityDao.updateUniversityData(targetUniversityCode, newUniversity),
+                () -> universityDao.update(targetUniversityCode, newUniversity),
                 newUniversity
         );
 
         UniversityDto targetOnDummy =
                 getUniversityDummy(targetUniversityCode);
         TestHelper.listCompareTest(
-                () -> universityDao.getAllUniversitiesData(),
+                () -> universityDao.getAllList(),
                 universityFakeDao.dummyStatusAfterUpdate(targetOnDummy, newUniversity)
         );
     }

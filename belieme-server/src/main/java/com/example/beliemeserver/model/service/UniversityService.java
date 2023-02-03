@@ -5,7 +5,6 @@ import com.example.beliemeserver.model.dto.UniversityDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,14 +16,14 @@ public class UniversityService extends BaseService {
     public List<UniversityDto> getAllList(@NonNull String userToken) {
         checkDeveloperPermission(userToken);
 
-        return universityDao.getAllUniversitiesData();
+        return universityDao.getAllList();
     }
 
     public UniversityDto getByIndex(
             @NonNull String userToken, @NonNull String universityCode
     ) {
         checkDeveloperPermission(userToken);
-        return universityDao.getUniversityByCodeData(universityCode);
+        return universityDao.getByIndex(universityCode);
     }
 
     public UniversityDto create(
@@ -34,7 +33,7 @@ public class UniversityService extends BaseService {
         checkDeveloperPermission(userToken);
 
         UniversityDto newUniversity = new UniversityDto(universityCode, name, apiUrl);
-        return universityDao.addUniversityData(newUniversity);
+        return universityDao.create(newUniversity);
     }
 
     public UniversityDto update(
@@ -44,7 +43,7 @@ public class UniversityService extends BaseService {
     ) {
         checkDeveloperPermission(userToken);
 
-        UniversityDto oldUniversity = universityDao.getUniversityByCodeData(universityCode);
+        UniversityDto oldUniversity = universityDao.getByIndex(universityCode);
         if(newUniversityCode == null && newName == null && newApiUrl == null) return oldUniversity;
 
         if(newUniversityCode == null) newUniversityCode = oldUniversity.code();
@@ -52,6 +51,6 @@ public class UniversityService extends BaseService {
         if(newApiUrl == null) newApiUrl = oldUniversity.apiUrl();
         UniversityDto newUniversity = new UniversityDto(newUniversityCode, newName, newApiUrl);
 
-        return universityDao.updateUniversityData(universityCode, newUniversity);
+        return universityDao.update(universityCode, newUniversity);
     }
 }

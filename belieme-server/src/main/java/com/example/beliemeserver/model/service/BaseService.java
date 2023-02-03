@@ -89,7 +89,7 @@ public abstract class BaseService {
 
     protected DepartmentDto getDepartmentOrThrowInvalidIndexException(String universityCode, String departmentCode) {
         try {
-            return departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(universityCode, departmentCode);
+            return departmentDao.getByIndex(universityCode, departmentCode);
         } catch (NotFoundException e) {
             throw new InvalidIndexException();
         }

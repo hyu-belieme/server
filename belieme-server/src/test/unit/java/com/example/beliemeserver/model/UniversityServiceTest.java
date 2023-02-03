@@ -3,17 +3,16 @@ package com.example.beliemeserver.model;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.service.UniversityService;
-import com.example.beliemeserver.util.StubHelper;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.example.beliemeserver.util.RandomFilter;
+import com.example.beliemeserver.util.TestHelper;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -25,221 +24,256 @@ public class UniversityServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getAllList()")
-    public class TestGetAllList {
-        @Test
+    public class TestGetAllList extends UnivNestedTest {
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
+        }
+
+        @Override
+        protected List<UniversityDto> execMethod() {
+            return universityService.getAllList(userToken);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[-]_[-]")
         public void success() {
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
+            setUpDefault();
 
-            universityService.getAllList(userToken);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getAllList()).thenReturn(stub.ALL_UNIVS);
 
-            verify(universityDao).getAllUniversitiesData();
-        }
-
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void isUnauthorizedToken_UnauthorizedException() {
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
-
-            Assertions.assertThrows(UnauthorizedException.class, () -> universityService.getAllList(userToken));
-        }
-
-        @Test
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
-        public void accessDenied_ForbiddenException() {
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.masterOfDepartment1);
-
-            Assertions.assertThrows(ForbiddenException.class, () -> universityService.getAllList(userToken));
+            TestHelper.listCompareTest(this::execMethod, stub.ALL_UNIVS);
         }
     }
 
     @Nested
     @DisplayName("getByIndex()")
-    public class TestGetByIndex {
-        @Test
+    public class TestGetByIndex extends UnivNestedTest {
+        private UniversityDto univ;
+        private String univCode;
+
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
+            setUniv(randomUniv());
+        }
+
+        private void setUniv(UniversityDto univ) {
+            this.univ = univ;
+            this.univCode = univ.name();
+        }
+
+        @Override
+        protected UniversityDto execMethod() {
+            return universityService.getByIndex(userToken, univCode);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[-]_[-]")
         public void success() {
-            String universityCode = "HYU";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
+            setUpDefault();
 
-            universityService.getByIndex(userToken, universityCode);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
 
-            verify(universityDao).getUniversityByCodeData(universityCode);
+            TestHelper.objectCompareTest(this::execMethod, univ);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[해당 code에 university가 존재하지 않을 시]_[NotFoundException]")
         public void universityNotFound_NotFoundException() {
-            String universityCode = "HYU";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.getUniversityByCodeData(universityCode)).thenThrow(NotFoundException.class);
+            setUpDefault();
 
-            Assertions.assertThrows(NotFoundException.class, () -> universityService.getByIndex(userToken, universityCode));
-        }
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(univCode)).thenThrow(NotFoundException.class);
 
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void isUnauthorizedToken_UnauthorizedException() {
-            String universityCode = "HYU";
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
-
-            Assertions.assertThrows(UnauthorizedException.class, () -> universityService.getByIndex(userToken, universityCode));
-        }
-
-        @Test
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
-        public void accessDenied_ForbiddenException() {
-            String universityCode = "HYU";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.masterOfDepartment1);
-
-            Assertions.assertThrows(ForbiddenException.class, () -> universityService.getByIndex(userToken, universityCode));
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
     }
 
     @Nested
     @DisplayName("create()")
-    public class TestCreate {
-        @Test
+    public class TestCreate extends UnivNestedTest {
+        private UniversityDto univ;
+        private String code;
+        private String name;
+        private String apiUrl;
+
+
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
+            setUniv(randomUniv());
+        }
+
+        private void setUniv(UniversityDto univ) {
+            this.univ = univ;
+            this.code = univ.code();
+            this.name = univ.name();
+            this.apiUrl = univ.apiUrl();
+        }
+
+        @Override
+        protected UniversityDto execMethod() {
+            return universityService.create(userToken, code, name, apiUrl);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[-]_[-]")
         public void success() {
-            String universityCode = ""; String name = ""; String apiUrl = "";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
+            setUpDefault();
 
-            universityService.create(userToken, universityCode, name, apiUrl);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
 
-            verify(universityDao).addUniversityData(new UniversityDto(universityCode, name, apiUrl));
+            execMethod();
+
+            verify(universityDao).create(univ);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[해당 code가 이미 존재할 시]_[ConflictException]")
         public void universityConflict_ConflictException() {
-            String universityCode = ""; String name = ""; String apiUrl = "";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.addUniversityData(new UniversityDto(universityCode, name, apiUrl))).thenThrow(ConflictException.class);
+            setUpDefault();
 
-            Assertions.assertThrows(ConflictException.class, () -> universityService.create(userToken, universityCode, name, apiUrl));
-        }
+            when(userDao.getByToken(userToken)).thenReturn(randomDevUser());
+            when(universityDao.create(univ)).thenThrow(ConflictException.class);
 
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void isUnauthorizedToken_UnauthorizedException() {
-            String universityCode = ""; String name = ""; String apiUrl = "";
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
-
-            Assertions.assertThrows(
-                    UnauthorizedException.class,
-                    () -> universityService.create(userToken, universityCode, name, apiUrl)
-            );
-        }
-
-        @Test
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
-        public void accessDenied_ForbiddenException() {
-            String universityCode = ""; String name = ""; String apiUrl = "";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.masterOfDepartment1);
-
-            Assertions.assertThrows(
-                    ForbiddenException.class,
-                    () -> universityService.create(userToken, universityCode, name, apiUrl)
-            );
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
     }
 
     @Nested
     @DisplayName("update()")
-    public class TestUpdate {
-        @Test
+    public class TestUpdate extends UnivNestedTest {
+        private UniversityDto targetUniv;
+        private String targetCode;
+
+        private String newCode;
+        private String newName;
+        private String newApiUrl;
+
+        @Override
+        protected void setUpDefault() {
+            setRequester(randomDevUser());
+            setUniv(randomUniv());
+        }
+
+        private void setUniv(UniversityDto univ) {
+            this.targetUniv = univ;
+            this.targetCode = univ.code();
+
+            this.newCode = univ.code() + "AAA";
+            this.newName = univ.name() + "BBB";
+            this.newApiUrl = univ.apiUrl() + "CCC";
+        }
+
+        @Override
+        protected UniversityDto execMethod() {
+            return universityService.update(userToken, targetCode, newCode, newName, newApiUrl);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[모든 멤버 변경 시]_[-]")
         public void success() {
-            UniversityDto target = StubHelper.basicUniversity1;
-            String targetCode = target.code();
-            String newUniversityCode = ""; String newName = ""; String newApiUrl = "";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.getUniversityByCodeData(targetCode)).thenReturn(target);
+            setUpDefault();
 
-            universityService.update(userToken, targetCode, newUniversityCode, newName, newApiUrl);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
-            verify(universityDao).updateUniversityData(targetCode, new UniversityDto(newUniversityCode, newName, newApiUrl));
+            execMethod();
+
+            UniversityDto newUniv = new UniversityDto(newCode, newName, newApiUrl);
+            verify(universityDao).update(targetCode, newUniv);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[newUniversityCode, newName이 null일 때]_[-]")
         public void success_newUniversityCodeIsNull() {
-            UniversityDto target = StubHelper.basicUniversity1;
-            String newApiUrl = "";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.getUniversityByCodeData(target.code())).thenReturn(target);
+            setUpDefault();
+            newCode = null;
+            newName = null;
 
-            universityService.update(userToken, target.code(), null, null, newApiUrl);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
-            verify(universityDao).updateUniversityData(target.code(), new UniversityDto(target.code(), target.name(), newApiUrl));
+            execMethod();
+
+            UniversityDto newUniv = new UniversityDto(targetCode, targetUniv.name(), newApiUrl);
+            verify(universityDao).update(targetCode, newUniv);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[newApiUrl이 null일 때]_[-]")
         public void success_newApiUrlIsNull() {
-            UniversityDto target = StubHelper.basicUniversity1;
-            String newUniversityCode = ""; String newName = "";
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.getUniversityByCodeData(target.code())).thenReturn(target);
+            setUpDefault();
+            newApiUrl = null;
 
-            universityService.update(userToken, target.code(), newUniversityCode, newName, null);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
-            verify(universityDao).updateUniversityData(target.code(), new UniversityDto(newUniversityCode, newName, target.apiUrl()));
+            execMethod();
+
+            UniversityDto newUniv = new UniversityDto(newCode, newName, targetUniv.apiUrl());
+            verify(universityDao).update(targetCode, newUniv);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[모든 member가 null일 때]_[-]")
         public void success_allNewMemberIsNull() {
-            UniversityDto target = StubHelper.basicUniversity1;
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.getUniversityByCodeData(target.code())).thenReturn(target);
+            setUpDefault();
+            newCode = null;
+            newName = null;
+            newApiUrl = null;
 
-            universityService.update(userToken, target.code(), null, null, null);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
 
+            execMethod();
 
-            verify(universityDao, never()).updateUniversityData(target.code(), target);
+            verify(universityDao, never()).update(eq(targetCode), any());
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[target이 존재하지 않을 시]_[NotFoundException]")
         public void universityNotFound_NotFoundException() {
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.updateUniversityData(any(), any())).thenThrow(NotFoundException.class);
+            setUpDefault();
 
-            Assertions.assertThrows(NotFoundException.class, () -> universityService.update(userToken, "", "", "", ""));
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetCode)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
 
-        @Test
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[해당 code가 이미 존재할 시]_[ConflictException]")
         public void universityConflict_ConflictException() {
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.developer);
-            when(universityDao.updateUniversityData(any(), any())).thenThrow(ConflictException.class);
+            setUpDefault();
+            UniversityDto newUniv = new UniversityDto(newCode, newName, newApiUrl);
 
-            Assertions.assertThrows(ConflictException.class, () -> universityService.update(userToken, "", "", "", ""));
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(universityDao.getByIndex(targetCode)).thenReturn(targetUniv);
+            when(universityDao.update(targetCode, newUniv)).thenThrow(ConflictException.class);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
+    }
 
-
-        @Test
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void isUnauthorizedToken_UnauthorizedException() {
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
-
-            Assertions.assertThrows(
-                    UnauthorizedException.class,
-                    () -> universityService.update(userToken, "", "", "", "")
-            );
-        }
-
-        @Test
+    private abstract class UnivNestedTest extends BaseNestedTest {
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
         public void accessDenied_ForbiddenException() {
-            when(userDao.getByToken(userToken)).thenReturn(StubHelper.masterOfDepartment1);
+            setUpDefault();
+            setRequester(randomNonDevUser());
 
-            Assertions.assertThrows(
-                    ForbiddenException.class,
-                    () -> universityService.update(userToken, "", "", "", "")
-            );
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+        }
+
+        protected UniversityDto randomUniv() {
+            RandomFilter<UniversityDto> randomFilter = RandomFilter.makeInstance(stub.ALL_UNIVS, (univ) -> true);
+            return randomFilter.get().orElse(null);
         }
     }
 }

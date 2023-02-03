@@ -9,14 +9,14 @@ import java.util.List;
 
 public interface MajorDao {
     @Transactional
-    List<MajorDto> getAllMajorsData();
+    List<MajorDto> getAllList();
 
     @Transactional
-    MajorDto getMajorByIndex(String universityCode, String majorCode);
+    MajorDto getByIndex(String universityCode, String majorCode);
 
     @Transactional
-    MajorDto addMajorData(MajorDto newMajor) throws NotFoundException, ConflictException;
+    MajorDto create(MajorDto newMajor) throws NotFoundException, ConflictException;
 
     @Transactional
-    MajorDto updateMajorData(String universityCode, String majorCode, MajorDto newMajor) throws NotFoundException, ConflictException;
+    MajorDto update(String universityCode, String majorCode, MajorDto newMajor) throws NotFoundException, ConflictException;
 }

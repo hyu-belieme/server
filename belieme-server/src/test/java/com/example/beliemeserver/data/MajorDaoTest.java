@@ -16,7 +16,7 @@ public class MajorDaoTest extends DaoTest {
     @Test
     public void getAllMajorsTest() {
         TestHelper.listCompareTest(
-                ()->majorDao.getAllMajorsData(),
+                ()->majorDao.getAllList(),
                 majorFakeDao.getAll()
         );
     }
@@ -44,7 +44,7 @@ public class MajorDaoTest extends DaoTest {
                 DummyDataSet.universityDummies.get(0), "FH04068");
 
         TestHelper.exceptionTest(
-                () -> majorDao.addMajorData(newMajor),
+                () -> majorDao.create(newMajor),
                 ConflictException.class
         );
     }
@@ -54,7 +54,7 @@ public class MajorDaoTest extends DaoTest {
         MajorDto newMajor = new MajorDto(DummyDataSet.notFoundUniversity, "FH04070");
 
         TestHelper.exceptionTest(
-                () -> majorDao.addMajorData(newMajor),
+                () -> majorDao.create(newMajor),
                 NotFoundException.class
         );
     }
@@ -97,7 +97,7 @@ public class MajorDaoTest extends DaoTest {
                 DummyDataSet.universityDummies.get(0), "FH04068");
 
         TestHelper.exceptionTest(
-                () -> majorDao.updateMajorData(targetUniversityCode, targetMajorCode, newMajor),
+                () -> majorDao.update(targetUniversityCode, targetMajorCode, newMajor),
                 ConflictException.class
         );
     }
@@ -110,33 +110,33 @@ public class MajorDaoTest extends DaoTest {
                 DummyDataSet.universityDummies.get(0), "FH04080");
 
         TestHelper.exceptionTest(
-                () -> majorDao.updateMajorData(targetUniversityCode, targetMajorCode, newMajor),
+                () -> majorDao.update(targetUniversityCode, targetMajorCode, newMajor),
                 NotFoundException.class
         );
     }
 
     private void testCreatingMajor(MajorDto newMajor) {
         TestHelper.objectCompareTest(
-                () -> majorDao.addMajorData(newMajor),
+                () -> majorDao.create(newMajor),
                 newMajor
         );
 
         TestHelper.listCompareTest(
-                () -> majorDao.getAllMajorsData(),
+                () -> majorDao.getAllList(),
                 majorFakeDao.dummyStatusAfterCreate(newMajor)
         );
     }
 
     private void testUpdatingMajor(String targetUniversityCode, String targetMajorCode, MajorDto newMajor) {
         TestHelper.objectCompareTest(
-                () -> majorDao.updateMajorData(targetUniversityCode, targetMajorCode, newMajor),
+                () -> majorDao.update(targetUniversityCode, targetMajorCode, newMajor),
                 newMajor
         );
 
         MajorDto targetOnDummy =
                 getMajorDummy(targetUniversityCode, targetMajorCode);
         TestHelper.listCompareTest(
-                () -> majorDao.getAllMajorsData(),
+                () -> majorDao.getAllList(),
                 majorFakeDao.dummyStatusAfterUpdate(targetOnDummy, newMajor)
         );
     }
