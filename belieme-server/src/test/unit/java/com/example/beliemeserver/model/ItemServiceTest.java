@@ -234,6 +234,6 @@ public class ItemServiceTest extends BaseServiceTest {
         }
     }
 
-    private abstract class ItemNestedTest extends BaseNestedTest {
+    private abstract class ItemNestedTest extends BaseNestedTestWithDept {
     }
 }

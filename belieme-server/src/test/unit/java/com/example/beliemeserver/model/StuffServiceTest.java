@@ -348,6 +348,6 @@ public class StuffServiceTest extends BaseServiceTest {
         }
     }
 
-    private abstract class StuffNestedTest extends BaseNestedTest {
+    private abstract class StuffNestedTest extends BaseNestedTestWithDept {
     }
 }

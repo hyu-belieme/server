@@ -43,6 +43,45 @@ public abstract class BaseServiceTest {
     protected abstract class BaseNestedTest {
         protected String userToken = "";
 
+        protected UserDto requester;
+        protected String requesterUnivCode;
+        protected String requesterStudentId;
+
+        protected abstract void setUpDefault();
+        protected abstract Object execMethod();
+
+        protected void setRequester(UserDto requester) {
+            this.requester = requester;
+            this.requesterUnivCode = requester.university().code();
+            this.requesterStudentId = requester.studentId();
+        }
+
+        protected UserDto randomDevUser() {
+            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
+                    UserDto::isDeveloper);
+            return randomFilter.get().orElse(null);
+        }
+
+        protected UserDto randomNonDevUser() {
+            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
+                    (user) -> !user.isDeveloper());
+            return randomFilter.get().orElse(null);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
+        public void ERROR_isUnauthorizedToken_UnauthorizedException() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
+        }
+    }
+
+    protected abstract class BaseNestedTestWithDept {
+        protected String userToken = "";
+
         protected DepartmentDto dept;
         protected String univCode;
         protected String deptCode;

@@ -1162,7 +1162,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
     }
 
-    private abstract class HistoryNestedTest extends BaseNestedTest {
+    private abstract class HistoryNestedTest extends BaseNestedTestWithDept {
         protected ItemDto randomUsableItemByDept(DepartmentDto dept) {
             RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
                     (item) -> item.stuff().department().matchUniqueKey(dept)
