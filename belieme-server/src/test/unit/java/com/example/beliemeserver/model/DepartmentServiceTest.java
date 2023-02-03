@@ -1,6 +1,7 @@
 package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
@@ -169,12 +170,16 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(universityDao.getByIndex(univCode))
                     .thenReturn(univ);
+            when(departmentDao.create(dept)).thenReturn(dept);
             mockGetMajors(baseMajors, univ, baseMajorCodes);
 
             execMethod();
 
             verify(departmentDao).create(dept);
             verify(majorDao, never()).create(any());
+            for(AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+                verify(authorityDao).create(new AuthorityDto(dept, permission));
+            }
         }
 
         @RepeatedTest(10)
@@ -186,12 +191,16 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(universityDao.getByIndex(univCode))
                     .thenReturn(univ);
+            when(departmentDao.create(dept)).thenReturn(dept);
             mockGetOrCreateMajors(baseMajors, univ, baseMajorCodes);
 
             execMethod();
 
             verify(departmentDao).create(dept);
             verify(majorDao, times(1)).create(baseMajors.get(0));
+            for(AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+                verify(authorityDao).create(new AuthorityDto(dept, permission));
+            }
         }
 
         @RepeatedTest(10)

@@ -52,7 +52,12 @@ public class DepartmentService extends BaseService {
         }
 
         DepartmentDto newDepartment = new DepartmentDto(university, departmentCode, name, baseMajors);
-        return departmentDao.create(newDepartment);
+        newDepartment = departmentDao.create(newDepartment);
+
+        for(AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+            authorityDao.create(new AuthorityDto(newDepartment, permission));
+        }
+        return newDepartment;
     }
 
     public DepartmentDto update(
