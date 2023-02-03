@@ -46,6 +46,7 @@ public abstract class BaseServiceTest {
         protected String requesterStudentId;
 
         protected abstract void setUpDefault();
+
         protected abstract Object execMethod();
 
         protected void setRequester(UserDto requester) {
@@ -83,6 +84,7 @@ public abstract class BaseServiceTest {
         protected String deptCode;
 
         protected abstract void setUpDefault();
+
         protected abstract Object execMethod();
 
         protected void setDept(DepartmentDto dept) {
@@ -92,13 +94,29 @@ public abstract class BaseServiceTest {
         }
 
         protected void setRequesterAccessDenied() {
-            requester = randomUserByDeptAndAuth(dept, AuthorityDto.Permission.BANNED);
+            requester = randomUserHaveLessAuthOnDept(dept, AuthorityDto.Permission.USER);
         }
 
         protected void mockDepartmentAndRequester() {
             when(departmentDao.getByIndex(univCode, deptCode))
                     .thenReturn(dept);
             when(userDao.getByToken(userToken)).thenReturn(requester);
+        }
+
+        protected UserDto randomUserHaveAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
+                (user) -> user.getMaxPermission(dept).hasMorePermission(permission));
+            UserDto output = randomFilter.get().orElse(null);
+            System.out.println(output);
+            return output;
+        }
+
+        protected UserDto randomUserHaveLessAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
+                    (user) -> !user.getMaxPermission(dept).hasMorePermission(permission));
+            UserDto output = randomFilter.get().orElse(null);
+            System.out.println(output);
+            return output;
         }
 
         protected UserDto randomUserByDeptAndAuth(DepartmentDto dept, AuthorityDto.Permission permission) {
