@@ -38,8 +38,6 @@ public abstract class BaseServiceTest {
     @Mock
     protected HistoryDao historyDao;
 
-    public static final String userToken = "";
-
     protected abstract class BaseNestedTest {
         protected String userToken = "";
 
@@ -79,16 +77,10 @@ public abstract class BaseServiceTest {
         }
     }
 
-    protected abstract class BaseNestedTestWithDept {
-        protected String userToken = "";
-
+    protected abstract class BaseNestedTestWithDept extends BaseNestedTest {
         protected DepartmentDto dept;
         protected String univCode;
         protected String deptCode;
-
-        protected UserDto requester;
-        protected String requesterUnivCode;
-        protected String requesterStudentId;
 
         protected abstract void setUpDefault();
         protected abstract Object execMethod();
@@ -97,12 +89,6 @@ public abstract class BaseServiceTest {
             this.dept = dept;
             this.univCode = dept.university().code();
             this.deptCode = dept.code();
-        }
-
-        protected void setRequester(UserDto requester) {
-            this.requester = requester;
-            this.requesterUnivCode = requester.university().code();
-            this.requesterStudentId = requester.studentId();
         }
 
         protected void setRequesterAccessDenied() {
