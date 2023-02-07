@@ -87,11 +87,11 @@ public record AuthorityDto(
 
         public boolean hasMorePermission(Permission other) {
             return switch (this) {
-                case BANNED -> true;
-                case USER -> other != BANNED && other != USER;
-                case STAFF -> other == MASTER || other == DEVELOPER;
-                case MASTER -> other == DEVELOPER;
-                default -> false;
+                case DEVELOPER -> true;
+                case MASTER -> other != DEVELOPER;
+                case STAFF -> other != DEVELOPER && other != MASTER;
+                case USER -> other == BANNED || other == USER;
+                case BANNED -> other == BANNED;
             };
         }
     }
