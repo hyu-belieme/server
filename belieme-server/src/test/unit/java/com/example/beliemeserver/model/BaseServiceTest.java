@@ -6,7 +6,6 @@ import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.util.RandomFilter;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.StubData;
 import com.example.beliemeserver.util.TestHelper;
@@ -67,44 +66,6 @@ public abstract class BaseServiceTest {
 
             TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
         }
-
-        private<T> T returnAfterLog(T output) {
-            System.out.println(output);
-            return output;
-        }
-
-        protected DepartmentDto randomDept() {
-            return returnAfterLog(allDepts().randomSelect());
-        }
-
-        protected UserDto randomUser() {
-            return returnAfterLog(allUsers().randomSelect());
-        }
-
-        protected UserDto randomDevUser() {
-            return returnAfterLog(devs(allUsers()).randomSelect());
-        }
-
-        protected UserDto randomNonDevUser() {
-            return returnAfterLog(usersNotDev(allUsers()).randomSelect());
-        }
-
-        protected UserDto randomUserMoreHaveAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
-            return returnAfterLog(
-                    usersHaveMorePermissionOnDept(allUsers(), dept, permission).randomSelect()
-            );
-        }
-
-        protected UserDto randomUserHaveLessAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
-            return returnAfterLog(
-                    usersHaveLessPermissionOnDept(allUsers(), dept, permission).randomSelect());
-        }
-
-        protected UserDto randomUserHaveExactAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
-            return returnAfterLog(
-                    usersHaveExactPermissionOnDept(allUsers(), dept, permission).randomSelect()
-            );
-        }
     }
 
     protected abstract class BaseNestedTestWithDept extends BaseNestedTest {
@@ -123,7 +84,7 @@ public abstract class BaseServiceTest {
         }
 
         protected void setRequesterAccessDenied() {
-            requester = randomUserHaveLessAuthOnDept(dept, AuthorityDto.Permission.USER);
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER);
         }
 
         protected void mockDepartmentAndRequester() {
@@ -164,47 +125,6 @@ public abstract class BaseServiceTest {
             mockDepartmentAndRequester();
 
             TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
-        }
-
-        protected UserDto randomUserMoreHaveAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
-            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
-                    (user) -> user.getMaxPermission(dept).hasMorePermission(permission));
-            UserDto output = randomFilter.get().orElse(null);
-            System.out.println(output);
-            return output;
-        }
-
-        protected UserDto randomUserHaveLessAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
-            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
-                    (user) -> !user.getMaxPermission(dept).hasMorePermission(permission));
-            UserDto output = randomFilter.get().orElse(null);
-            System.out.println(output);
-            return output;
-        }
-
-        protected UserDto randomUserByDeptAndAuth(DepartmentDto dept, AuthorityDto.Permission permission) {
-            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
-                    (user) -> user.getMaxPermission(dept) == permission);
-            return randomFilter.get().orElse(null);
-        }
-
-        protected UserDto randomUserByDeptAndAuthWithExclude(DepartmentDto dept, AuthorityDto.Permission permission, UserDto exclude) {
-            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
-                    (user) -> user.getMaxPermission(dept) == permission
-                            && !user.matchUniqueKey(exclude));
-            return randomFilter.get().orElse(null);
-        }
-
-        protected StuffDto randomStuffByDept(DepartmentDto dept) {
-            RandomFilter<StuffDto> randomFilter = RandomFilter.makeInstance(stub.ALL_STUFFS,
-                    (stuff) -> stuff.department().matchUniqueKey(dept));
-            return randomFilter.get().orElse(null);
-        }
-
-        protected ItemDto randomItemByDept(DepartmentDto dept) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().department().matchUniqueKey(dept));
-            return randomFilter.get().orElse(null);
         }
     }
 
@@ -262,5 +182,66 @@ public abstract class BaseServiceTest {
 
     protected RandomGetter<UserDto> usersHaveExactPermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, AuthorityDto.Permission permission) {
         return rs.filter((user) -> user.getMaxPermission(dept) == permission);
+    }
+
+    protected RandomGetter<StuffDto> stuffsOnDept(RandomGetter<StuffDto> rs, DepartmentDto dept) {
+        return rs.filter((stuff) -> stuff.department().matchUniqueKey(dept));
+    }
+
+    protected RandomGetter<ItemDto> itemsOnDept(RandomGetter<ItemDto> rs, DepartmentDto dept) {
+        return rs.filter((item) -> item.stuff().department().matchUniqueKey(dept));
+    }
+
+    protected RandomGetter<HistoryDto> historiesOnDept(RandomGetter<HistoryDto> rs, DepartmentDto dept) {
+        return rs.filter((history) -> history.item().stuff().department().matchUniqueKey(dept));
+    }
+
+    protected <T> T randomSelectAndLog(RandomGetter<T> rs) {
+        T output = rs.randomSelect();
+        System.out.println(output);
+        return output;
+    }
+
+    protected DepartmentDto randomDept() {
+        return randomSelectAndLog(allDepts());
+    }
+
+    protected UserDto randomUser() {
+        return randomSelectAndLog(allUsers());
+    }
+
+    protected UserDto randomDevUser() {
+        return randomSelectAndLog(devs(allUsers()));
+    }
+
+    protected UserDto randomNonDevUser() {
+        return randomSelectAndLog(usersNotDev(allUsers()));
+    }
+
+    protected UserDto randomUserHaveMorePermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+        return randomSelectAndLog(
+                usersHaveMorePermissionOnDept(allUsers(), dept, permission));
+    }
+
+    protected UserDto randomUserHaveLessPermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+        return randomSelectAndLog(
+                usersHaveLessPermissionOnDept(allUsers(), dept, permission));
+    }
+
+    protected UserDto randomUserHaveExactPermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+        return randomSelectAndLog(
+                usersHaveExactPermissionOnDept(allUsers(), dept, permission));
+    }
+
+    protected StuffDto randomStuffOnDept(DepartmentDto dept) {
+        return randomSelectAndLog(stuffsOnDept(allStuffs(), dept));
+    }
+
+    protected ItemDto randomItemOnDept(DepartmentDto dept) {
+        return randomSelectAndLog(itemsOnDept(allItems(), dept));
+    }
+
+    protected HistoryDto randomHistoryOnDept(DepartmentDto dept) {
+        return randomSelectAndLog(historiesOnDept(allHistories(), dept));
     }
 }

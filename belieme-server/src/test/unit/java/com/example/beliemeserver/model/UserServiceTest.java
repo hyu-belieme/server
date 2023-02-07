@@ -34,7 +34,7 @@ public class UserServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(randomDept());
-            setRequester(randomUserMoreHaveAuthOnDept(dept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.MASTER));
         }
 
         @Override
@@ -44,7 +44,7 @@ public class UserServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveLessAuthOnDept(dept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.MASTER));
         }
 
         @RepeatedTest(10)
@@ -165,7 +165,7 @@ public class UserServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setAuthDept(TEST_DEPT);
             setAuthPermission(randomUnderMasterPermission());
-            setRequester(randomUserHaveExactAuthOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveExactPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
             setTargetUser(randomUsersNotHaveAdditionalAuthOnDept(authDept));
         }
 
@@ -256,7 +256,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`가 `MASTER`권한을 갖고 있지 않을 시]_[Forbidden]")
         public void ERROR_requesterDoesNotHaveMasterPermission_Forbidden() {
             setUpDefault();
-            setRequester(randomUserHaveLessAuthOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveLessPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
 
             when(departmentDao.getByIndex(authUnivCode, authDeptCode))
                     .thenReturn(authDept);
@@ -314,7 +314,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데 `targetUser`가`MASTER`일 시]_[Forbidden]")
         public void ERROR_requesterIsNotDevAndTargetUserIsMaster_Forbidden() {
             setUpDefault();
-            setTargetUser(randomUserHaveExactAuthOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setTargetUser(randomUserHaveExactPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))

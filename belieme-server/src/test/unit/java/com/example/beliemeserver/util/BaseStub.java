@@ -14,36 +14,6 @@ public abstract class BaseStub {
     protected List<ItemDto> ALL_ITEMS;
     protected List<HistoryDto> ALL_HISTORIES;
 
-    public UniversityDto getUnivByIdx(String univCode) {
-        return ALL_UNIVS.stream().filter(
-                (univ) -> univ.matchUniqueKey(univCode)
-        ).findAny().orElse(null);
-    }
-
-    public DepartmentDto getDeptByIdx(String univCode, String deptCode) {
-        return ALL_DEPTS.stream().filter(
-                (dept) -> dept.matchUniqueKey(univCode, deptCode)
-        ).findAny().orElse(null);
-    }
-
-    public StuffDto getStuffByIndex(String univCode, String deptCode, String stuffName) {
-        return ALL_STUFFS.stream().filter(
-                (stuff) -> stuff.matchUniqueKey(univCode, deptCode, stuffName)
-        ).findAny().orElse(null);
-    }
-
-    public ItemDto getItemByIndex(String univCode, String deptCode, String stuffName, int itemNum) {
-        return ALL_ITEMS.stream().filter(
-                (item) -> item.matchUniqueKey(univCode, deptCode, stuffName, itemNum)
-        ).findAny().orElse(null);
-    }
-
-    public HistoryDto getHistoryByIndex(String univCode, String deptCode, String stuffName, int itemNum, int historyNum) {
-        return ALL_HISTORIES.stream().filter(
-                (history) -> history.matchUniqueKey(univCode, deptCode, stuffName, itemNum, historyNum)
-        ).findAny().orElse(null);
-    }
-
     protected void setUpRelations(List<StuffDto> stuffs, List<ItemDto> items, List<HistoryDto> histories) {
         setLastHistoryOfItem(items, histories);
         setItemsOfStuff(stuffs, items);

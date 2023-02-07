@@ -3,7 +3,7 @@ package com.example.beliemeserver.model;
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.service.HistoryService;
-import com.example.beliemeserver.util.RandomFilter;
+import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
 
             historyList = getHistoryListByDept(dept);
@@ -47,8 +46,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserByDeptAndAuth(
-                    dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, AuthorityDto.Permission.STAFF));
         }
 
         @Override
@@ -90,9 +89,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
-            setStuff(randomStuffByDept(dept));
+            setStuff(randomStuffOnDept(dept));
             historyList = getHistoryListByStuff(stuff);
         }
 
@@ -103,8 +102,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserByDeptAndAuth(
-                    dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, AuthorityDto.Permission.STAFF));
         }
 
         @Override
@@ -166,16 +165,16 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
-            setItem(randomItemByDept(dept));
+            setItem(randomItemOnDept(dept));
 
             historyList = getHistoryListByItem(item);
         }
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
         }
 
         @Override
@@ -231,7 +230,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
 
             setHistoryRequester(requester);
@@ -274,9 +273,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[타인의 `History List`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
         public void SUCCESS_getHistoryListOfOthers() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
-            setHistoryRequester(randomUserByDeptAndAuth(
+            setHistoryRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
             historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
 
@@ -299,9 +298,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         public void ERROR_accessDenied_ForbiddenException() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.BANNED));
-            setHistoryRequester(randomUserByDeptAndAuth(
+            setHistoryRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
 
             mockDepartmentAndRequester();
@@ -317,10 +316,10 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
         public void ERROR_getHistoryListOfOthers_ForbiddenException() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setHistoryRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
-            setHistoryRequester(randomUserByDeptAndAuthWithExclude(
-                    dept, AuthorityDto.Permission.USER, requester));
+            setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
+                    dept, AuthorityDto.Permission.USER, List.of(historyRequester)));
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -335,9 +334,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`History Requester`의 `index`가 유효하지 않을 시]_[InvalidException]")
         public void ERROR_userInvalidIndex_InvalidException() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
-            setHistoryRequester(randomUserByDeptAndAuth(
+            setHistoryRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
 
             mockDepartmentAndRequester();
@@ -368,9 +367,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
-            setHistory(randomHistoryByDept(dept));
+            setHistory(randomHistoryOnDept(dept));
         }
 
         private void setHistory(HistoryDto history) {
@@ -408,7 +407,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[타인의 `History`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
         public void SUCCESS_getHistoryListOfOthers() {
             setUpDefault();
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
 
             mockDepartmentAndRequester();
@@ -426,8 +425,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         public void ERROR_accessDenied_ForbiddenException() {
             setUpDefault();
-            setRequester(randomUserByDeptAndAuth(
-                    dept, AuthorityDto.Permission.BANNED));
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, AuthorityDto.Permission.USER));
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -442,8 +441,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
         public void ERROR_getHistoryListOfOthers_ForbiddenException() {
             setUpDefault();
-            setRequester(randomUserByDeptAndAuthWithExclude(
-                    dept, AuthorityDto.Permission.USER, history.requester()));
+            setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
+                    dept, AuthorityDto.Permission.USER, List.of(history.requester())));
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -466,12 +465,6 @@ public class HistoryServiceTest extends BaseServiceTest {
             ).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
-        }
-
-        private HistoryDto randomHistoryByDept(DepartmentDto dept) {
-            RandomFilter<HistoryDto> randomFilter = RandomFilter.makeInstance(stub.ALL_HISTORIES,
-                    (history) -> history.item().stuff().department().matchUniqueKey(dept));
-            return randomFilter.get().orElse(null);
         }
     }
 
@@ -497,7 +490,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
             setItem(randomNonFirstUsableItemByDept(dept));
         }
@@ -544,7 +537,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[`itemNum`이 `null`일 시]_[-]")
         public void SUCCESS_itemNumIsNull() {
             setUpDefault();
-            setItem(randomFirstUsableItemByDept(dept));
+            setItem(randomFirstUsableItemOnDept(dept));
             argItemNum = null;
 
             mockDepartmentAndRequester();
@@ -572,7 +565,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 1]_[MethodNotAllowedException]")
         public void ERROR_itemIsUnusable_MethodNotAllowedException() {
             setUpDefault();
-            setItem(randomUnusableItemByDept(dept));
+            setItem(randomUnusableItemOnDept(dept));
 
             mockDepartmentAndRequester();
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
@@ -603,7 +596,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_noUsableItem_MethodNotAllowedException() {
             setUpDefault();
             StuffDto targetStuff = randomUnusableStuffByDept(dept);
-            setItem(randomItemByStuff(targetStuff));
+            setItem(randomItemOnStuff(targetStuff));
             argItemNum = null;
 
             mockDepartmentAndRequester();
@@ -617,8 +610,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`가 이미 해당 물품을 " + HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF + "개 사용 중일 시]_[MethodNotAllowedException]")
         public void ERROR_requesterAlreadyRequestStuff_MethodNotAllowedException() {
             setUpDefault();
-            StuffDto targetStuff = randomStuffWithMoreThanNItemByDept(dept, HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF);
-            setItem(randomItemByStuff(targetStuff));
+            StuffDto targetStuff = randomStuffHaveItemMoreOnDept(dept, HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF);
+            setItem(randomItemOnStuff(targetStuff));
 
             mockDepartmentAndRequester();
             when(historyDao.getListByDepartmentAndRequester(univCode, deptCode, requesterUnivCode, requesterStudentId))
@@ -668,71 +661,11 @@ public class HistoryServiceTest extends BaseServiceTest {
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
-        private ItemDto randomItemByStuff(StuffDto stuff) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().matchUniqueKey(stuff));
-            return randomFilter.get().orElse(null);
-        }
-
-        private ItemDto randomItemWithExcludeByStuff(StuffDto stuff, List<ItemDto> exclude) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().matchUniqueKey(stuff)
-                            && !exclude.contains(item));
-            return randomFilter.get().orElse(null);
-        }
-
-        private ItemDto randomFirstUsableItemByDept(DepartmentDto dept) {
-            StuffDto targetStuff = RandomFilter.makeInstance(stub.ALL_STUFFS,
-                    (stuff) -> stuff.department().matchUniqueKey(dept) && stuff.count() > 0
-            ).get().orElse(null);
-
-            return stub.ALL_ITEMS.stream().filter(
-                    (item) -> item.stuff().matchUniqueKey(targetStuff)
-                            && item.status() == ItemDto.ItemStatus.USABLE
-            ).min(Comparator.comparingInt(ItemDto::num)).orElse(null);
-        }
-
-        private ItemDto randomNonFirstUsableItemByDept(DepartmentDto dept) {
-            StuffDto targetStuff = RandomFilter.makeInstance(stub.ALL_STUFFS,
-                    (stuff) -> stuff.department().matchUniqueKey(dept)
-                            && stuff.count() > 1
-            ).get().orElse(null);
-
-            return RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().matchUniqueKey(targetStuff)
-                            && item.status() == ItemDto.ItemStatus.USABLE
-                            && item.num() != item.stuff().firstUsableItemNum()
-            ).get().orElse(null);
-        }
-
-        private StuffDto randomStuffWithMoreThanNItemByDept(DepartmentDto dept, int minItemNum) {
-            RandomFilter<StuffDto> randomFilter = RandomFilter.makeInstance(stub.ALL_STUFFS,
-                    (stuff) -> stuff.department().matchUniqueKey(dept)
-                            && stuff.items().size() > minItemNum
-            );
-            return randomFilter.get().orElse(null);
-        }
-
-        private StuffDto randomUnusableStuffByDept(DepartmentDto dept) {
-            RandomFilter<StuffDto> randomFilter = RandomFilter.makeInstance(stub.ALL_STUFFS,
-                    (stuff) -> stuff.department().matchUniqueKey(dept)
-                            && stuff.firstUsableItemNum() == 0
-            );
-            return randomFilter.get().orElse(null);
-        }
-
-        private StuffDto randomStuffWithExcludeByDept(DepartmentDto dept, List<StuffDto> exclude) {
-            RandomFilter<StuffDto> randomFilter = RandomFilter.makeInstance(stub.ALL_STUFFS,
-                    (stuff) -> stuff.department().matchUniqueKey(dept)
-                            && !exclude.contains(stuff));
-            return randomFilter.get().orElse(null);
-        }
-
         private List<HistoryDto> makeHistoryListWithSameStuff() {
             List<HistoryDto> output = new ArrayList<>();
             List<ItemDto> exclude = new ArrayList<>(List.of(item));
             for(int i = 0; i < HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF; i++) {
-                ItemDto newItem = randomItemWithExcludeByStuff(stuff, exclude);
+                ItemDto newItem = randomItemOnStuffWithExclude(stuff, exclude);
                 exclude.add(newItem);
                 output.add(
                         new HistoryDto(
@@ -758,10 +691,10 @@ public class HistoryServiceTest extends BaseServiceTest {
             List<HistoryDto> output = new ArrayList<>();
             List<StuffDto> exclude = new ArrayList<>(List.of(stuff));
             for(int i = 0; i < HistoryService.MAX_LENTAL_COUNT; i++) {
-                StuffDto newStuff = randomStuffWithExcludeByDept(dept, exclude);
+                StuffDto newStuff = randomStuffOnDeptWithExclude(dept, exclude);
                 exclude.add(newStuff);
 
-                ItemDto newItem = randomItemByStuff(newStuff);
+                ItemDto newItem = randomItemOnStuff(newStuff);
                 output.add(
                         new HistoryDto(
                                 newItem,
@@ -802,14 +735,19 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.STAFF));
-            setItem(randomUsableItemByDept(dept));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setItem(randomUsableItemOnDept(dept));
         }
 
         private void setItem(ItemDto item) {
             this.item = item;
             this.stuffName = item.stuff().name();
             this.itemNum = item.num();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
         }
 
         @Override
@@ -821,7 +759,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[해당 `item`이 보관 중 분실되었을 시]_[-]")
         public void SUCCESS_itemIsUsable() {
             setUpDefault();
-            setItem(randomUsableItemByDept(dept));
+            setItem(randomUsableItemOnDept(dept));
 
             mockDepartmentAndRequester();
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
@@ -848,7 +786,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[해당 `item`이 대여 중 분실 되었을 시]_[-]")
         public void SUCCESS_itemIsUnusable() {
             setUpDefault();
-            setItem(randomUnusableItemByDept(dept));
+            setItem(randomUnusableItemOnDept(dept));
 
             mockDepartmentAndRequester();
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
@@ -911,7 +849,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
             setItem(randomReservedItemByDept(dept));
         }
 
@@ -919,6 +857,11 @@ public class HistoryServiceTest extends BaseServiceTest {
             this.item = item;
             this.stuffName = item.stuff().name();
             this.itemNum = item.num();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
         }
 
         @Override
@@ -954,7 +897,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`item`이 예약된 상태가 아닐 시]_[MethodNotAllowedException]")
         public void ERROR_itemIsUnusable_MethodNotAllowedException() {
             setUpDefault();
-            setItem(randomUsableItemByDept(dept));
+            setItem(randomUsableItemOnDept(dept));
 
             mockDepartmentAndRequester();
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
@@ -992,7 +935,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
             setItem(randomReturnAbleItemByDept(dept));
         }
 
@@ -1000,6 +943,11 @@ public class HistoryServiceTest extends BaseServiceTest {
             this.item = item;
             this.stuffName = item.stuff().name();
             this.itemNum = item.num();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
         }
 
         @Override
@@ -1035,7 +983,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 1]_[MethodNotAllowedException]")
         public void ERROR_itemIsUsable_MethodNotAllowedException() {
             setUpDefault();
-            setItem(randomUsableItemByDept(dept));
+            setItem(randomUsableItemOnDept(dept));
 
             mockDepartmentAndRequester();
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
@@ -1068,17 +1016,6 @@ public class HistoryServiceTest extends BaseServiceTest {
 
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
-
-        private ItemDto randomReturnAbleItemByDept(DepartmentDto dept) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().department().matchUniqueKey(dept)
-                            && item.lastHistory() != null
-                            && (item.lastHistory().status() == HistoryDto.HistoryStatus.USING
-                            || item.lastHistory().status() == HistoryDto.HistoryStatus.DELAYED
-                            || item.lastHistory().status() == HistoryDto.HistoryStatus.LOST)
-            );
-            return randomFilter.get().orElse(null);
-        }
     }
 
     @Nested
@@ -1097,7 +1034,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
             setItem(randomReservedItemByDept(dept));
         }
 
@@ -1105,6 +1042,11 @@ public class HistoryServiceTest extends BaseServiceTest {
             this.item = item;
             this.itemNum = item.num();
             this.stuffName = item.stuff().name();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
         }
 
         @Override
@@ -1140,7 +1082,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 1]_[MethodNotAllowedException]")
         public void ERROR_itemIsUsable_MethodNotAllowedException() {
             setUpDefault();
-            setItem(randomUsableItemByDept(dept));
+            setItem(randomUsableItemOnDept(dept));
 
             mockDepartmentAndRequester();
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
@@ -1162,37 +1104,138 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
     }
 
+    private UserDto randomUserHaveExactPermissionOnDeptWithExclude(DepartmentDto dept, AuthorityDto.Permission permission, List<UserDto> exclude) {
+        RandomGetter<UserDto> users = usersHaveExactPermissionOnDept(allUsers(), dept, permission);
+        users = withExclude(users, exclude);
+        return randomSelectAndLog(users);
+    }
+
+    private StuffDto randomStuffHaveItemMoreOnDept(DepartmentDto dept, int n) {
+        RandomGetter<StuffDto> stuffs = stuffsOnDept(allStuffs(), dept);
+        stuffs = stuffsHaveItemMore(stuffs, n);
+        return randomSelectAndLog(stuffs);
+    }
+
+    private StuffDto randomUnusableStuffByDept(DepartmentDto dept) {
+        RandomGetter<StuffDto> stuffs = stuffsOnDept(allStuffs(), dept);
+        stuffs = unusableStuffs(stuffs);
+        return randomSelectAndLog(stuffs);
+    }
+
+    private StuffDto randomStuffOnDeptWithExclude(DepartmentDto dept, List<StuffDto> exclude) {
+        RandomGetter<StuffDto> stuffs = stuffsOnDept(allStuffs(), dept);
+        stuffs = withExclude(stuffs, exclude);
+        return randomSelectAndLog(stuffs);
+    }
+
+    private ItemDto randomUsableItemOnDept(DepartmentDto dept) {
+        RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
+        items = usableItems(items);
+        return randomSelectAndLog(items);
+    }
+
+    private ItemDto randomItemOnStuff(StuffDto stuff) {
+        return randomSelectAndLog(itemsOnStuff(allItems(), stuff));
+    }
+
+    private ItemDto randomItemOnStuffWithExclude(StuffDto stuff, List<ItemDto> exclude) {
+        RandomGetter<ItemDto> items = itemsOnStuff(allItems(), stuff);
+        items = withExclude(items, exclude);
+        return randomSelectAndLog(items);
+    }
+
+    private ItemDto randomUnusableItemOnDept(DepartmentDto dept) {
+        RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
+        items = unusableItems(items);
+        return randomSelectAndLog(items);
+    }
+
+    private ItemDto randomInactiveItemByDept(DepartmentDto dept) {
+        RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
+        items = inactiveItems(items);
+        return randomSelectAndLog(items);
+    }
+
+    private ItemDto randomReservedItemByDept(DepartmentDto dept) {
+        RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
+        items = reservedItems(items);
+        return randomSelectAndLog(items);
+    }
+
+    private ItemDto randomReturnAbleItemByDept(DepartmentDto dept) {
+        RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
+        items = returnableItems(items);
+        return randomSelectAndLog(items);
+    }
+
+    private ItemDto randomFirstUsableItemOnDept(DepartmentDto dept) {
+        RandomGetter<StuffDto> stuffs = stuffsOnDept(allStuffs(), dept);
+        stuffs = stuffs.filter((stuff) -> stuff.count() > 0);
+        StuffDto targetStuff = stuffs.randomSelect();
+
+        RandomGetter<ItemDto> items = itemsOnStuff(allItems(), targetStuff);
+        items = usableItems(items);
+        items = firstUsableItems(items);
+
+        return randomSelectAndLog(items);
+    }
+
+    private ItemDto randomNonFirstUsableItemByDept(DepartmentDto dept) {
+        RandomGetter<StuffDto> stuffs = stuffsOnDept(allStuffs(), dept);
+        stuffs = stuffs.filter((stuff) -> stuff.count() > 1);
+        StuffDto targetStuff = stuffs.randomSelect();
+
+        RandomGetter<ItemDto> items = itemsOnStuff(allItems(), targetStuff);
+        items = usableItems(items);
+        items = nonFirstUsableItems(items);
+
+        return randomSelectAndLog(items);
+    }
+
+    private RandomGetter<StuffDto> stuffsHaveItemMore(RandomGetter<StuffDto> stuffs, int n) {
+        return stuffs.filter((stuff) -> stuff.items().size() > n);
+    }
+
+    private RandomGetter<StuffDto> unusableStuffs(RandomGetter<StuffDto> stuffs) {
+        return stuffs.filter((stuff) -> stuff.firstUsableItemNum() == 0);
+    }
+
+    private RandomGetter<ItemDto> usableItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.status() == ItemDto.ItemStatus.USABLE);
+    }
+
+    private RandomGetter<ItemDto> unusableItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.status() == ItemDto.ItemStatus.UNUSABLE);
+    }
+
+    private RandomGetter<ItemDto> inactiveItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.status() == ItemDto.ItemStatus.INACTIVE);
+    }
+
+    private RandomGetter<ItemDto> reservedItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.lastHistory() != null
+                && item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED);
+    }
+
+    private RandomGetter<ItemDto> returnableItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.lastHistory() != null
+                && (item.lastHistory().status() == HistoryDto.HistoryStatus.USING
+                || item.lastHistory().status() == HistoryDto.HistoryStatus.DELAYED
+                || item.lastHistory().status() == HistoryDto.HistoryStatus.LOST));
+    }
+
+    private RandomGetter<ItemDto> itemsOnStuff(RandomGetter<ItemDto> items, StuffDto stuff) {
+        return items.filter((item) -> item.stuff().matchUniqueKey(stuff));
+    }
+
+    private RandomGetter<ItemDto> firstUsableItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.num() == item.stuff().firstUsableItemNum());
+    }
+
+    private RandomGetter<ItemDto> nonFirstUsableItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.num() != item.stuff().firstUsableItemNum());
+    }
+
     private abstract class HistoryNestedTest extends BaseNestedTestWithDept {
-        protected ItemDto randomUsableItemByDept(DepartmentDto dept) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().department().matchUniqueKey(dept)
-                            && item.status() == ItemDto.ItemStatus.USABLE);
-            return randomFilter.get().orElse(null);
-        }
-
-        protected ItemDto randomUnusableItemByDept(DepartmentDto dept) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().department().matchUniqueKey(dept)
-                            && item.status() == ItemDto.ItemStatus.UNUSABLE
-            );
-            return randomFilter.get().orElse(null);
-        }
-
-        protected ItemDto randomInactiveItemByDept(DepartmentDto dept) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().department().matchUniqueKey(dept)
-                            && item.status() == ItemDto.ItemStatus.INACTIVE
-            );
-            return randomFilter.get().orElse(null);
-        }
-
-        protected ItemDto randomReservedItemByDept(DepartmentDto dept) {
-            RandomFilter<ItemDto> randomFilter = RandomFilter.makeInstance(stub.ALL_ITEMS,
-                    (item) -> item.stuff().department().matchUniqueKey(dept)
-                            && item.lastHistory() != null
-                            && item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED
-            );
-            return randomFilter.get().orElse(null);
-        }
     }
 }

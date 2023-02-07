@@ -6,7 +6,7 @@ import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.service.DepartmentService;
-import com.example.beliemeserver.util.RandomFilter;
+import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -143,7 +143,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setRequester(randomDevUser());
-            setDept(randomDeptWithMajors());
+            setDept(randomDeptHaveMajors());
         }
 
         private void setDept(DepartmentDto dept) {
@@ -186,7 +186,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[새로운 major_code 등장했을 시]_[-]")
         public void SUCCESS_hasNewMajorCode() {
             setUpDefault();
-            setDept(randomDeptWithMajors());
+            setDept(randomDeptHaveMajors());
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(universityDao.getByIndex(univCode))
@@ -306,7 +306,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[모든 멤버 변경하고 새로운 `major_code`가 존재할 시]_[-]")
         public void SUCCESS_allMemberIsNotNullWithMajorAdd() {
             setUpDefault();
-            setTargetDept(randomDeptWithMajors());
+            setTargetDept(randomDeptHaveMajors());
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(universityDao.getByIndex(targetUnivCode))
@@ -402,18 +402,15 @@ public class DepartmentServiceTest extends BaseServiceTest {
         }
     }
 
+    private RandomGetter<DepartmentDto> deptsHaveMajors(RandomGetter<DepartmentDto> depts) {
+        return depts.filter((dept) -> dept.baseMajors().size() > 0);
+    }
+
+    private DepartmentDto randomDeptHaveMajors() {
+        return randomSelectAndLog(deptsHaveMajors(allDepts()));
+    }
+
     private abstract class DeptNestedTest extends BaseNestedTest {
-        protected DepartmentDto randomDept() {
-            RandomFilter<DepartmentDto> randomFilter = RandomFilter.makeInstance(stub.ALL_DEPTS, (dept) -> true);
-            return randomFilter.get().orElse(null);
-        }
-
-        protected DepartmentDto randomDeptWithMajors() {
-            RandomFilter<DepartmentDto> randomFilter = RandomFilter.makeInstance(
-                    stub.ALL_DEPTS, (dept) -> dept.baseMajors().size() > 0);
-            return randomFilter.get().orElse(null);
-        }
-
         protected void mockGetMajors(List<MajorDto> majors, UniversityDto univ, List<String> majorCodes) {
             for(int i = 0; i < majorCodes.size(); i++) {
                 String majorCode = majorCodes.get(i);

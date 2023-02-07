@@ -33,7 +33,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
 
             stuffList = getStuffListByDept(dept);
@@ -75,8 +75,8 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.USER));
-            setStuff(randomStuffByDept(dept));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setStuff(randomStuffOnDept(dept));
         }
 
         private void setStuff(StuffDto stuff) {
@@ -132,8 +132,8 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.STAFF));
-            setStuff(randomStuffByDept(dept).withItems(new ArrayList<>()));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setStuff(randomStuffOnDept(dept).withItems(new ArrayList<>()));
             amount = 5;
         }
 
@@ -153,7 +153,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER));
         }
 
         @RepeatedTest(10)
@@ -241,8 +241,8 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.STAFF));
-            setStuff(randomStuffByDept(dept));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setStuff(randomStuffOnDept(dept));
             newStuffName = "changed";
             newStuffEmoji = "𝌡";
         }
@@ -262,7 +262,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER));
         }
 
         @RepeatedTest(10)

@@ -34,8 +34,8 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.USER));
-            setStuff(randomStuffByDept(dept));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setStuff(randomStuffOnDept(dept));
 
             itemList = getItemListByStuff(stuff);
         }
@@ -77,7 +77,7 @@ public class ItemServiceTest extends BaseServiceTest {
         private List<ItemDto> getItemListByStuff(StuffDto stuff) {
             return stub.ALL_ITEMS.stream()
                     .filter((item) -> stuff.matchUniqueKey(item.stuff()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
     }
 
@@ -91,8 +91,8 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.USER));
-            setItem(randomItemByDept(dept));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setItem(randomItemOnDept(dept));
         }
 
         private void setItem(ItemDto item) {
@@ -147,9 +147,9 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
 
-            StuffDto targetStuff = randomStuffByDept(dept);
+            StuffDto targetStuff = randomStuffOnDept(dept);
             setItem(ItemDto.init(targetStuff, targetStuff.nextItemNum()));
         }
 
@@ -161,7 +161,7 @@ public class ItemServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserByDeptAndAuth(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER));
         }
 
         @Override

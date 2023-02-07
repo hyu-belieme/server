@@ -5,7 +5,6 @@ import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.service.UniversityService;
-import com.example.beliemeserver.util.RandomFilter;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -259,6 +258,10 @@ public class UniversityServiceTest extends BaseServiceTest {
         }
     }
 
+    private UniversityDto randomUniv() {
+        return randomSelectAndLog(allUnivs());
+    }
+
     private abstract class UnivNestedTest extends BaseNestedTest {
         @RepeatedTest(10)
         @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
@@ -269,11 +272,6 @@ public class UniversityServiceTest extends BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(requester);
 
             TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
-        }
-
-        protected UniversityDto randomUniv() {
-            RandomFilter<UniversityDto> randomFilter = RandomFilter.makeInstance(stub.ALL_UNIVS, (univ) -> true);
-            return randomFilter.get().orElse(null);
         }
     }
 }
