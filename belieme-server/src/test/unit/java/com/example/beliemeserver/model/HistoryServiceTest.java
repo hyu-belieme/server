@@ -46,8 +46,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, AuthorityDto.Permission.STAFF));
         }
 
         @Override
@@ -102,8 +102,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, AuthorityDto.Permission.STAFF));
         }
 
         @Override
@@ -174,7 +174,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
         }
 
         @Override
@@ -300,7 +300,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.BANNED));
-            setHistoryRequester(randomUserHaveExactPermissionOnDept(
+            setHistoryRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
 
             mockDepartmentAndRequester();
@@ -316,10 +316,10 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
         public void ERROR_getHistoryListOfOthers_ForbiddenException() {
             setDept(TEST_DEPT);
-            setHistoryRequester(
-                    randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
-            setRequester(
-                    randomUserHaveExactPermissionOnDeptWithExclude(dept, AuthorityDto.Permission.USER, List.of(historyRequester)));
+            setHistoryRequester(randomUserHaveMorePermissionOnDept(
+                    dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
+                    dept, AuthorityDto.Permission.USER, List.of(historyRequester)));
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -425,8 +425,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         public void ERROR_accessDenied_ForbiddenException() {
             setUpDefault();
-            setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.BANNED));
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, AuthorityDto.Permission.USER));
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -746,6 +746,11 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
+        }
+
+        @Override
         protected Object execMethod() {
             return historyService.makeItemLost(userToken, univCode, deptCode, stuffName, itemNum);
         }
@@ -855,6 +860,11 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
+        }
+
+        @Override
         protected HistoryDto execMethod() {
             return historyService.makeItemUsing(userToken, univCode, deptCode, stuffName, itemNum);
         }
@@ -933,6 +943,11 @@ public class HistoryServiceTest extends BaseServiceTest {
             this.item = item;
             this.stuffName = item.stuff().name();
             this.itemNum = item.num();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
         }
 
         @Override
@@ -1027,6 +1042,11 @@ public class HistoryServiceTest extends BaseServiceTest {
             this.item = item;
             this.itemNum = item.num();
             this.stuffName = item.stuff().name();
+        }
+
+        @Override
+        protected void setRequesterAccessDenied() {
+            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
         }
 
         @Override
