@@ -7,7 +7,7 @@ import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.util.RandomFilter;
-import com.example.beliemeserver.util.RandomGetStream;
+import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.StubData;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -41,64 +41,8 @@ public abstract class BaseServiceTest {
     @Mock
     protected HistoryDao historyDao;
 
-    protected RandomGetStream<UniversityDto> allUnivs() {
-        return new RandomGetStream<>(stub.ALL_UNIVS);
-    }
-
-    protected RandomGetStream<MajorDto> allMajors() {
-        return new RandomGetStream<>(stub.ALL_MAJORS);
-    }
-
-    protected RandomGetStream<DepartmentDto> allDepts() {
-        return new RandomGetStream<>(stub.ALL_DEPTS);
-    }
-
-    protected RandomGetStream<AuthorityDto.Permission> allPermissions() {
-        return new RandomGetStream<>(stub.ALL_PERMISSIONS);
-    }
-
-    protected RandomGetStream<UserDto> allUsers() {
-        return new RandomGetStream<>(stub.ALL_USERS);
-    }
-
-    protected RandomGetStream<StuffDto> allStuffs() {
-        return new RandomGetStream<>(stub.ALL_STUFFS);
-    }
-
-    protected RandomGetStream<ItemDto> allItems() {
-        return new RandomGetStream<>(stub.ALL_ITEMS);
-    }
-
-    protected RandomGetStream<HistoryDto> allHistories() {
-        return new RandomGetStream<>(stub.ALL_HISTORIES);
-    }
-
-    protected <T> RandomGetStream<T> withExclude(RandomGetStream<T> rs, List<T> exclude) {
-        return rs.filter((element) -> !exclude.contains(element));
-    }
-
-    protected RandomGetStream<UserDto> devs(RandomGetStream<UserDto> rs) {
-        return rs.filter(UserDto::isDeveloper);
-    }
-
-    protected RandomGetStream<UserDto> usersNotDev(RandomGetStream<UserDto> rs) {
-        return rs.filter((user) -> !user.isDeveloper());
-    }
-
-    protected RandomGetStream<UserDto> mastersOfDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
-        return rs.filter((user) -> user.getMaxPermission(dept) == AuthorityDto.Permission.MASTER);
-    }
-
-    protected RandomGetStream<UserDto> usersHaveMasterPermissionOfDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
-        return rs.filter((user) -> user.getMaxPermission(dept).hasMasterPermission());
-    }
-
-    protected RandomGetStream<UserDto> usersNotHaveMasterPermissionOfDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
-        return rs.filter((user) -> !user.getMaxPermission(dept).hasMasterPermission());
-    }
-
     protected abstract class BaseNestedTest {
-        protected String userToken = "";
+        protected final String userToken = "";
 
         protected UserDto requester;
         protected String requesterUnivCode;
@@ -114,26 +58,6 @@ public abstract class BaseServiceTest {
             this.requesterStudentId = requester.studentId();
         }
 
-        protected UserDto randomDevUser() {
-            return devs(allUsers()).randomSelect();
-        }
-
-        protected UserDto randomNonDevUser() {
-            return usersNotDev(allUsers()).randomSelect();
-        }
-
-        protected UserDto randomMasterOfDept(DepartmentDto dept) {
-            return mastersOfDept(allUsers(), dept).randomSelect();
-        }
-
-        protected UserDto randomUserHaveMasterPermission(DepartmentDto dept) {
-            return usersHaveMasterPermissionOfDept(allUsers(), dept).randomSelect();
-        }
-
-        protected UserDto randomUserNotHaveMasterPermission(DepartmentDto dept) {
-            return usersNotHaveMasterPermissionOfDept(allUsers(), dept).randomSelect();
-        }
-
         @RepeatedTest(10)
         @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
         public void ERROR_isUnauthorizedToken_UnauthorizedException() {
@@ -142,6 +66,44 @@ public abstract class BaseServiceTest {
             when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
+        }
+
+        private<T> T returnAfterLog(T output) {
+            System.out.println(output);
+            return output;
+        }
+
+        protected DepartmentDto randomDept() {
+            return returnAfterLog(allDepts().randomSelect());
+        }
+
+        protected UserDto randomUser() {
+            return returnAfterLog(allUsers().randomSelect());
+        }
+
+        protected UserDto randomDevUser() {
+            return returnAfterLog(devs(allUsers()).randomSelect());
+        }
+
+        protected UserDto randomNonDevUser() {
+            return returnAfterLog(usersNotDev(allUsers()).randomSelect());
+        }
+
+        protected UserDto randomUserMoreHaveAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+            return returnAfterLog(
+                    usersHaveMorePermissionOnDept(allUsers(), dept, permission).randomSelect()
+            );
+        }
+
+        protected UserDto randomUserHaveLessAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+            return returnAfterLog(
+                    usersHaveLessPermissionOnDept(allUsers(), dept, permission).randomSelect());
+        }
+
+        protected UserDto randomUserHaveExactAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+            return returnAfterLog(
+                    usersHaveExactPermissionOnDept(allUsers(), dept, permission).randomSelect()
+            );
         }
     }
 
@@ -170,9 +132,43 @@ public abstract class BaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(requester);
         }
 
-        protected UserDto randomUserHaveAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[해당 `index`의 `department`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_getInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            when(departmentDao.getByIndex(univCode, deptCode))
+                    .thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
+        public void ERROR_isUnauthorizedToken_UnauthorizedException() {
+            setUpDefault();
+
+            when(departmentDao.getByIndex(univCode, deptCode))
+                    .thenReturn(dept);
+            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
+        public void ERROR_accessDenied_ForbiddenException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            mockDepartmentAndRequester();
+
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+        }
+
+        protected UserDto randomUserMoreHaveAuthOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
             RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
-                (user) -> user.getMaxPermission(dept).hasMorePermission(permission));
+                    (user) -> user.getMaxPermission(dept).hasMorePermission(permission));
             UserDto output = randomFilter.get().orElse(null);
             System.out.println(output);
             return output;
@@ -210,39 +206,61 @@ public abstract class BaseServiceTest {
                     (item) -> item.stuff().department().matchUniqueKey(dept));
             return randomFilter.get().orElse(null);
         }
+    }
 
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[해당 `index`의 `department`가 존재하지 않을 시]_[InvalidIndexException]")
-        public void ERROR_getInvalidIndex_InvalidIndexException() {
-            setUpDefault();
+    protected RandomGetter<UniversityDto> allUnivs() {
+        return new RandomGetter<>(stub.ALL_UNIVS);
+    }
 
-            when(departmentDao.getByIndex(univCode, deptCode))
-                    .thenThrow(NotFoundException.class);
+    protected RandomGetter<MajorDto> allMajors() {
+        return new RandomGetter<>(stub.ALL_MAJORS);
+    }
 
-            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
-        }
+    protected RandomGetter<DepartmentDto> allDepts() {
+        return new RandomGetter<>(stub.ALL_DEPTS);
+    }
 
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
-        public void ERROR_isUnauthorizedToken_UnauthorizedException() {
-            setUpDefault();
+    protected RandomGetter<AuthorityDto.Permission> allPermissions() {
+        return new RandomGetter<>(stub.ALL_PERMISSIONS);
+    }
 
-            when(departmentDao.getByIndex(univCode, deptCode))
-                    .thenReturn(dept);
-            when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
+    protected RandomGetter<UserDto> allUsers() {
+        return new RandomGetter<>(stub.ALL_USERS);
+    }
 
-            TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
-        }
+    protected RandomGetter<StuffDto> allStuffs() {
+        return new RandomGetter<>(stub.ALL_STUFFS);
+    }
 
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
-        public void ERROR_accessDenied_ForbiddenException() {
-            setUpDefault();
-            setRequesterAccessDenied();
+    protected RandomGetter<ItemDto> allItems() {
+        return new RandomGetter<>(stub.ALL_ITEMS);
+    }
 
-            mockDepartmentAndRequester();
+    protected RandomGetter<HistoryDto> allHistories() {
+        return new RandomGetter<>(stub.ALL_HISTORIES);
+    }
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
-        }
+    protected <T> RandomGetter<T> withExclude(RandomGetter<T> rs, List<T> exclude) {
+        return rs.filter((element) -> !exclude.contains(element));
+    }
+
+    protected RandomGetter<UserDto> devs(RandomGetter<UserDto> rs) {
+        return rs.filter(UserDto::isDeveloper);
+    }
+
+    protected RandomGetter<UserDto> usersNotDev(RandomGetter<UserDto> rs) {
+        return rs.filter((user) -> !user.isDeveloper());
+    }
+
+    protected RandomGetter<UserDto> usersHaveLessPermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, AuthorityDto.Permission permission) {
+        return rs.filter((user) -> !user.getMaxPermission(dept).hasMorePermission(permission));
+    }
+
+    protected RandomGetter<UserDto> usersHaveMorePermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, AuthorityDto.Permission permission) {
+        return rs.filter((user) -> user.getMaxPermission(dept).hasMorePermission(permission));
+    }
+
+    protected RandomGetter<UserDto> usersHaveExactPermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, AuthorityDto.Permission permission) {
+        return rs.filter((user) -> user.getMaxPermission(dept) == permission);
     }
 }

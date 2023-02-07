@@ -7,8 +7,7 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.service.UserService;
-import com.example.beliemeserver.util.RandomFilter;
-import com.example.beliemeserver.util.RandomGetStream;
+import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,7 +34,7 @@ public class UserServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(randomDept());
-            setRequester(randomUserHaveAuthOnDept(dept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserMoreHaveAuthOnDept(dept, AuthorityDto.Permission.MASTER));
         }
 
         @Override
@@ -63,12 +62,6 @@ public class UserServiceTest extends BaseServiceTest {
             }
 
             TestHelper.listCompareTest(this::execMethod, expected);
-        }
-
-        private DepartmentDto randomDept() {
-            RandomFilter<DepartmentDto> randomFilter = RandomFilter.makeInstance(
-                    stub.ALL_DEPTS, (dept) -> true);
-            return randomFilter.get().orElse(null);
         }
     }
 
@@ -172,7 +165,7 @@ public class UserServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setAuthDept(TEST_DEPT);
             setAuthPermission(randomUnderMasterPermission());
-            setRequester(randomMasterOfDept(authDept));
+            setRequester(randomUserHaveExactAuthOnDept(authDept, AuthorityDto.Permission.MASTER));
             setTargetUser(randomUsersNotHaveAdditionalAuthOnDept(authDept));
         }
 
@@ -211,7 +204,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[`Requester`가 `Master`이고 기존 `dept`의 권한을 변경할 시]_[-]")
         public void SUCCESS_requesterIsMasterAndUpdateAuth() {
             setUpDefault();
-            setTargetUser(randomNonMasterUserHaveAdditionalAuthOnDept(authDept));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
             setAuthPermission(randomUnderMasterPermission());
 
             mockAndTestHappyPath();
@@ -221,7 +214,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[`Requester`가 `Master`이고 기존 `dept`의 권한을 `default`로 변경할 시]_[-]")
         public void SUCCESS_requesterIsMasterAndPermissionIsNull() {
             setUpDefault();
-            setTargetUser(randomNonMasterUserHaveAdditionalAuthOnDept(authDept));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
             setAuthPermission(null);
 
             mockAndTestHappyPath();
@@ -242,7 +235,7 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_requesterIsDeveloperAndUpdateAuth() {
             setUpDefault();
             setRequester(randomDevUser());
-            setTargetUser(randomNonDevUserHaveAdditionalAuthOnDept(authDept));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.DEVELOPER));
             setAuthPermission(randomUnderDevPermission());
 
             mockAndTestHappyPath();
@@ -253,7 +246,7 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_requesterIsDeveloperAndPermissionIsNull() {
             setUpDefault();
             setRequester(randomDevUser());
-            setTargetUser(randomNonDevUserHaveAdditionalAuthOnDept(authDept));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.DEVELOPER));
             setAuthPermission(null);
 
             mockAndTestHappyPath();
@@ -263,7 +256,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`가 `MASTER`권한을 갖고 있지 않을 시]_[Forbidden]")
         public void ERROR_requesterDoesNotHaveMasterPermission_Forbidden() {
             setUpDefault();
-            setRequester(randomUserNotHaveMasterPermission(authDept));
+            setRequester(randomUserHaveLessAuthOnDept(authDept, AuthorityDto.Permission.MASTER));
 
             when(departmentDao.getByIndex(authUnivCode, authDeptCode))
                     .thenReturn(authDept);
@@ -321,7 +314,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데 `targetUser`가`MASTER`일 시]_[Forbidden]")
         public void ERROR_requesterIsNotDevAndTargetUserIsMaster_Forbidden() {
             setUpDefault();
-            setTargetUser(randomMasterOfDept(authDept));
+            setTargetUser(randomUserHaveExactAuthOnDept(authDept, AuthorityDto.Permission.MASTER));
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
@@ -354,35 +347,28 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private UserDto randomUsersNotHaveAdditionalAuthOnDept(DepartmentDto dept) {
-            RandomGetStream<UserDto> users = allUsers();
+            RandomGetter<UserDto> users = allUsers();
             users = usersNotHaveAdditionalAuthOnDept(users, dept);
             return users.randomSelect();
         }
 
-        private UserDto randomNonDevUserHaveAdditionalAuthOnDept(DepartmentDto dept) {
-            RandomGetStream<UserDto> users = allUsers();
-            users = usersNotDev(users);
-            users = usersHaveAdditionalAuthOnDept(users, dept);
-            return users.randomSelect();
-        }
-
-        private UserDto randomNonMasterUserHaveAdditionalAuthOnDept(DepartmentDto dept) {
-            RandomGetStream<UserDto> users = allUsers();
-            users = usersNotHaveMasterPermissionOfDept(users, dept);
+        private UserDto randomUserHaveAdditionalAuthButLessPermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+            RandomGetter<UserDto> users = allUsers();
+            users = usersHaveLessPermissionOnDept(users, dept, permission);
             users = usersHaveAdditionalAuthOnDept(users, dept);
             return users.randomSelect();
         }
     }
 
-    private RandomGetStream<AuthorityDto.Permission> permissionsUnderDev(RandomGetStream<AuthorityDto.Permission> rs) {
+    private RandomGetter<AuthorityDto.Permission> permissionsUnderDev(RandomGetter<AuthorityDto.Permission> rs) {
         return rs.filter((permission) -> !permission.hasDeveloperPermission());
     }
 
-    private RandomGetStream<AuthorityDto.Permission> permissionsUnderMaster(RandomGetStream<AuthorityDto.Permission> rs) {
+    private RandomGetter<AuthorityDto.Permission> permissionsUnderMaster(RandomGetter<AuthorityDto.Permission> rs) {
         return rs.filter((permission) -> !permission.hasMasterPermission());
     }
 
-    private RandomGetStream<UserDto> usersHaveAdditionalAuthOnDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
+    private RandomGetter<UserDto> usersHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
             for(AuthorityDto auth : user.authorities()) {
                 if(auth.department().matchUniqueKey(dept) ||
@@ -394,7 +380,7 @@ public class UserServiceTest extends BaseServiceTest {
         });
     }
 
-    private RandomGetStream<UserDto> usersNotHaveAdditionalAuthOnDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
+    private RandomGetter<UserDto> usersNotHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
             for(AuthorityDto auth : user.authorities()) {
                 if(auth.department().matchUniqueKey(dept) ||
@@ -407,9 +393,5 @@ public class UserServiceTest extends BaseServiceTest {
     }
 
     private abstract class UserNestedTest extends BaseNestedTest {
-        protected UserDto randomUser() {
-            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS, (user) -> true);
-            return randomFilter.get().orElse(null);
-        }
     }
 }
