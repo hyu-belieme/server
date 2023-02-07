@@ -7,6 +7,7 @@ import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.util.RandomFilter;
+import com.example.beliemeserver.util.RandomGetStream;
 import com.example.beliemeserver.util.StubData;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 
 import static org.mockito.Mockito.when;
 
@@ -38,6 +41,62 @@ public abstract class BaseServiceTest {
     @Mock
     protected HistoryDao historyDao;
 
+    protected RandomGetStream<UniversityDto> allUnivs() {
+        return new RandomGetStream<>(stub.ALL_UNIVS);
+    }
+
+    protected RandomGetStream<MajorDto> allMajors() {
+        return new RandomGetStream<>(stub.ALL_MAJORS);
+    }
+
+    protected RandomGetStream<DepartmentDto> allDepts() {
+        return new RandomGetStream<>(stub.ALL_DEPTS);
+    }
+
+    protected RandomGetStream<AuthorityDto.Permission> allPermissions() {
+        return new RandomGetStream<>(stub.ALL_PERMISSIONS);
+    }
+
+    protected RandomGetStream<UserDto> allUsers() {
+        return new RandomGetStream<>(stub.ALL_USERS);
+    }
+
+    protected RandomGetStream<StuffDto> allStuffs() {
+        return new RandomGetStream<>(stub.ALL_STUFFS);
+    }
+
+    protected RandomGetStream<ItemDto> allItems() {
+        return new RandomGetStream<>(stub.ALL_ITEMS);
+    }
+
+    protected RandomGetStream<HistoryDto> allHistories() {
+        return new RandomGetStream<>(stub.ALL_HISTORIES);
+    }
+
+    protected <T> RandomGetStream<T> withExclude(RandomGetStream<T> rs, List<T> exclude) {
+        return rs.filter((element) -> !exclude.contains(element));
+    }
+
+    protected RandomGetStream<UserDto> devs(RandomGetStream<UserDto> rs) {
+        return rs.filter(UserDto::isDeveloper);
+    }
+
+    protected RandomGetStream<UserDto> usersNotDev(RandomGetStream<UserDto> rs) {
+        return rs.filter((user) -> !user.isDeveloper());
+    }
+
+    protected RandomGetStream<UserDto> mastersOfDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
+        return rs.filter((user) -> user.getMaxPermission(dept) == AuthorityDto.Permission.MASTER);
+    }
+
+    protected RandomGetStream<UserDto> usersHaveMasterPermissionOfDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
+        return rs.filter((user) -> user.getMaxPermission(dept).hasMasterPermission());
+    }
+
+    protected RandomGetStream<UserDto> usersNotHaveMasterPermissionOfDept(RandomGetStream<UserDto> rs, DepartmentDto dept) {
+        return rs.filter((user) -> !user.getMaxPermission(dept).hasMasterPermission());
+    }
+
     protected abstract class BaseNestedTest {
         protected String userToken = "";
 
@@ -56,15 +115,23 @@ public abstract class BaseServiceTest {
         }
 
         protected UserDto randomDevUser() {
-            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
-                    UserDto::isDeveloper);
-            return randomFilter.get().orElse(null);
+            return devs(allUsers()).randomSelect();
         }
 
         protected UserDto randomNonDevUser() {
-            RandomFilter<UserDto> randomFilter = RandomFilter.makeInstance(stub.ALL_USERS,
-                    (user) -> !user.isDeveloper());
-            return randomFilter.get().orElse(null);
+            return usersNotDev(allUsers()).randomSelect();
+        }
+
+        protected UserDto randomMasterOfDept(DepartmentDto dept) {
+            return mastersOfDept(allUsers(), dept).randomSelect();
+        }
+
+        protected UserDto randomUserHaveMasterPermission(DepartmentDto dept) {
+            return usersHaveMasterPermissionOfDept(allUsers(), dept).randomSelect();
+        }
+
+        protected UserDto randomUserNotHaveMasterPermission(DepartmentDto dept) {
+            return usersNotHaveMasterPermissionOfDept(allUsers(), dept).randomSelect();
         }
 
         @RepeatedTest(10)

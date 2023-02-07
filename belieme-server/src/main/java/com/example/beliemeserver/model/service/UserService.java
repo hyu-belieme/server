@@ -1,5 +1,7 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
@@ -54,8 +56,30 @@ public class UserService extends BaseService {
             @NonNull String authorityDepartmentCode,
             AuthorityDto.Permission newPermission
     ) {
-        // TODO Need to implements.
-        return null;
+        UserDto requester = checkTokenAndGetUser(userToken);
+
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(authorityUniversityCode, authorityDepartmentCode);
+        checkMasterPermission(department, requester);
+
+        UserDto targetUser = userDao.getByIndex(universityCode, studentId);
+        if(targetUser.isDeveloper()) {
+            throw new MethodNotAllowedException();
+        }
+        if(newPermission != null && newPermission.hasDeveloperPermission()) {
+            throw new MethodNotAllowedException();
+        }
+
+        if(!requester.isDeveloper()) {
+            if(targetUser.getMaxPermission(department).hasMasterPermission()) {
+                throw new ForbiddenException();
+            }
+            if(newPermission != null && newPermission.hasMasterPermission()) {
+                throw new ForbiddenException();
+            }
+        }
+
+        UserDto newUser = targetUser.withAuthorityUpdate(department, newPermission);
+        return userDao.update(universityCode, studentId, newUser);
     }
 
     public UserDto updateUserFromHanyangUniversity(String apiToken) {

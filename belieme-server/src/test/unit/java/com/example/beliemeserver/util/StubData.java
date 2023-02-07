@@ -3,12 +3,14 @@ package com.example.beliemeserver.util;
 import com.example.beliemeserver.model.dto.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class StubData extends BaseStub {
     public final List<UniversityDto> ALL_UNIVS;
     public final List<MajorDto> ALL_MAJORS;
     public final List<DepartmentDto> ALL_DEPTS;
+    public final List<AuthorityDto.Permission> ALL_PERMISSIONS;
     public final List<UserDto> ALL_USERS;
     public final List<StuffDto> ALL_STUFFS;
     public final List<ItemDto> ALL_ITEMS;
@@ -59,6 +61,7 @@ public class StubData extends BaseStub {
         List<MajorDto> tmpAllMajors;
         List<DepartmentDto> tmpAllDepts;
         List<UserDto> tmpAllUsers;
+        List<AuthorityDto.Permission> tmpAllPermissions;
         List<StuffDto> tmpAllStuffs;
         List<ItemDto> tmpAllItems;
         List<HistoryDto> tmpAllHistories;
@@ -156,6 +159,9 @@ public class StubData extends BaseStub {
                 HYU_DUMMY_USER_3, HYU_DUMMY_USER_4, CKU_DUMMY_USER_1, CKU_DUMMY_USER_2,
                 CKU_DUMMY_USER_3, CKU_DUMMY_USER_4, CKU_DUMMY_USER_5
         );
+
+        // Permissions
+        tmpAllPermissions = Arrays.stream(AuthorityDto.Permission.values()).toList();
 
         // --------------------------------------------------------------------------------------
         // Stuffs init
@@ -266,6 +272,7 @@ public class StubData extends BaseStub {
         ALL_MAJORS = List.copyOf(tmpAllMajors);
         ALL_DEPTS = List.copyOf(tmpAllDepts);
         ALL_USERS = List.copyOf(tmpAllUsers);
+        ALL_PERMISSIONS = List.copyOf(tmpAllPermissions);
         ALL_STUFFS = List.copyOf(tmpAllStuffs);
         ALL_ITEMS = List.copyOf(tmpAllItems);
         ALL_HISTORIES = List.copyOf(tmpAllHistories);
@@ -278,6 +285,7 @@ public class StubData extends BaseStub {
         super.ALL_MAJORS = this.ALL_MAJORS;
         super.ALL_DEPTS = this.ALL_DEPTS;
         super.ALL_USERS = this.ALL_USERS;
+        super.ALL_PERMISSIONS = this.ALL_PERMISSIONS;
         super.ALL_STUFFS = this.ALL_STUFFS;
         super.ALL_ITEMS = this.ALL_ITEMS;
         super.ALL_HISTORIES = this.ALL_HISTORIES;
