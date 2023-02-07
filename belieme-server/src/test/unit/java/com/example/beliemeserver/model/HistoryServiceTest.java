@@ -38,7 +38,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
 
             historyList = getHistoryListByDept(dept);
@@ -89,7 +89,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
             setStuff(randomStuffOnDept(dept));
             historyList = getHistoryListByStuff(stuff);
@@ -165,7 +165,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.STAFF));
             setItem(randomItemOnDept(dept));
 
@@ -490,7 +490,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(
+            setRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
             setItem(randomNonFirstUsableItemByDept(dept));
         }
@@ -735,7 +735,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
             setItem(randomUsableItemOnDept(dept));
         }
 
@@ -849,7 +849,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
             setItem(randomReservedItemByDept(dept));
         }
 
@@ -935,7 +935,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
             setItem(randomReturnAbleItemByDept(dept));
         }
 
@@ -1034,7 +1034,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
             setItem(randomReservedItemByDept(dept));
         }
 

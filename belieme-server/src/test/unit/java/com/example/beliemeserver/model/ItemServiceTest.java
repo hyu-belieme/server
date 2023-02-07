@@ -34,7 +34,7 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
             setStuff(randomStuffOnDept(dept));
 
             itemList = getItemListByStuff(stuff);
@@ -77,7 +77,7 @@ public class ItemServiceTest extends BaseServiceTest {
         private List<ItemDto> getItemListByStuff(StuffDto stuff) {
             return stub.ALL_ITEMS.stream()
                     .filter((item) -> stuff.matchUniqueKey(item.stuff()))
-                    .collect(Collectors.toList());
+                    .toList();
         }
     }
 
@@ -91,7 +91,7 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
             setItem(randomItemOnDept(dept));
         }
 
@@ -147,7 +147,7 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
 
             StuffDto targetStuff = randomStuffOnDept(dept);
             setItem(ItemDto.init(targetStuff, targetStuff.nextItemNum()));
@@ -161,7 +161,7 @@ public class ItemServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveExactPermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER));
         }
 
         @Override
