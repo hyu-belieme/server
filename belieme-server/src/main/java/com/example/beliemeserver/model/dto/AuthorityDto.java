@@ -7,6 +7,7 @@ public record AuthorityDto(
         @NonNull DepartmentDto department, @NonNull Permission permission
 ) {
     public static final AuthorityDto nestedEndpoint = new AuthorityDto(DepartmentDto.nestedEndpoint, Permission.BANNED);
+    public static final AuthorityDto developerAuthority = new AuthorityDto(DepartmentDto.developerDepartment, Permission.DEVELOPER);
 
     public AuthorityDto withDepartment(@NonNull DepartmentDto department) {
         return new AuthorityDto(department, permission);
