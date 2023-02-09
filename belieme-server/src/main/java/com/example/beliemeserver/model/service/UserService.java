@@ -111,7 +111,8 @@ public class UserService extends BaseService {
         List<MajorDto> newBaseMajors = newMajors(majorCodes, university, newUser);
         newUser = newUser.withName(name)
                 .withApprovalTimeStamp(currentTimestamp())
-                .withMajors(newBaseMajors);
+                .withMajors(newBaseMajors)
+                .withToken(UUID.randomUUID().toString());
 
         if(isNew) return userDao.create(newUser);
         return userDao.update(universityCode, studentId, newUser);

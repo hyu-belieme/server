@@ -28,8 +28,10 @@ public class HttpRequest {
             e.printStackTrace();
             throw new BadGateWayException();
         }
-        jsonResponse = (JSONObject) jsonResponse.get("response");
-        jsonResponse = (JSONObject) jsonResponse.get("item");
+
+        jsonResponse = (JSONObject) jsonResponse.getOrDefault("response", new JSONObject());
+        jsonResponse = (JSONObject) jsonResponse.getOrDefault("item", null);
+        if(jsonResponse == null) throw new BadGateWayException();
         return jsonResponse;
     }
 
