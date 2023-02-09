@@ -1,19 +1,22 @@
 package com.example.beliemeserver.model;
 
+import com.example.beliemeserver.exception.BadGateWayException;
 import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.service.UserService;
+import com.example.beliemeserver.model.util.HttpRequest;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.RepeatedTest;
+import org.assertj.core.api.Assertions;
+import org.json.simple.JSONObject;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -358,6 +361,167 @@ public class UserServiceTest extends BaseServiceTest {
             users = usersHaveAdditionalAuthOnDept(users, dept);
             return users.randomSelect();
         }
+        @Nested
+        @DisplayName("updateUserFromHanyangUniversity()")
+        public final class TestUpdateUserFromHanyangUniversity {
+            private static MockedStatic<HttpRequest> httpRequest;
+            @Captor
+            private ArgumentCaptor<UserDto> userArgumentCaptor;
+
+            private String apiToken = "";
+
+            private UniversityDto univ;
+            private String univCode;
+
+            private UserDto targetUser;
+            private String studentId;
+
+            private String newName;
+            private String newMajorCode;
+            private MajorDto newMajor;
+
+            @BeforeEach
+            void setUp() {
+                httpRequest = mockStatic(HttpRequest.class);
+            }
+
+            @AfterEach
+            void tearDown() {
+                httpRequest.close();
+            }
+
+            private void setUpDefault() {
+                setUniv();
+                setTargetUser(randomUserOnUniv(univ));
+                newName = "이석환";
+                newMajorCode = "FH04067";
+                newMajor = new MajorDto(univ, newMajorCode);
+            }
+
+            private void setUniv() {
+                univ = stub.HYU_UNIV;
+                univCode = stub.HYU_UNIV.code();
+            }
+
+            private void setTargetUser(UserDto user) {
+                this.targetUser = user;
+                this.studentId = user.studentId();
+            }
+
+            private JSONObject makeJsonResponse() {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("gaeinNo", studentId);
+                jsonObject.put("userNm", newName);
+                jsonObject.put("sosokId", newMajorCode);
+
+                return jsonObject;
+            }
+
+            private UserDto execMethod() {
+                return userService.updateUserFromHanyangUniversity(apiToken);
+            }
+
+            @RepeatedTest(10)
+            @DisplayName("[SUCCESS]_[기존에 존재하는 유저이고 새로운 `majorCode`또한 기존에 존재 할 시]_[-]")
+            public void SUCCESS_userIsAlreadyCreatedAndNoMajorCreate() {
+                setUpDefault();
+
+                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+                when(universityDao.getByIndex(univCode)).thenReturn(univ);
+                when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+                when(majorDao.getByIndex(univCode, newMajorCode)).thenReturn(newMajor);
+
+                execMethod();
+
+                verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
+                UserDto newUser = userArgumentCaptor.getValue();
+                Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+            }
+
+            @RepeatedTest(10)
+            @DisplayName("[SUCCESS]_[기존에 존재하는 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
+            public void SUCCESS_userIsAlreadyCreatedAndNewMajorCreate() {
+                setUpDefault();
+
+                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+                when(universityDao.getByIndex(univCode)).thenReturn(univ);
+                when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+                when(majorDao.getByIndex(univCode, newMajorCode)).thenThrow(NotFoundException.class);
+                when(majorDao.create(newMajor)).thenReturn(newMajor);
+
+                execMethod();
+
+                verify(majorDao).create(newMajor);
+                verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
+                UserDto newUser = userArgumentCaptor.getValue();
+                Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+            }
+
+            @RepeatedTest(10)
+            @DisplayName("[SUCCESS]_[새로운 유저이고 새로운 `majorCode`가 기존에 존재 할 시]_[-]")
+            public void SUCCESS_userIsNewAndNoMajorCreate() {
+                setUpDefault();
+
+                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+                when(universityDao.getByIndex(univCode)).thenReturn(univ);
+                when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+                when(majorDao.getByIndex(univCode, newMajorCode)).thenReturn(newMajor);
+
+                execMethod();
+
+                verify(userDao).create(userArgumentCaptor.capture());
+                UserDto newUser = userArgumentCaptor.getValue();
+                Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+            }
+
+            @RepeatedTest(10)
+            @DisplayName("[SUCCESS]_[새로운 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
+            public void SUCCESS_userIsNewAndNewMajorCreate() {
+                setUpDefault();
+
+                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+                when(universityDao.getByIndex(univCode)).thenReturn(univ);
+                when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+                when(majorDao.getByIndex(univCode, newMajorCode)).thenThrow(NotFoundException.class);
+                when(majorDao.create(newMajor)).thenReturn(newMajor);
+
+                execMethod();
+
+                verify(majorDao).create(newMajor);
+                verify(userDao).create(userArgumentCaptor.capture());
+                UserDto newUser = userArgumentCaptor.getValue();
+                Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+            }
+
+            @RepeatedTest(10)
+            @DisplayName("[ERROR]_[한양 api 통신 과정에 문제가 생겼을 시]_[BadGateWayException]")
+            public void ERROR_networkProblemOnHanyangApi_BadGateWayException() {
+                setUpDefault();
+
+                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenThrow(BadGateWayException.class);
+
+                TestHelper.exceptionTest(this::execMethod, BadGateWayException.class);
+            }
+
+            private boolean checkUpdatedUser(UserDto newUser) {
+                return newUser.studentId().equals(studentId)
+                        && newUser.university().equals(univ)
+                        && newUser.name().equals(newName)
+                        && newUser.majors().get(0).equals(newMajor)
+                        && !newUser.token().equals(targetUser.token());
+            }
+
+            private boolean checkCreatedUser(UserDto newUser) {
+                return newUser.studentId().equals(studentId)
+                        && newUser.university().equals(univ)
+                        && newUser.name().equals(newName)
+                        && newUser.majors().get(0).equals(newMajor);
+            }
+        }
+    }
+
+    private UserDto randomUserOnUniv(UniversityDto univ) {
+        return randomSelectAndLog(usersOnUniv(allUsers(), univ));
     }
 
     private RandomGetter<AuthorityDto.Permission> permissionsUnderDev(RandomGetter<AuthorityDto.Permission> rs) {
@@ -366,6 +530,10 @@ public class UserServiceTest extends BaseServiceTest {
 
     private RandomGetter<AuthorityDto.Permission> permissionsUnderMaster(RandomGetter<AuthorityDto.Permission> rs) {
         return rs.filter((permission) -> !permission.hasMasterPermission());
+    }
+
+    private RandomGetter<UserDto> usersOnUniv(RandomGetter<UserDto> rs, UniversityDto univ) {
+        return rs.filter((user) -> user.university().matchUniqueKey(univ));
     }
 
     private RandomGetter<UserDto> usersHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {

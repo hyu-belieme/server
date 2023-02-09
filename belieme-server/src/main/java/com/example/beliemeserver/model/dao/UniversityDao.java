@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model.dao;
 
+import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.NotFoundException;
@@ -14,6 +15,9 @@ public interface UniversityDao {
     @Transactional
     UniversityDto getByIndex(String code)
             throws NotFoundException;
+
+    @Transactional
+    boolean checkExistByIndex(String universityCode);
 
     @Transactional
     UniversityDto create(UniversityDto newUniversity)

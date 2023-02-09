@@ -1,16 +1,21 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.exception.BadGateWayException;
 import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.MethodNotAllowedException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.util.HttpRequest;
 import lombok.NonNull;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserService extends BaseService {
@@ -82,8 +87,57 @@ public class UserService extends BaseService {
         return userDao.update(universityCode, studentId, newUser);
     }
 
-    public UserDto updateUserFromHanyangUniversity(String apiToken) {
-        // TODO Need to implements.
-        return null;
+    public UserDto updateUserFromHanyangUniversity(@NonNull String apiToken) {
+        JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(apiToken);
+        String studentId = (String) (jsonResponse.get("gaeinNo"));
+        String name = (String) (jsonResponse.get("userNm"));
+        String sosokId = (String) jsonResponse.get("sosokId");
+        List<String> majorCodes = List.of(sosokId);
+
+        return updateOrInitAndSave(Globals.HANYANG_UNIVERSITY.code(), studentId, name, majorCodes);
+    }
+
+    private UserDto updateOrInitAndSave(String universityCode, String studentId, String name, List<String> majorCodes) {
+        boolean isNew = false;
+
+        UserDto newUser;
+        UniversityDto university = universityDao.getByIndex(universityCode);
+        try {
+            newUser = userDao.getByIndex(universityCode, studentId);
+        } catch (NotFoundException e) {
+            isNew = true;
+            newUser = UserDto.init(university, studentId, name);
+        }
+        List<MajorDto> newBaseMajors = newMajors(majorCodes, university, newUser);
+        newUser = newUser.withName(name)
+                .withApprovalTimeStamp(currentTimestamp())
+                .withMajors(newBaseMajors)
+                .withToken(UUID.randomUUID().toString());
+
+        if(isNew) return userDao.create(newUser);
+        return userDao.update(universityCode, studentId, newUser);
+    }
+
+    private List<MajorDto> newMajors(List<String> majorCodes, UniversityDto university, UserDto newUser) {
+        List<MajorDto> newBaseMajors = newUser.majors();
+        if(majorCodes != null) {
+            newBaseMajors = new ArrayList<>();
+            for(String majorCode : majorCodes) {
+                newBaseMajors.add(getMajorOrCreate(university, majorCode));
+            }
+        }
+        return newBaseMajors;
+    }
+
+    private MajorDto getMajorOrCreate(UniversityDto university, String majorCode) {
+        try {
+            return majorDao.getByIndex(university.code(), majorCode);
+        } catch (NotFoundException e) {
+            return majorDao.create(new MajorDto(university, majorCode));
+        }
+    }
+
+    private long currentTimestamp() {
+        return System.currentTimeMillis() / 1000;
     }
 }
