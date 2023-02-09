@@ -4,7 +4,6 @@ import lombok.NonNull;
 
 public record UniversityDto(@NonNull String code, @NonNull String name, String apiUrl) {
     public static final UniversityDto nestedEndpoint = new UniversityDto("-", "-", "-");
-    public static final UniversityDto developerUniversity = new UniversityDto("DEV", "DEV", "DEV");
 
     public UniversityDto withCode(@NonNull String code) {
         return new UniversityDto(code, name, apiUrl);

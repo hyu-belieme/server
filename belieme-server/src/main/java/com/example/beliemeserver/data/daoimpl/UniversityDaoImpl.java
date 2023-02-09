@@ -37,6 +37,11 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
+    public boolean checkExistByIndex(String universityCode) {
+        return universityRepository.existsByCode(universityCode);
+    }
+
+    @Override
     public UniversityDto create(UniversityDto newUniversity) throws ConflictException {
         checkUniversityConflict(newUniversity.code());
 

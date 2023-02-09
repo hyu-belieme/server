@@ -10,7 +10,6 @@ public record DepartmentDto(
         @NonNull String name, @NonNull List<MajorDto> baseMajors
 ) {
     public static final DepartmentDto nestedEndpoint = new DepartmentDto(UniversityDto.nestedEndpoint, "-", "-", new ArrayList<>());
-    public static final DepartmentDto developerDepartment = new DepartmentDto(UniversityDto.developerUniversity, "DEV", "DEV", new ArrayList<>());
 
     public DepartmentDto(@NonNull UniversityDto university, @NonNull String code, @NonNull String name, @NonNull List<MajorDto> baseMajors) {
         this.university = university;

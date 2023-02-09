@@ -94,7 +94,7 @@ public class UserService extends BaseService {
         String sosokId = (String) jsonResponse.get("sosokId");
         List<String> majorCodes = List.of(sosokId);
 
-        return updateOrInitAndSave(Globals.HANYANG_UNIVERSITY_CODE, studentId, name, majorCodes);
+        return updateOrInitAndSave(Globals.HANYANG_UNIVERSITY.code(), studentId, name, majorCodes);
     }
 
     private UserDto updateOrInitAndSave(String universityCode, String studentId, String name, List<String> majorCodes) {
