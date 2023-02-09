@@ -57,6 +57,24 @@ public record DepartmentDto(
         return output;
     }
 
+    public boolean matchUniqueKey(String universityCode, String departmentCode) {
+        if(universityCode == null || departmentCode == null) {
+            return false;
+        }
+        return universityCode.equals(this.university().code())
+                && departmentCode.equals(this.code());
+    }
+
+    public boolean matchUniqueKey(DepartmentDto oth) {
+        if(oth == null) {
+            return false;
+        }
+        String universityCode = oth.university().code();
+        String departmentCode = oth.code();
+        return universityCode.equals(this.university().code())
+                && departmentCode.equals(this.code());
+    }
+
     @Override
     public String toString() {
         if(this.equals(nestedEndpoint)) {

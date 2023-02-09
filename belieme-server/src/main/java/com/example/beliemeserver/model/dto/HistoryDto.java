@@ -9,7 +9,7 @@ import java.util.TimeZone;
 public record HistoryDto(
         @NonNull ItemDto item, int num, UserDto requester, UserDto approveManager,
         UserDto returnManager, UserDto lostManager, UserDto cancelManager,
-        long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp,
+        long reservedTimeStamp, long approvalTimeStamp, long returnTimeStamp,
         long lostTimeStamp, long cancelTimeStamp
 ) {
     public static final HistoryDto nestedEndpoint = new HistoryDto(ItemDto.nestedEndpoint, 0, null, null, null, null, null, 0, 0, 0, 0, 0);
@@ -17,85 +17,100 @@ public record HistoryDto(
     public HistoryDto withItem(@NonNull ItemDto item) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withNum(int num) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withRequester(UserDto requester) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withApproveManager(UserDto approveManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withReturnManager(UserDto returnManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withLostManager(UserDto lostManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withCancelManager(UserDto cancelManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withReservedTimeStamp(long reservedTimeStamp) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withApprovalTimeStamp(long approvalTimeStamp) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withReturnTimeStamp(long returnTimeStamp) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withLostTimeStamp(long lostTimeStamp) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
     }
 
     public HistoryDto withCancelTimeStamp(long cancelTimeStamp) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
+                reservedTimeStamp, approvalTimeStamp, returnTimeStamp,
                 lostTimeStamp, cancelTimeStamp);
+    }
+
+    public boolean matchUniqueKey(
+            String universityCode, String departmentCode,
+            String stuffName, int itemNum, int num
+    ) {
+        return this.item().matchUniqueKey(
+                universityCode, departmentCode, stuffName, itemNum)
+                && this.num() == num;
+    }
+
+    public boolean matchUniqueKey(HistoryDto oth) {
+        if(oth == null) return false;
+        return this.item().matchUniqueKey(oth.item())
+                && this.num == oth.num;
     }
 
     @Override
@@ -113,7 +128,7 @@ public record HistoryDto(
                 ", lostManager=" + lostManager +
                 ", cancelManager=" + cancelManager +
                 ", reservedTimeStamp=" + reservedTimeStamp +
-                ", approveTimeStamp=" + approveTimeStamp +
+                ", approveTimeStamp=" + approvalTimeStamp +
                 ", returnTimeStamp=" + returnTimeStamp +
                 ", lostTimeStamp=" + lostTimeStamp +
                 ", cancelTimeStamp=" + cancelTimeStamp +
@@ -133,7 +148,7 @@ public record HistoryDto(
             else if(cancelTimeStamp != 0) {
                 return HistoryDto.HistoryStatus.EXPIRED;
             }
-            else if(approveTimeStamp != 0) {
+            else if(approvalTimeStamp != 0) {
                 if(lostTimeStamp != 0) {
                     return HistoryDto.HistoryStatus.LOST;
                 }
@@ -171,7 +186,7 @@ public record HistoryDto(
         TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
         Calendar tmp = Calendar.getInstance();
 
-        tmp.setTime(new Date(approveTimeStamp*1000));
+        tmp.setTime(new Date(approvalTimeStamp*1000));
         tmp.setTimeZone(timeZone);
         tmp.add(Calendar.DATE, 7);
         if(tmp.get(Calendar.HOUR_OF_DAY) > 18 ) {
@@ -190,6 +205,14 @@ public record HistoryDto(
     }
 
     public enum HistoryStatus {
-        REQUESTED, USING, DELAYED, LOST, EXPIRED, RETURNED, FOUND, ERROR
+        REQUESTED, USING, DELAYED, LOST, EXPIRED, RETURNED, FOUND, ERROR;
+
+        public boolean isClosed() {
+            return (this == EXPIRED) || (this == RETURNED) || (this == FOUND);
+        }
+
+        public boolean isOpen() {
+            return !isClosed() && (this != ERROR);
+        }
     }
 }

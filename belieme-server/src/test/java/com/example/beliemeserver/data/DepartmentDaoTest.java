@@ -19,7 +19,7 @@ public class DepartmentDaoTest extends DaoTest {
     @Test
     public void getAllListTest() {
         TestHelper.listCompareTest(
-                () -> departmentDao.getAllDepartmentsData(),
+                () -> departmentDao.getAllList(),
                 departmentFakeDao.getAll()
         );
     }
@@ -32,7 +32,7 @@ public class DepartmentDaoTest extends DaoTest {
                 target -> targetUniversityCode.equals(target.university().code())
         );
         TestHelper.listCompareTest(
-                () -> departmentDao.getAllDepartmentsByUniversityCodeData(targetUniversityCode),
+                () -> departmentDao.getListByUniversity(targetUniversityCode),
                 expected
         );
     }
@@ -42,7 +42,7 @@ public class DepartmentDaoTest extends DaoTest {
         String targetUniversityCode = "KNU";
 
         TestHelper.exceptionTest(
-                () -> departmentDao.getAllDepartmentsByUniversityCodeData(targetUniversityCode),
+                () -> departmentDao.getListByUniversity(targetUniversityCode),
                 NotFoundException.class
         );
     }
@@ -53,7 +53,7 @@ public class DepartmentDaoTest extends DaoTest {
         String targetDepartmentCode = "CSE";
 
         TestHelper.objectCompareTest(
-                () -> departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode),
+                () -> departmentDao.getByIndex(targetUniversityCode, targetDepartmentCode),
                 getDepartmentDummy(targetUniversityCode, targetDepartmentCode)
         );
     }
@@ -64,7 +64,7 @@ public class DepartmentDaoTest extends DaoTest {
         String targetDepartmentCode = "MED";
 
         TestHelper.exceptionTest(
-                () -> departmentDao.getDepartmentByUniversityCodeAndDepartmentCodeData(targetUniversityCode, targetDepartmentCode),
+                () -> departmentDao.getByIndex(targetUniversityCode, targetDepartmentCode),
                 NotFoundException.class
         );
     }
@@ -117,7 +117,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         TestHelper.exceptionTest(
-                () -> departmentDao.addDepartmentData(newDepartment),
+                () -> departmentDao.create(newDepartment),
                 ConflictException.class
         );
     }
@@ -136,7 +136,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         TestHelper.exceptionTest(
-                () -> departmentDao.addDepartmentData(newDepartment),
+                () -> departmentDao.create(newDepartment),
                 NotFoundException.class
         );
     }
@@ -199,7 +199,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         TestHelper.exceptionTest(
-                () -> departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment),
+                () -> departmentDao.update(targetUniversityCode, targetDepartmentCode, newDepartment),
                 NotFoundException.class
         );
     }
@@ -222,7 +222,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         TestHelper.exceptionTest(
-                () -> departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment),
+                () -> departmentDao.update(targetUniversityCode, targetDepartmentCode, newDepartment),
                 NotFoundException.class
         );
     }
@@ -244,105 +244,33 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         TestHelper.exceptionTest(
-                () -> departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment),
+                () -> departmentDao.update(targetUniversityCode, targetDepartmentCode, newDepartment),
                 ConflictException.class
-        );
-    }
-
-    @Test
-    public void putBaseMajorOnDepartmentTest() {
-        String targetUniversityCode = "HYU";
-        String targetDepartmentCode = "CSE";
-
-        String newUniversityCode = "HYU";
-        String newMajorCode = "FH04069";
-
-        DepartmentDto targetDepartment =
-                getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
-        MajorDto newMajor =
-                getMajorDummy(newUniversityCode, newMajorCode);
-
-        List<MajorDto> expectedBaseMajors = targetDepartment.baseMajors();
-        expectedBaseMajors.add(newMajor);
-
-        DepartmentDto expectedResult = new DepartmentDto(
-                getUniversityDummy(targetUniversityCode),
-                targetDepartmentCode,
-                targetDepartment.name(),
-                expectedBaseMajors
-        );
-
-        TestHelper.objectCompareTest(
-                () -> departmentDao.putBaseMajorOnDepartmentData(targetUniversityCode, targetDepartmentCode, newMajor),
-                expectedResult
-        );
-
-        TestHelper.listCompareTest(
-                () -> departmentDao.getAllDepartmentsData(),
-                departmentFakeDao.dummyStatusAfterUpdate(
-                        targetDepartment,
-                        expectedResult
-                )
-        );
-    }
-
-    @Test
-    public void removeBaseMajorOnDepartmentTest() {
-        String targetUniversityCode = "HYU";
-        String targetDepartmentCode = "CSE";
-
-        String targetMajorUniversityCode = "HYU";
-        String targetMajorCode = "FH04068";
-
-        MajorDto targetMajor = getMajorDummy(targetMajorUniversityCode, targetMajorCode);
-
-        DepartmentDto targetDepartment = getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
-        List<MajorDto> expectedBaseMajors = targetDepartment.baseMajors();
-        expectedBaseMajors.remove(targetMajor);
-
-        DepartmentDto expectedResult = new DepartmentDto(
-                getUniversityDummy(targetUniversityCode),
-                targetDepartmentCode,
-                targetDepartment.name(),
-                expectedBaseMajors
-        );
-
-        TestHelper.objectCompareTest(
-                () -> departmentDao.removeBaseMajorOnDepartmentData(targetUniversityCode, targetDepartmentCode, targetMajor),
-                expectedResult
-        );
-
-        TestHelper.listCompareTest(
-                () -> departmentDao.getAllDepartmentsData(),
-                departmentFakeDao.dummyStatusAfterUpdate(
-                        targetDepartment,
-                        expectedResult
-                )
         );
     }
 
     private void testCreatingDepartment(DepartmentDto newDepartment) {
         TestHelper.objectCompareTest(
-                () -> departmentDao.addDepartmentData(newDepartment),
+                () -> departmentDao.create(newDepartment),
                 newDepartment
         );
 
         TestHelper.listCompareTest(
-                () -> departmentDao.getAllDepartmentsData(),
+                () -> departmentDao.getAllList(),
                 departmentFakeDao.dummyStatusAfterCreate(newDepartment)
         );
     }
 
     private void testUpdatingDepartment(String targetUniversityCode, String targetDepartmentCode, DepartmentDto newDepartment) {
         TestHelper.objectCompareTest(
-                () -> departmentDao.updateDepartmentData(targetUniversityCode, targetDepartmentCode, newDepartment),
+                () -> departmentDao.update(targetUniversityCode, targetDepartmentCode, newDepartment),
                 newDepartment
         );
 
         DepartmentDto targetOnDummy =
                 getDepartmentDummy(targetUniversityCode, targetDepartmentCode);
         TestHelper.listCompareTest(
-                () -> departmentDao.getAllDepartmentsData(),
+                () -> departmentDao.getAllList(),
                 departmentFakeDao.dummyStatusAfterUpdate(targetOnDummy, newDepartment)
         );
     }

@@ -96,9 +96,31 @@ public record UserDto(
         return output;
     }
 
-    public UserDto withAuthorityRemove(AuthorityDto authorityDto) {
+    public UserDto withAuthorityRemove(DepartmentDto department) {
         UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
-        output.authorities.remove(authorityDto);
+        output.authorities.removeIf(
+                (authority) -> department.matchUniqueKey(authority.department()));
+        return output;
+    }
+
+    public UserDto withAuthorityUpdate(DepartmentDto department, AuthorityDto.Permission permission) {
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+
+        if(permission == null) {
+            output.authorities.removeIf(
+                    (authority) -> department.matchUniqueKey(authority.department()));
+            return output;
+        }
+
+        for(int i = 0; i < output.authorities.size(); i++) {
+            AuthorityDto authority = output.authorities.get(i);
+            if(authority.department().matchUniqueKey(department)) {
+                output.authorities.set(i, new AuthorityDto(department, permission));
+                return output;
+            }
+        }
+
+        output.authorities.add(new AuthorityDto(department, permission));
         return output;
     }
 
@@ -120,9 +142,52 @@ public record UserDto(
                 '}';
     }
 
-    public AuthorityDto.Permission getMaxPermission(DepartmentDto departmentDto) {
-        // TODO Needs implement
-        return AuthorityDto.Permission.USER;
+    public boolean matchUniqueKey(String universityCode, String studentId) {
+        if (universityCode == null || studentId == null) {
+            return false;
+        }
+        return universityCode.equals(this.university().code())
+                && studentId.equals(this.studentId());
+    }
+
+    public boolean matchUniqueKey(UserDto oth) {
+        if(oth == null) {
+            return false;
+        }
+        String universityCode = oth.university().code();
+        String studentId = oth.studentId();
+        return universityCode.equals(this.university().code())
+                && studentId.equals(this.studentId());
+    }
+
+    public boolean isDeveloper() {
+        for(AuthorityDto authority : authorities) {
+            if(authority.permission().hasDeveloperPermission()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public AuthorityDto.Permission getMaxPermission(DepartmentDto department) {
+        if(isDeveloper()) return AuthorityDto.Permission.DEVELOPER;
+
+        AuthorityDto.Permission maxPermission = AuthorityDto.Permission.BANNED;
+        List<MajorDto> baseMajors = department.baseMajors();
+        for(MajorDto major : majors) {
+            if (baseMajors.contains(major)) {
+                maxPermission = AuthorityDto.Permission.USER;
+                break;
+            }
+        }
+
+        for(AuthorityDto authority : authorities) {
+            if(department.equals(authority.department())) {
+                maxPermission = authority.permission();
+                break;
+            }
+        }
+        return maxPermission;
     }
 
     private static long currentTimeStamp() {

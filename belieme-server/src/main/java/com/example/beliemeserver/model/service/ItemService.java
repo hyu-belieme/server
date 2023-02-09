@@ -1,63 +1,67 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.exception.UnauthorizedException;
-import com.example.beliemeserver.model.dao.old.ItemDao;
-import com.example.beliemeserver.model.dao.old.StuffDao;
-import com.example.beliemeserver.model.dao.old.UserDao;
-import com.example.beliemeserver.model.dto.old.OldItemDto;
-import com.example.beliemeserver.model.dto.old.OldStuffDto;
-import com.example.beliemeserver.model.dto.old.OldUserDto;
-
-import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.util.AuthCheck;
+import com.example.beliemeserver.model.dao.*;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ItemService {
-    private final StuffDao stuffDao;
+public class ItemService extends BaseService {
+    public static final int MAX_ITEM_NUM = 50;
 
-    private final ItemDao itemDao;
-
-    private final AuthCheck authCheck;
-
-    public ItemService(StuffDao stuffDao, ItemDao itemDao, UserDao userDao) {
-        this.stuffDao = stuffDao;
-        this.itemDao = itemDao;
-        this.authCheck = new AuthCheck(userDao);
+    public ItemService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
-    public List<OldItemDto> getItems(String userToken, String stuffName) throws DataException, UnauthorizedException, ForbiddenException {
-        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        authCheck.checkIfRequesterHasStaffPermission(requester);
+    public List<ItemDto> getListByStuff(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String stuffName
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkUserPermission(userToken, department);
 
-        return itemDao.getItemsByStuffNameData(stuffName);
+        return getItemListByStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
     }
 
-    public OldStuffDto postItem(String userToken, String stuffName, Integer amount) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException {
-        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        authCheck.checkIfRequesterHasStaffPermission(requester);
+    public ItemDto getByIndex(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode,
+            @NonNull String stuffName, int itemNum
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkUserPermission(userToken, department);
+        return itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum);
+    }
 
-        OldStuffDto targetStuff = stuffDao.getStuffByNameData(stuffName);
+    public ItemDto create(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String stuffName
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
 
-        int realAmount = 1;
-        if(amount != null) {
-            realAmount = amount;
+        StuffDto stuff = getStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
+        ItemDto newItem = ItemDto.init(stuff, stuff.nextItemNum());
+
+        if(newItem.num() > MAX_ITEM_NUM) {
+            throw new MethodNotAllowedException();
         }
+        return itemDao.create(newItem);
+    }
 
-        for (int i = 0; i < realAmount; i++) {
-            itemDao.addItemData(
-                    OldItemDto.builder()
-                            .stuff(targetStuff)
-                            .lastHistory(null)
-                            .build()
-            );
+    protected List<ItemDto> getItemListByStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
+        try {
+            return itemDao.getListByStuff(universityCode, departmentCode, stuffName);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
         }
-
-        return stuffDao.getStuffByNameData(stuffName);
     }
 }

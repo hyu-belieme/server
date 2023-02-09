@@ -28,6 +28,27 @@ public record AuthorityDto(
                 '}';
     }
 
+    public boolean matchUniqueKey(String universityCode, String departmentCode, Permission permission) {
+        if(universityCode == null || departmentCode == null || permission == null) {
+            return false;
+        }
+        return universityCode.equals(this.department().university().code())
+                && departmentCode.equals(this.department().code())
+                && permission.equals(this.permission());
+    }
+
+    public boolean matchUniqueKey(AuthorityDto oth) {
+        if(oth == null) {
+            return false;
+        }
+        String universityCode = oth.department().university().code();
+        String departmentCode = oth.department().code();
+        Permission permission = oth.permission();
+        return universityCode.equals(this.department().university().code())
+                && departmentCode.equals(this.department().code())
+                && permission.equals(this.permission());
+    }
+
     public enum Permission {
         BANNED, USER, STAFF, MASTER, DEVELOPER;
 
@@ -66,11 +87,11 @@ public record AuthorityDto(
 
         public boolean hasMorePermission(Permission other) {
             return switch (this) {
-                case BANNED -> true;
-                case USER -> other != BANNED && other != USER;
-                case STAFF -> other == MASTER || other == DEVELOPER;
-                case MASTER -> other == DEVELOPER;
-                default -> false;
+                case DEVELOPER -> true;
+                case MASTER -> other != DEVELOPER;
+                case STAFF -> other != DEVELOPER && other != MASTER;
+                case USER -> other == BANNED || other == USER;
+                case BANNED -> other == BANNED;
             };
         }
     }

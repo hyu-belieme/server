@@ -1,156 +1,143 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.*;
-import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.util.AuthCheck;
+import com.example.beliemeserver.exception.BadGateWayException;
+import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dao.*;
+import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.util.HttpRequest;
-
-import com.example.beliemeserver.model.dao.old.AuthorityDao;
-import com.example.beliemeserver.model.dao.old.UserDao;
-
-import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
-import com.example.beliemeserver.model.dto.old.OldUserDto;
-
+import lombok.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class UserService {
-    private static final String client_id = "a4b1abe746f384c3d43fa82a17f222";
-    private static final Set<String> CSE_SOSOK_ID = new HashSet<>(Arrays.asList("FH04067"));
-
-    private final UserDao userDao;
-    private final AuthorityDao authorityDao;
-    private final AuthCheck authCheck;
-
-    public UserService(UserDao userDao, AuthorityDao authorityDao) {
-        this.userDao = userDao;
-        this.authorityDao = authorityDao;
-        this.authCheck = new AuthCheck(userDao);
+public class UserService extends BaseService {
+    public UserService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
-    public OldUserDto getUserInfoFromUnivApiByApiToken(String apiToken) throws DataException, ConflictException, NotFoundException, ForbiddenException, BadGateWayException {
-        String studentId, name, sosokId;
-        if(apiToken.equals(Globals.developerApiToken)) {
-            studentId = "dev";
-            name = "dev";
-            sosokId = "dev";
-        } else {
-            JSONObject jsonResponse = getStudentInfoFromHanyangApi(apiToken);
-            studentId = (String) (jsonResponse.get("gaeinNo"));
-            name = (String) (jsonResponse.get("userNm"));
-            sosokId = (String) jsonResponse.get("sosokId");
-        }
+    public List<UserDto> getListByDepartment(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkMasterPermission(userToken, department);
 
-        OldUserDto savedUser = setUserAndUpdateDB(studentId, name);
-
-        if(savedUser.getMaxPermission() == null) {
-            OldAuthorityDto newAuthority;
-            if(apiToken.equals(Globals.developerApiToken)) {
-                newAuthority = addAuthority(savedUser, OldAuthorityDto.Permission.DEVELOPER);
-            } else {
-                newAuthority = checkAndAddUserAuthority(savedUser, sosokId);
+        List<UserDto> output = new ArrayList<>();
+        for(UserDto user : userDao.getAllList()) {
+            if(user.getMaxPermission(department).hasMorePermission(AuthorityDto.Permission.USER)) {
+                output.add(user);
             }
-            savedUser.addAuthority(newAuthority);
         }
 
-        return savedUser;
+        return output;
     }
 
-    public OldUserDto getUserByUserToken(String userToken) throws DataException, UnauthorizedException {
-        return authCheck.checkTokenAndGetUser(userToken);
+    public UserDto getByIndex(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String studentId
+    ) {
+        checkDeveloperPermission(userToken);
+        return userDao.getByIndex(universityCode, studentId);
     }
 
-    public OldUserDto makeUserHavePermission(String userToken, String studentId, OldAuthorityDto.Permission permission) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException, ConflictException, MethodNotAllowedException {
-        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        authCheck.checkIfRequesterHasDeveloperPermission(requester);
+    public UserDto getByToken(
+            @NonNull String userToken
+    ) {
+        return checkTokenAndGetUser(userToken);
+    }
 
-        OldUserDto target = userDao.getUserByStudentIdData(studentId);
+    public UserDto updateAuthority(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String studentId,
+            @NonNull String authorityUniversityCode,
+            @NonNull String authorityDepartmentCode,
+            AuthorityDto.Permission newPermission
+    ) {
+        UserDto requester = checkTokenAndGetUser(userToken);
 
-        if(target.getMaxPermission() == OldAuthorityDto.Permission.DEVELOPER) {
-            throw new MethodNotAllowedException("DEVELOPER의 권한을 변경할 수 없습니다.");
-        } else if(target.getMaxPermission() == null) {
-            addAuthority(target, permission);
-        } else {
-            updateAuthority(target, permission);
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(authorityUniversityCode, authorityDepartmentCode);
+        checkMasterPermission(department, requester);
+
+        UserDto targetUser = userDao.getByIndex(universityCode, studentId);
+        if(targetUser.isDeveloper()) {
+            throw new MethodNotAllowedException();
         }
-        return userDao.getUserByStudentIdData(studentId);
-    }
-
-    private JSONObject getStudentInfoFromHanyangApi(String apiToken) throws BadGateWayException {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Host", "https://api.hanyang.ac.kr/");
-        headers.put("client_id", client_id);
-        headers.put("swap_key", Long.toString(System.currentTimeMillis()/1000));
-        headers.put("access_token", apiToken);
-        String responseString = null;
-        responseString = HttpRequest.sendGetRequest("https://api.hanyang.ac.kr/rs/user/loginInfo.json", headers);
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonResponse;
-        try {
-            jsonResponse = (JSONObject) jsonParser.parse(responseString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new BadGateWayException("Response of Hanyang Api does not fit into JSON Format.");
+        if(newPermission != null && newPermission.hasDeveloperPermission()) {
+            throw new MethodNotAllowedException();
         }
-        jsonResponse = (JSONObject) jsonResponse.get("response");
-        jsonResponse = (JSONObject) jsonResponse.get("item");
-        return jsonResponse;
+
+        if(!requester.isDeveloper()) {
+            if(targetUser.getMaxPermission(department).hasMasterPermission()) {
+                throw new ForbiddenException();
+            }
+            if(newPermission != null && newPermission.hasMasterPermission()) {
+                throw new ForbiddenException();
+            }
+        }
+
+        UserDto newUser = targetUser.withAuthorityUpdate(department, newPermission);
+        return userDao.update(universityCode, studentId, newUser);
     }
 
-    private OldUserDto setUserAndUpdateDB(String studentId, String name) throws DataException, ConflictException, NotFoundException {
+    public UserDto updateUserFromHanyangUniversity(@NonNull String apiToken) {
+        JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(apiToken);
+        String studentId = (String) (jsonResponse.get("gaeinNo"));
+        String name = (String) (jsonResponse.get("userNm"));
+        String sosokId = (String) jsonResponse.get("sosokId");
+        List<String> majorCodes = List.of(sosokId);
+
+        return updateOrInitAndSave(Globals.HANYANG_UNIVERSITY.code(), studentId, name, majorCodes);
+    }
+
+    private UserDto updateOrInitAndSave(String universityCode, String studentId, String name, List<String> majorCodes) {
         boolean isNew = false;
 
-        OldUserDto newUser;
+        UserDto newUser;
+        UniversityDto university = universityDao.getByIndex(universityCode);
         try {
-            newUser = userDao.getUserByStudentIdData(studentId);
+            newUser = userDao.getByIndex(universityCode, studentId);
         } catch (NotFoundException e) {
             isNew = true;
-            newUser = new OldUserDto();
-            newUser.setCreateTimeStampNow();
+            newUser = UserDto.init(university, studentId, name);
         }
+        List<MajorDto> newBaseMajors = newMajors(majorCodes, university, newUser);
+        newUser = newUser.withName(name)
+                .withApprovalTimeStamp(currentTimestamp())
+                .withMajors(newBaseMajors)
+                .withToken(UUID.randomUUID().toString());
 
-        newUser.setStudentId(studentId);
-        newUser.setName(name);
-        newUser.setNewToken();
-        newUser.setApprovalTimeStampNow();
+        if(isNew) return userDao.create(newUser);
+        return userDao.update(universityCode, studentId, newUser);
+    }
 
-        if(isNew) {
-            return userDao.addUserData(newUser);
-        } else {
-            return userDao.updateUserData(studentId, newUser);
+    private List<MajorDto> newMajors(List<String> majorCodes, UniversityDto university, UserDto newUser) {
+        List<MajorDto> newBaseMajors = newUser.majors();
+        if(majorCodes != null) {
+            newBaseMajors = new ArrayList<>();
+            for(String majorCode : majorCodes) {
+                newBaseMajors.add(getMajorOrCreate(university, majorCode));
+            }
+        }
+        return newBaseMajors;
+    }
+
+    private MajorDto getMajorOrCreate(UniversityDto university, String majorCode) {
+        try {
+            return majorDao.getByIndex(university.code(), majorCode);
+        } catch (NotFoundException e) {
+            return majorDao.create(new MajorDto(university, majorCode));
         }
     }
 
-    private OldAuthorityDto checkAndAddUserAuthority(OldUserDto savedUser, String sosokId) throws ConflictException, DataException, ForbiddenException {
-        if(CSE_SOSOK_ID.contains(sosokId)) {
-            return addAuthority(savedUser, OldAuthorityDto.Permission.USER);
-        } else {
-            throw new ForbiddenException("You're not CSE student.");
-        }
-    }
-
-    private OldAuthorityDto addAuthority(OldUserDto savedUser, OldAuthorityDto.Permission permission) throws ConflictException, DataException {
-        OldAuthorityDto newAuthority = OldAuthorityDto.builder()
-                .permission(permission)
-                .userDto(savedUser)
-                .build();
-
-        return authorityDao.addAuthorityData(newAuthority);
-    }
-
-    private OldAuthorityDto updateAuthority(OldUserDto savedUser, OldAuthorityDto.Permission permission) throws DataException {
-        OldAuthorityDto newAuthority = OldAuthorityDto.builder()
-                .permission(permission)
-                .userDto(savedUser)
-                .build();
-
-        return authorityDao.updateAuthorityData(savedUser.getStudentId(), newAuthority);
+    private long currentTimestamp() {
+        return System.currentTimeMillis() / 1000;
     }
 }

@@ -1,98 +1,81 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.exception.*;
-import com.example.beliemeserver.model.dao.old.ItemDao;
-import com.example.beliemeserver.model.dao.old.StuffDao;
-import com.example.beliemeserver.model.dao.old.UserDao;
-import com.example.beliemeserver.model.dto.old.OldItemDto;
-import com.example.beliemeserver.model.dto.old.OldStuffDto;
-import com.example.beliemeserver.model.dto.old.OldUserDto;
-import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.util.AuthCheck;
-
+import com.example.beliemeserver.exception.MethodNotAllowedException;
+import com.example.beliemeserver.model.dao.*;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class StuffService {
-    private final StuffDao stuffDao;
+public class StuffService extends BaseService {
 
-    private final ItemDao itemDao;
+    public static final int CREATE_AMOUNT_UPPER_BOUND = 50;
 
-    private final AuthCheck authCheck;
-
-    public StuffService(StuffDao stuffDao, ItemDao itemDao, UserDao userDao) {
-        this.stuffDao = stuffDao;
-        this.itemDao = itemDao;
-        this.authCheck = new AuthCheck(userDao);
+    public StuffService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
-    public List<OldStuffDto> getStuffs(String userToken) throws DataException, UnauthorizedException, ForbiddenException {
-        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        authCheck.checkIfRequesterHasUserPermission(requester);
+    public List<StuffDto> getListByDepartment(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkUserPermission(userToken, department);
 
-        return stuffDao.getStuffsData();
+        return stuffDao.getListByDepartment(universityCode, departmentCode);
     }
 
-    public OldStuffDto getStuffByName(String userToken, String name) throws DataException, UnauthorizedException, ForbiddenException, NotFoundException {
-        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        authCheck.checkIfRequesterHasStaffPermission(requester);
+    public StuffDto getByIndex(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String name
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkUserPermission(userToken, department);
 
-        return stuffDao.getStuffByNameData(name);
+        return stuffDao.getByIndex(universityCode, departmentCode, name);
     }
 
+    public StuffDto create(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode,
+            @NonNull String name, @NonNull String emoji, Integer amount
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
 
-    public List<OldStuffDto> addStuff(String userToken, String name, String emoji, Integer amount) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, ConflictException, ItCannotBeException {
-        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        authCheck.checkIfRequesterHasStaffPermission(requester);
+        StuffDto newStuff = StuffDto.init(department, name, emoji);
+        StuffDto output = newStuff;
+        newStuff = stuffDao.create(newStuff);
 
-        if(amount != null && amount <= 0) {
-            throw new BadRequestException("amount는 음수가 될 수 없습니다.");
+        if(amount == null) return output;
+        if(amount < 0 || amount > CREATE_AMOUNT_UPPER_BOUND) throw new MethodNotAllowedException();
+
+        for(int i = 0; i < amount; i++) {
+            ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i+1));
+            output = output.withItemAdd(newItem);
         }
-
-        OldStuffDto newStuff = OldStuffDto.builder()
-                .name(name)
-                .emoji(emoji)
-                .build();
-        OldStuffDto savedStuff = stuffDao.addStuffData(newStuff);
-
-        int realAmount = 1;
-        if(amount != null) {
-            realAmount = amount;
-        }
-        for(int i = 0; i < realAmount; i++) {
-            OldItemDto newItem = OldItemDto.builder()
-                    .stuff(savedStuff)
-                    .build();
-            try {
-                itemDao.addItemData(newItem);
-            } catch (NotFoundException e) {
-                e.printStackTrace();
-                throw new ItCannotBeException();
-            }
-        }
-
-        return stuffDao.getStuffsData();
+        return output;
     }
 
-    public OldStuffDto updateStuff(String userToken, String name, String newName, String newEmoji) throws DataException, UnauthorizedException, ForbiddenException, BadRequestException, NotFoundException {
-        OldUserDto requester = authCheck.checkTokenAndGetUser(userToken);
-        authCheck.checkIfRequesterHasStaffPermission(requester);
+    public StuffDto update(
+            @NonNull String userToken,
+            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String name,
+            String newName, String newEmoji
+    ) {
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+        checkStaffPermission(userToken, department);
 
-        if(newName == null && newEmoji == null) {
-            throw new BadRequestException("정보가 부족합니다.\n필요한 정보 : name(String), emoji(String) 중 하나 이상");
-        }
+        StuffDto oldStuff = stuffDao.getByIndex(universityCode, departmentCode, name);
 
-        OldStuffDto newStuff = stuffDao.getStuffByNameData(name);
+        if(newName == null && newEmoji == null) return oldStuff;
+        if(newName == null) newName = oldStuff.name();
+        if(newEmoji == null) newEmoji = oldStuff.emoji();
 
-        if(newName != null) {
-            newStuff.setName(newName);
-        }
-        if(newEmoji != null) {
-            newStuff.setEmoji(newEmoji);
-        }
-
-        return stuffDao.updateStuffData(name, newStuff);
+        StuffDto newStuff = StuffDto.init(department, newName, newEmoji);
+        return stuffDao.update(universityCode, departmentCode, name, newStuff);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model.dao;
 
+import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.NotFoundException;
@@ -9,17 +10,20 @@ import java.util.List;
 
 public interface UniversityDao {
     @Transactional
-    List<UniversityDto> getAllUniversitiesData();
+    List<UniversityDto> getAllList();
 
     @Transactional
-    UniversityDto getUniversityByCodeData(String code)
+    UniversityDto getByIndex(String code)
             throws NotFoundException;
 
     @Transactional
-    UniversityDto addUniversityData(UniversityDto newUniversity)
+    boolean checkExistByIndex(String universityCode);
+
+    @Transactional
+    UniversityDto create(UniversityDto newUniversity)
             throws ConflictException;
 
     @Transactional
-    UniversityDto updateUniversityData(String code, UniversityDto newUniversityDto)
+    UniversityDto update(String code, UniversityDto newUniversityDto)
             throws NotFoundException, ConflictException;
 }
