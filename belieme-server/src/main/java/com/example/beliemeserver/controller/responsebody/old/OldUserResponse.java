@@ -1,4 +1,4 @@
-package com.example.beliemeserver.controller.responsebody;
+package com.example.beliemeserver.controller.responsebody.old;
 
 import com.example.beliemeserver.model.dto.old.OldUserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class UserResponse extends JSONResponse {
+public class OldUserResponse extends OldJSONResponse {
     private String studentId;
     private String name;
 
@@ -22,7 +22,7 @@ public class UserResponse extends JSONResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String permission;
 
-    public UserResponse(String studentId, String name, String token, long createTimeStamp, long approvalTimeStamp, String permission) {
+    public OldUserResponse(String studentId, String name, String token, long createTimeStamp, long approvalTimeStamp, String permission) {
         super(true);
         this.studentId = studentId;
         this.name = name;
@@ -32,21 +32,21 @@ public class UserResponse extends JSONResponse {
         this.permission = permission;
     }
 
-    private UserResponse(boolean doesJsonInclude) {
+    private OldUserResponse(boolean doesJsonInclude) {
         super(false);
     }
 
-    public UserResponse toUserResponseNestedInHistory() {
-        return new UserResponse(studentId, name, null, 0, 0, null);
+    public OldUserResponse toUserResponseNestedInHistory() {
+        return new OldUserResponse(studentId, name, null, 0, 0, null);
     }
 
-    public static UserResponse responseWillBeIgnore() {
-        return new UserResponse(false);
+    public static OldUserResponse responseWillBeIgnore() {
+        return new OldUserResponse(false);
     }
 
-    public static UserResponse from(OldUserDto userDto) {
+    public static OldUserResponse from(OldUserDto userDto) {
         if(userDto.getMaxPermission() == null) {
-            return new UserResponse(
+            return new OldUserResponse(
                     userDto.getStudentId(),
                     userDto.getName(),
                     userDto.getToken(),
@@ -55,7 +55,7 @@ public class UserResponse extends JSONResponse {
                     null
             );
         }
-        return new UserResponse(
+        return new OldUserResponse(
                 userDto.getStudentId(),
                 userDto.getName(),
                 userDto.getToken(),

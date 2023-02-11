@@ -1,9 +1,9 @@
-package com.example.beliemeserver.controller.responsebody;
+package com.example.beliemeserver.controller.responsebody.old;
 
-public class ExceptionResponse {
+public class OldExceptionResponse {
     private String name;
     private String message;
-    public ExceptionResponse(String name, String message) {
+    public OldExceptionResponse(String name, String message) {
         this.name = name;
         this.message = message;
     }

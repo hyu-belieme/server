@@ -1,4 +1,4 @@
-package com.example.beliemeserver.controller.responsebody;
+package com.example.beliemeserver.controller.responsebody.old;
 
 import com.example.beliemeserver.model.dto.old.OldItemDto;
 import com.example.beliemeserver.model.dto.old.OldStuffDto;
@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class StuffResponse extends JSONResponse {
+public class OldStuffResponse extends OldJSONResponse {
     private String name;
     private String emoji;
     private int amount;
@@ -21,10 +21,10 @@ public class StuffResponse extends JSONResponse {
 //    private int nextItemNum;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<ItemResponse> itemList;
+    private List<OldItemResponse> itemList;
 
 
-    public StuffResponse(String name, String emoji, int amount, int count, List<ItemResponse> itemList) {
+    public OldStuffResponse(String name, String emoji, int amount, int count, List<OldItemResponse> itemList) {
         super(true);
         this.name = name;
         this.emoji = emoji;
@@ -43,25 +43,25 @@ public class StuffResponse extends JSONResponse {
 //        this.nextItemNum = nextItemNum;
 //    }
 
-    private StuffResponse(boolean doesJsonInclude) {
+    private OldStuffResponse(boolean doesJsonInclude) {
         super(false);
     }
 
-    public static StuffResponse responseWillBeIgnore() {
-        return new StuffResponse(false);
+    public static OldStuffResponse responseWillBeIgnore() {
+        return new OldStuffResponse(false);
     }
 
-    public static StuffResponse from(OldStuffDto stuffDto) {
-        List<ItemResponse> itemResponseList = new ArrayList<>();
+    public static OldStuffResponse from(OldStuffDto stuffDto) {
+        List<OldItemResponse> itemResponseList = new ArrayList<>();
 
         List<OldItemDto> itemDtoList = stuffDto.getItems();
         for(int i = 0; i < itemDtoList.size(); i++) {
-            itemResponseList.add(ItemResponse.from(itemDtoList.get(i)));
+            itemResponseList.add(OldItemResponse.from(itemDtoList.get(i)));
         }
-        return new StuffResponse(stuffDto.getName(), stuffDto.getEmoji(), stuffDto.getAmount(), stuffDto.getCount(), itemResponseList);
+        return new OldStuffResponse(stuffDto.getName(), stuffDto.getEmoji(), stuffDto.getAmount(), stuffDto.getCount(), itemResponseList);
     }
 
-    public StuffResponse toStuffResponseWithoutItemList() {
-        return new StuffResponse(name, emoji, amount, count, null);
+    public OldStuffResponse toStuffResponseWithoutItemList() {
+        return new OldStuffResponse(name, emoji, amount, count, null);
     }
 }
