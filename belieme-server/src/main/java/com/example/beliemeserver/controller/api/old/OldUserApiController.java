@@ -1,7 +1,7 @@
-package com.example.beliemeserver.controller.api;
+package com.example.beliemeserver.controller.api.old;
 
 import com.example.beliemeserver.controller.httpexception.*;
-import com.example.beliemeserver.controller.requestbody.LoginInfoRequest;
+import com.example.beliemeserver.controller.requestbody.old.OldLoginInfoRequest;
 import com.example.beliemeserver.controller.responsebody.old.OldUserResponse;
 
 import com.example.beliemeserver.exception.*;
@@ -14,16 +14,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/")
-public class UserApiController {
+@RequestMapping("/old")
+public class OldUserApiController {
     private final OldUserService userService;
 
-    public UserApiController(OldUserService userService) {
+    public OldUserApiController(OldUserService userService) {
         this.userService = userService;
     }
 
     @PatchMapping("login/")
-    public ResponseEntity<OldUserResponse> getUserInfoFromUnivApi(@RequestBody LoginInfoRequest requestBody) throws ConflictHttpException, NotFoundHttpException, ForbiddenHttpException, BadRequestHttpException, InternalServerErrorHttpException {
+    public ResponseEntity<OldUserResponse> getUserInfoFromUnivApi(@RequestBody OldLoginInfoRequest requestBody) throws ConflictHttpException, NotFoundHttpException, ForbiddenHttpException, BadRequestHttpException, InternalServerErrorHttpException {
         if(requestBody == null || requestBody.getApiToken() == null) {
             throw new BadRequestHttpException("Request body에 정보가 부족합니다. 필요한 정보 : apiToken(String)");
         }

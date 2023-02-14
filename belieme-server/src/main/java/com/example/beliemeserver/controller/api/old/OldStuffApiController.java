@@ -1,7 +1,7 @@
-package com.example.beliemeserver.controller.api;
+package com.example.beliemeserver.controller.api.old;
 
 import com.example.beliemeserver.controller.httpexception.*;
-import com.example.beliemeserver.controller.requestbody.StuffRequest;
+import com.example.beliemeserver.controller.requestbody.old.OldStuffRequest;
 import com.example.beliemeserver.controller.responsebody.old.OldStuffResponse;
 import com.example.beliemeserver.common.Globals;
 
@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/stuffs")
-public class StuffApiController {
+@RequestMapping(path="/old/stuffs")
+public class OldStuffApiController {
     private final OldStuffService stuffService;
 
-    public StuffApiController(OldStuffService stuffService) {
+    public OldStuffApiController(OldStuffService stuffService) {
         this.stuffService = stuffService;
     }
 
@@ -67,7 +67,7 @@ public class StuffApiController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<List<OldStuffResponse>> postStuff(@RequestHeader("user-token") String userToken, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, BadRequestHttpException, ConflictHttpException {
+    public ResponseEntity<List<OldStuffResponse>> postStuff(@RequestHeader("user-token") String userToken, @RequestBody OldStuffRequest requestBody) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, BadRequestHttpException, ConflictHttpException {
         if(requestBody == null || requestBody.getName() == null || requestBody.getEmoji() == null) {
             throw new BadRequestHttpException("Request body에 정보가 부족합니다.\n필요한 정보 : name(String), emoji(String), amount(int)(optional)");
         }
@@ -98,7 +98,7 @@ public class StuffApiController {
     }
 
     @PatchMapping("/{name}")
-    public ResponseEntity<OldStuffResponse> patchStuff(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, BadRequestHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
+    public ResponseEntity<OldStuffResponse> patchStuff(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody OldStuffRequest requestBody) throws InternalServerErrorHttpException, BadRequestHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
         if(requestBody == null) {
             throw new BadRequestHttpException("Request body에 정보가 부족합니다.\n필요한 정보 : name(String), emoji(String) 중 하나 이상");
         }

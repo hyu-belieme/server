@@ -1,7 +1,7 @@
-package com.example.beliemeserver.controller.api;
+package com.example.beliemeserver.controller.api.old;
 
 import com.example.beliemeserver.controller.httpexception.*;
-import com.example.beliemeserver.controller.requestbody.StuffRequest;
+import com.example.beliemeserver.controller.requestbody.old.OldStuffRequest;
 import com.example.beliemeserver.controller.responsebody.old.OldItemResponse;
 import com.example.beliemeserver.controller.responsebody.old.OldStuffResponse;
 import com.example.beliemeserver.common.Globals;
@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/stuffs/{name}/items")
-public class ItemApiController {
+@RequestMapping(path="/old/stuffs/{name}/items")
+public class OldItemApiController {
     private final OldItemService itemService;
 
-    public ItemApiController(OldItemService itemService) {
+    public OldItemApiController(OldItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -51,7 +51,7 @@ public class ItemApiController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<OldStuffResponse> postOneItem(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest request) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, NotFoundHttpException, ConflictHttpException {
+    public ResponseEntity<OldStuffResponse> postOneItem(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody OldStuffRequest request) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, NotFoundHttpException, ConflictHttpException {
         URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + name + "/items");
 
         OldStuffDto updatedStuff;

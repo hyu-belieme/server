@@ -1,7 +1,7 @@
-package com.example.beliemeserver.controller.api;
+package com.example.beliemeserver.controller.api.old;
 
 import com.example.beliemeserver.controller.httpexception.*;
-import com.example.beliemeserver.controller.requestbody.ItemRequest;
+import com.example.beliemeserver.controller.requestbody.old.OldItemRequest;
 import com.example.beliemeserver.controller.responsebody.old.OldHistoryResponse;
 import com.example.beliemeserver.common.Globals;
 
@@ -18,10 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class HistoryApiController {
+@RequestMapping(path="/old")
+public class OldHistoryApiController {
     private final OldHistoryService historyService;
 
-    public HistoryApiController(OldHistoryService historyService) {
+    public OldHistoryApiController(OldHistoryService historyService) {
         this.historyService = historyService;
     }
 
@@ -67,7 +68,7 @@ public class HistoryApiController {
     }
 
     @PostMapping("/histories/reserve")
-    public ResponseEntity<OldHistoryResponse> postReserveHistory(@RequestHeader("user-token") String userToken, @RequestBody ItemRequest itemRequest) throws BadRequestHttpException, InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, ConflictHttpException {
+    public ResponseEntity<OldHistoryResponse> postReserveHistory(@RequestHeader("user-token") String userToken, @RequestBody OldItemRequest itemRequest) throws BadRequestHttpException, InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, ConflictHttpException {
         if(itemRequest == null) {
             throw new BadRequestHttpException("'stuff_name'은 필수입니다.('item_num'은 Optional 입니다)");
         }
