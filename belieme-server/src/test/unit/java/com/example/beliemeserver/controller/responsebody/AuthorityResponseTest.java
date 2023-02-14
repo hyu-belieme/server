@@ -11,7 +11,7 @@ import org.junit.jupiter.api.RepeatedTest;
 import java.io.IOException;
 
 
-public class AuthResponseTest extends BaseResponseTest {
+public class AuthorityResponseTest extends BaseResponseTest {
     private final RandomGetter<DepartmentDto> deptGetter = new RandomGetter<>(stub.ALL_DEPTS);
     private final RandomGetter<AuthorityDto.Permission> permissionGetter = new RandomGetter<>(stub.ALL_PERMISSIONS);
 
