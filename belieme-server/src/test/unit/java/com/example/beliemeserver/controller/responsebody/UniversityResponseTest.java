@@ -11,10 +11,11 @@ import java.io.IOException;
 
 
 public class UniversityResponseTest extends BaseResponseTest {
+    private final RandomGetter<UniversityDto> univGetter = new RandomGetter<>(stub.ALL_UNIVS);
+
     @RepeatedTest(10)
     @DisplayName("[-]_[`university json serialization` 테스트]_[-]")
     public void universityJsonSerializationTest() throws IOException, ParseException {
-        RandomGetter<UniversityDto> univGetter = new RandomGetter<>(stub.ALL_UNIVS);
         UniversityDto univ = univGetter.randomSelect();
 
         JSONObject json = makeJsonObject(UniversityResponse.from(univ));

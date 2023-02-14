@@ -11,10 +11,11 @@ import java.io.IOException;
 
 
 public class DepartmentResponseTest extends BaseResponseTest {
+    private final RandomGetter<DepartmentDto> deptGetter = new RandomGetter<>(stub.ALL_DEPTS);
+
     @RepeatedTest(10)
     @DisplayName("[-]_[`department json serialization` 테스트]_[-]")
     public void departmentJsonSerializationTest() throws IOException, ParseException {
-        RandomGetter<DepartmentDto> deptGetter = new RandomGetter<>(stub.ALL_DEPTS);
         DepartmentDto dept = deptGetter.randomSelect();
 
         JSONObject json = makeJsonObject(DepartmentResponse.from(dept));
@@ -24,7 +25,6 @@ public class DepartmentResponseTest extends BaseResponseTest {
     @RepeatedTest(10)
     @DisplayName("[-]_[`university` 제외한 `department json serialization` 테스트]_[-]")
     public void departmentWithoutUniversityJsonSerializationTest() throws IOException, ParseException {
-        RandomGetter<DepartmentDto> deptGetter = new RandomGetter<>(stub.ALL_DEPTS);
         DepartmentDto dept = deptGetter.randomSelect();
 
         JSONObject json = makeJsonObject(DepartmentResponse.from(dept).withoutUniversity());

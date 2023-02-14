@@ -12,11 +12,12 @@ import java.io.IOException;
 
 
 public class AuthResponseTest extends BaseResponseTest {
+    private final RandomGetter<DepartmentDto> deptGetter = new RandomGetter<>(stub.ALL_DEPTS);
+    private final RandomGetter<AuthorityDto.Permission> permissionGetter = new RandomGetter<>(stub.ALL_PERMISSIONS);
+
     @RepeatedTest(10)
     @DisplayName("[-]_[`authority json serialization` 테스트]_[-]")
     public void departmentJsonSerializationTest() throws IOException, ParseException {
-        RandomGetter<DepartmentDto> deptGetter = new RandomGetter<>(stub.ALL_DEPTS);
-        RandomGetter<AuthorityDto.Permission> permissionGetter = new RandomGetter<>(stub.ALL_PERMISSIONS);
         AuthorityDto auth = new AuthorityDto(deptGetter.randomSelect(), permissionGetter.randomSelect());
 
         JSONObject json = makeJsonObject(AuthorityResponse.from(auth));
