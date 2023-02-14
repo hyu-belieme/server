@@ -79,11 +79,11 @@ public class HistoryResponse extends JsonResponse {
                 DepartmentResponse.from(historyDto.item().stuff().department()).withoutUniversity(),
                 ItemResponse.from(historyDto.item()).withoutUniversityAndDepartment(),
                 historyDto.num(),
-                UserResponse.from(historyDto.requester()).withoutSecureInfo(),
-                UserResponse.from(historyDto.approveManager()).withoutSecureInfo(),
-                UserResponse.from(historyDto.returnManager()).withoutSecureInfo(),
-                UserResponse.from(historyDto.lostManager()).withoutSecureInfo(),
-                UserResponse.from(historyDto.cancelManager()).withoutSecureInfo(),
+                toNestedResponse(UserResponse.from(historyDto.requester())),
+                toNestedResponse(UserResponse.from(historyDto.approveManager())),
+                toNestedResponse(UserResponse.from(historyDto.returnManager())),
+                toNestedResponse(UserResponse.from(historyDto.lostManager())),
+                toNestedResponse(UserResponse.from(historyDto.cancelManager())),
                 historyDto.reservedTimeStamp(), historyDto.approvalTimeStamp(),
                 historyDto.returnTimeStamp(), historyDto.lostTimeStamp(),
                 historyDto.cancelTimeStamp(), historyDto.status().toString());
@@ -103,5 +103,10 @@ public class HistoryResponse extends JsonResponse {
                 ItemResponse.responseWillBeIgnore(), num, requester, approveManager,
                 returnManager, lostManager, cancelManager, reservedTimeStamp,
                 approveTimeStamp, returnTimeStamp, lostTimeStamp, cancelTimeStamp, status);
+    }
+
+    private static UserResponse toNestedResponse(UserResponse user) {
+        if(user == null) return null;
+        return user.withoutSecureInfo();
     }
 }

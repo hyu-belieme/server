@@ -60,7 +60,7 @@ public class ItemResponse extends JsonResponse {
                 stuffEmoji,
                 itemDto.num(),
                 itemDto.status().toString(),
-                HistoryResponse.from(itemDto.lastHistory()).withoutUniversityAndDepartment().withoutItem()
+                toNestedResponse(HistoryResponse.from(itemDto.lastHistory()))
         );
     }
 
@@ -81,5 +81,12 @@ public class ItemResponse extends JsonResponse {
         return new ItemResponse(
                 university, department, stuffName,
                 stuffEmoji, num, status, HistoryResponse.responseWillBeIgnore());
+    }
+
+    private static HistoryResponse toNestedResponse(HistoryResponse history) {
+        if(history == null) return null;
+        return history
+                .withoutItem()
+                .withoutUniversityAndDepartment();
     }
 }
