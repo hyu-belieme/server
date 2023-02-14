@@ -2,7 +2,7 @@ package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.LoginInfoRequest;
-import com.example.beliemeserver.controller.responsebody.UserResponse;
+import com.example.beliemeserver.controller.responsebody.old.OldUserResponse;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.old.OldAuthorityDto;
@@ -23,7 +23,7 @@ public class UserApiController {
     }
 
     @PatchMapping("login/")
-    public ResponseEntity<UserResponse> getUserInfoFromUnivApi(@RequestBody LoginInfoRequest requestBody) throws ConflictHttpException, NotFoundHttpException, ForbiddenHttpException, BadRequestHttpException, InternalServerErrorHttpException {
+    public ResponseEntity<OldUserResponse> getUserInfoFromUnivApi(@RequestBody LoginInfoRequest requestBody) throws ConflictHttpException, NotFoundHttpException, ForbiddenHttpException, BadRequestHttpException, InternalServerErrorHttpException {
         if(requestBody == null || requestBody.getApiToken() == null) {
             throw new BadRequestHttpException("Request body에 정보가 부족합니다. 필요한 정보 : apiToken(String)");
         }
@@ -48,11 +48,11 @@ public class UserApiController {
             throw new BadRequestHttpException(e);
         }
 
-        return ResponseEntity.ok(UserResponse.from(savedUserDto));
+        return ResponseEntity.ok(OldUserResponse.from(savedUserDto));
     }
 
     @GetMapping("auth/")
-    public ResponseEntity<UserResponse> getUserUsingUserToken(@RequestHeader(value = "User-Token") String userToken) throws UnauthorizedHttpException, InternalServerErrorHttpException {
+    public ResponseEntity<OldUserResponse> getUserUsingUserToken(@RequestHeader(value = "User-Token") String userToken) throws UnauthorizedHttpException, InternalServerErrorHttpException {
         OldUserDto target;
         try {
             target = userService.getUserByUserToken(userToken);
@@ -63,11 +63,11 @@ public class UserApiController {
             e.printStackTrace();
             throw new UnauthorizedHttpException(e);
         }
-        return ResponseEntity.ok().body(UserResponse.from(target));
+        return ResponseEntity.ok().body(OldUserResponse.from(target));
     }
 
     @PatchMapping("users/{studentId}/make_staff")
-    public ResponseEntity<UserResponse> makePermissionStaff(@RequestHeader(value = "User-Token") String userToken, @PathVariable String studentId) throws InternalServerErrorHttpException, ForbiddenHttpException, ConflictHttpException, UnauthorizedHttpException, NotFoundHttpException, MethodNotAllowedHttpException {
+    public ResponseEntity<OldUserResponse> makePermissionStaff(@RequestHeader(value = "User-Token") String userToken, @PathVariable String studentId) throws InternalServerErrorHttpException, ForbiddenHttpException, ConflictHttpException, UnauthorizedHttpException, NotFoundHttpException, MethodNotAllowedHttpException {
         OldUserDto target;
         try {
             target = userService.makeUserHavePermission(userToken, studentId, OldAuthorityDto.Permission.STAFF);
@@ -90,11 +90,11 @@ public class UserApiController {
             e.printStackTrace();
             throw new MethodNotAllowedHttpException(e);
         }
-        return ResponseEntity.ok().body(UserResponse.from(target));
+        return ResponseEntity.ok().body(OldUserResponse.from(target));
     }
 
     @PatchMapping("users/{studentId}/make_master")
-    public ResponseEntity<UserResponse> makePermissionMaster(@RequestHeader(value = "User-Token") String userToken, @PathVariable String studentId) throws InternalServerErrorHttpException, ForbiddenHttpException, ConflictHttpException, UnauthorizedHttpException, NotFoundHttpException, MethodNotAllowedHttpException {
+    public ResponseEntity<OldUserResponse> makePermissionMaster(@RequestHeader(value = "User-Token") String userToken, @PathVariable String studentId) throws InternalServerErrorHttpException, ForbiddenHttpException, ConflictHttpException, UnauthorizedHttpException, NotFoundHttpException, MethodNotAllowedHttpException {
         OldUserDto target;
         try {
             target = userService.makeUserHavePermission(userToken, studentId, OldAuthorityDto.Permission.MASTER);
@@ -117,11 +117,11 @@ public class UserApiController {
             e.printStackTrace();
             throw new MethodNotAllowedHttpException(e);
         }
-        return ResponseEntity.ok().body(UserResponse.from(target));
+        return ResponseEntity.ok().body(OldUserResponse.from(target));
     }
 
     @PatchMapping("users/{studentId}/make_user")
-    public ResponseEntity<UserResponse> makePermissionUser(@RequestHeader(value = "User-Token") String userToken, @PathVariable String studentId) throws InternalServerErrorHttpException, ForbiddenHttpException, ConflictHttpException, UnauthorizedHttpException, NotFoundHttpException, MethodNotAllowedHttpException {
+    public ResponseEntity<OldUserResponse> makePermissionUser(@RequestHeader(value = "User-Token") String userToken, @PathVariable String studentId) throws InternalServerErrorHttpException, ForbiddenHttpException, ConflictHttpException, UnauthorizedHttpException, NotFoundHttpException, MethodNotAllowedHttpException {
         OldUserDto target;
         try {
             target = userService.makeUserHavePermission(userToken, studentId, OldAuthorityDto.Permission.USER);
@@ -144,6 +144,6 @@ public class UserApiController {
             e.printStackTrace();
             throw new MethodNotAllowedHttpException(e);
         }
-        return ResponseEntity.ok().body(UserResponse.from(target));
+        return ResponseEntity.ok().body(OldUserResponse.from(target));
     }
 }

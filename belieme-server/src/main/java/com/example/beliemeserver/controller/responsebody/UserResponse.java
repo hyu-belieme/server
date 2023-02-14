@@ -1,17 +1,19 @@
 package com.example.beliemeserver.controller.responsebody;
 
-import com.example.beliemeserver.model.dto.old.OldUserDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
-@Setter
-@ToString
-public class UserResponse extends JSONResponse {
+public class UserResponse extends JsonResponse {
+    private UniversityResponse university;
     private String studentId;
     private String name;
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+//    private List<AuthorityResponse> authorities;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String token;
@@ -19,49 +21,43 @@ public class UserResponse extends JSONResponse {
     private long createTimeStamp;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private long approvalTimeStamp;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String permission;
 
-    public UserResponse(String studentId, String name, String token, long createTimeStamp, long approvalTimeStamp, String permission) {
+    private UserResponse(boolean doesJsonInclude) {
+        super(doesJsonInclude);
+    }
+
+    private UserResponse(UniversityResponse university, String studentId, String name, /*List<AuthorityResponse> authorities,*/ String token, long createTimeStamp, long approvalTimeStamp) {
         super(true);
+        this.university = university;
         this.studentId = studentId;
         this.name = name;
+//        this.authorities = authorities;
         this.token = token;
         this.createTimeStamp = createTimeStamp;
         this.approvalTimeStamp = approvalTimeStamp;
-        this.permission = permission;
-    }
-
-    private UserResponse(boolean doesJsonInclude) {
-        super(false);
-    }
-
-    public UserResponse toUserResponseNestedInHistory() {
-        return new UserResponse(studentId, name, null, 0, 0, null);
     }
 
     public static UserResponse responseWillBeIgnore() {
         return new UserResponse(false);
     }
 
-    public static UserResponse from(OldUserDto userDto) {
-        if(userDto.getMaxPermission() == null) {
-            return new UserResponse(
-                    userDto.getStudentId(),
-                    userDto.getName(),
-                    userDto.getToken(),
-                    userDto.getCreateTimeStamp(),
-                    userDto.getApprovalTimeStamp(),
-                    null
-            );
+    public static UserResponse from(UserDto userDto) {
+        if(userDto == null) return null;
+        if(userDto.equals(UserDto.nestedEndpoint)) {
+            return responseWillBeIgnore();
         }
+
         return new UserResponse(
-                userDto.getStudentId(),
-                userDto.getName(),
-                userDto.getToken(),
-                userDto.getCreateTimeStamp(),
-                userDto.getApprovalTimeStamp(),
-                userDto.getMaxPermission().toString()
+                UniversityResponse.from(userDto.university()),
+                userDto.studentId(),
+                userDto.name(),
+                userDto.token(),
+                userDto.createTimeStamp(),
+                userDto.approvalTimeStamp()
         );
+    }
+
+    public UserResponse withoutSecureInfo() {
+        return new UserResponse(university, studentId, name, null, 0, 0);
     }
 }

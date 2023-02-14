@@ -2,7 +2,7 @@ package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.StuffRequest;
-import com.example.beliemeserver.controller.responsebody.StuffResponse;
+import com.example.beliemeserver.controller.responsebody.old.OldStuffResponse;
 import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.exception.*;
@@ -27,7 +27,7 @@ public class StuffApiController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<StuffResponse>> getAllStuffs(@RequestHeader("user-token") String userToken) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
+    public ResponseEntity<List<OldStuffResponse>> getAllStuffs(@RequestHeader("user-token") String userToken) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
         List<OldStuffDto> stuffList;
         try {
             stuffList = stuffService.getStuffs(userToken);
@@ -45,7 +45,7 @@ public class StuffApiController {
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<StuffResponse> getStuffResponse(@RequestHeader("user-token") String userToken, @PathVariable("name") String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
+    public ResponseEntity<OldStuffResponse> getStuffResponse(@RequestHeader("user-token") String userToken, @PathVariable("name") String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
         OldStuffDto target;
         try {
             target = stuffService.getStuffByName(userToken, name);
@@ -63,11 +63,11 @@ public class StuffApiController {
             throw new NotFoundHttpException(e);
         }
 
-        return ResponseEntity.ok(StuffResponse.from(target));
+        return ResponseEntity.ok(OldStuffResponse.from(target));
     }
 
     @PostMapping("/")
-    public ResponseEntity<List<StuffResponse>> postStuff(@RequestHeader("user-token") String userToken, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, BadRequestHttpException, ConflictHttpException {
+    public ResponseEntity<List<OldStuffResponse>> postStuff(@RequestHeader("user-token") String userToken, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, BadRequestHttpException, ConflictHttpException {
         if(requestBody == null || requestBody.getName() == null || requestBody.getEmoji() == null) {
             throw new BadRequestHttpException("Request body에 정보가 부족합니다.\n필요한 정보 : name(String), emoji(String), amount(int)(optional)");
         }
@@ -98,7 +98,7 @@ public class StuffApiController {
     }
 
     @PatchMapping("/{name}")
-    public ResponseEntity<StuffResponse> patchStuff(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, BadRequestHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
+    public ResponseEntity<OldStuffResponse> patchStuff(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, BadRequestHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
         if(requestBody == null) {
             throw new BadRequestHttpException("Request body에 정보가 부족합니다.\n필요한 정보 : name(String), emoji(String) 중 하나 이상");
         }
@@ -127,13 +127,13 @@ public class StuffApiController {
             throw new NotFoundHttpException(e);
         }
 
-        return ResponseEntity.ok(StuffResponse.from(newAndSavedStuff));
+        return ResponseEntity.ok(OldStuffResponse.from(newAndSavedStuff));
     }
 
-    private List<StuffResponse> toStuffResponseList(List<OldStuffDto> allStuffDtoList) {
-        List<StuffResponse> allStuffResponseList = new ArrayList<>();
+    private List<OldStuffResponse> toStuffResponseList(List<OldStuffDto> allStuffDtoList) {
+        List<OldStuffResponse> allStuffResponseList = new ArrayList<>();
         for(int i = 0; i < allStuffDtoList.size(); i++) {
-            allStuffResponseList.add(StuffResponse.from(allStuffDtoList.get(i)).toStuffResponseWithoutItemList());
+            allStuffResponseList.add(OldStuffResponse.from(allStuffDtoList.get(i)).toStuffResponseWithoutItemList());
         }
         return allStuffResponseList;
     }

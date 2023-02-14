@@ -2,7 +2,7 @@ package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.ItemRequest;
-import com.example.beliemeserver.controller.responsebody.HistoryResponse;
+import com.example.beliemeserver.controller.responsebody.old.OldHistoryResponse;
 import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.exception.*;
@@ -26,7 +26,7 @@ public class HistoryApiController {
     }
 
     @GetMapping("/histories/")
-    public ResponseEntity<List<HistoryResponse>> getAllHistories(@RequestHeader("user-token") String userToken, @RequestParam(name = "studentId", required = false) String studentId) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException {
+    public ResponseEntity<List<OldHistoryResponse>> getAllHistories(@RequestHeader("user-token") String userToken, @RequestParam(name = "studentId", required = false) String studentId) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException {
         List<OldHistoryDto> historyList;
         try {
             historyList = historyService.getHistories(userToken, studentId);
@@ -44,7 +44,7 @@ public class HistoryApiController {
     }
 
     @GetMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/")
-    public ResponseEntity<HistoryResponse> getHistory(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws InternalServerErrorHttpException, UnauthorizedHttpException, NotFoundHttpException, ForbiddenHttpException {
+    public ResponseEntity<OldHistoryResponse> getHistory(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws InternalServerErrorHttpException, UnauthorizedHttpException, NotFoundHttpException, ForbiddenHttpException {
         OldHistoryDto target;
 
         try {
@@ -63,11 +63,11 @@ public class HistoryApiController {
             throw new ForbiddenHttpException(e);
         }
 
-        return ResponseEntity.ok(HistoryResponse.from(target));
+        return ResponseEntity.ok(OldHistoryResponse.from(target));
     }
 
     @PostMapping("/histories/reserve")
-    public ResponseEntity<HistoryResponse> postReserveHistory(@RequestHeader("user-token") String userToken, @RequestBody ItemRequest itemRequest) throws BadRequestHttpException, InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, ConflictHttpException {
+    public ResponseEntity<OldHistoryResponse> postReserveHistory(@RequestHeader("user-token") String userToken, @RequestBody ItemRequest itemRequest) throws BadRequestHttpException, InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, ConflictHttpException {
         if(itemRequest == null) {
             throw new BadRequestHttpException("'stuff_name'은 필수입니다.('item_num'은 Optional 입니다)");
         }
@@ -96,11 +96,11 @@ public class HistoryApiController {
         }
 
         URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + savedHistory.getItem().getStuff().getName() + "/items/" + savedHistory.getItem().getNum() + "/histories/" + savedHistory.getNum());
-        return ResponseEntity.created(location).body(HistoryResponse.from(savedHistory).toHistoryResponseWithItemWithoutLastHistory());
+        return ResponseEntity.created(location).body(OldHistoryResponse.from(savedHistory).toHistoryResponseWithItemWithoutLastHistory());
     }
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/lost")
-    public ResponseEntity<HistoryResponse> postLostHistory(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException, MethodNotAllowedHttpException, ConflictHttpException {
+    public ResponseEntity<OldHistoryResponse> postLostHistory(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException, MethodNotAllowedHttpException, ConflictHttpException {
         OldHistoryDto savedHistoryDto;
         try {
             savedHistoryDto = historyService.addOrEditToLostHistory(userToken, stuffName, itemNum);
@@ -123,11 +123,11 @@ public class HistoryApiController {
             e.printStackTrace();
             throw new ConflictHttpException(e);
         }
-        return ResponseEntity.ok(HistoryResponse.from(savedHistoryDto).toHistoryResponseWithItemWithoutLastHistory());
+        return ResponseEntity.ok(OldHistoryResponse.from(savedHistoryDto).toHistoryResponseWithItemWithoutLastHistory());
     }
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/cancel")
-    public ResponseEntity<HistoryResponse> patchHistoryToCancel(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
+    public ResponseEntity<OldHistoryResponse> patchHistoryToCancel(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
         OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToCanceledHistory(userToken, stuffName, itemNum, historyNum);
@@ -147,11 +147,11 @@ public class HistoryApiController {
             e.printStackTrace();
             throw new MethodNotAllowedHttpException(e);
         }
-        return ResponseEntity.ok(HistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
+        return ResponseEntity.ok(OldHistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
     }
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/approve")
-    public ResponseEntity<HistoryResponse> patchHistoryToApprove(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
+    public ResponseEntity<OldHistoryResponse> patchHistoryToApprove(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
         OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToApprovedHistory(userToken, stuffName, itemNum, historyNum);
@@ -171,11 +171,11 @@ public class HistoryApiController {
             e.printStackTrace();
             throw new MethodNotAllowedHttpException(e);
         }
-        return ResponseEntity.ok(HistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
+        return ResponseEntity.ok(OldHistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
     }
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/return")
-    public ResponseEntity<HistoryResponse> patchHistoryToReturn(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
+    public ResponseEntity<OldHistoryResponse> patchHistoryToReturn(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
         OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToReturnedHistory(userToken, stuffName, itemNum, historyNum);
@@ -195,11 +195,11 @@ public class HistoryApiController {
             e.printStackTrace();
             throw new MethodNotAllowedHttpException(e);
         }
-        return ResponseEntity.ok(HistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
+        return ResponseEntity.ok(OldHistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
     }
 
     @PatchMapping("/stuffs/{stuffName}/items/{itemNum}/histories/{historyNum}/found")
-    public ResponseEntity<HistoryResponse> patchHistoryToFound(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
+    public ResponseEntity<OldHistoryResponse> patchHistoryToFound(@RequestHeader("user-token") String userToken, @PathVariable String stuffName, @PathVariable int itemNum, @PathVariable int historyNum) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, MethodNotAllowedHttpException, NotFoundHttpException {
         OldHistoryDto updatedHistory;
         try {
             updatedHistory = historyService.editToFoundHistory(userToken, stuffName, itemNum, historyNum);
@@ -219,13 +219,13 @@ public class HistoryApiController {
             e.printStackTrace();
             throw new MethodNotAllowedHttpException(e);
         }
-        return ResponseEntity.ok(HistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
+        return ResponseEntity.ok(OldHistoryResponse.from(updatedHistory).toHistoryResponseWithItemWithoutLastHistory());
     }
 
-    private List<HistoryResponse> toHistoryResponse(List<OldHistoryDto> historyDtoList) {
-        List<HistoryResponse> historyResponseList = new ArrayList<>();
+    private List<OldHistoryResponse> toHistoryResponse(List<OldHistoryDto> historyDtoList) {
+        List<OldHistoryResponse> historyResponseList = new ArrayList<>();
         for(int i = 0; i < historyDtoList.size(); i++) {
-            historyResponseList.add(HistoryResponse.from(historyDtoList.get(i)));
+            historyResponseList.add(OldHistoryResponse.from(historyDtoList.get(i)));
         }
         return historyResponseList;
     }

@@ -89,7 +89,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
                 toUserEntityOrNull(newHistory.lostManager()),
                 toUserEntityOrNull(newHistory.cancelManager()),
                 newHistory.reservedTimeStamp(),
-                newHistory.approvalTimeStamp(),
+                newHistory.approveTimeStamp(),
                 newHistory.returnTimeStamp(),
                 newHistory.lostTimeStamp(),
                 newHistory.cancelTimeStamp()
@@ -114,7 +114,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
                 .setLostManager(toUserEntityOrNull(newHistory.lostManager()))
                 .setCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
                 .setReservedTimeStamp(newHistory.reservedTimeStamp())
-                .setApproveTimeStamp(newHistory.approvalTimeStamp())
+                .setApproveTimeStamp(newHistory.approveTimeStamp())
                 .setReturnTimeStamp(newHistory.returnTimeStamp())
                 .setLostTimeStamp(newHistory.lostTimeStamp())
                 .setCancelTimeStamp(newHistory.cancelTimeStamp());

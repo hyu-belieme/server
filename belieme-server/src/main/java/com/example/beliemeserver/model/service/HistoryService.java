@@ -199,7 +199,7 @@ public class HistoryService extends BaseService {
 
         HistoryDto newHistory = lastHistory
                 .withApproveManager(requester)
-                .withApprovalTimeStamp(System.currentTimeMillis()/1000);
+                .withApproveTimeStamp(System.currentTimeMillis()/1000);
 
         return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }

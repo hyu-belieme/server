@@ -2,8 +2,8 @@ package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.StuffRequest;
-import com.example.beliemeserver.controller.responsebody.ItemResponse;
-import com.example.beliemeserver.controller.responsebody.StuffResponse;
+import com.example.beliemeserver.controller.responsebody.old.OldItemResponse;
+import com.example.beliemeserver.controller.responsebody.old.OldStuffResponse;
 import com.example.beliemeserver.common.Globals;
 
 import com.example.beliemeserver.exception.ConflictException;
@@ -32,7 +32,7 @@ public class ItemApiController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<ItemResponse>> getItemsByStuffName(@RequestHeader("user-token") String userToken, @PathVariable String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
+    public ResponseEntity<List<OldItemResponse>> getItemsByStuffName(@RequestHeader("user-token") String userToken, @PathVariable String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
         List<OldItemDto> itemDtoList;
         try {
             itemDtoList = itemService.getItems(userToken, name);
@@ -51,7 +51,7 @@ public class ItemApiController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<StuffResponse> postOneItem(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest request) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, NotFoundHttpException, ConflictHttpException {
+    public ResponseEntity<OldStuffResponse> postOneItem(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest request) throws UnauthorizedHttpException, InternalServerErrorHttpException, ForbiddenHttpException, NotFoundHttpException, ConflictHttpException {
         URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + name + "/items");
 
         OldStuffDto updatedStuff;
@@ -78,13 +78,13 @@ public class ItemApiController {
             throw new ConflictHttpException(e);
         }
 
-        return ResponseEntity.created(location).body(StuffResponse.from(updatedStuff));
+        return ResponseEntity.created(location).body(OldStuffResponse.from(updatedStuff));
     }
 
-    private List<ItemResponse> toItemResponseList(List<OldItemDto> allItemDtoList) {
-        List<ItemResponse> allItemResponseList = new ArrayList<>();
+    private List<OldItemResponse> toItemResponseList(List<OldItemDto> allItemDtoList) {
+        List<OldItemResponse> allItemResponseList = new ArrayList<>();
         for(int i = 0; i < allItemDtoList.size(); i++) {
-            allItemResponseList.add(ItemResponse.from(allItemDtoList.get(i)));
+            allItemResponseList.add(OldItemResponse.from(allItemDtoList.get(i)));
         }
         return allItemResponseList;
     }

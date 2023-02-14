@@ -1,7 +1,7 @@
 package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.httpexception.HttpException;
-import com.example.beliemeserver.controller.responsebody.ExceptionResponse;
+import com.example.beliemeserver.controller.responsebody.old.OldExceptionResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,7 +21,7 @@ public class Advice {
     //    "path": "/univs/HYU/users/2018008886/permissions"
     //}
     @ExceptionHandler(HttpException.class)
-    public ResponseEntity<ExceptionResponse> exceptionResponse(HttpException e) {
+    public ResponseEntity<OldExceptionResponse> exceptionResponse(HttpException e) {
         return e.toResponseEntity();
     }
 }
