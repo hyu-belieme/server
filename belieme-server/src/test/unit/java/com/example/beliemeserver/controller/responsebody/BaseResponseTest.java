@@ -105,7 +105,140 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("count")).isTrue();
         Assertions.assertThat(json.get("count")).isEqualTo((long) stuff.count());
 
-        // TODO Item 해야함
+        Assertions.assertThat(json.containsKey("itemList")).isTrue();
+        JSONArray jsonArray = (JSONArray) json.get("itemList");
+        for(int i = 0; i < jsonArray.size(); i++) {
+            JSONObject itemJson = (JSONObject) jsonArray.get(i);
+            itemJsonWithoutUnivAndDeptAndStuffInfoCmpAssertions(itemJson, stuff.items().get(i));
+        }
+    }
+
+    protected void itemJsonCmpAssertions(JSONObject json, ItemDto item) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isTrue();
+        JSONObject univJson = (JSONObject) json.get("university");
+        basicUnivJsonCmpAssertions(univJson, item.stuff().department().university());
+
+        Assertions.assertThat(json.containsKey("department")).isTrue();
+        JSONObject deptJson = (JSONObject) json.get("department");
+        deptWithoutUnivJsonCmpAssertions(deptJson, item.stuff().department());
+
+        Assertions.assertThat(json.containsKey("stuffName")).isTrue();
+        Assertions.assertThat(json.get("stuffName")).isEqualTo(item.stuff().name());
+
+        Assertions.assertThat(json.containsKey("stuffEmoji")).isTrue();
+        Assertions.assertThat(json.get("stuffEmoji")).isEqualTo(item.stuff().emoji());
+
+        itemInfoJsonCmpAssertions(json, item);
+
+        historyJsonNestedToItemCmpAssertions(json, item);
+    }
+
+    protected void itemJsonWithoutUnivAndDeptInfoCmpAssertions(JSONObject json, ItemDto item) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isFalse();
+        Assertions.assertThat(json.containsKey("department")).isFalse();
+
+        Assertions.assertThat(json.containsKey("stuffName")).isTrue();
+        Assertions.assertThat(json.get("stuffName")).isEqualTo(item.stuff().name());
+
+        Assertions.assertThat(json.containsKey("stuffEmoji")).isTrue();
+        Assertions.assertThat(json.get("stuffEmoji")).isEqualTo(item.stuff().emoji());
+
+        itemInfoJsonCmpAssertions(json, item);
+
+        historyJsonNestedToItemCmpAssertions(json, item);
+    }
+
+    protected void itemJsonWithoutStuffInfoCmpAssertions(JSONObject json, ItemDto item) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isTrue();
+        JSONObject univJson = (JSONObject) json.get("university");
+        basicUnivJsonCmpAssertions(univJson, item.stuff().department().university());
+
+        Assertions.assertThat(json.containsKey("department")).isTrue();
+        JSONObject deptJson = (JSONObject) json.get("department");
+        deptWithoutUnivJsonCmpAssertions(deptJson, item.stuff().department());
+
+        Assertions.assertThat(json.containsKey("stuffName")).isFalse();
+        Assertions.assertThat(json.containsKey("stuffEmoji")).isFalse();
+
+        itemInfoJsonCmpAssertions(json, item);
+
+        historyJsonNestedToItemCmpAssertions(json, item);
+    }
+
+    protected void itemJsonWithoutUnivAndDeptAndStuffInfoCmpAssertions(JSONObject json, ItemDto item) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isFalse();
+        Assertions.assertThat(json.containsKey("department")).isFalse();
+        Assertions.assertThat(json.containsKey("stuffName")).isFalse();
+        Assertions.assertThat(json.containsKey("stuffEmoji")).isFalse();
+
+        itemInfoJsonCmpAssertions(json, item);
+
+        historyJsonNestedToItemCmpAssertions(json, item);
+    }
+
+    protected void historyJsoCmpAssertions(JSONObject json, HistoryDto history) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isTrue();
+        JSONObject univJson = (JSONObject) json.get("university");
+        basicUnivJsonCmpAssertions(univJson, history.item().stuff().department().university());
+
+        Assertions.assertThat(json.containsKey("department")).isTrue();
+        JSONObject deptJson = (JSONObject) json.get("department");
+        deptWithoutUnivJsonCmpAssertions(deptJson, history.item().stuff().department());
+
+        Assertions.assertThat(json.containsKey("item")).isTrue();
+        JSONObject itemJson = (JSONObject) json.get("item");
+        itemJsonWithoutUnivAndDeptInfoCmpAssertions(itemJson, history.item());
+
+        historyInfoJsonCmpAssertions(json, history);
+    }
+
+    protected void historyJsonWithoutUnivAndDeptInfoCmpAssertions(JSONObject json, HistoryDto history) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isFalse();
+        Assertions.assertThat(json.containsKey("department")).isFalse();
+
+        Assertions.assertThat(json.containsKey("item")).isTrue();
+        JSONObject itemJson = (JSONObject) json.get("item");
+        itemJsonWithoutUnivAndDeptInfoCmpAssertions(itemJson, history.item());
+
+        historyInfoJsonCmpAssertions(json, history);
+    }
+
+    protected void historyJsonWithoutItemInfoCmpAssertions(JSONObject json, HistoryDto history) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isTrue();
+        JSONObject univJson = (JSONObject) json.get("university");
+        basicUnivJsonCmpAssertions(univJson, history.item().stuff().department().university());
+
+        Assertions.assertThat(json.containsKey("department")).isTrue();
+        JSONObject deptJson = (JSONObject) json.get("department");
+        deptWithoutUnivJsonCmpAssertions(deptJson, history.item().stuff().department());
+
+        Assertions.assertThat(json.containsKey("item")).isFalse();
+
+        historyInfoJsonCmpAssertions(json, history);
+    }
+
+    protected void historyJsonWithoutUnivAndDeptAndItemInfoCmpAssertions(JSONObject json, HistoryDto history) {
+        System.out.println(json.toString());
+
+        Assertions.assertThat(json.containsKey("university")).isFalse();
+        Assertions.assertThat(json.containsKey("department")).isFalse();
+        Assertions.assertThat(json.containsKey("item")).isFalse();
+
+        historyInfoJsonCmpAssertions(json, history);
     }
 
     private void deptInfoJsonCmpAssertions(JSONObject json, DepartmentDto department) {
@@ -132,5 +265,61 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("name")).isTrue();
         Assertions.assertThat(json.get("name")).isEqualTo(user.name());
+    }
+
+    private void itemInfoJsonCmpAssertions(JSONObject json, ItemDto item) {
+        Assertions.assertThat(json.containsKey("num")).isTrue();
+        Assertions.assertThat(json.get("num")).isEqualTo((long) item.num());
+
+        Assertions.assertThat(json.containsKey("status")).isTrue();
+        Assertions.assertThat(json.get("status")).isEqualTo(item.status().toString());
+    }
+
+    private void historyInfoJsonCmpAssertions(JSONObject json, HistoryDto history) {
+        Assertions.assertThat(json.containsKey("num")).isTrue();
+        Assertions.assertThat(json.get("num")).isEqualTo((long) history.num());
+
+        userJsonNestedToHistoryCmpAssertions("requester" , json, history.requester());
+        userJsonNestedToHistoryCmpAssertions("approveManager" , json, history.approveManager());
+        userJsonNestedToHistoryCmpAssertions("returnManager" , json, history.returnManager());
+        userJsonNestedToHistoryCmpAssertions("lostManager" , json, history.lostManager());
+        userJsonNestedToHistoryCmpAssertions("cancelManager" , json, history.cancelManager());
+
+        timestampOnHistoryJsonCmpAssertions("reservedTimeStamp", json, history.reservedTimeStamp());
+        timestampOnHistoryJsonCmpAssertions("approveTimeStamp", json, history.approvalTimeStamp());
+        timestampOnHistoryJsonCmpAssertions("returnTimeStamp", json, history.returnTimeStamp());
+        timestampOnHistoryJsonCmpAssertions("lostTimeStamp", json, history.lostTimeStamp());
+        timestampOnHistoryJsonCmpAssertions("cancelTimeStamp", json, history.cancelTimeStamp());
+
+        Assertions.assertThat(json.containsKey("status")).isTrue();
+        Assertions.assertThat(json.get("status")).isEqualTo(history.status().toString());
+    }
+
+    private void timestampOnHistoryJsonCmpAssertions(String tag, JSONObject json, long timeStamp) {
+        if(timeStamp == 0) {
+            Assertions.assertThat(json.containsKey(tag)).isFalse();
+            return;
+        }
+
+        Assertions.assertThat(json.containsKey(tag)).isTrue();
+        Assertions.assertThat(json.get(tag)).isEqualTo(timeStamp);
+    }
+
+    private void userJsonNestedToHistoryCmpAssertions(String tag, JSONObject json, UserDto user) {
+        if(user != null) {
+            Assertions.assertThat(json.containsKey(tag)).isTrue();
+            JSONObject userJson = (JSONObject) json.get(tag);
+            userWithoutSecureInfoJsonCmpAssertions(userJson, user);
+        }
+    }
+
+    private void historyJsonNestedToItemCmpAssertions(JSONObject json, ItemDto item) {
+        Assertions.assertThat(json.containsKey("lastHistory")).isTrue();
+        JSONObject historyJson = (JSONObject) json.get("lastHistory");
+        if(item.lastHistory() == null) {
+            Assertions.assertThat(historyJson).isNull();
+            return;
+        }
+        historyJsonWithoutUnivAndDeptAndItemInfoCmpAssertions(historyJson, item.lastHistory());
     }
 }
