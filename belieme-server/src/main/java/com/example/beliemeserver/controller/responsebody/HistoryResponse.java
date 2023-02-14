@@ -84,7 +84,7 @@ public class HistoryResponse extends JsonResponse {
                 toNestedResponse(UserResponse.from(historyDto.returnManager())),
                 toNestedResponse(UserResponse.from(historyDto.lostManager())),
                 toNestedResponse(UserResponse.from(historyDto.cancelManager())),
-                historyDto.reservedTimeStamp(), historyDto.approvalTimeStamp(),
+                historyDto.reservedTimeStamp(), historyDto.approveTimeStamp(),
                 historyDto.returnTimeStamp(), historyDto.lostTimeStamp(),
                 historyDto.cancelTimeStamp(), historyDto.status().toString());
     }

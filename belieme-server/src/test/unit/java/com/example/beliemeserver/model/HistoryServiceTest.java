@@ -886,7 +886,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
             int historyNum = integerCaptor.getValue();
             UserDto historyApprovalManage = historyCaptor.getValue().approveManager();
-            long approvalTimestamp = historyCaptor.getValue().approvalTimeStamp();
+            long approvalTimestamp = historyCaptor.getValue().approveTimeStamp();
 
             Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
             Assertions.assertThat(historyApprovalManage).isEqualTo(requester);

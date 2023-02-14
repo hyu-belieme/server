@@ -69,8 +69,8 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("createTimeStamp")).isTrue();
         Assertions.assertThat(json.get("createTimeStamp")).isEqualTo(user.createTimeStamp());
 
-        Assertions.assertThat(json.containsKey("approvalTimeStamp")).isTrue();
-        Assertions.assertThat(json.get("approvalTimeStamp")).isEqualTo(user.approvalTimeStamp());
+        Assertions.assertThat(json.containsKey("approveTimeStamp")).isTrue();
+        Assertions.assertThat(json.get("approveTimeStamp")).isEqualTo(user.approvalTimeStamp());
     }
 
     protected void userWithoutSecureInfoJsonCmpAssertions(JSONObject json, UserDto user) {
@@ -80,7 +80,7 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("token")).isFalse();
         Assertions.assertThat(json.containsKey("createTimeStamp")).isFalse();
-        Assertions.assertThat(json.containsKey("approvalTimeStamp")).isFalse();
+        Assertions.assertThat(json.containsKey("approveTimeStamp")).isFalse();
     }
 
     protected void stuffJsonCmpAssertions(JSONObject json, StuffDto stuff) {
@@ -286,7 +286,7 @@ public class BaseResponseTest {
         userJsonNestedToHistoryCmpAssertions("cancelManager" , json, history.cancelManager());
 
         timestampOnHistoryJsonCmpAssertions("reservedTimeStamp", json, history.reservedTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("approveTimeStamp", json, history.approvalTimeStamp());
+        timestampOnHistoryJsonCmpAssertions("approveTimeStamp", json, history.approveTimeStamp());
         timestampOnHistoryJsonCmpAssertions("returnTimeStamp", json, history.returnTimeStamp());
         timestampOnHistoryJsonCmpAssertions("lostTimeStamp", json, history.lostTimeStamp());
         timestampOnHistoryJsonCmpAssertions("cancelTimeStamp", json, history.cancelTimeStamp());
