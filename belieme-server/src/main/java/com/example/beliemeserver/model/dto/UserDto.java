@@ -136,7 +136,7 @@ public record UserDto(
                 ", name='" + name + '\'' +
                 ", token='" + token + '\'' +
                 ", createTimeStamp=" + createTimeStamp +
-                ", approveTimeStamp=" + approvalTimeStamp +
+                ", approvalTimeStamp=" + approvalTimeStamp +
                 ", majors=" + majors +
                 ", authorities=" + authorities +
                 '}';
