@@ -1,5 +1,7 @@
 package com.example.beliemeserver.controller.api;
 
+import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.controller.httpexception.BadRequestHttpException;
 import com.example.beliemeserver.controller.responsebody.UserResponse;
 import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.service.UserService;
@@ -13,6 +15,7 @@ import java.util.List;
 @RequestMapping(path="")
 public class UserApiController {
     private final UserService userService;
+    private final String HYU_UNIV_LOGIN_PATH = "/universities/" + Globals.HANYANG_UNIVERSITY.code() + "/login";
 
     public UserApiController(UserService userService) {
         this.userService = userService;
@@ -47,6 +50,21 @@ public class UserApiController {
         List<UserDto> userDtoList = userService.getListByDepartment(userToken, universityCode, departmentCode);
         List<UserResponse> responseList = toResponseList(userDtoList);
         return ResponseEntity.ok(responseList);
+    }
+
+    @PatchMapping("/universities/{university-code}/login")
+    public ResponseEntity<UserResponse> loginByUniversityApi(
+            @RequestHeader("api-token") String apiToken,
+            @PathVariable("university-code") String universityCode
+    ) {
+        if(universityCode.equals(Globals.HANYANG_UNIVERSITY.code())) {
+            UserDto userDto = userService.updateUserFromHanyangUniversity(apiToken);
+            UserResponse response = UserResponse.from(userDto);
+            return ResponseEntity.ok(response);
+        }
+
+        // TODO exception 한번에 정리할 때 손 보기
+        throw new BadRequestHttpException("");
     }
 
     private List<UserResponse> toResponseList(List<UserDto> userDtoList) {
