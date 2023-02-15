@@ -1,5 +1,6 @@
 package com.example.beliemeserver.controller.api;
 
+import com.example.beliemeserver.controller.httpexception.BadRequestHttpException;
 import com.example.beliemeserver.controller.responsebody.HistoryResponse;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.service.HistoryService;
@@ -22,12 +23,28 @@ public class HistoryApiController {
     public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfDepartment(
             @RequestHeader("user-token") String userToken,
             @PathVariable("university-code") String universityCode,
-            @PathVariable("department-code") String departmentCode
+            @PathVariable("department-code") String departmentCode,
+            @RequestParam("requester-university-code") String requesterUniversityCode,
+            @RequestParam("requester-student-id") String requesterStudentId
     ) {
-        List<HistoryDto> historyDtoList = historyService.getListByDepartment(
-                userToken, universityCode, departmentCode);
-        List<HistoryResponse> responseList = toResponseList(historyDtoList);
-        return ResponseEntity.ok(responseList);
+        if(requesterUniversityCode == null && requesterStudentId == null) {
+            List<HistoryDto> historyDtoList = historyService.getListByDepartment(
+                    userToken, universityCode, departmentCode);
+            List<HistoryResponse> responseList = toResponseList(historyDtoList);
+            return ResponseEntity.ok(responseList);
+        }
+
+        if(requesterUniversityCode != null && requesterStudentId != null) {
+            List<HistoryDto> historyDtoList = historyService.getListByDepartmentAndRequester(
+                    userToken, universityCode, departmentCode,
+                    requesterUniversityCode, requesterStudentId
+            );
+            List<HistoryResponse> responseList = toResponseList(historyDtoList);
+            return ResponseEntity.ok(responseList);
+        }
+
+        // TODO exception 한번에 정리할 때 손 보기
+        throw new BadRequestHttpException("");
     }
 
     private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {
