@@ -45,6 +45,19 @@ public class ItemApiController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/items")
+    public ResponseEntity<ItemResponse> createNewItem(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName
+    ) {
+        ItemDto itemDto = itemService.create(
+                userToken, universityCode, departmentCode, stuffName);
+        ItemResponse response = ItemResponse.from(itemDto);
+        return ResponseEntity.ok(response);
+    }
+
     private List<ItemResponse> toResponseList(List<ItemDto> itemDtoList) {
         List<ItemResponse> responseList = new ArrayList<>();
         for(ItemDto dto : itemDtoList) {
