@@ -30,6 +30,19 @@ public class StuffApiController {
         return ResponseEntity.ok(responseList);
     }
 
+    @GetMapping("/stuffs/{stuff-name}")
+    public ResponseEntity<StuffResponse> getStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName
+    ) {
+        StuffDto stuffDto = stuffService.getByIndex(
+                userToken, universityCode, departmentCode,stuffName);
+        StuffResponse response = StuffResponse.from(stuffDto);
+        return ResponseEntity.ok(response);
+    }
+
     private List<StuffResponse> toResponseList(List<StuffDto> stuffDtoList) {
         List<StuffResponse> responseList = new ArrayList<>();
         for(StuffDto dto : stuffDtoList) {
