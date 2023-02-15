@@ -74,6 +74,22 @@ public class HistoryApiController {
         return ResponseEntity.ok(responseList);
     }
 
+    @GetMapping("/stuffs/{stuff-name}/items/{item-num}/histories/{history-num}")
+    public ResponseEntity<HistoryResponse> getAllHistoriesOfItem(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName,
+            @PathVariable("item-num") int itemNum,
+            @PathVariable("history-num") int historyNum
+    ) {
+        HistoryDto historyDto = historyService.getByIndex(
+                userToken, universityCode, departmentCode,
+                stuffName, itemNum, historyNum);
+        HistoryResponse response = HistoryResponse.from(historyDto);
+        return ResponseEntity.ok(response);
+    }
+
     private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {
         List<HistoryResponse> responseList = new ArrayList<>();
         for(HistoryDto dto : historyDtoList) {
