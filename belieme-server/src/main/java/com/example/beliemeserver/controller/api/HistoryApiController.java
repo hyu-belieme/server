@@ -90,6 +90,20 @@ public class HistoryApiController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/stuffs/{stuff-name}/reserve")
+    public ResponseEntity<HistoryResponse> reserveStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName
+    ) {
+        HistoryDto historyDto = historyService.createReservation(
+                userToken, universityCode, departmentCode,
+                stuffName, null);
+        HistoryResponse response = HistoryResponse.from(historyDto);
+        return ResponseEntity.ok(response);
+    }
+
     private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {
         List<HistoryResponse> responseList = new ArrayList<>();
         for(HistoryDto dto : historyDtoList) {
