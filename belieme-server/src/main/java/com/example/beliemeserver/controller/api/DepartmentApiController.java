@@ -54,7 +54,7 @@ public class DepartmentApiController {
     }
 
     @PatchMapping("/universities/{university-code}/departments/{department-code}")
-    public ResponseEntity<DepartmentResponse> createNewDepartment(
+    public ResponseEntity<DepartmentResponse> updateDepartment(
             @RequestHeader("user-token") String userToken,
             @PathVariable("university-code") String universityCode,
             @PathVariable("department-code") String departmentCode,
