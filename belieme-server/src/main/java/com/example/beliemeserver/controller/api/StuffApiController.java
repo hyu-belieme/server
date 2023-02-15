@@ -58,6 +58,21 @@ public class StuffApiController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/stuffs/{stuff-name}")
+    public ResponseEntity<StuffResponse> updateStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName,
+            @RequestBody StuffRequest newStuff
+    ) {
+        StuffDto stuffDto = stuffService.update(
+                userToken, universityCode, departmentCode, stuffName,
+                newStuff.getName(), newStuff.getEmoji());
+        StuffResponse response = StuffResponse.from(stuffDto);
+        return ResponseEntity.ok(response);
+    }
+
     private List<StuffResponse> toResponseList(List<StuffDto> stuffDtoList) {
         List<StuffResponse> responseList = new ArrayList<>();
         for(StuffDto dto : stuffDtoList) {
