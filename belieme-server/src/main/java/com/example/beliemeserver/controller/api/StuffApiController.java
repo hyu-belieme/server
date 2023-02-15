@@ -1,5 +1,6 @@
 package com.example.beliemeserver.controller.api;
 
+import com.example.beliemeserver.controller.requestbody.StuffRequest;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
 import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.service.StuffService;
@@ -39,6 +40,20 @@ public class StuffApiController {
     ) {
         StuffDto stuffDto = stuffService.getByIndex(
                 userToken, universityCode, departmentCode,stuffName);
+        StuffResponse response = StuffResponse.from(stuffDto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/stuffs")
+    public ResponseEntity<StuffResponse> createNewStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @RequestBody StuffRequest newStuff
+    ) {
+        StuffDto stuffDto = stuffService.create(
+                userToken, universityCode, departmentCode,
+                newStuff.getName(), newStuff.getEmoji(), newStuff.getAmount());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
     }
