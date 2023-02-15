@@ -4,7 +4,7 @@ import com.example.beliemeserver.controller.responsebody.old.OldExceptionRespons
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class HttpException extends Exception {
+public class HttpException extends RuntimeException {
     protected HttpStatus httpStatus;
     protected String message;
 
