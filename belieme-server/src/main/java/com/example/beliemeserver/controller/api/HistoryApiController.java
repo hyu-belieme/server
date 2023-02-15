@@ -47,6 +47,19 @@ public class HistoryApiController {
         throw new BadRequestHttpException("");
     }
 
+    @GetMapping("/stuffs/{stuff-name}/histories")
+    public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName
+    ) {
+        List<HistoryDto> historyDtoList = historyService.getListByStuff(
+                userToken, universityCode, departmentCode, stuffName);
+        List<HistoryResponse> responseList = toResponseList(historyDtoList);
+        return ResponseEntity.ok(responseList);
+    }
+
     private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {
         List<HistoryResponse> responseList = new ArrayList<>();
         for(HistoryDto dto : historyDtoList) {
