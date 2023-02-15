@@ -164,6 +164,21 @@ public class HistoryApiController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/stuffs/{stuff-name}/items/{item-num}/cancel")
+    public ResponseEntity<HistoryResponse> makeItemCancel(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName,
+            @PathVariable("item-num") int itemNum
+    ) {
+        HistoryDto historyDto = historyService.makeItemCancel(
+                userToken, universityCode, departmentCode,
+                stuffName, itemNum);
+        HistoryResponse response = HistoryResponse.from(historyDto);
+        return ResponseEntity.ok(response);
+    }
+
     private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {
         List<HistoryResponse> responseList = new ArrayList<>();
         for(HistoryDto dto : historyDtoList) {
