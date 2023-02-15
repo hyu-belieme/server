@@ -31,6 +31,20 @@ public class ItemApiController {
         return ResponseEntity.ok(responseList);
     }
 
+    @GetMapping("/items/{item-num}")
+    public ResponseEntity<ItemResponse> getItem(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName,
+            @PathVariable("item-num") int itemNum
+    ) {
+        ItemDto itemDto = itemService.getByIndex(
+                userToken, universityCode, departmentCode, stuffName, itemNum);
+        ItemResponse response = ItemResponse.from(itemDto);
+        return ResponseEntity.ok(response);
+    }
+
     private List<ItemResponse> toResponseList(List<ItemDto> itemDtoList) {
         List<ItemResponse> responseList = new ArrayList<>();
         for(ItemDto dto : itemDtoList) {
