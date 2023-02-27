@@ -5,6 +5,7 @@ import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public record UserDto(
         @NonNull UniversityDto university, @NonNull String studentId,
@@ -181,8 +182,17 @@ public record UserDto(
             }
         }
 
+//        for(AuthorityDto authority : authorities) {
+//            if(department.equals(authority.department())
+//                    && authority.permission() == AuthorityDto.Permission.DEFAULT) {
+//                maxPermission = AuthorityDto.Permission.USER;
+//                break;
+//            }
+//        }
+
         for(AuthorityDto authority : authorities) {
-            if(department.equals(authority.department())) {
+            if(department.equals(authority.department())
+                    && authority.permission() != AuthorityDto.Permission.DEFAULT) {
                 maxPermission = authority.permission();
                 break;
             }

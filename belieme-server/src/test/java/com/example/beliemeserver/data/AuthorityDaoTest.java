@@ -24,7 +24,7 @@ public class AuthorityDaoTest extends DaoTest {
     @Test
     public void createTest() {
         AuthorityDto newAuthority = new AuthorityDto(
-                DummyDataSet.departmentDummies.get(3),
+                DummyDataSet.departmentDummies.get(4),
                 AuthorityDto.Permission.BANNED
         );
 
@@ -64,7 +64,7 @@ public class AuthorityDaoTest extends DaoTest {
         AuthorityDto.Permission permission = AuthorityDto.Permission.STAFF;
 
         AuthorityDto newAuthority = new AuthorityDto(
-                DummyDataSet.departmentDummies.get(3),
+                DummyDataSet.departmentDummies.get(4),
                 AuthorityDto.Permission.STAFF
         );
 
@@ -74,10 +74,10 @@ public class AuthorityDaoTest extends DaoTest {
     @Test
     public void updateFailByNotFound() {
         String universityCode = "CKU";
-        String departmentCode = "STU";
+        String departmentCode = "ME";
         AuthorityDto.Permission permission = AuthorityDto.Permission.BANNED;
         AuthorityDto newAuthority = new AuthorityDto(
-                DummyDataSet.departmentDummies.get(3),
+                DummyDataSet.departmentDummies.get(4),
                 AuthorityDto.Permission.STAFF
         );
 

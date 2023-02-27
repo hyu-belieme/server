@@ -50,10 +50,11 @@ public record AuthorityDto(
     }
 
     public enum Permission {
-        BANNED, USER, STAFF, MASTER, DEVELOPER;
+        DEFAULT, BANNED, USER, STAFF, MASTER, DEVELOPER;
 
         public static Permission create(String string) throws FormatDoesNotMatchException {
             return switch (string) {
+                case "DEFAULT" -> DEFAULT;
                 case "BANNED" -> BANNED;
                 case "USER" -> USER;
                 case "STAFF" -> STAFF;
@@ -92,6 +93,7 @@ public record AuthorityDto(
                 case STAFF -> other != DEVELOPER && other != MASTER;
                 case USER -> other == BANNED || other == USER;
                 case BANNED -> other == BANNED;
+                default -> false;
             };
         }
     }

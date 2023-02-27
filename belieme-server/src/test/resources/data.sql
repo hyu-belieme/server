@@ -18,6 +18,7 @@ insert into department(id, university_id, code, name) values (1, 1, 'CSE', '컴�
 insert into department(id, university_id, code, name) values (2, 1, 'STU', '총학생회');
 insert into department(id, university_id, code, name) values (3, 2, 'MED', '의과대학');
 insert into department(id, university_id, code, name) values (4, 2, 'STU', '총학생회');
+insert into department(id, university_id, code, name) values (5, 2, 'ME', '기계공학과');
 
 insert into major_department_join(department_id, major_id) values (1, 1);
 insert into major_department_join(department_id, major_id) values (1, 2);
@@ -34,22 +35,34 @@ insert into major_department_join(department_id, major_id) values (4, 6);
 insert into major_department_join(department_id, major_id) values (4, 7);
 insert into major_department_join(department_id, major_id) values (4, 8);
 
+insert into major_department_join(department_id, major_id) values (5, 4);
+insert into major_department_join(department_id, major_id) values (5, 7);
+
 -- insert authority
-insert into authority(id, department_id, permission) values (1, 1, 'BANNED');
-insert into authority(id, department_id, permission) values (2, 1, 'USER');
-insert into authority(id, department_id, permission) values (3, 1, 'STAFF');
-insert into authority(id, department_id, permission) values (4, 1, 'MASTER');
-insert into authority(id, department_id, permission) values (5, 1, 'DEVELOPER');
-insert into authority(id, department_id, permission) values (6, 2, 'BANNED');
-insert into authority(id, department_id, permission) values (7, 2, 'USER');
-insert into authority(id, department_id, permission) values (8, 2, 'STAFF');
-insert into authority(id, department_id, permission) values (9, 2, 'MASTER');
-insert into authority(id, department_id, permission) values (10, 2, 'DEVELOPER');
-insert into authority(id, department_id, permission) values (11, 3, 'BANNED');
-insert into authority(id, department_id, permission) values (12, 3, 'USER');
-insert into authority(id, department_id, permission) values (13, 3, 'STAFF');
-insert into authority(id, department_id, permission) values (14, 3, 'MASTER');
-insert into authority(id, department_id, permission) values (15, 3, 'DEVELOPER');
+insert into authority(id, department_id, permission) values (1, 1, 'DEFAULT');
+insert into authority(id, department_id, permission) values (2, 1, 'BANNED');
+insert into authority(id, department_id, permission) values (3, 1, 'USER');
+insert into authority(id, department_id, permission) values (4, 1, 'STAFF');
+insert into authority(id, department_id, permission) values (5, 1, 'MASTER');
+insert into authority(id, department_id, permission) values (6, 1, 'DEVELOPER');
+insert into authority(id, department_id, permission) values (7, 2, 'DEFAULT');
+insert into authority(id, department_id, permission) values (8, 2, 'BANNED');
+insert into authority(id, department_id, permission) values (9, 2, 'USER');
+insert into authority(id, department_id, permission) values (10, 2, 'STAFF');
+insert into authority(id, department_id, permission) values (11, 2, 'MASTER');
+insert into authority(id, department_id, permission) values (12, 2, 'DEVELOPER');
+insert into authority(id, department_id, permission) values (13, 3, 'DEFAULT');
+insert into authority(id, department_id, permission) values (14, 3, 'BANNED');
+insert into authority(id, department_id, permission) values (15, 3, 'USER');
+insert into authority(id, department_id, permission) values (16, 3, 'STAFF');
+insert into authority(id, department_id, permission) values (17, 3, 'MASTER');
+insert into authority(id, department_id, permission) values (18, 3, 'DEVELOPER');
+insert into authority(id, department_id, permission) values (19, 4, 'DEFAULT');
+insert into authority(id, department_id, permission) values (20, 4, 'BANNED');
+insert into authority(id, department_id, permission) values (21, 4, 'USER');
+insert into authority(id, department_id, permission) values (22, 4, 'STAFF');
+insert into authority(id, department_id, permission) values (23, 4, 'MASTER');
+insert into authority(id, department_id, permission) values (24, 4, 'DEVELOPER');
 
 -- insert user
 insert into user(id, university_id, student_id, name,token, create_time_stamp, approval_time_stamp)
@@ -71,11 +84,23 @@ insert into major_user_join(user_id, major_id) values (3, 5);
 insert into major_user_join(user_id, major_id) values (4, 6);
 insert into major_user_join(user_id, major_id) values (5, 8);
 
-insert into authority_user_join(user_id, authority_id) values (1, 4);
-insert into authority_user_join(user_id, authority_id) values (1, 9);
-insert into authority_user_join(user_id, authority_id) values (1, 12);
+insert into authority_user_join(user_id, authority_id) values (1, 1);
+insert into authority_user_join(user_id, authority_id) values (1, 7);
+insert into authority_user_join(user_id, authority_id) values (1, 5);
+insert into authority_user_join(user_id, authority_id) values (1, 11);
+insert into authority_user_join(user_id, authority_id) values (1, 15);
+
 insert into authority_user_join(user_id, authority_id) values (2, 1);
-insert into authority_user_join(user_id, authority_id) values (4, 14);
+insert into authority_user_join(user_id, authority_id) values (2, 7);
+insert into authority_user_join(user_id, authority_id) values (2, 2);
+
+insert into authority_user_join(user_id, authority_id) values (3, 7);
+
+insert into authority_user_join(user_id, authority_id) values (4, 13);
+insert into authority_user_join(user_id, authority_id) values (4, 19);
+insert into authority_user_join(user_id, authority_id) values (4, 17);
+
+insert into authority_user_join(user_id, authority_id) values (5, 19);
 
 -- insert stuff
 insert into stuff(id, department_id, name, emoji, next_item_num)

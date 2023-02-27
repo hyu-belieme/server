@@ -60,11 +60,17 @@ public class DummyDataSet {
                 majorDummies.get(7)
         ));
 
+        List<MajorDto> CKU_ME_BASE_MAJORS = new ArrayList<>(List.of(
+                majorDummies.get(3),
+                majorDummies.get(6)
+        ));
+
         departmentDummies = new ArrayList<>(List.of(
                 new DepartmentDto(universityDummies.get(0), "CSE", "컴퓨터소프트웨어학부", HYU_CSE_BASE_MAJORS),
                 new DepartmentDto(universityDummies.get(0), "STU", "총학생회", HYU_STU_BASE_MAJORS),
                 new DepartmentDto(universityDummies.get(1), "MED", "의과대학", CKU_MED_BASE_MAJORS),
-                new DepartmentDto(universityDummies.get(1), "STU", "총학생회", CKU_STU_BASE_MAJORS)
+                new DepartmentDto(universityDummies.get(1), "STU", "총학생회", CKU_STU_BASE_MAJORS),
+                new DepartmentDto(universityDummies.get(1), "ME", "기계공학과", CKU_ME_BASE_MAJORS)
         ));
 
         authorityDummies = new ArrayList<>();
@@ -92,12 +98,23 @@ public class DummyDataSet {
                         List.of(majorDummies.get(7)), new ArrayList<>())
         ));
 
-        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(0 * 5 + 3)));
-        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(1 * 5 + 3)));
-        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(2 * 5 + 1)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(0 * 6 + 0)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(1 * 6 + 0)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(0 * 6 + 4)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(1 * 6 + 4)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(2 * 6 + 2)));
 
-        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(0 * 5 + 0)));
-        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(2 * 5 + 3)));
+        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(0 * 6 + 0)));
+        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(1 * 6 + 0)));
+        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(0 * 6 + 1)));
+
+        userDummies.set(2, userDummies.get(2).withAuthorityAdd(authorityDummies.get(1 * 6 + 0)));
+
+        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(2 * 6 + 0)));
+        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(3 * 6 + 0)));
+        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(2 * 6 + 4)));
+
+        userDummies.set(4, userDummies.get(4).withAuthorityAdd(authorityDummies.get(3 * 6 + 0)));
 
         stuffDummies = new ArrayList<>(List.of(
                 StuffDto.init(departmentDummies.get(0), "우산", "☂"),

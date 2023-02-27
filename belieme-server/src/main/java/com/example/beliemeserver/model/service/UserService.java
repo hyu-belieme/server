@@ -109,6 +109,17 @@ public class UserService extends BaseService {
             newUser = UserDto.init(university, studentId, name);
         }
         List<MajorDto> newBaseMajors = newMajors(majorCodes, university, newUser);
+
+//        newUser.authorities().removeIf(
+//                (authority) -> authority.permission() == AuthorityDto.Permission.DEFAULT);
+//
+//        List<DepartmentDto> candidateDepartments = departmentDao.getListByUniversity(universityCode);
+//        for(DepartmentDto department : candidateDepartments) {
+//            if(department.baseMajors().stream().anyMatch((major) -> majorCodes.contains(major.code()))) {
+//                newUser.authorities().add(new AuthorityDto(department, AuthorityDto.Permission.DEFAULT));
+//            }
+//        }
+
         newUser = newUser.withName(name)
                 .withApprovalTimeStamp(currentTimestamp())
                 .withMajors(newBaseMajors)
