@@ -1,9 +1,8 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -59,11 +58,7 @@ public class UserEntity extends DataEntity {
     private UniversityEntity university;
 
     @NonNull
-    @OneToMany(mappedBy = "user")
-    private List<MajorUserJoinEntity> majorJoin;
-
-    @NonNull
-    @OneToMany(mappedBy = "userId") // TODO 실험
+    @OneToMany(mappedBy = "userId")
     private List<AuthorityUserJoinEntity> authorityJoin;
 
     public UserEntity(UniversityEntity university, String studentId, String name, String token, long createTimeStamp, long approvalTimeStamp) {
@@ -74,7 +69,6 @@ public class UserEntity extends DataEntity {
         this.token = token;
         this.createTimeStamp = createTimeStamp;
         this.approvalTimeStamp = approvalTimeStamp;
-        this.majorJoin = new ArrayList<>();
         this.authorityJoin = new ArrayList<>();
     }
 
@@ -92,20 +86,7 @@ public class UserEntity extends DataEntity {
         this.authorityJoin.remove(authority);
     }
 
-    public void addMajor(MajorUserJoinEntity major) {
-        this.majorJoin.add(major);
-    }
-
-    public void removeMajor(MajorUserJoinEntity major) {
-        this.majorJoin.remove(major);
-    }
-
     public UserDto toUserDto() throws FormatDoesNotMatchException {
-        List<MajorDto> majorDtoList = new ArrayList<>();
-        for(MajorUserJoinEntity major : majorJoin) {
-            majorDtoList.add(major.getMajor().toMajorDto());
-        }
-
         List<AuthorityDto> authorityDtoList = new ArrayList<>();
         for(AuthorityUserJoinEntity authority : authorityJoin) {
             authorityDtoList.add(authority.getAuthority().toAuthorityDto());
@@ -118,7 +99,6 @@ public class UserEntity extends DataEntity {
                 token,
                 createTimeStamp,
                 approvalTimeStamp,
-                majorDtoList,
                 authorityDtoList
         );
     }

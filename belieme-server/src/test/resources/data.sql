@@ -76,14 +76,6 @@ values (4, 2, '2018008886', '이석환', 'TEST4', 1673155358, 1673155358);
 insert into user(id, university_id, student_id, name,token, create_time_stamp, approval_time_stamp)
 values (5, 2, '2018008887', '이석환', 'TEST5', 1673155358, 1673155358);
 
-insert into major_user_join(user_id, major_id) values (1, 1);
-insert into major_user_join(user_id, major_id) values (2, 2);
-insert into major_user_join(user_id, major_id) values (2, 5);
-insert into major_user_join(user_id, major_id) values (3, 3);
-insert into major_user_join(user_id, major_id) values (3, 5);
-insert into major_user_join(user_id, major_id) values (4, 6);
-insert into major_user_join(user_id, major_id) values (5, 8);
-
 insert into authority_user_join(user_id, authority_id) values (1, 1);
 insert into authority_user_join(user_id, authority_id) values (1, 7);
 insert into authority_user_join(user_id, authority_id) values (1, 5);

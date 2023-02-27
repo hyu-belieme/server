@@ -1,14 +1,16 @@
 package com.example.beliemeserver.data.daoimpl;
 
-import com.example.beliemeserver.data.entity.*;
+import com.example.beliemeserver.data.entity.AuthorityEntity;
+import com.example.beliemeserver.data.entity.AuthorityUserJoinEntity;
+import com.example.beliemeserver.data.entity.UniversityEntity;
+import com.example.beliemeserver.data.entity.UserEntity;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.model.dao.UserDao;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dao.UserDao;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +20,8 @@ import java.util.List;
 @Component
 public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     @Autowired
-    public UserDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorUserJoinRepository majorUserJoinRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
-        super(universityRepository, departmentRepository, userRepository, majorRepository, majorUserJoinRepository, majorDepartmentJoinRepository, authorityRepository, authorityUserJoinRepository, stuffRepository, itemRepository, historyRepository);
+    public UserDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+        super(universityRepository, departmentRepository, userRepository, majorRepository, majorDepartmentJoinRepository, authorityRepository, authorityUserJoinRepository, stuffRepository, itemRepository, historyRepository);
     }
 
     @Override
@@ -56,7 +58,6 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     @Override
     public UserDto create(UserDto user) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
         UserEntity newUserEntity = saveUserOnly(user);
-        saveMajorJoins(newUserEntity, user.majors());
         saveAuthorityJoins(newUserEntity, user.authorities());
 
         return newUserEntity.toUserDto();
@@ -66,11 +67,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     public UserDto update(String universityCode, String studentId, UserDto newUser) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
         UserEntity target = findUserEntity(universityCode, studentId);
         updateUserOnly(target, newUser);
-
-        removeAllMajorJoins(target);
         removeAllAuthorityJoins(target);
-
-        saveMajorJoins(target, newUser.majors());
         saveAuthorityJoins(target, newUser.authorities());
         return target.toUserDto();
     }
@@ -106,17 +103,6 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
                 .setApprovalTimeStamp(newUser.approvalTimeStamp());
     }
 
-    private void saveMajorJoins(UserEntity newUserEntity, List<MajorDto> majors) throws NotFoundException {
-        for(MajorDto major: majors) {
-            MajorEntity baseMajorEntity = findMajorEntity(major);
-            MajorUserJoinEntity newJoin = new MajorUserJoinEntity(
-                    baseMajorEntity,
-                    newUserEntity
-            );
-            majorUserJoinRepository.save(newJoin);
-        }
-    }
-
     private void saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) throws NotFoundException {
         for(AuthorityDto authority: authorities) {
             AuthorityEntity authorityEntity = findAuthorityEntity(authority);
@@ -125,12 +111,6 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
                     newUserEntity
             );
             authorityUserJoinRepository.save(newJoin);
-        }
-    }
-
-    private void removeAllMajorJoins(UserEntity user) {
-        while (user.getMajorJoin().size() > 0) {
-            majorUserJoinRepository.delete(user.getMajorJoin().get(0));
         }
     }
 

@@ -118,10 +118,6 @@ public class UserDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetStudentId = "2018008886";
 
-
-        List<MajorDto> majors = List.of(
-                DummyDataSet.majorDummies.get(0)
-        );
         List<AuthorityDto> authorities = List.of(
                 DummyDataSet.authorityDummies.get(0),
                 DummyDataSet.authorityDummies.get(1),
@@ -135,7 +131,6 @@ public class UserDaoTest extends DaoTest {
                 "TEST1",
                 1673155358,
                 1673155358,
-                majors,
                 authorities
         );
 
@@ -147,10 +142,6 @@ public class UserDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetStudentId = "2018008886";
 
-
-        List<MajorDto> majors = List.of(
-                DummyDataSet.majorDummies.get(0)
-        );
         List<AuthorityDto> authorities = List.of(
                 DummyDataSet.authorityDummies.get(0),
                 DummyDataSet.authorityDummies.get(1),
@@ -164,7 +155,6 @@ public class UserDaoTest extends DaoTest {
                 "TEST10",
                 1673155358,
                 1673155358,
-                majors,
                 authorities
         );
 
@@ -176,11 +166,6 @@ public class UserDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetStudentId = "2018008886";
 
-
-        List<MajorDto> majors = List.of(
-                DummyDataSet.majorDummies.get(0),
-                DummyDataSet.majorDummies.get(4)
-        );
         List<AuthorityDto> authorities = List.of(
                 DummyDataSet.authorityDummies.get(0),
                 DummyDataSet.authorityDummies.get(1)
@@ -193,7 +178,6 @@ public class UserDaoTest extends DaoTest {
                 "TEST10",
                 1673155358,
                 1673155358,
-                majors,
                 authorities
         );
 
@@ -205,10 +189,6 @@ public class UserDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetStudentId = "2018008886";
 
-
-        List<MajorDto> majors = List.of(
-                DummyDataSet.majorDummies.get(0)
-        );
         List<AuthorityDto> authorities = List.of(
                 DummyDataSet.authorityDummies.get(0),
                 DummyDataSet.authorityDummies.get(1),
@@ -222,7 +202,6 @@ public class UserDaoTest extends DaoTest {
                 "TEST1",
                 1673155356,
                 1673155356,
-                majors,
                 authorities
         );
 

@@ -11,16 +11,15 @@ public record UserDto(
         @NonNull UniversityDto university, @NonNull String studentId,
         @NonNull String name, @NonNull String token,
         long createTimeStamp, long approvalTimeStamp,
-        @NonNull List<MajorDto> majors,
         @NonNull List<AuthorityDto> authorities
 ) {
-    public static final UserDto nestedEndpoint = new UserDto(UniversityDto.nestedEndpoint, "-", "-", "", 0, 0, new ArrayList<>(), new ArrayList<>());
+    public static final UserDto nestedEndpoint = new UserDto(UniversityDto.nestedEndpoint, "-", "-", "", 0, 0, new ArrayList<>());
 
     public UserDto(
             @NonNull UniversityDto university, @NonNull String studentId,
             @NonNull String name, @NonNull String token,
             long createTimeStamp, long approvalTimeStamp,
-            @NonNull List<MajorDto> majors, @NonNull List<AuthorityDto> authorities
+            @NonNull List<AuthorityDto> authorities
     ) {
         this.university = university;
         this.studentId = studentId;
@@ -28,18 +27,12 @@ public record UserDto(
         this.token = token;
         this.createTimeStamp = createTimeStamp;
         this.approvalTimeStamp = approvalTimeStamp;
-        this.majors = new ArrayList<>(majors);
         this.authorities = new ArrayList<>(authorities);
     }
 
     public static UserDto init(@NonNull UniversityDto university, @NonNull String studentId, @NonNull String name) {
         return new UserDto(university, studentId, name, newToken(),
-                currentTimeStamp(), currentTimeStamp(), new ArrayList<>(), new ArrayList<>());
-    }
-
-    @Override
-    public List<MajorDto> majors() {
-        return new ArrayList<>(majors);
+                currentTimeStamp(), currentTimeStamp(), new ArrayList<>());
     }
 
     @Override
@@ -48,64 +41,48 @@ public record UserDto(
     }
 
     public UserDto withUniversity(@NonNull UniversityDto university) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
 
     public UserDto withStudentId(@NonNull String studentId) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
 
     public UserDto withName(@NonNull String name) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
 
     public UserDto withToken(@NonNull String token) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
 
     public UserDto withCreateTimeStamp(long createTimeStamp) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
 
     public UserDto withApprovalTimeStamp(long approvalTimeStamp) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
-    }
-
-    public UserDto withMajors(@NonNull List<MajorDto> majors) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
-    }
-
-    public UserDto withMajorAdd(MajorDto majorDto) {
-        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
-        output.majors.add(majorDto);
-        return output;
-    }
-
-    public UserDto withMajorRemove(MajorDto majorDto) {
-        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
-        output.majors.remove(majorDto);
-        return output;
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
 
     public UserDto withAuthorities(@NonNull List<AuthorityDto> authorities) {
-        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
 
     public UserDto withAuthorityAdd(AuthorityDto authorityDto) {
-        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
         output.authorities.add(authorityDto);
         return output;
     }
 
     public UserDto withAuthorityRemove(DepartmentDto department) {
-        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
         output.authorities.removeIf(
                 (authority) -> department.matchUniqueKey(authority.department()));
         return output;
     }
 
     public UserDto withAuthorityUpdate(DepartmentDto department, AuthorityDto.Permission permission) {
-        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, majors, authorities);
+        UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
 
         if(permission == null) {
             output.authorities.removeIf(
@@ -138,7 +115,6 @@ public record UserDto(
                 ", token='" + token + '\'' +
                 ", createTimeStamp=" + createTimeStamp +
                 ", approvalTimeStamp=" + approvalTimeStamp +
-                ", majors=" + majors +
                 ", authorities=" + authorities +
                 '}';
     }

@@ -81,21 +81,16 @@ public class DummyDataSet {
         }
 
         userDummies = new ArrayList<>(List.of(
-                new UserDto(universityDummies.get(0), "2018008886", "이석환",
-                        "TEST1", 1673155358, 1673155358,
-                        List.of(majorDummies.get(0)), new ArrayList<>()),
-                new UserDto(universityDummies.get(0), "2018008887", "이석현",
-                        "TEST2", 1673155358, 1673155358,
-                        List.of(majorDummies.get(1), majorDummies.get(4)), new ArrayList<>()),
-                new UserDto(universityDummies.get(0), "2019008887", "강백호",
-                        "TEST3", 1673155358, 1673155358,
-                        List.of(majorDummies.get(2), majorDummies.get(4)), new ArrayList<>()),
-                new UserDto(universityDummies.get(1), "2018008886", "이석환",
-                        "TEST4", 1673155358, 1673155358,
-                        List.of(majorDummies.get(5)), new ArrayList<>()),
-                new UserDto(universityDummies.get(1), "2018008887", "이석환",
-                        "TEST5", 1673155358, 1673155358,
-                        List.of(majorDummies.get(7)), new ArrayList<>())
+                new UserDto(universityDummies.get(0), "2018008886", "이석환", "TEST1",
+                        1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(0), "2018008887", "이석현", "TEST2",
+                        1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(0), "2019008887", "강백호", "TEST3",
+                        1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(1), "2018008886", "이석환", "TEST4",
+                        1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(1), "2018008887", "이석환", "TEST5",
+                        1673155358, 1673155358, new ArrayList<>())
         ));
 
         userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(0 * 6 + 0)));

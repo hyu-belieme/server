@@ -14,7 +14,6 @@ public abstract class BaseDaoImpl {
     protected final DepartmentRepository departmentRepository;
     protected final UserRepository userRepository;
     protected final MajorRepository majorRepository;
-    protected final MajorUserJoinRepository majorUserJoinRepository;
     protected final MajorDepartmentJoinRepository majorDepartmentJoinRepository;
     protected final AuthorityRepository authorityRepository;
     protected final AuthorityUserJoinRepository authorityUserJoinRepository;
@@ -23,12 +22,11 @@ public abstract class BaseDaoImpl {
     protected final HistoryRepository historyRepository;
 
     @Autowired
-    public BaseDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorUserJoinRepository majorUserJoinRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
+    public BaseDaoImpl(UniversityRepository universityRepository, DepartmentRepository departmentRepository, UserRepository userRepository, MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository, AuthorityRepository authorityRepository, AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository, ItemRepository itemRepository, HistoryRepository historyRepository) {
         this.universityRepository = universityRepository;
         this.departmentRepository = departmentRepository;
         this.userRepository = userRepository;
         this.majorRepository = majorRepository;
-        this.majorUserJoinRepository = majorUserJoinRepository;
         this.majorDepartmentJoinRepository = majorDepartmentJoinRepository;
         this.authorityRepository = authorityRepository;
         this.authorityUserJoinRepository = authorityUserJoinRepository;
