@@ -40,6 +40,14 @@ public record UserDto(
         return new ArrayList<>(authorities);
     }
 
+    public List<AuthorityDto> meaningfulAuthorities() {
+        List<AuthorityDto> output = new ArrayList<>();
+        for(AuthorityDto authority : authorities) {
+            overwriteAuthority(output, authority);
+        }
+        return output;
+    }
+
     public UserDto withUniversity(@NonNull UniversityDto university) {
         return new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
     }
@@ -166,6 +174,27 @@ public record UserDto(
             }
         }
         return maxPermission;
+    }
+
+    private void overwriteAuthority(List<AuthorityDto> list, AuthorityDto newAuthority) {
+        DepartmentDto targetDepartment = newAuthority.department();
+        AuthorityDto.Permission newPermission = newAuthority.permission();
+        if(newPermission == AuthorityDto.Permission.DEFAULT) {
+            newPermission = AuthorityDto.Permission.USER;
+        }
+
+        boolean notExist = true;
+        for(int i = 0; i < list.size(); i++) {
+            DepartmentDto department = list.get(i).department();
+            if(!department.matchUniqueKey(targetDepartment)) continue;
+            notExist = false;
+
+            if(newAuthority.permission() != AuthorityDto.Permission.DEFAULT) {
+                list.set(i, new AuthorityDto(department, newPermission));
+            }
+            break;
+        }
+        if(notExist) list.add(new AuthorityDto(targetDepartment, newPermission));
     }
 
     private static long currentTimeStamp() {
