@@ -361,162 +361,183 @@ public class UserServiceTest extends BaseServiceTest {
             users = usersHaveAdditionalAuthOnDept(users, dept);
             return users.randomSelect();
         }
-        @Nested
-        @DisplayName("updateUserFromHanyangUniversity()")
-        public final class TestUpdateUserFromHanyangUniversity {
-            private static MockedStatic<HttpRequest> httpRequest;
-            @Captor
-            private ArgumentCaptor<UserDto> userArgumentCaptor;
+    }
 
-            private String apiToken = "";
+    @Nested
+    @DisplayName("updateUserFromHanyangUniversity()")
+    public final class TestUpdateUserFromHanyangUniversity {
+        private static MockedStatic<HttpRequest> httpRequest;
+        @Captor
+        private ArgumentCaptor<UserDto> userArgumentCaptor;
 
-            private UniversityDto univ;
-            private String univCode;
+        private final String apiToken = "";
 
-            private UserDto targetUser;
-            private String studentId;
+        private UniversityDto univ;
+        private String univCode;
 
-            private String newName;
-            private String newMajorCode;
-            private MajorDto newMajor;
+        private UserDto targetUser;
+        private String studentId;
 
-            @BeforeEach
-            void setUp() {
-                httpRequest = mockStatic(HttpRequest.class);
+        private String newName;
+        private String newMajorCode;
+
+        private List<DepartmentDto> deptByUniv;
+        private List<DepartmentDto> newDepartments;
+
+        @BeforeEach
+        void setUp() {
+            httpRequest = mockStatic(HttpRequest.class);
+        }
+
+        @AfterEach
+        void tearDown() {
+            httpRequest.close();
+        }
+
+        private void setUpDefault() {
+            setUniv();
+            setTargetUser(randomUserOnUniv(univ));
+            newName = "이석환";
+            newMajorCode = "FH04067";
+            deptByUniv = stub.ALL_DEPTS.stream()
+                    .filter((dept) -> dept.university().matchUniqueKey(univ))
+                    .toList();
+            newDepartments = stub.ALL_DEPTS.stream().filter((dept) -> {
+                if(!dept.university().matchUniqueKey(univ)) return false;
+                return dept.baseMajors().stream().anyMatch(major -> newMajorCode.equals(major.code()));
+            }).toList();
+        }
+
+        private void setUniv() {
+            univ = stub.HYU_UNIV;
+            univCode = stub.HYU_UNIV.code();
+        }
+
+        private void setTargetUser(UserDto user) {
+            this.targetUser = user;
+            this.studentId = user.studentId();
+        }
+
+        private JSONObject makeJsonResponse() {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("gaeinNo", studentId);
+            jsonObject.put("userNm", newName);
+            jsonObject.put("sosokId", newMajorCode);
+
+            return jsonObject;
+        }
+
+        private UserDto execMethod() {
+            return userService.updateUserFromHanyangUniversity(apiToken);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[기존에 존재하는 유저이고 새로운 `majorCode`또한 기존에 존재 할 시]_[-]")
+        public void SUCCESS_userIsAlreadyCreatedAndNoMajorCreate() {
+            setUpDefault();
+
+            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
+            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
+            when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+
+            execMethod();
+
+            verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
+            UserDto newUser = userArgumentCaptor.getValue();
+            Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[기존에 존재하는 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
+        public void SUCCESS_userIsAlreadyCreatedAndNewMajorCreate() {
+            setUpDefault();
+
+            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
+            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
+            when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+
+            execMethod();
+
+            verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
+            UserDto newUser = userArgumentCaptor.getValue();
+            Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[새로운 유저이고 새로운 `majorCode`가 기존에 존재 할 시]_[-]")
+        public void SUCCESS_userIsNewAndNoMajorCreate() {
+            setUpDefault();
+
+            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
+            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
+            when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+
+            execMethod();
+
+            verify(userDao).create(userArgumentCaptor.capture());
+            UserDto newUser = userArgumentCaptor.getValue();
+            Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[새로운 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
+        public void SUCCESS_userIsNewAndNewMajorCreate() {
+            setUpDefault();
+
+            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
+            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
+            when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+
+            execMethod();
+
+            verify(userDao).create(userArgumentCaptor.capture());
+            UserDto newUser = userArgumentCaptor.getValue();
+            Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[한양 api 통신 과정에 문제가 생겼을 시]_[BadGateWayException]")
+        public void ERROR_networkProblemOnHanyangApi_BadGateWayException() {
+            setUpDefault();
+
+            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenThrow(BadGateWayException.class);
+
+            TestHelper.exceptionTest(this::execMethod, BadGateWayException.class);
+        }
+
+        private boolean checkUpdatedUser(UserDto newUser) {
+            if(newUser.studentId().equals(studentId)
+                    && newUser.university().equals(univ)
+                    && newUser.name().equals(newName)
+                    && !newUser.token().equals(targetUser.token())) {
+                return checkAuthUpdate(newUser);
             }
+            return false;
+        }
 
-            @AfterEach
-            void tearDown() {
-                httpRequest.close();
+        private boolean checkCreatedUser(UserDto newUser) {
+            if(newUser.studentId().equals(studentId)
+                    && newUser.university().equals(univ)
+                    && newUser.name().equals(newName)) {
+                return checkAuthUpdate(newUser);
             }
+            return false;
+        }
 
-            private void setUpDefault() {
-                setUniv();
-                setTargetUser(randomUserOnUniv(univ));
-                newName = "이석환";
-                newMajorCode = "FH04067";
-                newMajor = new MajorDto(univ, newMajorCode);
+        private boolean checkAuthUpdate(UserDto newUser) {
+            for(DepartmentDto dept: newDepartments) {
+                if(newUser.authorities().stream()
+                        .filter(authority -> authority.permission() == AuthorityDto.Permission.DEFAULT)
+                        .noneMatch(authority -> authority.department().equals(dept))
+                ) {
+                    return false;
+                }
             }
-
-            private void setUniv() {
-                univ = stub.HYU_UNIV;
-                univCode = stub.HYU_UNIV.code();
-            }
-
-            private void setTargetUser(UserDto user) {
-                this.targetUser = user;
-                this.studentId = user.studentId();
-            }
-
-            private JSONObject makeJsonResponse() {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("gaeinNo", studentId);
-                jsonObject.put("userNm", newName);
-                jsonObject.put("sosokId", newMajorCode);
-
-                return jsonObject;
-            }
-
-            private UserDto execMethod() {
-                return userService.updateUserFromHanyangUniversity(apiToken);
-            }
-
-            @RepeatedTest(10)
-            @DisplayName("[SUCCESS]_[기존에 존재하는 유저이고 새로운 `majorCode`또한 기존에 존재 할 시]_[-]")
-            public void SUCCESS_userIsAlreadyCreatedAndNoMajorCreate() {
-                setUpDefault();
-
-                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
-                when(universityDao.getByIndex(univCode)).thenReturn(univ);
-                when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
-                when(majorDao.getByIndex(univCode, newMajorCode)).thenReturn(newMajor);
-
-                execMethod();
-
-                verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
-                UserDto newUser = userArgumentCaptor.getValue();
-                Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
-            }
-
-            @RepeatedTest(10)
-            @DisplayName("[SUCCESS]_[기존에 존재하는 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
-            public void SUCCESS_userIsAlreadyCreatedAndNewMajorCreate() {
-                setUpDefault();
-
-                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
-                when(universityDao.getByIndex(univCode)).thenReturn(univ);
-                when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
-                when(majorDao.getByIndex(univCode, newMajorCode)).thenThrow(NotFoundException.class);
-                when(majorDao.create(newMajor)).thenReturn(newMajor);
-
-                execMethod();
-
-                verify(majorDao).create(newMajor);
-                verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
-                UserDto newUser = userArgumentCaptor.getValue();
-                Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
-            }
-
-            @RepeatedTest(10)
-            @DisplayName("[SUCCESS]_[새로운 유저이고 새로운 `majorCode`가 기존에 존재 할 시]_[-]")
-            public void SUCCESS_userIsNewAndNoMajorCreate() {
-                setUpDefault();
-
-                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
-                when(universityDao.getByIndex(univCode)).thenReturn(univ);
-                when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
-                when(majorDao.getByIndex(univCode, newMajorCode)).thenReturn(newMajor);
-
-                execMethod();
-
-                verify(userDao).create(userArgumentCaptor.capture());
-                UserDto newUser = userArgumentCaptor.getValue();
-                Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
-            }
-
-            @RepeatedTest(10)
-            @DisplayName("[SUCCESS]_[새로운 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
-            public void SUCCESS_userIsNewAndNewMajorCreate() {
-                setUpDefault();
-
-                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
-                when(universityDao.getByIndex(univCode)).thenReturn(univ);
-                when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
-                when(majorDao.getByIndex(univCode, newMajorCode)).thenThrow(NotFoundException.class);
-                when(majorDao.create(newMajor)).thenReturn(newMajor);
-
-                execMethod();
-
-                verify(majorDao).create(newMajor);
-                verify(userDao).create(userArgumentCaptor.capture());
-                UserDto newUser = userArgumentCaptor.getValue();
-                Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
-            }
-
-            @RepeatedTest(10)
-            @DisplayName("[ERROR]_[한양 api 통신 과정에 문제가 생겼을 시]_[BadGateWayException]")
-            public void ERROR_networkProblemOnHanyangApi_BadGateWayException() {
-                setUpDefault();
-
-                when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenThrow(BadGateWayException.class);
-
-                TestHelper.exceptionTest(this::execMethod, BadGateWayException.class);
-            }
-
-            private boolean checkUpdatedUser(UserDto newUser) {
-                return newUser.studentId().equals(studentId)
-                        && newUser.university().equals(univ)
-                        && newUser.name().equals(newName)
-                        && newUser.majors().get(0).equals(newMajor)
-                        && !newUser.token().equals(targetUser.token());
-            }
-
-            private boolean checkCreatedUser(UserDto newUser) {
-                return newUser.studentId().equals(studentId)
-                        && newUser.university().equals(univ)
-                        && newUser.name().equals(newName)
-                        && newUser.majors().get(0).equals(newMajor);
-            }
+            return true;
         }
     }
 
@@ -539,10 +560,9 @@ public class UserServiceTest extends BaseServiceTest {
     private RandomGetter<UserDto> usersHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
             for(AuthorityDto auth : user.authorities()) {
-                if(auth.department().matchUniqueKey(dept) ||
-                        auth.permission() == AuthorityDto.Permission.DEVELOPER) {
-                    return true;
-                }
+                if(auth.department().matchUniqueKey(dept)
+                        && auth.permission() != AuthorityDto.Permission.DEFAULT) return true;
+                if(auth.permission() == AuthorityDto.Permission.DEVELOPER) return true;
             }
             return false;
         });
@@ -551,10 +571,9 @@ public class UserServiceTest extends BaseServiceTest {
     private RandomGetter<UserDto> usersNotHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
             for(AuthorityDto auth : user.authorities()) {
-                if(auth.department().matchUniqueKey(dept) ||
-                        auth.permission() == AuthorityDto.Permission.DEVELOPER) {
-                    return false;
-                }
+                if(auth.department().matchUniqueKey(dept)
+                        && auth.permission() != AuthorityDto.Permission.DEFAULT) return false;
+                if(auth.permission() == AuthorityDto.Permission.DEVELOPER) return false;
             }
             return true;
         });

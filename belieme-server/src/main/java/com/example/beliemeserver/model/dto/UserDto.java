@@ -174,21 +174,13 @@ public record UserDto(
         if(isDeveloper()) return AuthorityDto.Permission.DEVELOPER;
 
         AuthorityDto.Permission maxPermission = AuthorityDto.Permission.BANNED;
-        List<MajorDto> baseMajors = department.baseMajors();
-        for(MajorDto major : majors) {
-            if (baseMajors.contains(major)) {
+        for(AuthorityDto authority : authorities) {
+            if(department.equals(authority.department())
+                    && authority.permission() == AuthorityDto.Permission.DEFAULT) {
                 maxPermission = AuthorityDto.Permission.USER;
                 break;
             }
         }
-
-//        for(AuthorityDto authority : authorities) {
-//            if(department.equals(authority.department())
-//                    && authority.permission() == AuthorityDto.Permission.DEFAULT) {
-//                maxPermission = AuthorityDto.Permission.USER;
-//                break;
-//            }
-//        }
 
         for(AuthorityDto authority : authorities) {
             if(department.equals(authority.department())
