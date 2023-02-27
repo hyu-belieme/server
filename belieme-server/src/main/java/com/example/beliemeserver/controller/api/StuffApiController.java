@@ -1,140 +1,83 @@
 package com.example.beliemeserver.controller.api;
 
-import com.example.beliemeserver.controller.httpexception.*;
 import com.example.beliemeserver.controller.requestbody.StuffRequest;
 import com.example.beliemeserver.controller.responsebody.StuffResponse;
-import com.example.beliemeserver.common.Globals;
-
-import com.example.beliemeserver.exception.*;
-import com.example.beliemeserver.model.exception.old.DataException;
-import com.example.beliemeserver.model.service.old.OldStuffService;
-import com.example.beliemeserver.model.dto.old.OldStuffDto;
-
+import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.service.StuffService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/stuffs")
+@RequestMapping(path="/universities/{university-code}/departments/{department-code}")
 public class StuffApiController {
-    private final OldStuffService stuffService;
+    private final StuffService stuffService;
 
-    public StuffApiController(OldStuffService stuffService) {
+    public StuffApiController(StuffService stuffService) {
         this.stuffService = stuffService;
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<StuffResponse>> getAllStuffs(@RequestHeader("user-token") String userToken) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException {
-        List<OldStuffDto> stuffList;
-        try {
-            stuffList = stuffService.getStuffs(userToken);
-        } catch (DataException e) {
-            e.printStackTrace();
-            throw new InternalServerErrorHttpException(e);
-        } catch (UnauthorizedException e) {
-            e.printStackTrace();
-            throw new UnauthorizedHttpException(e);
-        } catch (ForbiddenException e) {
-            e.printStackTrace();
-            throw new ForbiddenHttpException(e);
-        }
-        return ResponseEntity.ok(toStuffResponseList(stuffList));
+    @GetMapping("/stuffs")
+    public ResponseEntity<List<StuffResponse>> getAllStuffListOfDepartment(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode
+    ) {
+        List<StuffDto> stuffDtoList = stuffService.getListByDepartment(
+                userToken, universityCode, departmentCode);
+        List<StuffResponse> responseList = toResponseList(stuffDtoList);
+        return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<StuffResponse> getStuffResponse(@RequestHeader("user-token") String userToken, @PathVariable("name") String name) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
-        OldStuffDto target;
-        try {
-            target = stuffService.getStuffByName(userToken, name);
-        } catch (DataException e) {
-            e.printStackTrace();
-            throw new InternalServerErrorHttpException(e);
-        } catch (UnauthorizedException e) {
-            e.printStackTrace();
-            throw new UnauthorizedHttpException(e);
-        } catch (ForbiddenException e) {
-            e.printStackTrace();
-            throw new ForbiddenHttpException(e);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            throw new NotFoundHttpException(e);
-        }
-
-        return ResponseEntity.ok(StuffResponse.from(target));
+    @GetMapping("/stuffs/{stuff-name}")
+    public ResponseEntity<StuffResponse> getStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName
+    ) {
+        StuffDto stuffDto = stuffService.getByIndex(
+                userToken, universityCode, departmentCode,stuffName);
+        StuffResponse response = StuffResponse.from(stuffDto);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/")
-    public ResponseEntity<List<StuffResponse>> postStuff(@RequestHeader("user-token") String userToken, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, UnauthorizedHttpException, ForbiddenHttpException, BadRequestHttpException, ConflictHttpException {
-        if(requestBody == null || requestBody.getName() == null || requestBody.getEmoji() == null) {
-            throw new BadRequestHttpException("Request body에 정보가 부족합니다.\n필요한 정보 : name(String), emoji(String), amount(int)(optional)");
-        }
-
-        URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + requestBody.getName());
-
-        List<OldStuffDto> updatedList;
-        try {
-            updatedList = stuffService.addStuff(userToken, requestBody.getName(), requestBody.getEmoji(), requestBody.getAmount());
-        } catch (DataException | ItCannotBeException e) {
-            e.printStackTrace();
-            throw new InternalServerErrorHttpException(e);
-        } catch (UnauthorizedException e) {
-            e.printStackTrace();
-            throw new UnauthorizedHttpException(e);
-        } catch (ForbiddenException e) {
-            e.printStackTrace();
-            throw new ForbiddenHttpException(e);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestHttpException(e);
-        } catch (ConflictException e) {
-            e.printStackTrace();
-            throw new ConflictHttpException(e);
-        }
-
-        return ResponseEntity.created(location).body(toStuffResponseList(updatedList));
+    @PostMapping("/stuffs")
+    public ResponseEntity<StuffResponse> createNewStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @RequestBody StuffRequest newStuff
+    ) {
+        StuffDto stuffDto = stuffService.create(
+                userToken, universityCode, departmentCode,
+                newStuff.getName(), newStuff.getEmoji(), newStuff.getAmount());
+        StuffResponse response = StuffResponse.from(stuffDto);
+        return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{name}")
-    public ResponseEntity<StuffResponse> patchStuff(@RequestHeader("user-token") String userToken, @PathVariable String name, @RequestBody StuffRequest requestBody) throws InternalServerErrorHttpException, BadRequestHttpException, UnauthorizedHttpException, ForbiddenHttpException, NotFoundHttpException {
-        if(requestBody == null) {
-            throw new BadRequestHttpException("Request body에 정보가 부족합니다.\n필요한 정보 : name(String), emoji(String) 중 하나 이상");
-        }
-
-        if(requestBody.getName() != null) {
-            URI location = Globals.getLocation(Globals.serverUrl + "/stuffs/" + requestBody.getName());
-        }
-
-        OldStuffDto newAndSavedStuff;
-        try {
-            newAndSavedStuff = stuffService.updateStuff(userToken, name, requestBody.getName(), requestBody.getEmoji());
-        } catch (DataException e) {
-            e.printStackTrace();
-            throw new InternalServerErrorHttpException(e);
-        } catch (UnauthorizedException e) {
-            e.printStackTrace();
-            throw new UnauthorizedHttpException(e);
-        } catch (ForbiddenException e) {
-            e.printStackTrace();
-            throw new ForbiddenHttpException(e);
-        } catch (BadRequestException e) {
-            e.printStackTrace();
-            throw new BadRequestHttpException(e);
-        } catch (NotFoundException e) {
-            e.printStackTrace();
-            throw new NotFoundHttpException(e);
-        }
-
-        return ResponseEntity.ok(StuffResponse.from(newAndSavedStuff));
+    @PatchMapping("/stuffs/{stuff-name}")
+    public ResponseEntity<StuffResponse> updateStuff(
+            @RequestHeader("user-token") String userToken,
+            @PathVariable("university-code") String universityCode,
+            @PathVariable("department-code") String departmentCode,
+            @PathVariable("stuff-name") String stuffName,
+            @RequestBody StuffRequest newStuff
+    ) {
+        StuffDto stuffDto = stuffService.update(
+                userToken, universityCode, departmentCode, stuffName,
+                newStuff.getName(), newStuff.getEmoji());
+        StuffResponse response = StuffResponse.from(stuffDto);
+        return ResponseEntity.ok(response);
     }
 
-    private List<StuffResponse> toStuffResponseList(List<OldStuffDto> allStuffDtoList) {
-        List<StuffResponse> allStuffResponseList = new ArrayList<>();
-        for(int i = 0; i < allStuffDtoList.size(); i++) {
-            allStuffResponseList.add(StuffResponse.from(allStuffDtoList.get(i)).toStuffResponseWithoutItemList());
+    private List<StuffResponse> toResponseList(List<StuffDto> stuffDtoList) {
+        List<StuffResponse> responseList = new ArrayList<>();
+        for(StuffDto dto : stuffDtoList) {
+            responseList.add(StuffResponse.from(dto));
         }
-        return allStuffResponseList;
+        return responseList;
     }
 }

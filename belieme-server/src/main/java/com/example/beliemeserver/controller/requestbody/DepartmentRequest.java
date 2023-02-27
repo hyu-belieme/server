@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
-public class StuffRequest {
+public class DepartmentRequest {
+    @JsonProperty("code") String code;
     @JsonProperty("name") String name;
-    @JsonProperty("emoji") String emoji;
-    @JsonProperty("amount") Integer amount;
+    @JsonProperty("base-majors") List<String> baseMajors;
 }

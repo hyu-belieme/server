@@ -1,9 +1,9 @@
 package com.example.beliemeserver.controller.responsebody;
 
-public class JSONResponse {
-    private boolean doesJsonInclude;
+public class JsonResponse {
+    private final boolean doesJsonInclude;
 
-    public JSONResponse(boolean doesJsonInclude) {
+    protected JsonResponse(boolean doesJsonInclude) {
         this.doesJsonInclude = doesJsonInclude;
     }
 

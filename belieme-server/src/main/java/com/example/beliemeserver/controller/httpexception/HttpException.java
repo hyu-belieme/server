@@ -1,10 +1,10 @@
 package com.example.beliemeserver.controller.httpexception;
 
-import com.example.beliemeserver.controller.responsebody.ExceptionResponse;
+import com.example.beliemeserver.controller.responsebody.old.OldExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class HttpException extends Exception {
+public class HttpException extends RuntimeException {
     protected HttpStatus httpStatus;
     protected String message;
 
@@ -32,7 +32,7 @@ public class HttpException extends Exception {
         this.message = message;
     }
 
-    public ResponseEntity<ExceptionResponse> toResponseEntity() {
-        return ResponseEntity.status(getHttpStatus()).body(new ExceptionResponse(getHttpStatus().name(), getMessage()));
+    public ResponseEntity<OldExceptionResponse> toResponseEntity() {
+        return ResponseEntity.status(getHttpStatus()).body(new OldExceptionResponse(getHttpStatus().name(), getMessage()));
     }
 }
