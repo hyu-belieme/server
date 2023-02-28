@@ -1,11 +1,9 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.InvalidIndexException;
-import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.exception.UnauthorizedException;
+import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.service.BaseService;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.StubData;
 import com.example.beliemeserver.util.TestHelper;
@@ -65,6 +63,17 @@ public abstract class BaseServiceTest {
             when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[토큰이 만료되었을 시]_[ExpiredTokenException]")
+        public void ERROR_isExpiredToken_ExpiredTokenException() {
+            setUpDefault();
+            long newApprovalTimestamp = requester.approvalTimeStamp() - BaseService.TOKEN_EXPIRED_TIME - 10;
+
+            when(userDao.getByToken(userToken)).thenReturn(requester.withApprovalTimeStamp(newApprovalTimestamp));
+
+            TestHelper.exceptionTest(this::execMethod, ExpiredTokenException.class);
         }
     }
 

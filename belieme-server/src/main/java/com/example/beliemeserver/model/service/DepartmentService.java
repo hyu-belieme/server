@@ -19,7 +19,7 @@ public class DepartmentService extends BaseService {
     public List<DepartmentDto> getAccessibleList(@NonNull String userToken) {
         List<DepartmentDto> output = new ArrayList<>();
 
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
         List<DepartmentDto> allDepartment = departmentDao.getAllList();
         for(DepartmentDto department : allDepartment) {
             if(requester.getMaxPermission(department).hasUserPermission()) {

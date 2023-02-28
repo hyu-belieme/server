@@ -57,8 +57,13 @@ public class UserApiController {
             @RequestHeader("api-token") String apiToken,
             @PathVariable("university-code") String universityCode
     ) {
+        if(universityCode.equals(Globals.DEV_UNIVERSITY.code())) {
+            UserDto userDto = userService.reloadDeveloperUser(apiToken);
+            UserResponse response = UserResponse.from(userDto);
+            return ResponseEntity.ok(response);
+        }
         if(universityCode.equals(Globals.HANYANG_UNIVERSITY.code())) {
-            UserDto userDto = userService.updateUserFromHanyangUniversity(apiToken);
+            UserDto userDto = userService.reloadHanyangUniversityUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);
         }

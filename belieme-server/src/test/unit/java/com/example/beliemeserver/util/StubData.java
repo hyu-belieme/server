@@ -115,43 +115,53 @@ public class StubData extends BaseStub {
         DEV_USER = UserDto.init(DEV_UNIV, "DEV", "개발자")
                 .withAuthorityAdd(new AuthorityDto(DEV_DEPT, AuthorityDto.Permission.DEVELOPER));
         HYU_CSE_MASTER_USER = UserDto.init(HYU_UNIV, "2018008886", "이석환")
-                .withMajorAdd(HYU_FH04067_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.MASTER));
         HYU_CSE_STAFF_USER = UserDto.init(HYU_UNIV, "2018008887", "강백호")
-                .withMajorAdd(HYU_FH04067_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.STAFF));
         HYU_CSE_NORMAL_1_USER = UserDto.init(HYU_UNIV, "2018008888", "서태웅")
-                .withMajorAdd(HYU_FH04068_MAJOR);
+                .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT));
         HYU_CSE_NORMAL_2_USER = UserDto.init(HYU_UNIV, "2018008889", "다빈치")
-                .withMajorAdd(HYU_FH04069_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(HYU_ME_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.USER));
         HYU_CSE_BANNED_USER = UserDto.init(HYU_UNIV, "2018008890", "박용수")
-                .withMajorAdd(HYU_FH04067_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.BANNED));
         HYU_DUMMY_USER_1 = UserDto.init(HYU_UNIV, "2018007129", "김경민")
-                .withMajorAdd(HYU_FH04069_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(HYU_ME_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.MASTER));
         HYU_DUMMY_USER_2 = UserDto.init(HYU_UNIV, "2018007130", "손성준")
-                .withMajorAdd(HYU_FH04069_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(HYU_ME_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.BANNED));
         HYU_DUMMY_USER_3 = UserDto.init(HYU_UNIV, "2018007131", "이수경")
-                .withMajorAdd(HYU_FH04069_MAJOR);
+                .withAuthorityAdd(new AuthorityDto(HYU_ME_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT));
         HYU_DUMMY_USER_4 = UserDto.init(HYU_UNIV, "2018007132", "황희수")
-                .withMajorAdd(HYU_FH04069_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(HYU_ME_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_ME_DEPT, AuthorityDto.Permission.STAFF));
         CKU_DUMMY_USER_1 = UserDto.init(CKU_UNIV, "C202201234", "박창훈")
-                .withMajorAdd(CKU_A68_MAJOR)
-                .withMajorAdd(CKU_A70_MAJOR)
-                .withAuthorityAdd(new AuthorityDto(CKU_MED_DEPT, AuthorityDto.Permission.MASTER));
+                .withAuthorityAdd(new AuthorityDto(CKU_STU_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(CKU_STU_DEPT, AuthorityDto.Permission.MASTER));
         CKU_DUMMY_USER_2 = UserDto.init(CKU_UNIV, "C202201235", "윤효성")
-                .withMajorAdd(CKU_A68_MAJOR)
+                .withAuthorityAdd(new AuthorityDto(CKU_MED_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(CKU_STU_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(CKU_MED_DEPT, AuthorityDto.Permission.STAFF));
         CKU_DUMMY_USER_3 = UserDto.init(CKU_UNIV, "C202201236", "서수빈")
-                .withMajorAdd(CKU_A68_MAJOR);
+                .withAuthorityAdd(new AuthorityDto(CKU_STU_DEPT, AuthorityDto.Permission.DEFAULT));
         CKU_DUMMY_USER_4 = UserDto.init(CKU_UNIV, "C202201237", "황형기")
-                .withMajorAdd(CKU_A69_MAJOR);
+                .withAuthorityAdd(new AuthorityDto(CKU_MED_DEPT, AuthorityDto.Permission.DEFAULT))
+                .withAuthorityAdd(new AuthorityDto(CKU_STU_DEPT, AuthorityDto.Permission.DEFAULT));
         CKU_DUMMY_USER_5 = UserDto.init(CKU_UNIV, "C202201238", "전승용")
-                .withMajorAdd(CKU_A70_MAJOR);
+                .withAuthorityAdd(new AuthorityDto(CKU_STU_DEPT, AuthorityDto.Permission.DEFAULT));
 
         tmpAllUsers = List.of(
                 DEV_USER, HYU_CSE_MASTER_USER, HYU_CSE_STAFF_USER, HYU_CSE_NORMAL_1_USER,
