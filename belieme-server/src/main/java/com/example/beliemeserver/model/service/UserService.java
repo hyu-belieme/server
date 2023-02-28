@@ -105,7 +105,7 @@ public class UserService extends BaseService {
                 .withToken(UUID.randomUUID().toString());
 
         if(isNew) return userDao.create(newUser);
-        return userDao.update(Globals.DEV_UNIVERSITY_CODE, targetDeveloper.studentId(), newUser);
+        return userDao.update(Globals.DEV_UNIVERSITY.code(), targetDeveloper.studentId(), newUser);
     }
 
     public UserDto reloadHanyangUniversityUser(@NonNull String apiToken) {
@@ -149,9 +149,9 @@ public class UserService extends BaseService {
     private Pair<Boolean, UserDto> getOrMakeDeveloperUser(String studentId, String name) {
         boolean isNew = false;
         UserDto newUser;
-        UniversityDto university = universityDao.getByIndex(Globals.DEV_UNIVERSITY_CODE);
+        UniversityDto university = universityDao.getByIndex(Globals.DEV_UNIVERSITY.code());
         try {
-            newUser = userDao.getByIndex(Globals.DEV_UNIVERSITY_CODE, studentId);
+            newUser = userDao.getByIndex(Globals.DEV_UNIVERSITY.code(), studentId);
         } catch (NotFoundException e) {
             isNew = true;
             newUser = UserDto.init(university, studentId, name);

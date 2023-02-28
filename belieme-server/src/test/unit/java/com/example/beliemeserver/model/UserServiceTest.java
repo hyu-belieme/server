@@ -369,7 +369,7 @@ public class UserServiceTest extends BaseServiceTest {
         private ArgumentCaptor<UserDto> userArgumentCaptor;
 
         private final UniversityDto univ = Globals.DEV_UNIVERSITY;
-        private final String univCode = Globals.DEV_UNIVERSITY_CODE;
+        private final String univCode = Globals.DEV_UNIVERSITY.code();
         private String apiToken;
         private String studentId;
         private String name;

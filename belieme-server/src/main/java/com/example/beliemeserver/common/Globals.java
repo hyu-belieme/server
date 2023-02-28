@@ -18,8 +18,6 @@ public class Globals {
     public static final DepartmentDto DEV_DEPARTMENT = new DepartmentDto(DEV_UNIVERSITY, "DEV", "DEV", new ArrayList<>());
     public static final AuthorityDto DEV_AUTHORITY = new AuthorityDto(DEV_DEPARTMENT, AuthorityDto.Permission.DEVELOPER);
 
-    public static final String DEV_UNIVERSITY_CODE = "DEV";
-
     public static final UniversityDto HANYANG_UNIVERSITY = new UniversityDto("HYU", "한양대학교", "https://api.hanyang.ac.kr/rs/user/loginInfo.json");
     public static final String HANYANG_API_CLIENT_TOKEN = "a4b1abe746f384c3d43fa82a17f222";
     public static final String HANYANG_API_URL = "https://api.hanyang.ac.kr/rs/user/loginInfo.json";
