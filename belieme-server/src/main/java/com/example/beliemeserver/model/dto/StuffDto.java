@@ -62,13 +62,13 @@ public record StuffDto(
     }
 
     public boolean matchUniqueKey(String universityCode, String departmentCode, String name) {
-        if(name == null) return false;
+        if (name == null) return false;
         return department().matchUniqueKey(universityCode, departmentCode)
                 && name.equals(this.name());
     }
 
     public boolean matchUniqueKey(StuffDto oth) {
-        if(oth == null) return false;
+        if (oth == null) return false;
         return matchUniqueKey(
                 oth.department().university().code(),
                 oth.department().code(),
@@ -78,7 +78,7 @@ public record StuffDto(
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
 
@@ -91,7 +91,7 @@ public record StuffDto(
     }
 
     public int firstUsableItemNum() {
-        for(ItemDto item : items) {
+        for (ItemDto item : items) {
             if (item.status() == ItemDto.ItemStatus.USABLE)
                 return item.num();
         }
@@ -100,8 +100,8 @@ public record StuffDto(
 
     public int nextItemNum() {
         int nextItemNum = 0;
-        for(ItemDto item : items) {
-            if(item.num() > nextItemNum) {
+        for (ItemDto item : items) {
+            if (item.num() > nextItemNum) {
                 nextItemNum = item.num();
             }
         }

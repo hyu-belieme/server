@@ -7,7 +7,7 @@ public class UnauthorizedHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.UNAUTHORIZED);
     }
-    
+
     public UnauthorizedHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.UNAUTHORIZED);

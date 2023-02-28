@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface StuffRepository extends RefreshRepository<StuffEntity, Integer> {
     List<StuffEntity> findByDepartmentId(int departmentId);
+
     Optional<StuffEntity> findByDepartmentIdAndName(int departmentId, String name);
+
     boolean existsByDepartmentIdAndName(int departmentId, String name);
 }

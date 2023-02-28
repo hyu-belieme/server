@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/universities/{university-code}/departments/{department-code}")
+@RequestMapping(path = "/universities/{university-code}/departments/{department-code}")
 public class HistoryApiController {
     private final HistoryService historyService;
 
@@ -27,14 +27,14 @@ public class HistoryApiController {
             @RequestParam("requester-university-code") String requesterUniversityCode,
             @RequestParam("requester-student-id") String requesterStudentId
     ) {
-        if(requesterUniversityCode == null && requesterStudentId == null) {
+        if (requesterUniversityCode == null && requesterStudentId == null) {
             List<HistoryDto> historyDtoList = historyService.getListByDepartment(
                     userToken, universityCode, departmentCode);
             List<HistoryResponse> responseList = toResponseList(historyDtoList);
             return ResponseEntity.ok(responseList);
         }
 
-        if(requesterUniversityCode != null && requesterStudentId != null) {
+        if (requesterUniversityCode != null && requesterStudentId != null) {
             List<HistoryDto> historyDtoList = historyService.getListByDepartmentAndRequester(
                     userToken, universityCode, departmentCode,
                     requesterUniversityCode, requesterStudentId
@@ -181,7 +181,7 @@ public class HistoryApiController {
 
     private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {
         List<HistoryResponse> responseList = new ArrayList<>();
-        for(HistoryDto dto : historyDtoList) {
+        for (HistoryDto dto : historyDtoList) {
             responseList.add(HistoryResponse.from(dto));
         }
         return responseList;

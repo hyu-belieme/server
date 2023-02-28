@@ -1,8 +1,8 @@
 package com.example.beliemeserver.data;
 
 import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.util.FakeDao;
 import com.example.beliemeserver.util.DummyDataSet;
+import com.example.beliemeserver.util.FakeDao;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;

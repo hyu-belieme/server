@@ -69,8 +69,8 @@ public class HistoryResponse extends JsonResponse {
     }
 
     public static HistoryResponse from(HistoryDto historyDto) {
-        if(historyDto == null) return null;
-        if(historyDto.equals(HistoryDto.nestedEndpoint)) {
+        if (historyDto == null) return null;
+        if (historyDto.equals(HistoryDto.nestedEndpoint)) {
             return HistoryResponse.responseWillBeIgnore();
         }
 
@@ -106,7 +106,7 @@ public class HistoryResponse extends JsonResponse {
     }
 
     private static UserResponse toNestedResponse(UserResponse user) {
-        if(user == null) return null;
+        if (user == null) return null;
         return user.withoutSecureInfo();
     }
 }

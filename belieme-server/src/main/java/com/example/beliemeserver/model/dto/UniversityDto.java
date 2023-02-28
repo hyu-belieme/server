@@ -18,14 +18,14 @@ public record UniversityDto(@NonNull String code, @NonNull String name, String a
     }
 
     public boolean matchUniqueKey(String universityCode) {
-        if(universityCode == null) {
+        if (universityCode == null) {
             return false;
         }
         return universityCode.equals(this.code());
     }
 
     public boolean matchUniqueKey(UniversityDto oth) {
-        if(oth == null) {
+        if (oth == null) {
             return false;
         }
         String universityCode = oth.code();
@@ -34,7 +34,7 @@ public record UniversityDto(@NonNull String code, @NonNull String name, String a
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
         return "UniversityDto{" +

@@ -7,7 +7,7 @@ public class BadRequestHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.BAD_REQUEST);
     }
-    
+
     public BadRequestHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.BAD_REQUEST);

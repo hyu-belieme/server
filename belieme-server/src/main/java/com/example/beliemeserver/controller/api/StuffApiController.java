@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/universities/{university-code}/departments/{department-code}")
+@RequestMapping(path = "/universities/{university-code}/departments/{department-code}")
 public class StuffApiController {
     private final StuffService stuffService;
 
@@ -39,7 +39,7 @@ public class StuffApiController {
             @PathVariable("stuff-name") String stuffName
     ) {
         StuffDto stuffDto = stuffService.getByIndex(
-                userToken, universityCode, departmentCode,stuffName);
+                userToken, universityCode, departmentCode, stuffName);
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
     }
@@ -75,7 +75,7 @@ public class StuffApiController {
 
     private List<StuffResponse> toResponseList(List<StuffDto> stuffDtoList) {
         List<StuffResponse> responseList = new ArrayList<>();
-        for(StuffDto dto : stuffDtoList) {
+        for (StuffDto dto : stuffDtoList) {
             responseList.add(StuffResponse.from(dto));
         }
         return responseList;

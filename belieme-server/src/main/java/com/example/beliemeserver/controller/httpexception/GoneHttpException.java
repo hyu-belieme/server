@@ -7,7 +7,7 @@ public class GoneHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.GONE);
     }
-    
+
     public GoneHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.GONE);

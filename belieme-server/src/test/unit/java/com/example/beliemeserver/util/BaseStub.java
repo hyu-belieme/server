@@ -22,11 +22,11 @@ public abstract class BaseStub {
     }
 
     private void setLastHistoryOfItem(List<ItemDto> items, List<HistoryDto> histories) {
-        for(HistoryDto history : histories) {
+        for (HistoryDto history : histories) {
             HistoryDto newLastHistory = history.withItem(ItemDto.nestedEndpoint);
-            for(int i = 0; i < items.size(); i++) {
+            for (int i = 0; i < items.size(); i++) {
                 ItemDto item = items.get(i);
-                if(item.matchUniqueKey(history.item())) {
+                if (item.matchUniqueKey(history.item())) {
                     items.set(i, item.withLastHistory(newLastHistory));
                 }
             }
@@ -34,10 +34,10 @@ public abstract class BaseStub {
     }
 
     private void setItemsOfStuff(List<StuffDto> stuffs, List<ItemDto> items) {
-        for(ItemDto item : items) {
-            for(int i = 0; i < stuffs.size(); i++) {
+        for (ItemDto item : items) {
+            for (int i = 0; i < stuffs.size(); i++) {
                 StuffDto stuff = stuffs.get(i);
-                if(stuff.matchUniqueKey(item.stuff())) {
+                if (stuff.matchUniqueKey(item.stuff())) {
                     stuffs.set(i, stuff.withItemAdd(item));
                 }
             }
@@ -45,10 +45,10 @@ public abstract class BaseStub {
     }
 
     private void setStuffOfItem(List<StuffDto> stuffs, List<ItemDto> items) {
-        for(StuffDto stuff : stuffs) {
-            for(int i = 0; i < items.size(); i++) {
+        for (StuffDto stuff : stuffs) {
+            for (int i = 0; i < items.size(); i++) {
                 ItemDto item = items.get(i);
-                if(stuff.matchUniqueKey(item.stuff())) {
+                if (stuff.matchUniqueKey(item.stuff())) {
                     items.set(i, item.withStuff(stuff));
                 }
             }
@@ -56,10 +56,10 @@ public abstract class BaseStub {
     }
 
     private void setItemOfHistory(List<ItemDto> items, List<HistoryDto> histories) {
-        for(ItemDto item : items) {
-            for(int i = 0; i < histories.size(); i++) {
+        for (ItemDto item : items) {
+            for (int i = 0; i < histories.size(); i++) {
                 HistoryDto history = histories.get(i);
-                if(item.matchUniqueKey(history.item())) {
+                if (item.matchUniqueKey(history.item())) {
                     histories.set(i, history.withItem(item));
                 }
             }

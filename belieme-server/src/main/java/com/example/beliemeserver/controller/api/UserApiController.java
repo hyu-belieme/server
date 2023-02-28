@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="")
+@RequestMapping(path = "")
 public class UserApiController {
     private final UserService userService;
     private final String HYU_UNIV_LOGIN_PATH = "/universities/" + Globals.HANYANG_UNIVERSITY.code() + "/login";
@@ -57,12 +57,12 @@ public class UserApiController {
             @RequestHeader("api-token") String apiToken,
             @PathVariable("university-code") String universityCode
     ) {
-        if(universityCode.equals(Globals.DEV_UNIVERSITY.code())) {
+        if (universityCode.equals(Globals.DEV_UNIVERSITY.code())) {
             UserDto userDto = userService.reloadDeveloperUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);
         }
-        if(universityCode.equals(Globals.HANYANG_UNIVERSITY.code())) {
+        if (universityCode.equals(Globals.HANYANG_UNIVERSITY.code())) {
             UserDto userDto = userService.reloadHanyangUniversityUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);
@@ -74,7 +74,7 @@ public class UserApiController {
 
     private List<UserResponse> toResponseList(List<UserDto> userDtoList) {
         List<UserResponse> responseList = new ArrayList<>();
-        for(UserDto dto : userDtoList) {
+        for (UserDto dto : userDtoList) {
             responseList.add(UserResponse.from(dto));
         }
         return responseList;

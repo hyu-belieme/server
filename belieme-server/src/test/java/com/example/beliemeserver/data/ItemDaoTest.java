@@ -83,7 +83,7 @@ public class ItemDaoTest extends DaoTest {
 
     private void testCreatingItem(ItemDto newItem) {
         ItemDto expectingResult = newItem;
-        if(newItem.lastHistory() != null) {
+        if (newItem.lastHistory() != null) {
             HistoryDto nestedHistory = newItem.lastHistory().withItem(ItemDto.nestedEndpoint);
             expectingResult = newItem.withLastHistory(nestedHistory);
         }
@@ -103,7 +103,7 @@ public class ItemDaoTest extends DaoTest {
             String universityCode, String departmentCode,
             String stuffName, int itemNum, ItemDto newItem) {
         ItemDto expectingResult = newItem;
-        if(newItem.lastHistory() != null) {
+        if (newItem.lastHistory() != null) {
             HistoryDto nestedHistory = newItem.lastHistory().withItem(ItemDto.nestedEndpoint);
             expectingResult = newItem.withLastHistory(nestedHistory);
         }
@@ -123,7 +123,7 @@ public class ItemDaoTest extends DaoTest {
     }
 
     private ItemDto simplify(ItemDto result) {
-        if(result == null) {
+        if (result == null) {
             return null;
         }
         StuffDto simplifiedStuff = result.stuff().withItems(List.of());
@@ -132,7 +132,7 @@ public class ItemDaoTest extends DaoTest {
 
     private List<ItemDto> simplify(List<ItemDto> itemDtoList) {
         List<ItemDto> output = new ArrayList<>();
-        for(ItemDto itemDto : itemDtoList) {
+        for (ItemDto itemDto : itemDtoList) {
             output.add(simplify(itemDto));
         }
 

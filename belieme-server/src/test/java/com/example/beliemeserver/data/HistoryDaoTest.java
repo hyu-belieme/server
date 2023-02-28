@@ -209,7 +209,7 @@ public class HistoryDaoTest extends DaoTest {
     }
 
     public HistoryDto simplify(HistoryDto result) {
-        if(result == null) {
+        if (result == null) {
             return null;
         }
         StuffDto simplifiedStuff = result.item().stuff().withItems(List.of());
@@ -221,7 +221,7 @@ public class HistoryDaoTest extends DaoTest {
 
     public List<HistoryDto> simplify(List<HistoryDto> historyDtoList) {
         List<HistoryDto> output = new ArrayList<>();
-        for(HistoryDto historyDto : historyDtoList) {
+        for (HistoryDto historyDto : historyDtoList) {
             output.add(simplify(historyDto));
         }
 

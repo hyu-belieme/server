@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class RandomGetter<T>  {
+public class RandomGetter<T> {
     private final List<T> list;
 
     public RandomGetter(List<T> list) {

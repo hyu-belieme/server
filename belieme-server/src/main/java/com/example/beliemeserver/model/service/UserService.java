@@ -7,14 +7,19 @@ import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.UniversityDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.util.HttpRequest;
 import lombok.NonNull;
 import org.json.simple.JSONObject;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService extends BaseService {
@@ -30,8 +35,8 @@ public class UserService extends BaseService {
         checkMasterPermission(userToken, department);
 
         List<UserDto> output = new ArrayList<>();
-        for(UserDto user : userDao.getAllList()) {
-            if(user.getMaxPermission(department).hasMorePermission(AuthorityDto.Permission.USER)) {
+        for (UserDto user : userDao.getAllList()) {
+            if (user.getMaxPermission(department).hasMorePermission(AuthorityDto.Permission.USER)) {
                 output.add(user);
             }
         }
@@ -66,18 +71,18 @@ public class UserService extends BaseService {
         checkMasterPermission(department, requester);
 
         UserDto targetUser = userDao.getByIndex(universityCode, studentId);
-        if(targetUser.isDeveloper()) {
+        if (targetUser.isDeveloper()) {
             throw new MethodNotAllowedException();
         }
-        if(newPermission != null && newPermission.hasDeveloperPermission()) {
+        if (newPermission != null && newPermission.hasDeveloperPermission()) {
             throw new MethodNotAllowedException();
         }
 
-        if(!requester.isDeveloper()) {
-            if(targetUser.getMaxPermission(department).hasMasterPermission()) {
+        if (!requester.isDeveloper()) {
+            if (targetUser.getMaxPermission(department).hasMasterPermission()) {
                 throw new ForbiddenException();
             }
-            if(newPermission != null && newPermission.hasMasterPermission()) {
+            if (newPermission != null && newPermission.hasMasterPermission()) {
                 throw new ForbiddenException();
             }
         }
@@ -88,13 +93,13 @@ public class UserService extends BaseService {
 
     public UserDto reloadDeveloperUser(@NonNull String apiToken) {
         DeveloperInfo targetDeveloper = null;
-        for(DeveloperInfo info : Globals.developers) {
-            if(info.apiToken().equals(apiToken)) {
+        for (DeveloperInfo info : Globals.developers) {
+            if (info.apiToken().equals(apiToken)) {
                 targetDeveloper = info;
                 break;
             }
         }
-        if(targetDeveloper == null) {
+        if (targetDeveloper == null) {
             throw new UnauthorizedException();
         }
 
@@ -104,7 +109,7 @@ public class UserService extends BaseService {
         newUser = newUser.withApprovalTimeStamp(currentTimestamp())
                 .withToken(UUID.randomUUID().toString());
 
-        if(isNew) return userDao.create(newUser);
+        if (isNew) return userDao.create(newUser);
         return userDao.update(Globals.DEV_UNIVERSITY.code(), targetDeveloper.studentId(), newUser);
     }
 
@@ -129,7 +134,7 @@ public class UserService extends BaseService {
                 .withAuthorities(newAuthorities)
                 .withToken(UUID.randomUUID().toString());
 
-        if(isNew) return userDao.create(newUser);
+        if (isNew) return userDao.create(newUser);
         return userDao.update(universityCode, studentId, newUser);
     }
 
@@ -165,11 +170,11 @@ public class UserService extends BaseService {
         newAuthorities.removeIf((authority) -> authority.permission() == AuthorityDto.Permission.DEFAULT);
 
         List<DepartmentDto> candidateDepartments = departmentDao.getListByUniversity(user.university().code());
-        for(DepartmentDto department : candidateDepartments) {
-            if(notContainAnyMajorCodesInBaseMajors(department, newMajorCodes)) continue;
+        for (DepartmentDto department : candidateDepartments) {
+            if (notContainAnyMajorCodesInBaseMajors(department, newMajorCodes)) continue;
 
             AuthorityDto newAuthority = new AuthorityDto(department, AuthorityDto.Permission.DEFAULT);
-            if(!newAuthorities.contains(newAuthority)) {
+            if (!newAuthorities.contains(newAuthority)) {
                 newAuthorities.add(newAuthority);
             }
         }

@@ -1,6 +1,9 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.service.HistoryService;
 import com.example.beliemeserver.util.RandomGetter;
@@ -664,7 +667,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         private List<HistoryDto> makeHistoryListWithSameStuff() {
             List<HistoryDto> output = new ArrayList<>();
             List<ItemDto> exclude = new ArrayList<>(List.of(item));
-            for(int i = 0; i < HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF; i++) {
+            for (int i = 0; i < HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF; i++) {
                 ItemDto newItem = randomItemOnStuffWithExclude(stuff, exclude);
                 exclude.add(newItem);
                 output.add(
@@ -676,7 +679,7 @@ public class HistoryServiceTest extends BaseServiceTest {
                                 null,
                                 null,
                                 null,
-                                System.currentTimeMillis()/1000,
+                                System.currentTimeMillis() / 1000,
                                 0,
                                 0,
                                 0,
@@ -690,7 +693,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         private List<HistoryDto> makeHistoryListWithSameRequester() {
             List<HistoryDto> output = new ArrayList<>();
             List<StuffDto> exclude = new ArrayList<>(List.of(stuff));
-            for(int i = 0; i < HistoryService.MAX_LENTAL_COUNT; i++) {
+            for (int i = 0; i < HistoryService.MAX_LENTAL_COUNT; i++) {
                 StuffDto newStuff = randomStuffOnDeptWithExclude(dept, exclude);
                 exclude.add(newStuff);
 
@@ -704,7 +707,7 @@ public class HistoryServiceTest extends BaseServiceTest {
                                 null,
                                 null,
                                 null,
-                                System.currentTimeMillis()/1000,
+                                System.currentTimeMillis() / 1000,
                                 0,
                                 0,
                                 0,

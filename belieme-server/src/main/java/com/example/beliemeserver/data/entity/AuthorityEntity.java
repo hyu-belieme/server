@@ -1,8 +1,11 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
-import lombok.*;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
 import javax.persistence.*;
 

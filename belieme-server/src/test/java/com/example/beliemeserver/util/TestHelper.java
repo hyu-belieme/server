@@ -38,7 +38,7 @@ public class TestHelper {
     private static <T> void assertThatAllElementIsEqual(List<T> result, List<T> expected) {
         Assertions.assertThat(result.size()).isEqualTo(expected.size());
 
-        for(T target : result) {
+        for (T target : result) {
             Assertions.assertThat(expected).contains(target);
         }
     }

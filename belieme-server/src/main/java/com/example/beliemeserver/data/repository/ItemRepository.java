@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface ItemRepository extends RefreshRepository<ItemEntity, Integer> {
     List<ItemEntity> findByStuffId(int stuffId);
+
     Optional<ItemEntity> findByStuffIdAndNum(int stuffId, int num);
+
     boolean existsByStuffIdAndNum(int stuffId, int num);
 }

@@ -18,7 +18,7 @@ public record AuthorityDto(
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
 
@@ -29,7 +29,7 @@ public record AuthorityDto(
     }
 
     public boolean matchUniqueKey(String universityCode, String departmentCode, Permission permission) {
-        if(universityCode == null || departmentCode == null || permission == null) {
+        if (universityCode == null || departmentCode == null || permission == null) {
             return false;
         }
         return universityCode.equals(this.department().university().code())
@@ -38,7 +38,7 @@ public record AuthorityDto(
     }
 
     public boolean matchUniqueKey(AuthorityDto oth) {
-        if(oth == null) {
+        if (oth == null) {
             return false;
         }
         String universityCode = oth.department().university().code();

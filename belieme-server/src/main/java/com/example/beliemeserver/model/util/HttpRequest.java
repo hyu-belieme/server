@@ -31,7 +31,7 @@ public class HttpRequest {
 
         jsonResponse = (JSONObject) jsonResponse.getOrDefault("response", new JSONObject());
         jsonResponse = (JSONObject) jsonResponse.getOrDefault("item", null);
-        if(jsonResponse == null) throw new BadGateWayException();
+        if (jsonResponse == null) throw new BadGateWayException();
         return jsonResponse;
     }
 
@@ -39,7 +39,7 @@ public class HttpRequest {
         Map<String, String> headers = new HashMap<>();
         headers.put("Host", "https://api.hanyang.ac.kr/");
         headers.put("client_id", Globals.HANYANG_API_CLIENT_TOKEN);
-        headers.put("swap_key", Long.toString(System.currentTimeMillis()/1000));
+        headers.put("swap_key", Long.toString(System.currentTimeMillis() / 1000));
         headers.put("access_token", apiToken);
 
         return headers;

@@ -23,8 +23,8 @@ public class AuthorityResponse extends JsonResponse {
     }
 
     public static AuthorityResponse from(AuthorityDto authorityDto) {
-        if(authorityDto == null) return null;
-        if(authorityDto.equals(AuthorityDto.nestedEndpoint)) {
+        if (authorityDto == null) return null;
+        if (authorityDto.equals(AuthorityDto.nestedEndpoint)) {
             return responseWillBeIgnore();
         }
 

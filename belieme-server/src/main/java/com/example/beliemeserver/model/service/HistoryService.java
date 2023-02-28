@@ -58,7 +58,7 @@ public class HistoryService extends BaseService {
         UserDto requester = validateTokenAndGetUser(userToken);
         UserDto historyRequester = getUserOrThrowInvalidIndexException(userUniversityCode, userStudentId);
 
-        if(!requester.matchUniqueKey(historyRequester)) {
+        if (!requester.matchUniqueKey(historyRequester)) {
             checkStaffPermission(department, requester);
         }
         checkUserPermission(department, requester);
@@ -73,7 +73,7 @@ public class HistoryService extends BaseService {
         UserDto requester = validateTokenAndGetUser(userToken);
 
         HistoryDto target = historyDao.getByIndex(universityCode, departmentCode, stuffName, itemNum, historyNum);
-        if(!requester.matchUniqueKey(target.requester())) {
+        if (!requester.matchUniqueKey(target.requester())) {
             checkStaffPermission(department, requester);
         }
         checkUserPermission(department, requester);
@@ -95,23 +95,23 @@ public class HistoryService extends BaseService {
 
         int usingItemCount = 0;
         int usingSameStuffCount = 0;
-        for(HistoryDto history : requesterHistory) {
-            if(history.status().isClosed()) continue;
-            if(history.item().stuff().matchUniqueKey(stuff)) usingSameStuffCount += 1;
+        for (HistoryDto history : requesterHistory) {
+            if (history.status().isClosed()) continue;
+            if (history.item().stuff().matchUniqueKey(stuff)) usingSameStuffCount += 1;
             usingItemCount += 1;
-            if(usingItemCount >= MAX_LENTAL_COUNT) throw new MethodNotAllowedException();
-            if(usingSameStuffCount >= MAX_LENTAL_COUNT_ON_SAME_STUFF) throw new MethodNotAllowedException();
+            if (usingItemCount >= MAX_LENTAL_COUNT) throw new MethodNotAllowedException();
+            if (usingSameStuffCount >= MAX_LENTAL_COUNT_ON_SAME_STUFF) throw new MethodNotAllowedException();
         }
 
-        if(itemNum == null) {
+        if (itemNum == null) {
             itemNum = stuff.firstUsableItemNum();
         }
-        if(itemNum == 0) throw new MethodNotAllowedException();
+        if (itemNum == 0) throw new MethodNotAllowedException();
 
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if(item.status() != ItemDto.ItemStatus.USABLE) throw new MethodNotAllowedException();
+        if (item.status() != ItemDto.ItemStatus.USABLE) throw new MethodNotAllowedException();
 
         HistoryDto newHistory = new HistoryDto(
                 item,
@@ -121,7 +121,7 @@ public class HistoryService extends BaseService {
                 null,
                 null,
                 null,
-                System.currentTimeMillis()/1000,
+                System.currentTimeMillis() / 1000,
                 0,
                 0,
                 0,
@@ -147,10 +147,10 @@ public class HistoryService extends BaseService {
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if(item.status() == ItemDto.ItemStatus.INACTIVE) throw new MethodNotAllowedException();
+        if (item.status() == ItemDto.ItemStatus.INACTIVE) throw new MethodNotAllowedException();
 
         HistoryDto newHistory;
-        if(item.status() == ItemDto.ItemStatus.USABLE) {
+        if (item.status() == ItemDto.ItemStatus.USABLE) {
             newHistory = new HistoryDto(
                     item,
                     item.nextHistoryNum(),
@@ -162,7 +162,7 @@ public class HistoryService extends BaseService {
                     0,
                     0,
                     0,
-                    System.currentTimeMillis()/1000,
+                    System.currentTimeMillis() / 1000,
                     0
             );
             historyDao.create(newHistory);
@@ -174,7 +174,7 @@ public class HistoryService extends BaseService {
 
         newHistory = item.lastHistory()
                 .withLostManager(requester)
-                .withLostTimeStamp(System.currentTimeMillis()/1000);
+                .withLostTimeStamp(System.currentTimeMillis() / 1000);
 
         return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
@@ -192,14 +192,14 @@ public class HistoryService extends BaseService {
                 universityCode, departmentCode, stuffName, itemNum);
 
         HistoryDto lastHistory = item.lastHistory();
-        if(lastHistory == null
+        if (lastHistory == null
                 || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
             throw new MethodNotAllowedException();
         }
 
         HistoryDto newHistory = lastHistory
                 .withApproveManager(requester)
-                .withApproveTimeStamp(System.currentTimeMillis()/1000);
+                .withApproveTimeStamp(System.currentTimeMillis() / 1000);
 
         return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
@@ -217,7 +217,7 @@ public class HistoryService extends BaseService {
                 universityCode, departmentCode, stuffName, itemNum);
 
         HistoryDto lastHistory = item.lastHistory();
-        if(lastHistory == null
+        if (lastHistory == null
                 || (lastHistory.status() != HistoryDto.HistoryStatus.USING
                 && lastHistory.status() != HistoryDto.HistoryStatus.DELAYED
                 && lastHistory.status() != HistoryDto.HistoryStatus.LOST)) {
@@ -226,7 +226,7 @@ public class HistoryService extends BaseService {
 
         HistoryDto newHistory = lastHistory
                 .withReturnManager(requester)
-                .withReturnTimeStamp(System.currentTimeMillis()/1000);
+                .withReturnTimeStamp(System.currentTimeMillis() / 1000);
 
         return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
@@ -244,14 +244,14 @@ public class HistoryService extends BaseService {
                 universityCode, departmentCode, stuffName, itemNum);
 
         HistoryDto lastHistory = item.lastHistory();
-        if(lastHistory == null
+        if (lastHistory == null
                 || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
             throw new MethodNotAllowedException();
         }
 
         HistoryDto newHistory = lastHistory
                 .withCancelManager(requester)
-                .withCancelTimeStamp(System.currentTimeMillis()/1000);
+                .withCancelTimeStamp(System.currentTimeMillis() / 1000);
 
         return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }

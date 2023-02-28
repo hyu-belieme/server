@@ -14,7 +14,7 @@ public record MajorDto(@NonNull UniversityDto university, @NonNull String code) 
     }
 
     public boolean matchUniqueKey(String universityCode, String majorCode) {
-        if(universityCode == null || majorCode == null) {
+        if (universityCode == null || majorCode == null) {
             return false;
         }
         return universityCode.equals(this.university().code())
@@ -22,7 +22,7 @@ public record MajorDto(@NonNull UniversityDto university, @NonNull String code) 
     }
 
     public boolean matchUniqueKey(MajorDto oth) {
-        if(oth == null) {
+        if (oth == null) {
             return false;
         }
         String universityCode = oth.university().code();
@@ -33,7 +33,7 @@ public record MajorDto(@NonNull UniversityDto university, @NonNull String code) 
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
 

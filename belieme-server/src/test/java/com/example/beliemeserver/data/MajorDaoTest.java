@@ -1,9 +1,9 @@
 package com.example.beliemeserver.data;
 
-import com.example.beliemeserver.model.dao.MajorDao;
-import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dao.MajorDao;
+import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ public class MajorDaoTest extends DaoTest {
     @Test
     public void getAllMajorsTest() {
         TestHelper.listCompareTest(
-                ()->majorDao.getAllList(),
+                () -> majorDao.getAllList(),
                 majorFakeDao.getAll()
         );
     }

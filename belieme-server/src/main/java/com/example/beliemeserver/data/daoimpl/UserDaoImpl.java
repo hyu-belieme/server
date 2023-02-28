@@ -28,7 +28,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     public List<UserDto> getAllList() throws FormatDoesNotMatchException {
         List<UserDto> output = new ArrayList<>();
 
-        for(UserEntity userEntity : userRepository.findAll()) {
+        for (UserEntity userEntity : userRepository.findAll()) {
             output.add(userEntity.toUserDto());
         }
         return output;
@@ -39,7 +39,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
         List<UserDto> output = new ArrayList<>();
 
         int universityId = findUniversityEntity(universityCode).getId();
-        for(UserEntity userEntity : userRepository.findByUniversityId(universityId)) {
+        for (UserEntity userEntity : userRepository.findByUniversityId(universityId)) {
             output.add(userEntity.toUserDto());
         }
         return output;
@@ -91,7 +91,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     private void updateUserOnly(UserEntity target, UserDto newUser) throws NotFoundException, ConflictException {
         UniversityEntity newUniversity = findUniversityEntity(newUser.university());
 
-        if(doesIndexChange(target, newUser)) {
+        if (doesIndexChange(target, newUser)) {
             checkUserConflict(newUniversity.getId(), newUser.studentId());
         }
 
@@ -104,7 +104,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     private void saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) throws NotFoundException {
-        for(AuthorityDto authority: authorities) {
+        for (AuthorityDto authority : authorities) {
             AuthorityEntity authorityEntity = findAuthorityEntity(authority);
             AuthorityUserJoinEntity newJoin = new AuthorityUserJoinEntity(
                     authorityEntity,
@@ -129,7 +129,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     private void checkUserConflict(int universityId, String studentId) throws ConflictException {
-        if(userRepository.existsByUniversityIdAndStudentId(universityId, studentId)) {
+        if (userRepository.existsByUniversityIdAndStudentId(universityId, studentId)) {
             throw new ConflictException();
         }
     }

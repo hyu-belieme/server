@@ -6,7 +6,7 @@ public abstract class DataEntity implements Serializable {
     public abstract int getId();
 
     public static Integer getIdOrElse(DataEntity dataEntity, Integer otherValue) {
-        if(dataEntity == null) {
+        if (dataEntity == null) {
             return otherValue;
         }
         return dataEntity.getId();

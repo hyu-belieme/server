@@ -7,7 +7,7 @@ public class GateWayTimeOutHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.GATEWAY_TIMEOUT);
     }
-    
+
     public GateWayTimeOutHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.GATEWAY_TIMEOUT);

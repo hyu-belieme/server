@@ -88,7 +88,7 @@ public class UserEntity extends DataEntity {
 
     public UserDto toUserDto() throws FormatDoesNotMatchException {
         List<AuthorityDto> authorityDtoList = new ArrayList<>();
-        for(AuthorityUserJoinEntity authority : authorityJoin) {
+        for (AuthorityUserJoinEntity authority : authorityJoin) {
             authorityDtoList.add(authority.getAuthority().toAuthorityDto());
         }
 

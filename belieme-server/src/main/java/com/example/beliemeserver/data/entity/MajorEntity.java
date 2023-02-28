@@ -1,15 +1,17 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.model.dto.MajorDto;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "major", uniqueConstraints={
+@Table(name = "major", uniqueConstraints = {
         @UniqueConstraint(
                 name = "major_index",
-                columnNames={"university_id", "code"}
+                columnNames = {"university_id", "code"}
         )
 })
 @NoArgsConstructor

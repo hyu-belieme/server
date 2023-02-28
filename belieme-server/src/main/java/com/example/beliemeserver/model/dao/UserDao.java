@@ -1,9 +1,9 @@
 package com.example.beliemeserver.model.dao;
 
-import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

@@ -7,7 +7,7 @@ public class InternalServerErrorHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    
+
     public InternalServerErrorHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);

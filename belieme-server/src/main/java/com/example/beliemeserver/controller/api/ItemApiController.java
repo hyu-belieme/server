@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/universities/{university-code}/departments/{department-code}/stuffs/{stuff-name}")
+@RequestMapping(path = "/universities/{university-code}/departments/{department-code}/stuffs/{stuff-name}")
 public class ItemApiController {
     private final ItemService itemService;
 
@@ -60,7 +60,7 @@ public class ItemApiController {
 
     private List<ItemResponse> toResponseList(List<ItemDto> itemDtoList) {
         List<ItemResponse> responseList = new ArrayList<>();
-        for(ItemDto dto : itemDtoList) {
+        for (ItemDto dto : itemDtoList) {
             responseList.add(ItemResponse.from(dto));
         }
         return responseList;

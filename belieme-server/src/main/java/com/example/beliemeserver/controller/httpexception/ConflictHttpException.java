@@ -7,7 +7,7 @@ public class ConflictHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.CONFLICT);
     }
-    
+
     public ConflictHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.CONFLICT);

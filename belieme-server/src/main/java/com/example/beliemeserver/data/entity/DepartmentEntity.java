@@ -2,17 +2,20 @@ package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "department", uniqueConstraints={
+@Table(name = "department", uniqueConstraints = {
         @UniqueConstraint(
                 name = "department_index",
-                columnNames={"university_id", "code"}
+                columnNames = {"university_id", "code"}
         )
 })
 @NoArgsConstructor
@@ -69,7 +72,7 @@ public class DepartmentEntity extends DataEntity {
 
     public DepartmentDto toDepartmentDto() {
         List<MajorDto> baseMajorDtoList = new ArrayList<>();
-        for(MajorDepartmentJoinEntity major : baseMajorJoin) {
+        for (MajorDepartmentJoinEntity major : baseMajorJoin) {
             baseMajorDtoList.add(major.getMajor().toMajorDto());
         }
 

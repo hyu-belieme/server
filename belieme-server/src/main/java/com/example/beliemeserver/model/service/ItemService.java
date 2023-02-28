@@ -10,7 +10,6 @@ import com.example.beliemeserver.model.dto.StuffDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,7 +50,7 @@ public class ItemService extends BaseService {
         StuffDto stuff = getStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
         ItemDto newItem = ItemDto.init(stuff, stuff.nextItemNum());
 
-        if(newItem.num() > MAX_ITEM_NUM) {
+        if (newItem.num() > MAX_ITEM_NUM) {
             throw new MethodNotAllowedException();
         }
         return itemDao.create(newItem);

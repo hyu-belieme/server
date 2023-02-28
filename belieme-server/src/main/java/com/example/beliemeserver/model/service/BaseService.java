@@ -49,53 +49,53 @@ public abstract class BaseService {
     private void validateUser(UserDto user) {
         long currentTimestamp = (System.currentTimeMillis() / 1000);
         long expiredTimestamp = user.approvalTimeStamp() + TOKEN_EXPIRED_TIME;
-        if(currentTimestamp > expiredTimestamp) {
+        if (currentTimestamp > expiredTimestamp) {
             throw new ExpiredTokenException();
         }
     }
 
     protected void checkUserPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
-        if(!requester.getMaxPermission(department).hasUserPermission()) {
+        if (!requester.getMaxPermission(department).hasUserPermission()) {
             throw new ForbiddenException();
         }
     }
 
     protected void checkStaffPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
-        if(!requester.getMaxPermission(department).hasStaffPermission()) {
+        if (!requester.getMaxPermission(department).hasStaffPermission()) {
             throw new ForbiddenException();
         }
     }
 
     protected void checkMasterPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
-        if(!requester.getMaxPermission(department).hasMasterPermission()) {
+        if (!requester.getMaxPermission(department).hasMasterPermission()) {
             throw new ForbiddenException();
         }
     }
 
     protected void checkDeveloperPermission(String token) {
         UserDto requester = validateTokenAndGetUser(token);
-        if(!requester.isDeveloper()) {
+        if (!requester.isDeveloper()) {
             throw new ForbiddenException();
         }
     }
 
     protected void checkUserPermission(DepartmentDto department, UserDto requester) {
-        if(!requester.getMaxPermission(department).hasUserPermission()) {
+        if (!requester.getMaxPermission(department).hasUserPermission()) {
             throw new ForbiddenException();
         }
     }
 
     protected void checkStaffPermission(DepartmentDto department, UserDto requester) {
-        if(!requester.getMaxPermission(department).hasStaffPermission()) {
+        if (!requester.getMaxPermission(department).hasStaffPermission()) {
             throw new ForbiddenException();
         }
     }
 
     protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
-        if(!requester.getMaxPermission(department).hasMasterPermission()) {
+        if (!requester.getMaxPermission(department).hasMasterPermission()) {
             throw new ForbiddenException();
         }
     }
