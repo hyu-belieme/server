@@ -78,7 +78,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "ENG",
                 "공과대학",
                 newDepartmentBaseMajor
@@ -94,7 +94,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(1),
+                DummyDataSet.universityDummies.get(2),
                 "CSE",
                 "컴퓨터공학과",
                 newDepartmentBaseMajor
@@ -110,7 +110,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(1),
+                DummyDataSet.universityDummies.get(2),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -152,7 +152,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -173,7 +173,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "ENG",
                 "공과대학",
                 newDepartmentBaseMajor
@@ -192,7 +192,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -215,7 +215,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
@@ -237,7 +237,7 @@ public class DepartmentDaoTest extends DaoTest {
         );
 
         DepartmentDto newDepartment = new DepartmentDto(
-                DummyDataSet.universityDummies.get(1),
+                DummyDataSet.universityDummies.get(2),
                 "MED",
                 "의과대학",
                 newDepartmentBaseMajor
