@@ -1,40 +1,42 @@
 -- insert university
 insert into university(id, code, name, api_url)
-values (1, 'HYU', '한양대학교', 'https://api.hanyang.ac.kr/oauth/authorize/');
+values (1, 'DEV', 'DEV', 'DEV');
 insert into university(id, code, name, api_url)
-values (2, 'CKU', '가톨릭관동대학교', null);
+values (2, 'HYU', '한양대학교', 'https://api.hanyang.ac.kr/rs/user/loginInfo.json');
 insert into university(id, code, name, api_url)
-values (3, 'SNU', '서울대학교', null);
+values (3, 'CKU', '가톨릭관동대학교', null);
+insert into university(id, code, name, api_url)
+values (4, 'SNU', '서울대학교', null);
 
 -- insert major
 insert into major(id, university_id, code)
-values (1, 1, 'FH04067');
+values (1, 2, 'FH04067');
 insert into major(id, university_id, code)
-values (2, 1, 'FH04068');
+values (2, 2, 'FH04068');
 insert into major(id, university_id, code)
-values (3, 1, 'FH04069');
+values (3, 2, 'FH04069');
 insert into major(id, university_id, code)
-values (4, 2, 'TEST');
+values (4, 3, 'TEST');
 insert into major(id, university_id, code)
-values (5, 1, 'TEST');
+values (5, 2, 'TEST');
 insert into major(id, university_id, code)
-values (6, 2, 'A68');
+values (6, 3, 'A68');
 insert into major(id, university_id, code)
-values (7, 2, 'A69');
+values (7, 3, 'A69');
 insert into major(id, university_id, code)
-values (8, 2, 'A70');
+values (8, 3, 'A70');
 
 -- insert department
 insert into department(id, university_id, code, name)
-values (1, 1, 'CSE', '컴퓨터소프트웨어학부');
+values (1, 2, 'CSE', '컴퓨터소프트웨어학부');
 insert into department(id, university_id, code, name)
-values (2, 1, 'STU', '총학생회');
+values (2, 2, 'STU', '총학생회');
 insert into department(id, university_id, code, name)
-values (3, 2, 'MED', '의과대학');
+values (3, 3, 'MED', '의과대학');
 insert into department(id, university_id, code, name)
-values (4, 2, 'STU', '총학생회');
+values (4, 3, 'STU', '총학생회');
 insert into department(id, university_id, code, name)
-values (5, 2, 'ME', '기계공학과');
+values (5, 3, 'ME', '기계공학과');
 
 insert into major_department_join(department_id, major_id)
 values (1, 1);
@@ -119,15 +121,15 @@ values (24, 4, 'DEVELOPER');
 
 -- insert user
 insert into user(id, university_id, student_id, name, token, create_time_stamp, approval_time_stamp)
-values (1, 1, '2018008886', '이석환', 'TEST1', 1673155358, 1673155358);
+values (1, 2, '2018008886', '이석환', 'TEST1', 1673155358, 1673155358);
 insert into user(id, university_id, student_id, name, token, create_time_stamp, approval_time_stamp)
-values (2, 1, '2018008887', '이석현', 'TEST2', 1673155358, 1673155358);
+values (2, 2, '2018008887', '이석현', 'TEST2', 1673155358, 1673155358);
 insert into user(id, university_id, student_id, name, token, create_time_stamp, approval_time_stamp)
-values (3, 1, '2019008887', '강백호', 'TEST3', 1673155358, 1673155358);
+values (3, 2, '2019008887', '강백호', 'TEST3', 1673155358, 1673155358);
 insert into user(id, university_id, student_id, name, token, create_time_stamp, approval_time_stamp)
-values (4, 2, '2018008886', '이석환', 'TEST4', 1673155358, 1673155358);
+values (4, 3, '2018008886', '이석환', 'TEST4', 1673155358, 1673155358);
 insert into user(id, university_id, student_id, name, token, create_time_stamp, approval_time_stamp)
-values (5, 2, '2018008887', '이석환', 'TEST5', 1673155358, 1673155358);
+values (5, 3, '2018008887', '이석환', 'TEST5', 1673155358, 1673155358);
 
 insert into authority_user_join(user_id, authority_id)
 values (1, 1);

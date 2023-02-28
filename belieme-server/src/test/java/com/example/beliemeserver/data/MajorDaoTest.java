@@ -24,7 +24,7 @@ public class MajorDaoTest extends DaoTest {
     @Test
     public void createNewMajorTest1() {
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "FH04070");
 
         testCreatingMajor(newMajor);
@@ -33,7 +33,7 @@ public class MajorDaoTest extends DaoTest {
     @Test
     public void createNewMajorTest2() {
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(1), "FH04068");
+                DummyDataSet.universityDummies.get(2), "FH04068");
 
         testCreatingMajor(newMajor);
     }
@@ -41,7 +41,7 @@ public class MajorDaoTest extends DaoTest {
     @Test
     public void createNewMajorFailByConflictExceptionTest() {
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(0), "FH04068");
+                DummyDataSet.universityDummies.get(1), "FH04068");
 
         TestHelper.exceptionTest(
                 () -> majorDao.create(newMajor),
@@ -64,7 +64,7 @@ public class MajorDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetMajorCode = "FH04069";
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(0), "FH04070");
+                DummyDataSet.universityDummies.get(1), "FH04070");
 
         testUpdatingMajor(targetUniversityCode, targetMajorCode, newMajor);
     }
@@ -74,7 +74,7 @@ public class MajorDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetMajorCode = "FH04069";
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(1), "FH04069");
+                DummyDataSet.universityDummies.get(2), "FH04069");
 
         testUpdatingMajor(targetUniversityCode, targetMajorCode, newMajor);
     }
@@ -84,7 +84,7 @@ public class MajorDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetMajorCode = "FH04069";
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(1), "FH04068");
+                DummyDataSet.universityDummies.get(2), "FH04068");
 
         testUpdatingMajor(targetUniversityCode, targetMajorCode, newMajor);
     }
@@ -94,7 +94,7 @@ public class MajorDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetMajorCode = "FH04069";
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(0), "FH04068");
+                DummyDataSet.universityDummies.get(1), "FH04068");
 
         TestHelper.exceptionTest(
                 () -> majorDao.update(targetUniversityCode, targetMajorCode, newMajor),
@@ -107,7 +107,7 @@ public class MajorDaoTest extends DaoTest {
         String targetUniversityCode = "HYU";
         String targetMajorCode = "FH04072";
         MajorDto newMajor = new MajorDto(
-                DummyDataSet.universityDummies.get(0), "FH04080");
+                DummyDataSet.universityDummies.get(1), "FH04080");
 
         TestHelper.exceptionTest(
                 () -> majorDao.update(targetUniversityCode, targetMajorCode, newMajor),

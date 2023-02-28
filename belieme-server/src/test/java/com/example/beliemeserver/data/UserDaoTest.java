@@ -213,7 +213,7 @@ public class UserDaoTest extends DaoTest {
         String targetStudentId = "2022005678";
 
         UserDto newUser = UserDto.init(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "2022001234",
                 "홍길동"
         );
@@ -230,7 +230,7 @@ public class UserDaoTest extends DaoTest {
         String targetStudentId = "2018008886";
 
         UserDto newUser = UserDto.init(
-                DummyDataSet.universityDummies.get(0),
+                DummyDataSet.universityDummies.get(1),
                 "2018008887",
                 "홍길동"
         );
