@@ -1,9 +1,8 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.BadGateWayException;
-import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.MethodNotAllowedException;
-import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.common.DeveloperInfo;
+import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.service.UserService;
 import com.example.beliemeserver.model.util.HttpRequest;
@@ -364,6 +363,103 @@ public class UserServiceTest extends BaseServiceTest {
     }
 
     @Nested
+    @DisplayName("reloadDeveloperUser()")
+    public final class TestReloadDeveloperUser {
+        @Captor
+        private ArgumentCaptor<UserDto> userArgumentCaptor;
+
+        private final UniversityDto univ = Globals.DEV_UNIVERSITY;
+        private final String univCode = Globals.DEV_UNIVERSITY_CODE;
+        private String apiToken;
+        private String studentId;
+        private String name;
+
+        private UserDto targetUser;
+
+        private void setUpDefault() {
+            RandomGetter<DeveloperInfo> devInfoGetter = new RandomGetter<>(Globals.developers);
+            DeveloperInfo devInfo = devInfoGetter.randomSelect();
+
+            this.apiToken = devInfo.apiToken();
+            this.studentId = devInfo.studentId();
+            this.name = devInfo.name();
+            this.targetUser = UserDto.init(univ, studentId, name)
+                    .withApprovalTimeStamp(0)
+                    .withAuthorityAdd(Globals.DEV_AUTHORITY);
+        }
+
+        private UserDto execMethod() {
+            return userService.reloadDeveloperUser(apiToken);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[이미 DB에 등록된 developer일 시]_[-]")
+        public void SUCCESS_devIsAlreadyOnDatabase() {
+            setUpDefault();
+
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
+            when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+
+            execMethod();
+
+            verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
+            UserDto newUser = userArgumentCaptor.getValue();
+            Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[DB에 등록되지 않은 developer일 시]_[-]")
+        public void SUCCESS_devIsNotOnDatabase() {
+            setUpDefault();
+
+            when(universityDao.getByIndex(univCode)).thenReturn(univ);
+            when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+
+            execMethod();
+
+            verify(userDao).create(userArgumentCaptor.capture());
+            UserDto newUser = userArgumentCaptor.getValue();
+            Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[API Token이 존재하지 않을 시]_[UnauthorizedException]")
+        public void ERROR_isUnauthorizedApiToken_UnauthorizedException() {
+            setUpDefault();
+            apiToken = "";
+
+            TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
+        }
+
+        private boolean checkUpdatedUser(UserDto newUser) {
+            System.out.println(newUser);
+            if(newUser.studentId().equals(studentId)
+                    && newUser.university().equals(univ)
+                    && newUser.name().equals(name)
+                    && !newUser.token().equals(targetUser.token())
+                    && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
+            ) {
+                return checkDeveloperAuth(newUser);
+            }
+            return false;
+        }
+
+        private boolean checkCreatedUser(UserDto newUser) {
+            if(newUser.studentId().equals(studentId)
+                    && newUser.university().equals(univ)
+                    && newUser.name().equals(name)) {
+                return checkDeveloperAuth(newUser);
+            }
+            return false;
+        }
+
+        private boolean checkDeveloperAuth(UserDto newUser) {
+            return newUser.authorities().stream()
+                    .anyMatch(authority -> authority.equals(Globals.DEV_AUTHORITY));
+        }
+    }
+
+    @Nested
     @DisplayName("updateUserFromHanyangUniversity()")
     public final class TestUpdateUserFromHanyangUniversity {
         private static MockedStatic<HttpRequest> httpRequest;
@@ -414,7 +510,7 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private void setTargetUser(UserDto user) {
-            this.targetUser = user;
+            this.targetUser = user.withApprovalTimeStamp(0);
             this.studentId = user.studentId();
         }
 
@@ -428,7 +524,7 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private UserDto execMethod() {
-            return userService.updateUserFromHanyangUniversity(apiToken);
+            return userService.reloadHanyangUniversityUser(apiToken);
         }
 
         @RepeatedTest(10)
@@ -513,7 +609,9 @@ public class UserServiceTest extends BaseServiceTest {
             if(newUser.studentId().equals(studentId)
                     && newUser.university().equals(univ)
                     && newUser.name().equals(newName)
-                    && !newUser.token().equals(targetUser.token())) {
+                    && !newUser.token().equals(targetUser.token())
+                    && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
+            ) {
                 return checkAuthUpdate(newUser);
             }
             return false;

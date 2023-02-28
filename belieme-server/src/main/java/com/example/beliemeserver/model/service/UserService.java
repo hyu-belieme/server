@@ -1,9 +1,11 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.common.DeveloperInfo;
 import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.util.HttpRequest;
@@ -84,7 +86,29 @@ public class UserService extends BaseService {
         return userDao.update(universityCode, studentId, newUser);
     }
 
-    public UserDto updateUserFromHanyangUniversity(@NonNull String apiToken) {
+    public UserDto reloadDeveloperUser(@NonNull String apiToken) {
+        DeveloperInfo targetDeveloper = null;
+        for(DeveloperInfo info : Globals.developers) {
+            if(info.apiToken().equals(apiToken)) {
+                targetDeveloper = info;
+                break;
+            }
+        }
+        if(targetDeveloper == null) {
+            throw new UnauthorizedException();
+        }
+
+        Pair<Boolean, UserDto> isNewAndUser = getOrMakeDeveloperUser(targetDeveloper.studentId(), targetDeveloper.name());
+        boolean isNew = isNewAndUser.getFirst();
+        UserDto newUser = isNewAndUser.getSecond();
+        newUser = newUser.withApprovalTimeStamp(currentTimestamp())
+                .withToken(UUID.randomUUID().toString());
+
+        if(isNew) return userDao.create(newUser);
+        return userDao.update(Globals.DEV_UNIVERSITY_CODE, targetDeveloper.studentId(), newUser);
+    }
+
+    public UserDto reloadHanyangUniversityUser(@NonNull String apiToken) {
         JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(apiToken);
         String studentId = (String) (jsonResponse.get("gaeinNo"));
         String name = (String) (jsonResponse.get("userNm"));
@@ -118,6 +142,20 @@ public class UserService extends BaseService {
         } catch (NotFoundException e) {
             isNew = true;
             newUser = UserDto.init(university, studentId, name);
+        }
+        return Pair.of(isNew, newUser);
+    }
+
+    private Pair<Boolean, UserDto> getOrMakeDeveloperUser(String studentId, String name) {
+        boolean isNew = false;
+        UserDto newUser;
+        UniversityDto university = universityDao.getByIndex(Globals.DEV_UNIVERSITY_CODE);
+        try {
+            newUser = userDao.getByIndex(Globals.DEV_UNIVERSITY_CODE, studentId);
+        } catch (NotFoundException e) {
+            isNew = true;
+            newUser = UserDto.init(university, studentId, name);
+            newUser = newUser.withAuthorityAdd(Globals.DEV_AUTHORITY);
         }
         return Pair.of(isNew, newUser);
     }
