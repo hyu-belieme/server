@@ -23,8 +23,8 @@ public class UniversityResponse extends JsonResponse {
     }
 
     public static UniversityResponse from(UniversityDto universityDto) {
-        if(universityDto == null) return null;
-        if(universityDto.equals(UniversityDto.nestedEndpoint)) {
+        if (universityDto == null) return null;
+        if (universityDto.equals(UniversityDto.nestedEndpoint)) {
             return responseWillBeIgnore();
         }
         return new UniversityResponse(universityDto.code(), universityDto.name());

@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface MajorRepository extends RefreshRepository<MajorEntity, Integer> {
     boolean existsByUniversityIdAndCode(int universityId, String code);
+
     Optional<MajorEntity> findByUniversityIdAndCode(int universityId, String code);
 }

@@ -7,7 +7,7 @@ public class ForbiddenHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.FORBIDDEN);
     }
-    
+
     public ForbiddenHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.FORBIDDEN);

@@ -1,7 +1,12 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.*;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.service.StuffService;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -177,21 +182,21 @@ public class StuffServiceTest extends BaseServiceTest {
 
             mockDepartmentAndRequester();
             when(stuffDao.create(stuff)).thenReturn(stuff);
-            for(int i = 0; i < amount; i++) {
-                ItemDto newItem = ItemDto.init(stuff, i+1);
+            for (int i = 0; i < amount; i++) {
+                ItemDto newItem = ItemDto.init(stuff, i + 1);
                 when(itemDao.create(newItem)).thenReturn(newItem);
             }
 
             StuffDto expected = stuff;
-            for(int i = 0; i < amount; i++) {
-                ItemDto newItem = ItemDto.init(stuff, i+1);
+            for (int i = 0; i < amount; i++) {
+                ItemDto newItem = ItemDto.init(stuff, i + 1);
                 expected = expected.withItemAdd(newItem);
             }
             TestHelper.objectCompareTest(this::execMethod, expected);
 
             verify(stuffDao).create(stuff);
-            for(int i = 0; i < amount; i++) {
-                verify(itemDao).create(ItemDto.init(stuff, i+1));
+            for (int i = 0; i < amount; i++) {
+                verify(itemDao).create(ItemDto.init(stuff, i + 1));
             }
         }
 

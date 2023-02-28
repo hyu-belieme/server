@@ -1,6 +1,9 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
@@ -18,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,8 +63,8 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(departmentDao.getAllList()).thenReturn(stub.ALL_DEPTS);
 
             List<DepartmentDto> expected = new ArrayList<>();
-            for(DepartmentDto department : stub.ALL_DEPTS) {
-                if(requester.getMaxPermission(department).hasUserPermission()) {
+            for (DepartmentDto department : stub.ALL_DEPTS) {
+                if (requester.getMaxPermission(department).hasUserPermission()) {
                     expected.add(department);
                 }
             }
@@ -154,7 +157,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             this.name = dept.name();
             this.baseMajors = dept.baseMajors();
             this.baseMajorCodes = new ArrayList<>();
-            dept.baseMajors().forEach((major)-> baseMajorCodes.add(major.code()));
+            dept.baseMajors().forEach((major) -> baseMajorCodes.add(major.code()));
         }
 
         protected DepartmentDto execMethod() {
@@ -177,7 +180,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
             verify(departmentDao).create(dept);
             verify(majorDao, never()).create(any());
-            for(AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+            for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
                 verify(authorityDao).create(new AuthorityDto(dept, permission));
             }
         }
@@ -198,7 +201,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
             verify(departmentDao).create(dept);
             verify(majorDao, times(1)).create(baseMajors.get(0));
-            for(AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+            for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
                 verify(authorityDao).create(new AuthorityDto(dept, permission));
             }
         }
@@ -412,7 +415,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
     private abstract class DeptNestedTest extends BaseNestedTest {
         protected void mockGetMajors(List<MajorDto> majors, UniversityDto univ, List<String> majorCodes) {
-            for(int i = 0; i < majorCodes.size(); i++) {
+            for (int i = 0; i < majorCodes.size(); i++) {
                 String majorCode = majorCodes.get(i);
                 when(majorDao.getByIndex(univ.code(), majorCode))
                         .thenReturn(majors.get(i));
@@ -420,9 +423,9 @@ public class DepartmentServiceTest extends BaseServiceTest {
         }
 
         protected void mockGetOrCreateMajors(List<MajorDto> majors, UniversityDto univ, List<String> majorCodes) {
-            for(int i = 0; i < majorCodes.size(); i++) {
+            for (int i = 0; i < majorCodes.size(); i++) {
                 String majorCode = majorCodes.get(i);
-                if(i == 0) {
+                if (i == 0) {
                     when(majorDao.getByIndex(univ.code(), majorCode))
                             .thenThrow(NotFoundException.class);
                     when(majorDao.create(new MajorDto(univ, majorCode)))

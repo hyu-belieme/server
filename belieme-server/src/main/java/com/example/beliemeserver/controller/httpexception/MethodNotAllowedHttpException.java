@@ -7,7 +7,7 @@ public class MethodNotAllowedHttpException extends HttpException {
         super(e);
         setHttpStatus(HttpStatus.METHOD_NOT_ALLOWED);
     }
-    
+
     public MethodNotAllowedHttpException(String message) {
         super();
         setHttpStatus(HttpStatus.METHOD_NOT_ALLOWED);

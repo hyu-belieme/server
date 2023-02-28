@@ -21,8 +21,8 @@ public class DepartmentService extends BaseService {
 
         UserDto requester = validateTokenAndGetUser(userToken);
         List<DepartmentDto> allDepartment = departmentDao.getAllList();
-        for(DepartmentDto department : allDepartment) {
-            if(requester.getMaxPermission(department).hasUserPermission()) {
+        for (DepartmentDto department : allDepartment) {
+            if (requester.getMaxPermission(department).hasUserPermission()) {
                 output.add(department);
             }
         }
@@ -47,14 +47,14 @@ public class DepartmentService extends BaseService {
 
         UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
         List<MajorDto> baseMajors = new ArrayList<>();
-        for(String majorCode : majorCodes) {
+        for (String majorCode : majorCodes) {
             baseMajors.add(getMajorOrCreate(university, majorCode));
         }
 
         DepartmentDto newDepartment = new DepartmentDto(university, departmentCode, name, baseMajors);
         newDepartment = departmentDao.create(newDepartment);
 
-        for(AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+        for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
             authorityDao.create(new AuthorityDto(newDepartment, permission));
         }
         return newDepartment;
@@ -69,15 +69,15 @@ public class DepartmentService extends BaseService {
         UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
         DepartmentDto oldDepartment = departmentDao.getByIndex(universityCode, departmentCode);
 
-        if(newDepartmentCode == null && newName == null && newMajorCodes == null) return oldDepartment;
+        if (newDepartmentCode == null && newName == null && newMajorCodes == null) return oldDepartment;
 
-        if(newDepartmentCode == null) newDepartmentCode = oldDepartment.code();
-        if(newName == null) newName = oldDepartment.name();
+        if (newDepartmentCode == null) newDepartmentCode = oldDepartment.code();
+        if (newName == null) newName = oldDepartment.name();
         List<MajorDto> newBaseMajors = oldDepartment.baseMajors();
 
-        if(newMajorCodes != null) {
+        if (newMajorCodes != null) {
             newBaseMajors = new ArrayList<>();
-            for(String majorCode : newMajorCodes) {
+            for (String majorCode : newMajorCodes) {
                 newBaseMajors.add(getMajorOrCreate(university, majorCode));
             }
         }

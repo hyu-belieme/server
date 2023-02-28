@@ -75,7 +75,7 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("authorities")).isTrue();
         JSONArray jsonArray = (JSONArray) json.get("authorities");
-        for(int i = 0; i < jsonArray.size(); i++) {
+        for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject authorityJson = (JSONObject) jsonArray.get(i);
             authorityJsonCmpAssertions(authorityJson, user.meaningfulAuthorities().get(i));
         }
@@ -130,7 +130,7 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("itemList")).isTrue();
         JSONArray jsonArray = (JSONArray) json.get("itemList");
-        for(int i = 0; i < jsonArray.size(); i++) {
+        for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject itemJson = (JSONObject) jsonArray.get(i);
             itemJsonWithoutUnivAndDeptAndStuffInfoCmpAssertions(itemJson, stuff.items().get(i));
         }
@@ -289,7 +289,7 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("baseMajors")).isTrue();
         JSONArray jsonArray = (JSONArray) json.get("baseMajors");
-        for(int i = 0; i < jsonArray.size(); i++) {
+        for (int i = 0; i < jsonArray.size(); i++) {
             Assertions.assertThat(jsonArray.get(i)).isEqualTo(department.baseMajors().get(i).code());
         }
     }
@@ -318,11 +318,11 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("num")).isTrue();
         Assertions.assertThat(json.get("num")).isEqualTo((long) history.num());
 
-        userJsonNestedToHistoryCmpAssertions("requester" , json, history.requester());
-        userJsonNestedToHistoryCmpAssertions("approveManager" , json, history.approveManager());
-        userJsonNestedToHistoryCmpAssertions("returnManager" , json, history.returnManager());
-        userJsonNestedToHistoryCmpAssertions("lostManager" , json, history.lostManager());
-        userJsonNestedToHistoryCmpAssertions("cancelManager" , json, history.cancelManager());
+        userJsonNestedToHistoryCmpAssertions("requester", json, history.requester());
+        userJsonNestedToHistoryCmpAssertions("approveManager", json, history.approveManager());
+        userJsonNestedToHistoryCmpAssertions("returnManager", json, history.returnManager());
+        userJsonNestedToHistoryCmpAssertions("lostManager", json, history.lostManager());
+        userJsonNestedToHistoryCmpAssertions("cancelManager", json, history.cancelManager());
 
         timestampOnHistoryJsonCmpAssertions("reservedTimeStamp", json, history.reservedTimeStamp());
         timestampOnHistoryJsonCmpAssertions("approveTimeStamp", json, history.approveTimeStamp());
@@ -335,7 +335,7 @@ public class BaseResponseTest {
     }
 
     private void timestampOnHistoryJsonCmpAssertions(String tag, JSONObject json, long timeStamp) {
-        if(timeStamp == 0) {
+        if (timeStamp == 0) {
             Assertions.assertThat(json.containsKey(tag)).isFalse();
             return;
         }
@@ -345,7 +345,7 @@ public class BaseResponseTest {
     }
 
     private void userJsonNestedToHistoryCmpAssertions(String tag, JSONObject json, UserDto user) {
-        if(user != null) {
+        if (user != null) {
             Assertions.assertThat(json.containsKey(tag)).isTrue();
             JSONObject userJson = (JSONObject) json.get(tag);
             userWithoutSecureInfoJsonCmpAssertions(userJson, user);
@@ -355,7 +355,7 @@ public class BaseResponseTest {
     private void historyJsonNestedToItemCmpAssertions(JSONObject json, ItemDto item) {
         Assertions.assertThat(json.containsKey("lastHistory")).isTrue();
         JSONObject historyJson = (JSONObject) json.get("lastHistory");
-        if(item.lastHistory() == null) {
+        if (item.lastHistory() == null) {
             Assertions.assertThat(historyJson).isNull();
             return;
         }

@@ -29,14 +29,14 @@ public record ItemDto(
     }
 
     public boolean matchUniqueKey(ItemDto oth) {
-        if(oth == null) return false;
+        if (oth == null) return false;
         return this.stuff().matchUniqueKey(oth.stuff())
                 && this.num() == oth.num();
     }
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
 
@@ -48,12 +48,12 @@ public record ItemDto(
     }
 
     public int nextHistoryNum() {
-        if(lastHistory == null) return 1;
+        if (lastHistory == null) return 1;
         return lastHistory.num() + 1;
     }
 
     public ItemStatus status() {
-        if(lastHistory == null) {
+        if (lastHistory == null) {
             return ItemStatus.USABLE;
         }
 

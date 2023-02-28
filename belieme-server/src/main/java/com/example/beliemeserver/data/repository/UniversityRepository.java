@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface UniversityRepository extends RefreshRepository<UniversityEntity, Integer> {
     boolean existsByCode(String code);
+
     Optional<UniversityEntity> findByCode(String code);
 }

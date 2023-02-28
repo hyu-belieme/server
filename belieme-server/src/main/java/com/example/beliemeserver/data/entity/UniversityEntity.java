@@ -1,7 +1,9 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.model.dto.UniversityDto;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.*;
 

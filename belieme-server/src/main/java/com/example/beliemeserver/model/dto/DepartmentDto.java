@@ -58,7 +58,7 @@ public record DepartmentDto(
     }
 
     public boolean matchUniqueKey(String universityCode, String departmentCode) {
-        if(universityCode == null || departmentCode == null) {
+        if (universityCode == null || departmentCode == null) {
             return false;
         }
         return universityCode.equals(this.university().code())
@@ -66,7 +66,7 @@ public record DepartmentDto(
     }
 
     public boolean matchUniqueKey(DepartmentDto oth) {
-        if(oth == null) {
+        if (oth == null) {
             return false;
         }
         String universityCode = oth.university().code();
@@ -77,7 +77,7 @@ public record DepartmentDto(
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
 

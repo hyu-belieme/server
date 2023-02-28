@@ -51,11 +51,11 @@ public class StuffService extends BaseService {
         StuffDto output = newStuff;
         newStuff = stuffDao.create(newStuff);
 
-        if(amount == null) return output;
-        if(amount < 0 || amount > CREATE_AMOUNT_UPPER_BOUND) throw new MethodNotAllowedException();
+        if (amount == null) return output;
+        if (amount < 0 || amount > CREATE_AMOUNT_UPPER_BOUND) throw new MethodNotAllowedException();
 
-        for(int i = 0; i < amount; i++) {
-            ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i+1));
+        for (int i = 0; i < amount; i++) {
+            ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i + 1));
             output = output.withItemAdd(newItem);
         }
         return output;
@@ -71,9 +71,9 @@ public class StuffService extends BaseService {
 
         StuffDto oldStuff = stuffDao.getByIndex(universityCode, departmentCode, name);
 
-        if(newName == null && newEmoji == null) return oldStuff;
-        if(newName == null) newName = oldStuff.name();
-        if(newEmoji == null) newEmoji = oldStuff.emoji();
+        if (newName == null && newEmoji == null) return oldStuff;
+        if (newName == null) newName = oldStuff.name();
+        if (newEmoji == null) newEmoji = oldStuff.emoji();
 
         StuffDto newStuff = StuffDto.init(department, newName, newEmoji);
         return stuffDao.update(universityCode, departmentCode, name, newStuff);

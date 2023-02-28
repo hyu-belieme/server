@@ -1,9 +1,9 @@
 package com.example.beliemeserver.data.entity;
 
+import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -91,7 +91,7 @@ public class ItemEntity extends DataEntity {
     }
 
     private HistoryDto getLastHistoryDto() throws FormatDoesNotMatchException {
-        if(lastHistory == null) {
+        if (lastHistory == null) {
             return null;
         }
         return lastHistory.toHistoryDtoNestedToItem();

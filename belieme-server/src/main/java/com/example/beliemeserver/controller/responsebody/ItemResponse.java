@@ -41,14 +41,14 @@ public class ItemResponse extends JsonResponse {
     }
 
     public static ItemResponse from(ItemDto itemDto) {
-        if(itemDto == null) return null;
-        if(itemDto.equals(ItemDto.nestedEndpoint)) {
+        if (itemDto == null) return null;
+        if (itemDto.equals(ItemDto.nestedEndpoint)) {
             return responseWillBeIgnore();
         }
 
         String stuffName = null;
         String stuffEmoji = null;
-        if(!itemDto.stuff().equals(StuffDto.nestedEndpoint)) {
+        if (!itemDto.stuff().equals(StuffDto.nestedEndpoint)) {
             stuffName = itemDto.stuff().name();
             stuffEmoji = itemDto.stuff().emoji();
         }
@@ -84,7 +84,7 @@ public class ItemResponse extends JsonResponse {
     }
 
     private static HistoryResponse toNestedResponse(HistoryResponse history) {
-        if(history == null) return null;
+        if (history == null) return null;
         return history
                 .withoutItem()
                 .withoutUniversityAndDepartment();

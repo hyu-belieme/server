@@ -3,11 +3,11 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.model.dao.StuffDao;
-import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dao.StuffDao;
+import com.example.beliemeserver.model.dto.StuffDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     @Override
     public List<StuffDto> getAllList() throws FormatDoesNotMatchException {
         List<StuffDto> output = new ArrayList<>();
-        for(StuffEntity stuffEntity : stuffRepository.findAll()) {
+        for (StuffEntity stuffEntity : stuffRepository.findAll()) {
             output.add(stuffEntity.toStuffDto());
         }
         return output;
@@ -33,7 +33,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
         DepartmentEntity departmentOfTarget = findDepartmentEntity(universityCode, departmentCode);
 
         List<StuffDto> output = new ArrayList<>();
-        for(StuffEntity stuffEntity : stuffRepository.findByDepartmentId(departmentOfTarget.getId())) {
+        for (StuffEntity stuffEntity : stuffRepository.findByDepartmentId(departmentOfTarget.getId())) {
             output.add(stuffEntity.toStuffDto());
         }
         return output;
@@ -63,7 +63,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
         StuffEntity target = findStuffEntity(universityCode, departmentCode, stuffName);
         DepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department());
 
-        if(doesIndexChange(target, newStuff)) {
+        if (doesIndexChange(target, newStuff)) {
             checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
         }
 
@@ -84,7 +84,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     }
 
     private void checkStuffConflict(int departmentId, String name) throws ConflictException {
-        if(stuffRepository.existsByDepartmentIdAndName(departmentId, name)) {
+        if (stuffRepository.existsByDepartmentIdAndName(departmentId, name)) {
             throw new ConflictException();
         }
     }

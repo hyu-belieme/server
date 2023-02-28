@@ -3,10 +3,10 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.MajorEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.model.dao.MajorDao;
-import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dao.MajorDao;
+import com.example.beliemeserver.model.dto.MajorDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     @Override
     public List<MajorDto> getAllList() {
         List<MajorDto> output = new ArrayList<>();
-        for(MajorEntity majorEntity : majorRepository.findAll()) {
+        for (MajorEntity majorEntity : majorRepository.findAll()) {
             output.add(majorEntity.toMajorDto());
         }
         return output;
@@ -64,7 +64,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     private void checkMajorConflict(int universityId, String majorCode) throws ConflictException {
-        if(majorRepository.existsByUniversityIdAndCode(universityId, majorCode)) {
+        if (majorRepository.existsByUniversityIdAndCode(universityId, majorCode)) {
             throw new ConflictException();
         }
     }

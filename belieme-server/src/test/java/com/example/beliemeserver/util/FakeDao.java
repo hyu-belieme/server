@@ -16,16 +16,16 @@ public class FakeDao<T> {
 
     public List<T> getAllByCondition(FilterMethod<T> filter) {
         List<T> output = new ArrayList<>();
-        for(T dummy : dummies) {
-            if(filter.checkCondition(dummy)) output.add(dummy);
+        for (T dummy : dummies) {
+            if (filter.checkCondition(dummy)) output.add(dummy);
         }
         return output;
     }
 
     public T getFirstByCondition(FilterMethod<T> filter) {
         T output = null;
-        for(T dummy : dummies) {
-            if(filter.checkCondition(dummy)) {
+        for (T dummy : dummies) {
+            if (filter.checkCondition(dummy)) {
                 output = dummy;
                 break;
             }

@@ -8,7 +8,10 @@ import java.util.Optional;
 
 public interface UserRepository extends RefreshRepository<UserEntity, Integer> {
     List<UserEntity> findByUniversityId(int universityId);
+
     Optional<UserEntity> findByUniversityIdAndStudentId(int universityId, String studentId);
+
     Optional<UserEntity> findByToken(String token);
+
     boolean existsByUniversityIdAndStudentId(int universityId, String studentId);
 }

@@ -5,7 +5,6 @@ import lombok.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public record UserDto(
         @NonNull UniversityDto university, @NonNull String studentId,
@@ -42,7 +41,7 @@ public record UserDto(
 
     public List<AuthorityDto> meaningfulAuthorities() {
         List<AuthorityDto> output = new ArrayList<>();
-        for(AuthorityDto authority : authorities) {
+        for (AuthorityDto authority : authorities) {
             overwriteAuthority(output, authority);
         }
         return output;
@@ -92,15 +91,15 @@ public record UserDto(
     public UserDto withAuthorityUpdate(DepartmentDto department, AuthorityDto.Permission permission) {
         UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
 
-        if(permission == null) {
+        if (permission == null) {
             output.authorities.removeIf(
                     (authority) -> department.matchUniqueKey(authority.department()));
             return output;
         }
 
-        for(int i = 0; i < output.authorities.size(); i++) {
+        for (int i = 0; i < output.authorities.size(); i++) {
             AuthorityDto authority = output.authorities.get(i);
-            if(authority.department().matchUniqueKey(department)) {
+            if (authority.department().matchUniqueKey(department)) {
                 output.authorities.set(i, new AuthorityDto(department, permission));
                 return output;
             }
@@ -112,7 +111,7 @@ public record UserDto(
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
 
@@ -136,7 +135,7 @@ public record UserDto(
     }
 
     public boolean matchUniqueKey(UserDto oth) {
-        if(oth == null) {
+        if (oth == null) {
             return false;
         }
         String universityCode = oth.university().code();
@@ -146,8 +145,8 @@ public record UserDto(
     }
 
     public boolean isDeveloper() {
-        for(AuthorityDto authority : authorities) {
-            if(authority.permission().hasDeveloperPermission()) {
+        for (AuthorityDto authority : authorities) {
+            if (authority.permission().hasDeveloperPermission()) {
                 return true;
             }
         }
@@ -155,19 +154,19 @@ public record UserDto(
     }
 
     public AuthorityDto.Permission getMaxPermission(DepartmentDto department) {
-        if(isDeveloper()) return AuthorityDto.Permission.DEVELOPER;
+        if (isDeveloper()) return AuthorityDto.Permission.DEVELOPER;
 
         AuthorityDto.Permission maxPermission = AuthorityDto.Permission.BANNED;
-        for(AuthorityDto authority : authorities) {
-            if(department.equals(authority.department())
+        for (AuthorityDto authority : authorities) {
+            if (department.equals(authority.department())
                     && authority.permission() == AuthorityDto.Permission.DEFAULT) {
                 maxPermission = AuthorityDto.Permission.USER;
                 break;
             }
         }
 
-        for(AuthorityDto authority : authorities) {
-            if(department.equals(authority.department())
+        for (AuthorityDto authority : authorities) {
+            if (department.equals(authority.department())
                     && authority.permission() != AuthorityDto.Permission.DEFAULT) {
                 maxPermission = authority.permission();
                 break;
@@ -179,26 +178,26 @@ public record UserDto(
     private void overwriteAuthority(List<AuthorityDto> list, AuthorityDto newAuthority) {
         DepartmentDto targetDepartment = newAuthority.department();
         AuthorityDto.Permission newPermission = newAuthority.permission();
-        if(newPermission == AuthorityDto.Permission.DEFAULT) {
+        if (newPermission == AuthorityDto.Permission.DEFAULT) {
             newPermission = AuthorityDto.Permission.USER;
         }
 
         boolean notExist = true;
-        for(int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             DepartmentDto department = list.get(i).department();
-            if(!department.matchUniqueKey(targetDepartment)) continue;
+            if (!department.matchUniqueKey(targetDepartment)) continue;
             notExist = false;
 
-            if(newAuthority.permission() != AuthorityDto.Permission.DEFAULT) {
+            if (newAuthority.permission() != AuthorityDto.Permission.DEFAULT) {
                 list.set(i, new AuthorityDto(department, newPermission));
             }
             break;
         }
-        if(notExist) list.add(new AuthorityDto(targetDepartment, newPermission));
+        if (notExist) list.add(new AuthorityDto(targetDepartment, newPermission));
     }
 
     private static long currentTimeStamp() {
-        return System.currentTimeMillis()/1000;
+        return System.currentTimeMillis() / 1000;
     }
 
     private static String newToken() {

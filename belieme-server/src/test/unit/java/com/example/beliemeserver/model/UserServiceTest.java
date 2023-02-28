@@ -3,7 +3,10 @@ package com.example.beliemeserver.model;
 import com.example.beliemeserver.common.DeveloperInfo;
 import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.exception.*;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.UniversityDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.service.UserService;
 import com.example.beliemeserver.model.util.HttpRequest;
 import com.example.beliemeserver.util.RandomGetter;
@@ -58,8 +61,8 @@ public class UserServiceTest extends BaseServiceTest {
             when(userDao.getAllList()).thenReturn(stub.ALL_USERS);
 
             List<UserDto> expected = new ArrayList<>();
-            for(UserDto user : stub.ALL_USERS) {
-                if(user.getMaxPermission(dept).hasMorePermission(AuthorityDto.Permission.USER))
+            for (UserDto user : stub.ALL_USERS) {
+                if (user.getMaxPermission(dept).hasMorePermission(AuthorityDto.Permission.USER))
                     expected.add(user);
             }
 
@@ -433,7 +436,7 @@ public class UserServiceTest extends BaseServiceTest {
 
         private boolean checkUpdatedUser(UserDto newUser) {
             System.out.println(newUser);
-            if(newUser.studentId().equals(studentId)
+            if (newUser.studentId().equals(studentId)
                     && newUser.university().equals(univ)
                     && newUser.name().equals(name)
                     && !newUser.token().equals(targetUser.token())
@@ -445,7 +448,7 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private boolean checkCreatedUser(UserDto newUser) {
-            if(newUser.studentId().equals(studentId)
+            if (newUser.studentId().equals(studentId)
                     && newUser.university().equals(univ)
                     && newUser.name().equals(name)) {
                 return checkDeveloperAuth(newUser);
@@ -499,7 +502,7 @@ public class UserServiceTest extends BaseServiceTest {
                     .filter((dept) -> dept.university().matchUniqueKey(univ))
                     .toList();
             newDepartments = stub.ALL_DEPTS.stream().filter((dept) -> {
-                if(!dept.university().matchUniqueKey(univ)) return false;
+                if (!dept.university().matchUniqueKey(univ)) return false;
                 return dept.baseMajors().stream().anyMatch(major -> newMajorCode.equals(major.code()));
             }).toList();
         }
@@ -606,7 +609,7 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private boolean checkUpdatedUser(UserDto newUser) {
-            if(newUser.studentId().equals(studentId)
+            if (newUser.studentId().equals(studentId)
                     && newUser.university().equals(univ)
                     && newUser.name().equals(newName)
                     && !newUser.token().equals(targetUser.token())
@@ -618,7 +621,7 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private boolean checkCreatedUser(UserDto newUser) {
-            if(newUser.studentId().equals(studentId)
+            if (newUser.studentId().equals(studentId)
                     && newUser.university().equals(univ)
                     && newUser.name().equals(newName)) {
                 return checkAuthUpdate(newUser);
@@ -627,8 +630,8 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private boolean checkAuthUpdate(UserDto newUser) {
-            for(DepartmentDto dept: newDepartments) {
-                if(newUser.authorities().stream()
+            for (DepartmentDto dept : newDepartments) {
+                if (newUser.authorities().stream()
                         .filter(authority -> authority.permission() == AuthorityDto.Permission.DEFAULT)
                         .noneMatch(authority -> authority.department().equals(dept))
                 ) {
@@ -657,10 +660,10 @@ public class UserServiceTest extends BaseServiceTest {
 
     private RandomGetter<UserDto> usersHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
-            for(AuthorityDto auth : user.authorities()) {
-                if(auth.department().matchUniqueKey(dept)
+            for (AuthorityDto auth : user.authorities()) {
+                if (auth.department().matchUniqueKey(dept)
                         && auth.permission() != AuthorityDto.Permission.DEFAULT) return true;
-                if(auth.permission() == AuthorityDto.Permission.DEVELOPER) return true;
+                if (auth.permission() == AuthorityDto.Permission.DEVELOPER) return true;
             }
             return false;
         });
@@ -668,10 +671,10 @@ public class UserServiceTest extends BaseServiceTest {
 
     private RandomGetter<UserDto> usersNotHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
-            for(AuthorityDto auth : user.authorities()) {
-                if(auth.department().matchUniqueKey(dept)
+            for (AuthorityDto auth : user.authorities()) {
+                if (auth.department().matchUniqueKey(dept)
                         && auth.permission() != AuthorityDto.Permission.DEFAULT) return false;
-                if(auth.permission() == AuthorityDto.Permission.DEVELOPER) return false;
+                if (auth.permission() == AuthorityDto.Permission.DEVELOPER) return false;
             }
             return true;
         });

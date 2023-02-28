@@ -2,12 +2,12 @@ package com.example.beliemeserver.data.daoimpl;
 
 import com.example.beliemeserver.data.entity.*;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.model.dao.HistoryDao;
-import com.example.beliemeserver.model.dto.HistoryDto;
-import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dao.HistoryDao;
+import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -29,8 +29,8 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         List<HistoryDto> output = new ArrayList<>();
         DepartmentEntity targetDepartment = findDepartmentEntity(universityCode, departmentCode);
 
-        for(StuffEntity stuff : stuffRepository.findByDepartmentId(targetDepartment.getId())) {
-            for(ItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
+        for (StuffEntity stuff : stuffRepository.findByDepartmentId(targetDepartment.getId())) {
+            for (ItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
                 output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
             }
         }
@@ -42,7 +42,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         List<HistoryDto> output = new ArrayList<>();
         StuffEntity targetStuff = findStuffEntity(universityCode, departmentCode, stuffName);
 
-        for(ItemEntity item : itemRepository.findByStuffId(targetStuff.getId())) {
+        for (ItemEntity item : itemRepository.findByStuffId(targetStuff.getId())) {
             output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
         }
         return output;
@@ -60,8 +60,8 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         DepartmentEntity targetDepartment = findDepartmentEntity(universityCodeForDepartment, departmentCode);
         UserEntity targetRequester = findUserEntity(universityCodeForUser, requesterStudentId);
 
-        for(HistoryEntity historyEntity : historyRepository.findByRequesterId(targetRequester.getId())) {
-            if(historyEntity.getItem().getStuff().getDepartment().getId() == targetDepartment.getId()) {
+        for (HistoryEntity historyEntity : historyRepository.findByRequesterId(targetRequester.getId())) {
+            if (historyEntity.getItem().getStuff().getDepartment().getId() == targetDepartment.getId()) {
                 output.add(historyEntity.toHistoryDto());
             }
         }
@@ -102,7 +102,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         HistoryEntity target = findHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum);
         ItemEntity itemOfNewHistory = findItemEntity(newHistory.item());
 
-        if(doesIndexChange(target, newHistory)) {
+        if (doesIndexChange(target, newHistory)) {
             checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
         }
 
@@ -124,7 +124,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     private List<HistoryDto> toHistoryDtoList(Iterable<HistoryEntity> historyEntities) throws FormatDoesNotMatchException {
         ArrayList<HistoryDto> output = new ArrayList<>();
 
-        for(HistoryEntity historyEntity : historyEntities) {
+        for (HistoryEntity historyEntity : historyEntities) {
             output.add(historyEntity.toHistoryDto());
         }
         return output;
@@ -145,13 +145,13 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     private void checkHistoryConflict(int itemId, int historyNum) throws ConflictException {
-        if(historyRepository.existsByItemIdAndNum(itemId, historyNum)) {
+        if (historyRepository.existsByItemIdAndNum(itemId, historyNum)) {
             throw new ConflictException();
         }
     }
 
     private UserEntity toUserEntityOrNull(UserDto userDto) throws NotFoundException {
-        if(userDto == null) {
+        if (userDto == null) {
             return null;
         }
         return findUserEntity(userDto);

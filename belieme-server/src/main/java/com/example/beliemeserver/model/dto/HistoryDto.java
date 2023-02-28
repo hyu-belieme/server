@@ -108,14 +108,14 @@ public record HistoryDto(
     }
 
     public boolean matchUniqueKey(HistoryDto oth) {
-        if(oth == null) return false;
+        if (oth == null) return false;
         return this.item().matchUniqueKey(oth.item())
                 && this.num == oth.num;
     }
 
     @Override
     public String toString() {
-        if(this.equals(nestedEndpoint)) {
+        if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
 
@@ -138,37 +138,30 @@ public record HistoryDto(
     public HistoryDto.HistoryStatus status() {
         //TODO 여기 분기 다시 깔끔하게 짜기
         //TODO ERROR인 조건들 추가하기 ex)item이 널이거나 그런경우?...
-        if(reservedTimeStamp != 0) {
-            if(returnTimeStamp != 0) {
-                if(lostTimeStamp != 0) {
+        if (reservedTimeStamp != 0) {
+            if (returnTimeStamp != 0) {
+                if (lostTimeStamp != 0) {
                     return HistoryDto.HistoryStatus.FOUND;
                 }
                 return HistoryDto.HistoryStatus.RETURNED;
-            }
-            else if(cancelTimeStamp != 0) {
+            } else if (cancelTimeStamp != 0) {
                 return HistoryDto.HistoryStatus.EXPIRED;
-            }
-            else if(approveTimeStamp != 0) {
-                if(lostTimeStamp != 0) {
+            } else if (approveTimeStamp != 0) {
+                if (lostTimeStamp != 0) {
                     return HistoryDto.HistoryStatus.LOST;
-                }
-                else if(dueTime() > System.currentTimeMillis()/1000) {
+                } else if (dueTime() > System.currentTimeMillis() / 1000) {
                     return HistoryDto.HistoryStatus.USING;
-                }
-                else {
+                } else {
                     return HistoryDto.HistoryStatus.DELAYED;
                 }
-            }
-            else if(expiredTime() > System.currentTimeMillis()/1000) {
+            } else if (expiredTime() > System.currentTimeMillis() / 1000) {
                 return HistoryDto.HistoryStatus.REQUESTED;
-            }
-            else {
+            } else {
                 return HistoryDto.HistoryStatus.EXPIRED;
             }
-        }
-        else {
-            if(lostTimeStamp != 0) {
-                if(returnTimeStamp != 0) {
+        } else {
+            if (lostTimeStamp != 0) {
+                if (returnTimeStamp != 0) {
                     return HistoryDto.HistoryStatus.FOUND;
                 } else {
                     return HistoryDto.HistoryStatus.LOST;
@@ -179,29 +172,28 @@ public record HistoryDto(
     }
 
     public long expiredTime() {
-        return reservedTimeStamp + 15*60;
+        return reservedTimeStamp + 15 * 60;
     }
 
     public long dueTime() {
         TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
         Calendar tmp = Calendar.getInstance();
 
-        tmp.setTime(new Date(approveTimeStamp *1000));
+        tmp.setTime(new Date(approveTimeStamp * 1000));
         tmp.setTimeZone(timeZone);
         tmp.add(Calendar.DATE, 7);
-        if(tmp.get(Calendar.HOUR_OF_DAY) > 18 ) {
+        if (tmp.get(Calendar.HOUR_OF_DAY) > 18) {
             tmp.add(Calendar.DATE, 1);
         }
         tmp.set(Calendar.HOUR_OF_DAY, 17);
         tmp.set(Calendar.MINUTE, 59);
         tmp.set(Calendar.SECOND, 59);
-        if(tmp.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+        if (tmp.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
             tmp.add(Calendar.DATE, 2);
-        }
-        else if(tmp.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+        } else if (tmp.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
             tmp.add(Calendar.DATE, 1);
         }
-        return tmp.getTime().getTime()/1000;
+        return tmp.getTime().getTime() / 1000;
     }
 
     public enum HistoryStatus {

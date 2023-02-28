@@ -33,13 +33,13 @@ public class DepartmentResponse extends JsonResponse {
     }
 
     public static DepartmentResponse from(DepartmentDto departmentDto) {
-        if(departmentDto == null) return null;
-        if(departmentDto.equals(DepartmentDto.nestedEndpoint)) {
+        if (departmentDto == null) return null;
+        if (departmentDto.equals(DepartmentDto.nestedEndpoint)) {
             return responseWillBeIgnore();
         }
 
         List<String> baseMajorCodes = new ArrayList<>();
-        for(MajorDto major : departmentDto.baseMajors()) {
+        for (MajorDto major : departmentDto.baseMajors()) {
             baseMajorCodes.add(major.code());
         }
 

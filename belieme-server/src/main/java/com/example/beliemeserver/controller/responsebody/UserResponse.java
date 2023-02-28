@@ -43,13 +43,13 @@ public class UserResponse extends JsonResponse {
     }
 
     public static UserResponse from(UserDto userDto) {
-        if(userDto == null) return null;
-        if(userDto.equals(UserDto.nestedEndpoint)) {
+        if (userDto == null) return null;
+        if (userDto.equals(UserDto.nestedEndpoint)) {
             return responseWillBeIgnore();
         }
 
         List<AuthorityResponse> authorityResponseList = new ArrayList<>();
-        for(AuthorityDto authorityDto : userDto.meaningfulAuthorities()) {
+        for (AuthorityDto authorityDto : userDto.meaningfulAuthorities()) {
             authorityResponseList.add(AuthorityResponse.from(authorityDto));
         }
 

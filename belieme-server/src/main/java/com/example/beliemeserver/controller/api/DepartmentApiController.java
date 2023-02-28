@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path="")
+@RequestMapping(path = "")
 public class DepartmentApiController {
     private final DepartmentService departmentService;
 
@@ -71,7 +71,7 @@ public class DepartmentApiController {
 
     private List<DepartmentResponse> toResponseList(List<DepartmentDto> departmentDtoList) {
         List<DepartmentResponse> responseList = new ArrayList<>();
-        for(DepartmentDto dto : departmentDtoList) {
+        for (DepartmentDto dto : departmentDtoList) {
             responseList.add(DepartmentResponse.from(dto));
         }
         return responseList;

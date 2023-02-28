@@ -3,11 +3,11 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.AuthorityEntity;
 import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.model.dao.AuthorityDao;
-import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.exception.ConflictException;
 import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dao.AuthorityDao;
+import com.example.beliemeserver.model.dto.AuthorityDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     public List<AuthorityDto> getAllList() throws FormatDoesNotMatchException {
         List<AuthorityDto> output = new ArrayList<>();
 
-        for(AuthorityEntity authorityEntity : authorityRepository.findAll()) {
+        for (AuthorityEntity authorityEntity : authorityRepository.findAll()) {
             output.add(authorityEntity.toAuthorityDto());
         }
         return output;
@@ -48,7 +48,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
         AuthorityEntity target = findAuthorityEntity(universityCode, departmentCode, permission.name());
         DepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department());
 
-        if(doesIndexChange(target, newAuthority)) {
+        if (doesIndexChange(target, newAuthority)) {
             checkAuthorityConflict(departmentOfAuthority.getId(), newAuthority.permission().name());
         }
 

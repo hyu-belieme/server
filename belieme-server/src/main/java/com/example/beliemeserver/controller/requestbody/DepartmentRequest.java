@@ -9,7 +9,10 @@ import java.util.List;
 @Getter
 @Setter
 public class DepartmentRequest {
-    @JsonProperty("code") String code;
-    @JsonProperty("name") String name;
-    @JsonProperty("base-majors") List<String> baseMajors;
+    @JsonProperty("code")
+    String code;
+    @JsonProperty("name")
+    String name;
+    @JsonProperty("base-majors")
+    List<String> baseMajors;
 }

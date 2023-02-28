@@ -1,7 +1,13 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.*;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.exception.InvalidIndexException;
+import com.example.beliemeserver.exception.MethodNotAllowedException;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.service.ItemService;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
 
@@ -25,7 +30,7 @@ public class ItemServiceTest extends BaseServiceTest {
 
     @Nested
     @DisplayName("getListByStuff()")
-    public final class  TestGetListByStuff extends ItemNestedTest {
+    public final class TestGetListByStuff extends ItemNestedTest {
         private StuffDto stuff;
         private String stuffName;
 
@@ -226,7 +231,7 @@ public class ItemServiceTest extends BaseServiceTest {
 
         private StuffDto getFullStuff(StuffDto stuff) {
             List<ItemDto> newItems = stuff.items();
-            while(newItems.size() <= ItemService.MAX_ITEM_NUM) {
+            while (newItems.size() <= ItemService.MAX_ITEM_NUM) {
                 ItemDto newItem = ItemDto.init(stuff, newItems.size());
                 newItems.add(newItem);
             }
