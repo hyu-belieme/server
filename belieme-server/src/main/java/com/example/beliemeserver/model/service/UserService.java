@@ -48,7 +48,7 @@ public class UserService extends BaseService {
     public UserDto getByToken(
             @NonNull String userToken
     ) {
-        return checkTokenAndGetUser(userToken);
+        return validateTokenAndGetUser(userToken);
     }
 
     public UserDto updateAuthority(
@@ -58,7 +58,7 @@ public class UserService extends BaseService {
             @NonNull String authorityDepartmentCode,
             AuthorityDto.Permission newPermission
     ) {
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
 
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(authorityUniversityCode, authorityDepartmentCode);
         checkMasterPermission(department, requester);

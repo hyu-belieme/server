@@ -55,7 +55,7 @@ public class HistoryService extends BaseService {
             @NonNull String userUniversityCode, @NonNull String userStudentId
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
         UserDto historyRequester = getUserOrThrowInvalidIndexException(userUniversityCode, userStudentId);
 
         if(!requester.matchUniqueKey(historyRequester)) {
@@ -70,7 +70,7 @@ public class HistoryService extends BaseService {
                                  @NonNull String universityCode, @NonNull String departmentCode,
                                  @NonNull String stuffName, int itemNum, int historyNum) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
 
         HistoryDto target = historyDao.getByIndex(universityCode, departmentCode, stuffName, itemNum, historyNum);
         if(!requester.matchUniqueKey(target.requester())) {
@@ -87,7 +87,7 @@ public class HistoryService extends BaseService {
             @NonNull String stuffName, Integer itemNum
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
         checkUserPermission(department, requester);
 
         StuffDto stuff = getStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
@@ -141,7 +141,7 @@ public class HistoryService extends BaseService {
             @NonNull String stuffName, int itemNum
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
         checkStaffPermission(department, requester);
 
         ItemDto item = getItemOrThrowInvalidIndexException(
@@ -185,7 +185,7 @@ public class HistoryService extends BaseService {
             @NonNull String stuffName, int itemNum
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
         checkStaffPermission(department, requester);
 
         ItemDto item = getItemOrThrowInvalidIndexException(
@@ -210,7 +210,7 @@ public class HistoryService extends BaseService {
             @NonNull String stuffName, int itemNum
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
         checkStaffPermission(department, requester);
 
         ItemDto item = getItemOrThrowInvalidIndexException(
@@ -237,7 +237,7 @@ public class HistoryService extends BaseService {
             @NonNull String stuffName, int itemNum
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        UserDto requester = checkTokenAndGetUser(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
         checkStaffPermission(department, requester);
 
         ItemDto item = getItemOrThrowInvalidIndexException(
