@@ -52,7 +52,7 @@ public record AuthorityDto(
     public enum Permission {
         DEFAULT, BANNED, USER, STAFF, MASTER, DEVELOPER;
 
-        public static Permission create(String string) throws FormatDoesNotMatchException {
+        public static Permission create(String string) {
             return switch (string) {
                 case "DEFAULT" -> DEFAULT;
                 case "BANNED" -> BANNED;

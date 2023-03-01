@@ -1,7 +1,5 @@
 package com.example.beliemeserver.model.dao;
 
-import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,28 +10,18 @@ public interface DepartmentDao {
     List<DepartmentDto> getAllList();
 
     @Transactional
-    List<DepartmentDto> getListByUniversity(
-            String universityCode
-    ) throws NotFoundException;
+    List<DepartmentDto> getListByUniversity(String universityCode);
 
     @Transactional
-    DepartmentDto getByIndex(
-            String universityCode,
-            String departmentCode
-    ) throws NotFoundException;
+    DepartmentDto getByIndex(String universityCode, String departmentCode);
 
     @Transactional
     boolean checkExistByIndex(String universityCode, String departmentCode);
 
     @Transactional
-    DepartmentDto create(
-            DepartmentDto newDepartment
-    ) throws NotFoundException, ConflictException;
+    DepartmentDto create(DepartmentDto newDepartment);
 
     @Transactional
-    DepartmentDto update(
-            String universityCode,
-            String departmentCode,
-            DepartmentDto newDepartment
-    ) throws NotFoundException, ConflictException;
+    DepartmentDto update(String universityCode,
+                         String departmentCode, DepartmentDto newDepartment);
 }

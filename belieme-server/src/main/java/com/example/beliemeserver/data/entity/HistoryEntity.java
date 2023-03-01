@@ -1,6 +1,5 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.UserDto;
@@ -151,7 +150,7 @@ public class HistoryEntity extends DataEntity {
         return this;
     }
 
-    public HistoryDto toHistoryDto() throws FormatDoesNotMatchException {
+    public HistoryDto toHistoryDto() {
         return new HistoryDto(
                 item.toItemDto(),
                 num,
@@ -168,7 +167,7 @@ public class HistoryEntity extends DataEntity {
         );
     }
 
-    public HistoryDto toHistoryDtoNestedToItem() throws FormatDoesNotMatchException {
+    public HistoryDto toHistoryDtoNestedToItem() {
         return new HistoryDto(
                 ItemDto.nestedEndpoint,
                 num,
@@ -185,7 +184,7 @@ public class HistoryEntity extends DataEntity {
         );
     }
 
-    private static UserDto getUserDtoOrNull(UserEntity user) throws FormatDoesNotMatchException {
+    private static UserDto getUserDtoOrNull(UserEntity user) {
         if (user == null) {
             return null;
         }

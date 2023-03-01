@@ -6,8 +6,6 @@ import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.entity.UserEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.UserDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.UserDto;
@@ -25,7 +23,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public List<UserDto> getAllList() throws FormatDoesNotMatchException {
+    public List<UserDto> getAllList() {
         List<UserDto> output = new ArrayList<>();
 
         for (UserEntity userEntity : userRepository.findAll()) {
@@ -35,7 +33,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public List<UserDto> getListByUniversity(String universityCode) throws NotFoundException, FormatDoesNotMatchException {
+    public List<UserDto> getListByUniversity(String universityCode) {
         List<UserDto> output = new ArrayList<>();
 
         int universityId = findUniversityEntity(universityCode).getId();
@@ -46,17 +44,17 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto getByToken(String token) throws NotFoundException, FormatDoesNotMatchException {
+    public UserDto getByToken(String token) {
         return findUserEntityByToken(token).toUserDto();
     }
 
     @Override
-    public UserDto getByIndex(String universityCode, String studentId) throws NotFoundException, FormatDoesNotMatchException {
+    public UserDto getByIndex(String universityCode, String studentId) {
         return findUserEntity(universityCode, studentId).toUserDto();
     }
 
     @Override
-    public UserDto create(UserDto user) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+    public UserDto create(UserDto user) {
         UserEntity newUserEntity = saveUserOnly(user);
         saveAuthorityJoins(newUserEntity, user.authorities());
 
@@ -64,7 +62,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto update(String universityCode, String studentId, UserDto newUser) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
+    public UserDto update(String universityCode, String studentId, UserDto newUser) {
         UserEntity target = findUserEntity(universityCode, studentId);
         updateUserOnly(target, newUser);
         removeAllAuthorityJoins(target);
@@ -72,7 +70,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
         return target.toUserDto();
     }
 
-    private UserEntity saveUserOnly(UserDto newUser) throws NotFoundException, ConflictException {
+    private UserEntity saveUserOnly(UserDto newUser) {
         UniversityEntity universityEntity = findUniversityEntity(newUser.university());
 
         checkUserConflict(universityEntity.getId(), newUser.studentId());
@@ -88,7 +86,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
         return userRepository.save(newUserEntity);
     }
 
-    private void updateUserOnly(UserEntity target, UserDto newUser) throws NotFoundException, ConflictException {
+    private void updateUserOnly(UserEntity target, UserDto newUser) {
         UniversityEntity newUniversity = findUniversityEntity(newUser.university());
 
         if (doesIndexChange(target, newUser)) {
@@ -103,7 +101,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
                 .setApprovalTimeStamp(newUser.approvalTimeStamp());
     }
 
-    private void saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) throws NotFoundException {
+    private void saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) {
         for (AuthorityDto authority : authorities) {
             AuthorityEntity authorityEntity = findAuthorityEntity(authority);
             AuthorityUserJoinEntity newJoin = new AuthorityUserJoinEntity(
@@ -128,7 +126,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
                 && oldStudentId.equals(newUser.studentId()));
     }
 
-    private void checkUserConflict(int universityId, String studentId) throws ConflictException {
+    private void checkUserConflict(int universityId, String studentId) {
         if (userRepository.existsByUniversityIdAndStudentId(universityId, studentId)) {
             throw new ConflictException();
         }

@@ -45,7 +45,7 @@ public class HttpRequest {
         return headers;
     }
 
-    private static String sendGetRequest(String urlString, Map<String, String> requestHeader) throws BadGateWayException {
+    private static String sendGetRequest(String urlString, Map<String, String> requestHeader) {
         String output;
         try {
             URL url = new URL(urlString);

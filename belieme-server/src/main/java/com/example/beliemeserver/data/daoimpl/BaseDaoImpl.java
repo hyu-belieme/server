@@ -3,7 +3,6 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.daoimpl.util.IndexAdapter;
 import com.example.beliemeserver.data.entity.*;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,65 +34,65 @@ public abstract class BaseDaoImpl {
         this.historyRepository = historyRepository;
     }
 
-    protected UniversityEntity findUniversityEntity(String universityCode) throws NotFoundException {
+    protected UniversityEntity findUniversityEntity(String universityCode) {
         return IndexAdapter.getUniversityEntity(universityRepository, universityCode);
     }
 
-    protected UniversityEntity findUniversityEntity(UniversityDto universityDto) throws NotFoundException {
+    protected UniversityEntity findUniversityEntity(UniversityDto universityDto) {
         String universityCode = universityDto.code();
         return findUniversityEntity(universityCode);
     }
 
-    protected DepartmentEntity findDepartmentEntity(String universityCode, String departmentCode) throws NotFoundException {
+    protected DepartmentEntity findDepartmentEntity(String universityCode, String departmentCode) {
         int universityId = findUniversityEntity(universityCode).getId();
 
         return IndexAdapter.getDepartmentEntity(departmentRepository, universityId, departmentCode);
     }
 
-    protected DepartmentEntity findDepartmentEntity(DepartmentDto departmentDto) throws NotFoundException {
+    protected DepartmentEntity findDepartmentEntity(DepartmentDto departmentDto) {
         String universityCode = departmentDto.university().code();
         String departmentCode = departmentDto.code();
 
         return findDepartmentEntity(universityCode, departmentCode);
     }
 
-    protected UserEntity findUserEntity(String universityCode, String studentId) throws NotFoundException {
+    protected UserEntity findUserEntity(String universityCode, String studentId) {
         int universityId = findUniversityEntity(universityCode).getId();
 
         return IndexAdapter.getUserEntity(userRepository, universityId, studentId);
     }
 
-    protected UserEntity findUserEntity(UserDto userDto) throws NotFoundException {
+    protected UserEntity findUserEntity(UserDto userDto) {
         String universityCode = userDto.university().code();
         String studentId = userDto.studentId();
 
         return findUserEntity(universityCode, studentId);
     }
 
-    protected UserEntity findUserEntityByToken(String token) throws NotFoundException {
+    protected UserEntity findUserEntityByToken(String token) {
         return IndexAdapter.getUserEntityByToken(userRepository, token);
     }
 
-    protected MajorEntity findMajorEntity(String universityCode, String majorCode) throws NotFoundException {
+    protected MajorEntity findMajorEntity(String universityCode, String majorCode) {
         int universityId = findUniversityEntity(universityCode).getId();
 
         return IndexAdapter.getMajorEntity(majorRepository, universityId, majorCode);
     }
 
-    protected MajorEntity findMajorEntity(MajorDto majorDto) throws NotFoundException {
+    protected MajorEntity findMajorEntity(MajorDto majorDto) {
         String universityCode = majorDto.university().code();
         String majorCode = majorDto.code();
 
         return findMajorEntity(universityCode, majorCode);
     }
 
-    protected AuthorityEntity findAuthorityEntity(String universityCode, String departmentCode, String permission) throws NotFoundException {
+    protected AuthorityEntity findAuthorityEntity(String universityCode, String departmentCode, String permission) {
         int departmentId = findDepartmentEntity(universityCode, departmentCode).getId();
 
         return IndexAdapter.getAuthorityEntity(authorityRepository, departmentId, permission);
     }
 
-    protected AuthorityEntity findAuthorityEntity(AuthorityDto authorityDto) throws NotFoundException {
+    protected AuthorityEntity findAuthorityEntity(AuthorityDto authorityDto) {
         String universityCode = authorityDto.department().university().code();
         String departmentCode = authorityDto.department().code();
         String permission = authorityDto.permission().toString();
@@ -101,13 +100,13 @@ public abstract class BaseDaoImpl {
         return findAuthorityEntity(universityCode, departmentCode, permission);
     }
 
-    protected StuffEntity findStuffEntity(String universityCode, String departmentCode, String stuffName) throws NotFoundException {
+    protected StuffEntity findStuffEntity(String universityCode, String departmentCode, String stuffName) {
         int departmentId = findDepartmentEntity(universityCode, departmentCode).getId();
 
         return IndexAdapter.getStuffEntity(stuffRepository, departmentId, stuffName);
     }
 
-    protected StuffEntity findStuffEntity(StuffDto stuffDto) throws NotFoundException {
+    protected StuffEntity findStuffEntity(StuffDto stuffDto) {
         String universityCode = stuffDto.department().university().code();
         String departmentCode = stuffDto.department().code();
         String stuffName = stuffDto.name();
@@ -115,13 +114,13 @@ public abstract class BaseDaoImpl {
         return findStuffEntity(universityCode, departmentCode, stuffName);
     }
 
-    protected ItemEntity findItemEntity(String universityCode, String departmentCode, String stuffName, int itemNum) throws NotFoundException {
+    protected ItemEntity findItemEntity(String universityCode, String departmentCode, String stuffName, int itemNum) {
         int stuffId = findStuffEntity(universityCode, departmentCode, stuffName).getId();
 
         return IndexAdapter.getItemEntity(itemRepository, stuffId, itemNum);
     }
 
-    protected ItemEntity findItemEntity(ItemDto itemDto) throws NotFoundException {
+    protected ItemEntity findItemEntity(ItemDto itemDto) {
         String universityCode = itemDto.stuff().department().university().code();
         String departmentCode = itemDto.stuff().department().code();
         String stuffName = itemDto.stuff().name();
@@ -130,13 +129,13 @@ public abstract class BaseDaoImpl {
         return findItemEntity(universityCode, departmentCode, stuffName, itemNum);
     }
 
-    protected HistoryEntity findHistoryEntity(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) throws NotFoundException {
+    protected HistoryEntity findHistoryEntity(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) {
         int itemId = findItemEntity(universityCode, departmentCode, stuffName, itemNum).getId();
 
         return IndexAdapter.getHistoryEntity(historyRepository, itemId, historyNum);
     }
 
-    protected HistoryEntity findHistoryEntity(HistoryDto historyDto) throws NotFoundException {
+    protected HistoryEntity findHistoryEntity(HistoryDto historyDto) {
         String universityCode = historyDto.item().stuff().department().university().code();
         String departmentCode = historyDto.item().stuff().department().code();
         String stuffName = historyDto.item().stuff().name();

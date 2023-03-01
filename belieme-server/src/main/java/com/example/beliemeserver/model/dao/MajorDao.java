@@ -1,7 +1,5 @@
 package com.example.beliemeserver.model.dao;
 
-import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.MajorDto;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +13,8 @@ public interface MajorDao {
     MajorDto getByIndex(String universityCode, String majorCode);
 
     @Transactional
-    MajorDto create(MajorDto newMajor) throws NotFoundException, ConflictException;
+    MajorDto create(MajorDto newMajor);
 
     @Transactional
-    MajorDto update(String universityCode, String majorCode, MajorDto newMajor) throws NotFoundException, ConflictException;
+    MajorDto update(String universityCode, String majorCode, MajorDto newMajor);
 }

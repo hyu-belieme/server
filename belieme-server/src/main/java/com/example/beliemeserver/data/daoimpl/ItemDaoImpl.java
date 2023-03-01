@@ -5,8 +5,6 @@ import com.example.beliemeserver.data.entity.ItemEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.ItemDao;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
@@ -22,7 +20,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public List<ItemDto> getAllList() throws FormatDoesNotMatchException {
+    public List<ItemDto> getAllList() {
         List<ItemDto> output = new ArrayList<>();
         for (ItemEntity itemEntity : itemRepository.findAll()) {
             output.add(itemEntity.toItemDto());
@@ -31,7 +29,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public List<ItemDto> getListByStuff(String universityCode, String departmentCode, String stuffName) throws NotFoundException, FormatDoesNotMatchException {
+    public List<ItemDto> getListByStuff(String universityCode, String departmentCode, String stuffName) {
         StuffEntity targetStuff = findStuffEntity(universityCode, departmentCode, stuffName);
         List<ItemDto> output = new ArrayList<>();
         for (ItemEntity itemEntity : itemRepository.findByStuffId(targetStuff.getId())) {
@@ -41,12 +39,12 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public ItemDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum) throws NotFoundException, FormatDoesNotMatchException {
+    public ItemDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum) {
         return findItemEntity(universityCode, departmentCode, stuffName, itemNum).toItemDto();
     }
 
     @Override
-    public ItemDto create(ItemDto newItem) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+    public ItemDto create(ItemDto newItem) {
         StuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff());
 
         checkItemConflict(stuffOfNewItem.getId(), newItem.num());
@@ -60,7 +58,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public ItemDto update(String universityCode, String departmentCode, String stuffName, int itemNum, ItemDto newItem) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+    public ItemDto update(String universityCode, String departmentCode, String stuffName, int itemNum, ItemDto newItem) {
         ItemEntity target = findItemEntity(universityCode, departmentCode, stuffName, itemNum);
         StuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff());
         HistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
@@ -75,7 +73,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
         return target.toItemDto();
     }
 
-    private HistoryEntity toHistoryEntityOrNull(HistoryDto historyDto) throws NotFoundException {
+    private HistoryEntity toHistoryEntityOrNull(HistoryDto historyDto) {
         if (historyDto == null) {
             return null;
         }
@@ -94,7 +92,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
                 && oldItemNum == newItem.num());
     }
 
-    private void checkItemConflict(int stuffId, int num) throws ConflictException {
+    private void checkItemConflict(int stuffId, int num) {
         if (itemRepository.existsByStuffIdAndNum(stuffId, num)) {
             throw new ConflictException();
         }
