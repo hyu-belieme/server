@@ -39,9 +39,6 @@ public class StuffEntity extends DataEntity {
     @Column(name = "emoji")
     private String emoji;
 
-    @Column(name = "next_item_num")
-    private int nextItemNum;
-
     @NonNull
     @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -56,7 +53,6 @@ public class StuffEntity extends DataEntity {
         this.departmentId = department.getId();
         this.name = name;
         this.emoji = emoji;
-        this.nextItemNum = 1;
         this.items = new ArrayList<>();
     }
 
@@ -64,10 +60,6 @@ public class StuffEntity extends DataEntity {
         this.department = department;
         this.departmentId = department.getId();
         return this;
-    }
-
-    public int getAndIncrementNextItemNum() {
-        return nextItemNum++;
     }
 
     public StuffDto toStuffDto() {

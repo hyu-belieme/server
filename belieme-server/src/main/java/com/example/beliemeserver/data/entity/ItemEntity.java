@@ -35,9 +35,6 @@ public class ItemEntity extends DataEntity {
     @Column(name = "last_history_id")
     private Integer lastHistoryId;
 
-    @Column(name = "next_history_num")
-    private int nextHistoryNum;
-
     @NonNull
     @ManyToOne
     @JoinColumn(name = "stuff_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -65,10 +62,6 @@ public class ItemEntity extends DataEntity {
         this.lastHistory = lastHistory;
         this.lastHistoryId = getIdOrElse(lastHistory, null);
         return this;
-    }
-
-    public int getAndIncrementNextHistoryNum() {
-        return nextHistoryNum++;
     }
 
     public ItemDto toItemDto() {
