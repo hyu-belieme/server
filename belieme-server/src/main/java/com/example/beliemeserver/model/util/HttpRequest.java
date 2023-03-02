@@ -69,7 +69,7 @@ public class HttpRequest {
             in.close();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new BadGateWayException("Timeout comes up while send Http Get Request to" + urlString);
+            throw new BadGateWayException();
         }
         return output;
     }
