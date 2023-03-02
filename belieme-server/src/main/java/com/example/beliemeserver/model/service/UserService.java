@@ -80,10 +80,10 @@ public class UserService extends BaseService {
 
         if (!requester.isDeveloper()) {
             if (targetUser.getMaxPermission(department).hasMasterPermission()) {
-                throw new ForbiddenException(AuthorityDto.Permission.BANNED, AuthorityDto.Permission.DEVELOPER);
+                throw new ForbiddenException();
             }
             if (newPermission != null && newPermission.hasMasterPermission()) {
-                throw new ForbiddenException(AuthorityDto.Permission.BANNED, AuthorityDto.Permission.DEVELOPER);
+                throw new ForbiddenException();
             }
         }
 
