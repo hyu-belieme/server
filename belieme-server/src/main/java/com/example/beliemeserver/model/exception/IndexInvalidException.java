@@ -2,7 +2,12 @@ package com.example.beliemeserver.model.exception;
 
 import com.example.beliemeserver.exception.BadRequestException;
 
-public class InvalidIndexException extends BadRequestException {
+public class IndexInvalidException extends BadRequestException {
+    @Override
+    protected String name() {
+        return "INDEX_INVALID";
+    }
+
     @Override
     protected String koreanMessage() {
         return "제공된 인덱스가 잘못되었습니다. " +

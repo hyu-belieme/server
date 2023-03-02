@@ -6,7 +6,7 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
-import com.example.beliemeserver.model.exception.InvalidIndexException;
+import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.DepartmentService;
 import com.example.beliemeserver.util.RandomGetter;
@@ -215,7 +215,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(universityDao.getByIndex(univCode))
                     .thenThrow(NotFoundException.class);
 
-            assertThrows(InvalidIndexException.class, this::execMethod);
+            assertThrows(IndexInvalidException.class, this::execMethod);
         }
 
         @RepeatedTest(10)
@@ -376,7 +376,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(universityDao.getByIndex(targetUnivCode))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
         }
 
         @RepeatedTest(10)

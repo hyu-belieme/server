@@ -6,7 +6,7 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.model.exception.ExceedMaxItemNumException;
+import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.model.service.StuffService;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -219,7 +219,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
             mockDepartmentAndRequester();
 
-            TestHelper.exceptionTest(this::execMethod, ExceedMaxItemNumException.class);
+            TestHelper.exceptionTest(this::execMethod, ItemAmountLimitExceededException.class);
         }
 
         @RepeatedTest(10)
@@ -230,7 +230,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
             mockDepartmentAndRequester();
 
-            TestHelper.exceptionTest(this::execMethod, ExceedMaxItemNumException.class);
+            TestHelper.exceptionTest(this::execMethod, ItemAmountLimitExceededException.class);
         }
     }
 

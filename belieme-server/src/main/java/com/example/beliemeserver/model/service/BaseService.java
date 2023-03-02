@@ -7,8 +7,8 @@ import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.dto.UserDto;
-import com.example.beliemeserver.model.exception.ExpiredTokenException;
-import com.example.beliemeserver.model.exception.InvalidIndexException;
+import com.example.beliemeserver.model.exception.TokenExpiredException;
+import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +54,7 @@ public abstract class BaseService {
         long currentTimestamp = (System.currentTimeMillis() / 1000);
         long expiredTimestamp = user.approvalTimeStamp() + TOKEN_EXPIRED_TIME;
         if (currentTimestamp > expiredTimestamp) {
-            throw new ExpiredTokenException();
+            throw new TokenExpiredException();
         }
     }
 
@@ -108,7 +108,7 @@ public abstract class BaseService {
         try {
             return departmentDao.getByIndex(universityCode, departmentCode);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -116,7 +116,7 @@ public abstract class BaseService {
         try {
             return stuffDao.getByIndex(universityCode, departmentCode, stuffName);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -124,7 +124,7 @@ public abstract class BaseService {
         try {
             return itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 }

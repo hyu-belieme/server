@@ -1,6 +1,18 @@
 package com.example.beliemeserver.exception;
 
+import org.springframework.http.HttpStatus;
+
 public class ConflictException extends ServerException {
+    @Override
+    protected final HttpStatus httpStatus() {
+        return HttpStatus.CONFLICT;
+    }
+
+    @Override
+    protected String name() {
+        return "CONFLICT";
+    }
+
     @Override
     protected String koreanMessage() {
         return "현재 리소스 상태와 충돌로 인해 요청한 작업을 완료할 수 없습니다. " +

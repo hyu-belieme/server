@@ -95,20 +95,20 @@ public class HistoryService extends BaseService {
             if (history.status().isClosed()) continue;
             if (history.item().stuff().matchUniqueKey(stuff)) usingSameStuffCount += 1;
             usingItemCount += 1;
-            if (usingItemCount >= Constants.MAX_RENTAL_COUNT) throw new ExceedMaxRentalCountException();
+            if (usingItemCount >= Constants.MAX_RENTAL_COUNT) throw new RentalCountLimitExceededException();
             if (usingSameStuffCount >= Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF)
-                throw new ExceedMaxRentalCountOnSameStuffException();
+                throw new RentalCountOnSameStuffLimitExceededException();
         }
 
         if (itemNum == null) {
             itemNum = stuff.firstUsableItemNum();
         }
-        if (itemNum == 0) throw new NoUsableItemExistException();
+        if (itemNum == 0) throw new UsableItemNotExistedException();
 
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() != ItemDto.ItemStatus.USABLE) throw new ReservationOnNonUsableItemException();
+        if (item.status() != ItemDto.ItemStatus.USABLE) throw new ReservationRequestedOnNonUsableItemException();
 
         HistoryDto newHistory = new HistoryDto(
                 item,
@@ -144,7 +144,7 @@ public class HistoryService extends BaseService {
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() == ItemDto.ItemStatus.INACTIVE) throw new LostRegistrationOnLostItemException();
+        if (item.status() == ItemDto.ItemStatus.INACTIVE) throw new LostRegistrationRequestedOnLostItemException();
 
         HistoryDto newHistory;
         if (item.status() == ItemDto.ItemStatus.USABLE) {
@@ -191,7 +191,7 @@ public class HistoryService extends BaseService {
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
                 || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
-            throw new ResponseOnUnrequestedItemException();
+            throw new RespondedOnUnrequestedItemException();
         }
 
         HistoryDto newHistory = lastHistory
@@ -218,7 +218,7 @@ public class HistoryService extends BaseService {
                 || (lastHistory.status() != HistoryDto.HistoryStatus.USING
                 && lastHistory.status() != HistoryDto.HistoryStatus.DELAYED
                 && lastHistory.status() != HistoryDto.HistoryStatus.LOST)) {
-            throw new ReturnRegistrationOnReturnedItemException();
+            throw new ReturnRegistrationRequestedOnReturnedItemException();
         }
 
         HistoryDto newHistory = lastHistory
@@ -243,7 +243,7 @@ public class HistoryService extends BaseService {
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
                 || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
-            throw new ResponseOnUnrequestedItemException();
+            throw new RespondedOnUnrequestedItemException();
         }
 
         HistoryDto newHistory = lastHistory
@@ -259,7 +259,7 @@ public class HistoryService extends BaseService {
         try {
             return historyDao.getListByStuff(universityCode, departmentCode, stuffName);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -269,7 +269,7 @@ public class HistoryService extends BaseService {
         try {
             return historyDao.getListByItem(universityCode, departmentCode, stuffName, itemNum);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -277,7 +277,7 @@ public class HistoryService extends BaseService {
         try {
             return userDao.getByIndex(universityCode, studentId);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 }

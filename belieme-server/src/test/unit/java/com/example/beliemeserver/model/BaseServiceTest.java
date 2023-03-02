@@ -4,8 +4,8 @@ import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.model.exception.ExpiredTokenException;
-import com.example.beliemeserver.model.exception.InvalidIndexException;
+import com.example.beliemeserver.model.exception.TokenExpiredException;
+import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.BaseService;
 import com.example.beliemeserver.util.RandomGetter;
@@ -77,7 +77,7 @@ public abstract class BaseServiceTest {
 
             when(userDao.getByToken(userToken)).thenReturn(requester.withApprovalTimeStamp(newApprovalTimestamp));
 
-            TestHelper.exceptionTest(this::execMethod, ExpiredTokenException.class);
+            TestHelper.exceptionTest(this::execMethod, TokenExpiredException.class);
         }
     }
 
@@ -114,7 +114,7 @@ public abstract class BaseServiceTest {
             when(departmentDao.getByIndex(univCode, deptCode))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
         }
 
         @RepeatedTest(10)

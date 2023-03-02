@@ -6,8 +6,8 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.model.exception.ExceedMaxItemNumException;
-import com.example.beliemeserver.model.exception.InvalidIndexException;
+import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
+import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.service.ItemService;
 import com.example.beliemeserver.model.util.Constants;
 import com.example.beliemeserver.util.TestHelper;
@@ -77,7 +77,7 @@ public class ItemServiceTest extends BaseServiceTest {
             when(itemDao.getListByStuff(univCode, deptCode, stuffName))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
         }
 
         private List<ItemDto> getItemListByStuff(StuffDto stuff) {
@@ -199,7 +199,7 @@ public class ItemServiceTest extends BaseServiceTest {
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
         }
 
         @RepeatedTest(10)
@@ -214,7 +214,7 @@ public class ItemServiceTest extends BaseServiceTest {
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
                     .thenReturn(stuff);
 
-            TestHelper.exceptionTest(this::execMethod, ExceedMaxItemNumException.class);
+            TestHelper.exceptionTest(this::execMethod, ItemAmountLimitExceededException.class);
         }
 
         @RepeatedTest(10)

@@ -5,8 +5,8 @@ import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.model.exception.ExceedMaxItemNumException;
-import com.example.beliemeserver.model.exception.InvalidIndexException;
+import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
+import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.util.Constants;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class ItemService extends BaseService {
         ItemDto newItem = ItemDto.init(stuff, stuff.nextItemNum());
 
         if (newItem.num() > Constants.MAX_ITEM_NUM) {
-            throw new ExceedMaxItemNumException();
+            throw new ItemAmountLimitExceededException();
         }
         return itemDao.create(newItem);
     }
@@ -59,7 +59,7 @@ public class ItemService extends BaseService {
         try {
             return itemDao.getListByStuff(universityCode, departmentCode, stuffName);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 }
