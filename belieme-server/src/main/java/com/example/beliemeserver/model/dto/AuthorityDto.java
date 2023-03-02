@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.dto;
 
-import com.example.beliemeserver.exception.InternalServerException;
+import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import lombok.NonNull;
 
 public record AuthorityDto(
@@ -60,7 +60,7 @@ public record AuthorityDto(
                 case "STAFF" -> STAFF;
                 case "MASTER" -> MASTER;
                 case "DEVELOPER" -> DEVELOPER;
-                default -> throw new InternalServerException();
+                default -> throw new FormatDoesNotMatchException();
             };
         }
 

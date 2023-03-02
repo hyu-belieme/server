@@ -1,8 +1,15 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.exception.ExpiredTokenException;
+import com.example.beliemeserver.model.exception.InvalidIndexException;
+import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,46 +61,46 @@ public abstract class BaseService {
     protected void checkUserPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkStaffPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkMasterPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkDeveloperPermission(String token) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.isDeveloper()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkUserPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkStaffPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 

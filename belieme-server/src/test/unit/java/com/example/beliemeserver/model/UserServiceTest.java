@@ -2,11 +2,15 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.common.DeveloperInfo;
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.exception.BadGateWayException;
+import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.UserService;
 import com.example.beliemeserver.model.util.HttpRequest;
 import com.example.beliemeserver.util.RandomGetter;
@@ -271,8 +275,8 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`newPermission`이 `DEVELOPER` 일 시]_[MethodNotAllowed]")
-        public void ERROR_newPermissionIsDeveloper_MethodNotAllowed() {
+        @DisplayName("[ERROR]_[`newPermission`이 `DEVELOPER` 일 시]_[ForbiddenException]")
+        public void ERROR_newPermissionIsDeveloper_ForbiddenException() {
             setUpDefault();
             setAuthPermission(AuthorityDto.Permission.DEVELOPER);
 
@@ -282,12 +286,12 @@ public class UserServiceTest extends BaseServiceTest {
             when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
                     .thenReturn(targetUser);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`targetUser`가`Developer`일 시]_[MethodNotAllowed]")
-        public void ERROR_targetUserIsDeveloper_MethodNotAllowed() {
+        @DisplayName("[ERROR]_[`targetUser`가`Developer`일 시]_[ForbiddenException]")
+        public void ERROR_targetUserIsDeveloper_ForbiddenException() {
             setUpDefault();
             setTargetUser(randomDevUser());
 
@@ -297,12 +301,12 @@ public class UserServiceTest extends BaseServiceTest {
             when(departmentDao.getByIndex(authUnivCode, authDeptCode))
                     .thenReturn(authDept);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데`newPermission`이 `MASTER` 일 시]_[Forbidden]")
-        public void ERROR_requesterIsNotDevAndNewPermissionIsMaster_Forbidden() {
+        @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데`newPermission`이 `MASTER` 일 시]_[PermissionDeniedException]")
+        public void ERROR_requesterIsNotDevAndNewPermissionIsMaster_PermissionDeniedException() {
             setUpDefault();
             setAuthPermission(AuthorityDto.Permission.MASTER);
 
@@ -312,12 +316,12 @@ public class UserServiceTest extends BaseServiceTest {
             when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
                     .thenReturn(targetUser);
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데 `targetUser`가`MASTER`일 시]_[Forbidden]")
-        public void ERROR_requesterIsNotDevAndTargetUserIsMaster_Forbidden() {
+        @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데 `targetUser`가`MASTER`일 시]_[PermissionDeniedException]")
+        public void ERROR_requesterIsNotDevAndTargetUserIsMaster_PermissionDeniedException() {
             setUpDefault();
             setTargetUser(randomUserHaveExactPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
 
@@ -327,7 +331,7 @@ public class UserServiceTest extends BaseServiceTest {
             when(departmentDao.getByIndex(authUnivCode, authDeptCode))
                     .thenReturn(authDept);
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         private void mockAndTestHappyPath() {

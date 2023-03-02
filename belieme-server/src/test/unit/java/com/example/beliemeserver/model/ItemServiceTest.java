@@ -1,14 +1,15 @@
 package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.InvalidIndexException;
-import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.exception.ExceedMaxItemNumException;
+import com.example.beliemeserver.model.exception.InvalidIndexException;
 import com.example.beliemeserver.model.service.ItemService;
+import com.example.beliemeserver.model.util.Constants;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -202,8 +203,8 @@ public class ItemServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[해당 `stuff`의 `item`개수가 이미 " + ItemService.MAX_ITEM_NUM + "개 일 시]_[MethodNotAllowedException]")
-        public void ERROR_stuffIsFull_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[해당 `stuff`의 `item`개수가 이미 " + Constants.MAX_ITEM_NUM + "개 일 시]_[ExceedMaxItemNumException]")
+        public void ERROR_stuffIsFull_ExceedMaxItemNumException() {
             setUpDefault();
 
             StuffDto newStuff = getFullStuff(stuff);
@@ -213,7 +214,7 @@ public class ItemServiceTest extends BaseServiceTest {
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
                     .thenReturn(stuff);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ExceedMaxItemNumException.class);
         }
 
         @RepeatedTest(10)
@@ -231,7 +232,7 @@ public class ItemServiceTest extends BaseServiceTest {
 
         private StuffDto getFullStuff(StuffDto stuff) {
             List<ItemDto> newItems = stuff.items();
-            while (newItems.size() <= ItemService.MAX_ITEM_NUM) {
+            while (newItems.size() <= Constants.MAX_ITEM_NUM) {
                 ItemDto newItem = ItemDto.init(stuff, newItems.size());
                 newItems.add(newItem);
             }

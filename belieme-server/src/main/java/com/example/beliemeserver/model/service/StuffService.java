@@ -1,10 +1,11 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.exception.ExceedMaxItemNumException;
+import com.example.beliemeserver.model.util.Constants;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +13,6 @@ import java.util.List;
 
 @Service
 public class StuffService extends BaseService {
-
-    public static final int CREATE_AMOUNT_UPPER_BOUND = 50;
-
     public StuffService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
@@ -52,7 +50,7 @@ public class StuffService extends BaseService {
         newStuff = stuffDao.create(newStuff);
 
         if (amount == null) return output;
-        if (amount < 0 || amount > CREATE_AMOUNT_UPPER_BOUND) throw new MethodNotAllowedException();
+        if (amount < 0 || amount > Constants.MAX_ITEM_NUM) throw new ExceedMaxItemNumException();
 
         for (int i = 0; i < amount; i++) {
             ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i + 1));

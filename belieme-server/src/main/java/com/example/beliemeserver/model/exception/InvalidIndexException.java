@@ -1,6 +1,8 @@
-package com.example.beliemeserver.exception;
+package com.example.beliemeserver.model.exception;
 
-public class InvalidIndexException extends ServerException {
+import com.example.beliemeserver.exception.BadRequestException;
+
+public class InvalidIndexException extends BadRequestException {
     @Override
     protected String koreanMessage() {
         return "제공된 인덱스가 잘못되었습니다. " +

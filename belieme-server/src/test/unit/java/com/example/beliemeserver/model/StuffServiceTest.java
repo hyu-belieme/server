@@ -1,12 +1,12 @@
 package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.exception.ExceedMaxItemNumException;
 import com.example.beliemeserver.model.service.StuffService;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -212,25 +212,25 @@ public class StuffServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`amount`가 음수일 시]_[MethodNotAllowedException]")
-        public void ERROR_amountIsNegative_() {
+        @DisplayName("[ERROR]_[`amount`가 음수일 시]_[ExceedMaxItemNumException]")
+        public void ERROR_amountIsNegative_ExceedMaxItemNumException() {
             setUpDefault();
             amount = -1;
 
             mockDepartmentAndRequester();
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ExceedMaxItemNumException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`amount`가 50을 초과할 시]_[MethodNotAllowedException]")
-        public void ERROR_amountIsUpperThanBound_() {
+        @DisplayName("[ERROR]_[`amount`가 50을 초과할 시]_[ExceedMaxItemNumException]")
+        public void ERROR_amountIsUpperThanBound_ExceedMaxItemNumException() {
             setUpDefault();
             amount = 51;
 
             mockDepartmentAndRequester();
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ExceedMaxItemNumException.class);
         }
     }
 

@@ -1,8 +1,12 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.exception.ExpiredTokenException;
+import com.example.beliemeserver.model.exception.InvalidIndexException;
+import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.BaseService;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.StubData;
@@ -126,14 +130,14 @@ public abstract class BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
-        public void ERROR_accessDenied_ForbiddenException() {
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
             setUpDefault();
             setRequesterAccessDenied();
 
             mockDepartmentAndRequester();
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 

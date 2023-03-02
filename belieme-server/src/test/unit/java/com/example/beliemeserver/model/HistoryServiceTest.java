@@ -1,11 +1,10 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.InvalidIndexException;
-import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.service.HistoryService;
+import com.example.beliemeserver.model.util.Constants;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
 import org.assertj.core.api.Assertions;
@@ -297,9 +296,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
         @Override
-        public void ERROR_accessDenied_ForbiddenException() {
+        public void ERROR_accessDenied_PermissionDeniedException() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveExactPermissionOnDept(
                     dept, AuthorityDto.Permission.BANNED));
@@ -312,12 +311,12 @@ public class HistoryServiceTest extends BaseServiceTest {
                     historyRequesterStudentId)
             ).thenReturn(historyRequester);
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
-        public void ERROR_getHistoryListOfOthers_ForbiddenException() {
+        @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[PermissionDeniedException]")
+        public void ERROR_getHistoryListOfOthers_PermissionDeniedException() {
             setDept(TEST_DEPT);
             setHistoryRequester(randomUserHaveMorePermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
@@ -330,7 +329,7 @@ public class HistoryServiceTest extends BaseServiceTest {
                     historyRequesterStudentId)
             ).thenReturn(historyRequester);
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         @RepeatedTest(10)
@@ -424,9 +423,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
         @Override
-        public void ERROR_accessDenied_ForbiddenException() {
+        public void ERROR_accessDenied_PermissionDeniedException() {
             setUpDefault();
             setRequester(randomUserHaveLessPermissionOnDept(
                     dept, AuthorityDto.Permission.USER));
@@ -437,12 +436,12 @@ public class HistoryServiceTest extends BaseServiceTest {
                     stuffName, itemNum, historyNum)
             ).thenReturn(history);
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[ForbiddenException]")
-        public void ERROR_getHistoryListOfOthers_ForbiddenException() {
+        @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[PermissionDeniedException]")
+        public void ERROR_getHistoryListOfOthers_PermissionDeniedException() {
             setUpDefault();
             setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
                     dept, AuthorityDto.Permission.USER, List.of(history.requester())));
@@ -453,7 +452,7 @@ public class HistoryServiceTest extends BaseServiceTest {
                     stuffName, itemNum, historyNum)
             ).thenReturn(history);
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         @RepeatedTest(10)
@@ -565,8 +564,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 1]_[MethodNotAllowedException]")
-        public void ERROR_itemIsUnusable_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 1]_[ReservationOnNonUsableItemException]")
+        public void ERROR_itemIsUnusable_ReservationOnNonUsableItemException() {
             setUpDefault();
             setItem(randomUnusableItemOnDept(dept));
 
@@ -576,12 +575,12 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenReturn(item);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ReservationOnNonUsableItemException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 2]_[MethodNotAllowedException]")
-        public void ERROR_itemIsInactive_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 2]_[ReservationOnNonUsableItemException]")
+        public void ERROR_itemIsInactive_ReservationOnNonUsableItemException() {
             setUpDefault();
             setItem(randomInactiveItemByDept(dept));
 
@@ -591,12 +590,12 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenReturn(item);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ReservationOnNonUsableItemException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`itemNum`이 `null`이고 대여가능 한 `item`이 존재하지 않을 시]_[MethodNotAllowedException]")
-        public void ERROR_noUsableItem_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`itemNum`이 `null`이고 대여가능 한 `item`이 존재하지 않을 시]_[NoUsableItemExistException]")
+        public void ERROR_noUsableItem_NoUsableItemExistException() {
             setUpDefault();
             StuffDto targetStuff = randomUnusableStuffByDept(dept);
             setItem(randomItemOnStuff(targetStuff));
@@ -606,14 +605,14 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
                     .thenReturn(stuff);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, NoUsableItemExistException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`requester`가 이미 해당 물품을 " + HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF + "개 사용 중일 시]_[MethodNotAllowedException]")
-        public void ERROR_requesterAlreadyRequestStuff_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`requester`가 이미 해당 물품을 " + Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF + "개 사용 중일 시]_[ExceedMaxRentalCountOnSameStuffException]")
+        public void ERROR_requesterAlreadyRequestStuff_ExceedMaxRentalCountOnSameStuffException() {
             setUpDefault();
-            StuffDto targetStuff = randomStuffHaveItemMoreOnDept(dept, HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF);
+            StuffDto targetStuff = randomStuffHaveItemMoreOnDept(dept, Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF);
             setItem(randomItemOnStuff(targetStuff));
 
             mockDepartmentAndRequester();
@@ -621,12 +620,12 @@ public class HistoryServiceTest extends BaseServiceTest {
                     .thenReturn(makeHistoryListWithSameStuff());
             when(stuffDao.getByIndex(univCode, deptCode, stuffName)).thenReturn(stuff);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ExceedMaxRentalCountOnSameStuffException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`requester`가 이미 " + HistoryService.MAX_LENTAL_COUNT + "개 이상에 대한 대여가 진행 중일 시]_[MethodNotAllowedException]")
-        public void ERROR_requesterHasTooManyRequest_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`requester`가 이미 " + Constants.MAX_RENTAL_COUNT + "개 이상에 대한 대여가 진행 중일 시]_[ExceedMaxRentalCountException]")
+        public void ERROR_requesterHasTooManyRequest_ExceedMaxRentalCountException() {
             setUpDefault();
 
             mockDepartmentAndRequester();
@@ -635,7 +634,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
                     .thenReturn(stuff);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ExceedMaxRentalCountException.class);
         }
 
         @RepeatedTest(10)
@@ -667,7 +666,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         private List<HistoryDto> makeHistoryListWithSameStuff() {
             List<HistoryDto> output = new ArrayList<>();
             List<ItemDto> exclude = new ArrayList<>(List.of(item));
-            for (int i = 0; i < HistoryService.MAX_LENTAL_COUNT_ON_SAME_STUFF; i++) {
+            for (int i = 0; i < Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF; i++) {
                 ItemDto newItem = randomItemOnStuffWithExclude(stuff, exclude);
                 exclude.add(newItem);
                 output.add(
@@ -693,7 +692,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         private List<HistoryDto> makeHistoryListWithSameRequester() {
             List<HistoryDto> output = new ArrayList<>();
             List<StuffDto> exclude = new ArrayList<>(List.of(stuff));
-            for (int i = 0; i < HistoryService.MAX_LENTAL_COUNT; i++) {
+            for (int i = 0; i < Constants.MAX_RENTAL_COUNT; i++) {
                 StuffDto newStuff = randomStuffOnDeptWithExclude(dept, exclude);
                 exclude.add(newStuff);
 
@@ -811,8 +810,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 이미 분실된 상태일 시]_[MethodNotAllowedException]")
-        public void ERROR_itemIsUnusable_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`item`이 이미 분실된 상태일 시]_[LostRegistrationOnLostItemException]")
+        public void ERROR_itemIsUnusable_LostRegistrationOnLostItemException() {
             setUpDefault();
             setItem(randomInactiveItemByDept(dept));
 
@@ -820,7 +819,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenReturn(item);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, LostRegistrationOnLostItemException.class);
         }
 
         @RepeatedTest(10)
@@ -897,8 +896,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 예약된 상태가 아닐 시]_[MethodNotAllowedException]")
-        public void ERROR_itemIsUnusable_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`item`이 예약된 상태가 아닐 시]_[ResponseOnUnrequestedItemException]")
+        public void ERROR_itemIsUnusable_ResponseOnUnrequestedItemException() {
             setUpDefault();
             setItem(randomUsableItemOnDept(dept));
 
@@ -906,7 +905,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenReturn(item);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ResponseOnUnrequestedItemException.class);
         }
 
         @RepeatedTest(10)
@@ -983,8 +982,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 1]_[MethodNotAllowedException]")
-        public void ERROR_itemIsUsable_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 1]_[ReturnRegistrationOnReturnedItemException]")
+        public void ERROR_itemIsUsable_ReturnRegistrationOnReturnedItemException() {
             setUpDefault();
             setItem(randomUsableItemOnDept(dept));
 
@@ -992,12 +991,12 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenReturn(item);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ReturnRegistrationOnReturnedItemException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 2]_[MethodNotAllowedException]")
-        public void ERROR_itemIsReserved_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 2]_[ReturnRegistrationOnReturnedItemException]")
+        public void ERROR_itemIsReserved_ReturnRegistrationOnReturnedItemException() {
             setUpDefault();
             setItem(randomReservedItemByDept(dept));
 
@@ -1005,7 +1004,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenReturn(item);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ReturnRegistrationOnReturnedItemException.class);
         }
 
         @RepeatedTest(10)
@@ -1082,8 +1081,8 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 이미 반납되어있는 상태일 시 1]_[MethodNotAllowedException]")
-        public void ERROR_itemIsUsable_MethodNotAllowedException() {
+        @DisplayName("[ERROR]_[`item`이 취소할 수 있는 상황이 아닐시]_[ResponseOnUnrequestedItemException]")
+        public void ERROR_itemIsNonCancelable_ResponseOnUnrequestedItemException() {
             setUpDefault();
             setItem(randomUsableItemOnDept(dept));
 
@@ -1091,7 +1090,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenReturn(item);
 
-            TestHelper.exceptionTest(this::execMethod, MethodNotAllowedException.class);
+            TestHelper.exceptionTest(this::execMethod, ResponseOnUnrequestedItemException.class);
         }
 
         @RepeatedTest(10)
