@@ -2,10 +2,7 @@ package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.exception.*;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.ItemDto;
-import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,46 +54,46 @@ public abstract class BaseService {
     protected void checkUserPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new ForbiddenException();
+            throw new ForbiddenException(requester.getMaxPermission(department), AuthorityDto.Permission.USER);
         }
     }
 
     protected void checkStaffPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new ForbiddenException();
+            throw new ForbiddenException(requester.getMaxPermission(department), AuthorityDto.Permission.STAFF);
         }
     }
 
     protected void checkMasterPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
-            throw new ForbiddenException();
+            throw new ForbiddenException(requester.getMaxPermission(department), AuthorityDto.Permission.MASTER);
         }
     }
 
     protected void checkDeveloperPermission(String token) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.isDeveloper()) {
-            throw new ForbiddenException();
+            throw new ForbiddenException(AuthorityDto.Permission.BANNED, AuthorityDto.Permission.DEVELOPER);
         }
     }
 
     protected void checkUserPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new ForbiddenException();
+            throw new ForbiddenException(requester.getMaxPermission(department), AuthorityDto.Permission.USER);
         }
     }
 
     protected void checkStaffPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new ForbiddenException();
+            throw new ForbiddenException(requester.getMaxPermission(department), AuthorityDto.Permission.STAFF);
         }
     }
 
     protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
-            throw new ForbiddenException();
+            throw new ForbiddenException(requester.getMaxPermission(department), AuthorityDto.Permission.MASTER);
         }
     }
 
