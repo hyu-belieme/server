@@ -68,6 +68,7 @@ public class DummyDataSet {
         ));
 
         departmentDummies = new ArrayList<>(List.of(
+                Globals.DEV_DEPARTMENT,
                 new DepartmentDto(universityDummies.get(1), "CSE", "컴퓨터소프트웨어학부", HYU_CSE_BASE_MAJORS),
                 new DepartmentDto(universityDummies.get(1), "STU", "총학생회", HYU_STU_BASE_MAJORS),
                 new DepartmentDto(universityDummies.get(2), "MED", "의과대학", CKU_MED_BASE_MAJORS),
@@ -95,33 +96,33 @@ public class DummyDataSet {
                         1673155358, 1673155358, new ArrayList<>())
         ));
 
-        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(0 * 6 + 0)));
         userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(1 * 6 + 0)));
-        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(0 * 6 + 4)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(2 * 6 + 0)));
         userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(1 * 6 + 4)));
-        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(2 * 6 + 2)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(2 * 6 + 4)));
+        userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(3 * 6 + 2)));
 
-        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(0 * 6 + 0)));
         userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(1 * 6 + 0)));
-        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(0 * 6 + 1)));
+        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(2 * 6 + 0)));
+        userDummies.set(1, userDummies.get(1).withAuthorityAdd(authorityDummies.get(1 * 6 + 1)));
 
-        userDummies.set(2, userDummies.get(2).withAuthorityAdd(authorityDummies.get(1 * 6 + 0)));
+        userDummies.set(2, userDummies.get(2).withAuthorityAdd(authorityDummies.get(2 * 6 + 0)));
 
-        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(2 * 6 + 0)));
         userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(3 * 6 + 0)));
-        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(2 * 6 + 4)));
+        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(4 * 6 + 0)));
+        userDummies.set(3, userDummies.get(3).withAuthorityAdd(authorityDummies.get(3 * 6 + 4)));
 
-        userDummies.set(4, userDummies.get(4).withAuthorityAdd(authorityDummies.get(3 * 6 + 0)));
+        userDummies.set(4, userDummies.get(4).withAuthorityAdd(authorityDummies.get(4 * 6 + 0)));
 
         stuffDummies = new ArrayList<>(List.of(
-                StuffDto.init(departmentDummies.get(0), "우산", "☂"),
-                StuffDto.init(departmentDummies.get(0), "블루투스스피커", "📻"),
-                StuffDto.init(departmentDummies.get(0), "축구공", "⚽️"),
-                StuffDto.init(departmentDummies.get(0), "농구공", "🏀"),
+                StuffDto.init(departmentDummies.get(1), "우산", "☂"),
+                StuffDto.init(departmentDummies.get(1), "블루투스스피커", "📻"),
                 StuffDto.init(departmentDummies.get(1), "축구공", "⚽️"),
                 StuffDto.init(departmentDummies.get(1), "농구공", "🏀"),
-                StuffDto.init(departmentDummies.get(2), "볼펜", "🖋️"),
-                StuffDto.init(departmentDummies.get(2), "스케이트보드", "🛹")
+                StuffDto.init(departmentDummies.get(2), "축구공", "⚽️"),
+                StuffDto.init(departmentDummies.get(2), "농구공", "🏀"),
+                StuffDto.init(departmentDummies.get(3), "볼펜", "🖋️"),
+                StuffDto.init(departmentDummies.get(3), "스케이트보드", "🛹")
         ));
 
         itemDummies = new ArrayList<>(List.of(

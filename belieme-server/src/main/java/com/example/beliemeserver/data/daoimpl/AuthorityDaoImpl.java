@@ -30,6 +30,16 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
+    public boolean checkExistByIndex(String universityCode, String departmentCode, AuthorityDto.Permission permission) {
+        try {
+            int departmentId = findDepartmentEntity(universityCode, departmentCode).getId();
+            return authorityRepository.existsByDepartmentIdAndPermission(departmentId, permission.toString());
+        } catch (NotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
     public AuthorityDto create(AuthorityDto authority) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
         DepartmentEntity departmentOfAuthority = findDepartmentEntity(authority.department());
 

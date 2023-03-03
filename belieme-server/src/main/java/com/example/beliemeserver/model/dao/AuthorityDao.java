@@ -13,6 +13,9 @@ public interface AuthorityDao {
     List<AuthorityDto> getAllList() throws FormatDoesNotMatchException;
 
     @Transactional
+    boolean checkExistByIndex(String universityCode, String departmentCode, AuthorityDto.Permission permission);
+
+    @Transactional
     AuthorityDto create(AuthorityDto authority)
             throws ConflictException, NotFoundException, FormatDoesNotMatchException;
 

@@ -28,46 +28,48 @@ values (8, 3, 'A70');
 
 -- insert department
 insert into department(id, university_id, code, name)
-values (1, 2, 'CSE', '컴퓨터소프트웨어학부');
+values (1, 1, 'DEV', 'DEV');
 insert into department(id, university_id, code, name)
-values (2, 2, 'STU', '총학생회');
+values (2, 2, 'CSE', '컴퓨터소프트웨어학부');
 insert into department(id, university_id, code, name)
-values (3, 3, 'MED', '의과대학');
+values (3, 2, 'STU', '총학생회');
 insert into department(id, university_id, code, name)
-values (4, 3, 'STU', '총학생회');
+values (4, 3, 'MED', '의과대학');
 insert into department(id, university_id, code, name)
-values (5, 3, 'ME', '기계공학과');
-
-insert into major_department_join(department_id, major_id)
-values (1, 1);
-insert into major_department_join(department_id, major_id)
-values (1, 2);
+values (5, 3, 'STU', '총학생회');
+insert into department(id, university_id, code, name)
+values (6, 3, 'ME', '기계공학과');
 
 insert into major_department_join(department_id, major_id)
 values (2, 1);
 insert into major_department_join(department_id, major_id)
 values (2, 2);
-insert into major_department_join(department_id, major_id)
-values (2, 3);
-insert into major_department_join(department_id, major_id)
-values (2, 5);
 
 insert into major_department_join(department_id, major_id)
-values (3, 6);
-
+values (3, 1);
 insert into major_department_join(department_id, major_id)
-values (4, 4);
+values (3, 2);
+insert into major_department_join(department_id, major_id)
+values (3, 3);
+insert into major_department_join(department_id, major_id)
+values (3, 5);
+
 insert into major_department_join(department_id, major_id)
 values (4, 6);
-insert into major_department_join(department_id, major_id)
-values (4, 7);
-insert into major_department_join(department_id, major_id)
-values (4, 8);
 
 insert into major_department_join(department_id, major_id)
 values (5, 4);
 insert into major_department_join(department_id, major_id)
+values (5, 6);
+insert into major_department_join(department_id, major_id)
 values (5, 7);
+insert into major_department_join(department_id, major_id)
+values (5, 8);
+
+insert into major_department_join(department_id, major_id)
+values (6, 4);
+insert into major_department_join(department_id, major_id)
+values (6, 7);
 
 -- insert authority
 insert into authority(id, department_id, permission)
@@ -118,6 +120,18 @@ insert into authority(id, department_id, permission)
 values (23, 4, 'MASTER');
 insert into authority(id, department_id, permission)
 values (24, 4, 'DEVELOPER');
+insert into authority(id, department_id, permission)
+values (25, 5, 'DEFAULT');
+insert into authority(id, department_id, permission)
+values (26, 5, 'BANNED');
+insert into authority(id, department_id, permission)
+values (27, 5, 'USER');
+insert into authority(id, department_id, permission)
+values (28, 5, 'STAFF');
+insert into authority(id, department_id, permission)
+values (29, 5, 'MASTER');
+insert into authority(id, department_id, permission)
+values (30, 5, 'DEVELOPER');
 
 -- insert user
 insert into user(id, university_id, student_id, name, token, create_time_stamp, approval_time_stamp)
@@ -132,53 +146,53 @@ insert into user(id, university_id, student_id, name, token, create_time_stamp, 
 values (5, 3, '2018008887', '이석환', 'TEST5', 1673155358, 1673155358);
 
 insert into authority_user_join(user_id, authority_id)
-values (1, 1);
-insert into authority_user_join(user_id, authority_id)
 values (1, 7);
 insert into authority_user_join(user_id, authority_id)
-values (1, 5);
+values (1, 13);
 insert into authority_user_join(user_id, authority_id)
 values (1, 11);
 insert into authority_user_join(user_id, authority_id)
-values (1, 15);
-
+values (1, 17);
 insert into authority_user_join(user_id, authority_id)
-values (2, 1);
+values (1, 21);
+
 insert into authority_user_join(user_id, authority_id)
 values (2, 7);
 insert into authority_user_join(user_id, authority_id)
-values (2, 2);
+values (2, 13);
+insert into authority_user_join(user_id, authority_id)
+values (2, 8);
 
 insert into authority_user_join(user_id, authority_id)
-values (3, 7);
+values (3, 13);
 
-insert into authority_user_join(user_id, authority_id)
-values (4, 13);
 insert into authority_user_join(user_id, authority_id)
 values (4, 19);
 insert into authority_user_join(user_id, authority_id)
-values (4, 17);
+values (4, 25);
+insert into authority_user_join(user_id, authority_id)
+values (4, 23);
 
 insert into authority_user_join(user_id, authority_id)
-values (5, 19);
+values (5, 25);
 
 -- insert stuff
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (1, 1, '우산', '☂', 5);
+values (1, 2, '우산', '☂', 5);
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (2, 1, '블루투스스피커', '📻', 3);
+values (2, 2, '블루투스스피커', '📻', 3);
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (3, 1, '축구공', '⚽️', 2);
+values (3, 2, '축구공', '⚽️', 2);
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (4, 1, '농구공', '🏀', 2);
+values (4, 2, '농구공', '🏀', 2);
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (5, 2, '축구공', '⚽️', 4);
+values (5, 3, '축구공', '⚽️', 4);
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (6, 2, '농구공', '🏀', 4);
+values (6, 3, '농구공', '🏀', 4);
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (7, 3, '볼펜', '🖋️', 9);
+values (7, 4, '볼펜', '🖋️', 9);
 insert into stuff(id, department_id, name, emoji, next_item_num)
-values (8, 3, '스케이트보드', '🛹', 2);
+values (8, 4, '스케이트보드', '🛹', 2);
 
 
 -- insert item

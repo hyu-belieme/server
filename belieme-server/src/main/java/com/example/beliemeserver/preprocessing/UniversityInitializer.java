@@ -16,6 +16,6 @@ public class UniversityInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        universityService.initUniversity();
+        universityService.initializeUniversities();
     }
 }
