@@ -2,7 +2,7 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.common.DeveloperInfo;
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.BadGateWayException;
+import com.example.beliemeserver.exception.BadGatewayException;
 import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
@@ -607,9 +607,9 @@ public class UserServiceTest extends BaseServiceTest {
         public void ERROR_networkProblemOnHanyangApi_BadGateWayException() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenThrow(BadGateWayException.class);
+            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenThrow(BadGatewayException.class);
 
-            TestHelper.exceptionTest(this::execMethod, BadGateWayException.class);
+            TestHelper.exceptionTest(this::execMethod, BadGatewayException.class);
         }
 
         private boolean checkUpdatedUser(UserDto newUser) {

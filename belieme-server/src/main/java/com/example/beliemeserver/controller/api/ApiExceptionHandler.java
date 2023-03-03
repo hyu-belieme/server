@@ -1,9 +1,7 @@
 package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.responsebody.ExceptionResponse;
-import com.example.beliemeserver.exception.BadRequestException;
-import com.example.beliemeserver.exception.InternalServerException;
-import com.example.beliemeserver.exception.ServerException;
+import com.example.beliemeserver.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,34 +16,34 @@ import java.util.List;
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> handleAllException(Exception ex) {
+    public ResponseEntity<Object> handleAllException() {
         return handleExceptionInternal(new InternalServerException());
     }
 
     @ExceptionHandler({ServerException.class})
-    public ResponseEntity<Object> handleExceptionInternal(ServerException ex) {
-        ExceptionResponse errorBody = new ExceptionResponse(ex.getName(), ex.getMessage());
-        return ResponseEntity.status(ex.getHttpStatus()).body(errorBody);
+    public ResponseEntity<Object> handleExceptionInternal(ServerException e) {
+        ExceptionResponse errorBody = new ExceptionResponse(e.getName(), e.getMessage());
+        return ResponseEntity.status(e.getHttpStatus()).body(errorBody);
     }
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
+            MethodArgumentNotValidException e,
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request) {
-        BadRequestException badRequestException = new BadRequestException();
-        List<ExceptionResponse.ValidationError> validationErrorList = ex.getBindingResult()
+        ErrorInfo errorInfo = CommonErrorInfo.BAD_REQUEST;
+        List<ExceptionResponse.ValidationError> validationErrorList = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(ExceptionResponse.ValidationError::of)
                 .toList();
 
         ExceptionResponse errorBody = new ExceptionResponse(
-                badRequestException.getName(),
-                badRequestException.getMessage(),
+                errorInfo.name(),
+                errorInfo.responseMessage(),
                 validationErrorList
         );
-        return ResponseEntity.status(badRequestException.getHttpStatus()).body(errorBody);
+        return ResponseEntity.status(errorInfo.httpStatus()).body(errorBody);
     }
 }

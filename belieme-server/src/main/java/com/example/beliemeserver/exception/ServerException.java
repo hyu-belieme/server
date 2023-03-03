@@ -3,22 +3,22 @@ package com.example.beliemeserver.exception;
 import org.springframework.http.HttpStatus;
 
 public abstract class ServerException extends RuntimeException {
-    public HttpStatus getHttpStatus() {
-        return httpStatus();
+    private final ErrorInfo errorInfo;
+
+    public ServerException(ErrorInfo errorInfo) {
+        this.errorInfo = errorInfo;
+    }
+
+    public final HttpStatus getHttpStatus() {
+        return errorInfo.httpStatus();
     }
 
     public String getName() {
-        return name();
+        return errorInfo.name();
     }
 
     @Override
     public String getMessage() {
-        return koreanMessage();
+        return errorInfo.responseMessage();
     }
-
-    protected abstract HttpStatus httpStatus();
-
-    protected abstract String name();
-
-    protected abstract String koreanMessage();
 }

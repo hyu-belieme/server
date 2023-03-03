@@ -4,12 +4,12 @@ import com.example.beliemeserver.exception.UnauthorizedException;
 
 public class TokenExpiredException extends UnauthorizedException {
     @Override
-    protected String name() {
+    public String getName() {
         return "TOKEN_EXPIRED";
     }
 
     @Override
-    protected String koreanMessage() {
+    public String getMessage() {
         return "토큰 인증에 실패하였습니다. 해당 토큰이 만료되었습니다.";
     }
 }

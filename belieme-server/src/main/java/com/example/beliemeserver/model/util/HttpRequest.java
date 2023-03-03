@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model.util;
 
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.BadGateWayException;
+import com.example.beliemeserver.exception.BadGatewayException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -26,12 +26,12 @@ public class HttpRequest {
             jsonResponse = (JSONObject) jsonParser.parse(response);
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new BadGateWayException();
+            throw new BadGatewayException();
         }
 
         jsonResponse = (JSONObject) jsonResponse.getOrDefault("response", new JSONObject());
         jsonResponse = (JSONObject) jsonResponse.getOrDefault("item", null);
-        if (jsonResponse == null) throw new BadGateWayException();
+        if (jsonResponse == null) throw new BadGatewayException();
         return jsonResponse;
     }
 
@@ -69,7 +69,7 @@ public class HttpRequest {
             in.close();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new BadGateWayException();
+            throw new BadGatewayException();
         }
         return output;
     }
