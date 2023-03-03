@@ -23,6 +23,9 @@ public interface DepartmentDao {
     ) throws NotFoundException;
 
     @Transactional
+    boolean checkExistByIndex(String universityCode, String departmentCode);
+
+    @Transactional
     DepartmentDto create(
             DepartmentDto newDepartment
     ) throws NotFoundException, ConflictException;

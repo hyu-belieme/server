@@ -21,6 +21,10 @@ public class Globals {
             HANYANG_UNIVERSITY
     );
 
+    public static final List<DepartmentDto> initialDepartments = List.of(
+            DEV_DEPARTMENT
+    );
+
     public static final List<DeveloperInfo> developers = List.of(
             new DeveloperInfo("c305ee87-a4c7-4b5a-8d71-7e23b6064613", "DEV1", "개발자1")
     );

@@ -50,6 +50,16 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
+    public boolean checkExistByIndex(String universityCode, String departmentCode) {
+        try {
+            int universityId = findUniversityEntity(universityCode).getId();
+            return departmentRepository.existsByUniversityIdAndCode(universityId, departmentCode);
+        } catch (NotFoundException e) {
+            return false;
+        }
+    }
+
+    @Override
     public DepartmentDto create(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
         DepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
         saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());

@@ -14,7 +14,7 @@ public class UniversityService extends BaseService {
         super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
-    public void initUniversity() {
+    public void initializeUniversities() {
         for (UniversityDto university : Globals.universities) {
             if (universityDao.checkExistByIndex(university.code())) {
                 universityDao.update(university.code(), university);

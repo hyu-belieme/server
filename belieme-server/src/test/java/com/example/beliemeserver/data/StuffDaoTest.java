@@ -50,7 +50,7 @@ public class StuffDaoTest extends DaoTest {
     public void createTest() {
         // TODO set good new data
         StuffDto newStuff = StuffDto.init(
-                DummyDataSet.departmentDummies.get(2),
+                DummyDataSet.departmentDummies.get(3),
                 "가위",
                 "✂️"
         );
