@@ -50,7 +50,7 @@ public class StuffService extends BaseService {
         newStuff = stuffDao.create(newStuff);
 
         if (amount == null) return output;
-        if (amount < 0 || amount > Constants.MAX_ITEM_NUM) throw new ItemAmountLimitExceededException();
+        if (amount > Constants.MAX_ITEM_NUM) throw new ItemAmountLimitExceededException();
 
         for (int i = 0; i < amount; i++) {
             ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i + 1));

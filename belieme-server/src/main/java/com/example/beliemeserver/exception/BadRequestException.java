@@ -15,6 +15,6 @@ public class BadRequestException extends ServerException {
 
     @Override
     protected String koreanMessage() {
-        return "";
+        return "요청으로 전달 받은 변수들이 유효하지 않습니다.";
     }
 }

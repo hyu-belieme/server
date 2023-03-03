@@ -1,7 +1,7 @@
 package com.example.beliemeserver.controller.api;
 
-import com.example.beliemeserver.controller.httpexception.BadRequestHttpException;
 import com.example.beliemeserver.controller.responsebody.HistoryResponse;
+import com.example.beliemeserver.exception.BadRequestException;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.service.HistoryService;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +43,7 @@ public class HistoryApiController {
             return ResponseEntity.ok(responseList);
         }
 
-        // TODO exception 한번에 정리할 때 손 보기
-        throw new BadRequestHttpException("");
+        throw new BadRequestException();
     }
 
     @GetMapping("/stuffs/{stuff-name}/histories")
