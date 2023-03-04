@@ -1,8 +1,8 @@
 package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.controller.httpexception.BadRequestHttpException;
 import com.example.beliemeserver.controller.responsebody.UserResponse;
+import com.example.beliemeserver.exception.BadRequestException;
 import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -68,8 +68,7 @@ public class UserApiController {
             return ResponseEntity.ok(response);
         }
 
-        // TODO exception 한번에 정리할 때 손 보기
-        throw new BadRequestHttpException("");
+        throw new BadRequestException();
     }
 
     private List<UserResponse> toResponseList(List<UserDto> userDtoList) {

@@ -44,10 +44,10 @@ public class TestHelper {
     }
 
     public interface ObjectReturnMethod<T> {
-        T method() throws Exception;
+        T method();
     }
 
     public interface ListReturnMethod<T> {
-        List<T> method() throws Exception;
+        List<T> method();
     }
 }

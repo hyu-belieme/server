@@ -1,8 +1,5 @@
 package com.example.beliemeserver.model.dao;
 
-import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,25 +7,21 @@ import java.util.List;
 
 public interface UserDao {
     @Transactional
-    List<UserDto> getAllList() throws FormatDoesNotMatchException;
+    List<UserDto> getAllList();
 
     @Transactional
-    List<UserDto> getListByUniversity(String universityCode)
-            throws NotFoundException, FormatDoesNotMatchException;
+    List<UserDto> getListByUniversity(String universityCode);
 
     @Transactional
-    UserDto getByToken(String token)
-            throws NotFoundException, FormatDoesNotMatchException;
+    UserDto getByToken(String token);
 
     @Transactional
-    UserDto getByIndex(String universityCode, String studentId)
-            throws NotFoundException, FormatDoesNotMatchException;
+    UserDto getByIndex(String universityCode, String studentId);
 
     @Transactional
-    UserDto create(UserDto user)
-            throws ConflictException, NotFoundException, FormatDoesNotMatchException;
+    UserDto create(UserDto user);
 
     @Transactional
-    UserDto update(String universityCode, String studentId, UserDto newUser)
-            throws NotFoundException, ConflictException, FormatDoesNotMatchException;
+    UserDto update(String universityCode,
+                   String studentId, UserDto newUser);
 }

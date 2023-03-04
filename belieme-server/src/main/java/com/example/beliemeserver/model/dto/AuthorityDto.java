@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.dto;
 
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
+import com.example.beliemeserver.data.exception.FormatDoesNotMatchException;
 import lombok.NonNull;
 
 public record AuthorityDto(
@@ -52,7 +52,7 @@ public record AuthorityDto(
     public enum Permission {
         DEFAULT, BANNED, USER, STAFF, MASTER, DEVELOPER;
 
-        public static Permission create(String string) throws FormatDoesNotMatchException {
+        public static Permission create(String string) {
             return switch (string) {
                 case "DEFAULT" -> DEFAULT;
                 case "BANNED" -> BANNED;

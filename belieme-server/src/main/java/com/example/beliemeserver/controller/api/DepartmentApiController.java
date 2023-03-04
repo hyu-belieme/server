@@ -7,6 +7,7 @@ import com.example.beliemeserver.model.service.DepartmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class DepartmentApiController {
     public ResponseEntity<DepartmentResponse> createNewDepartment(
             @RequestHeader("user-token") String userToken,
             @PathVariable("university-code") String universityCode,
-            @RequestBody DepartmentRequest newDepartment
+            @RequestBody @Valid DepartmentRequest newDepartment
     ) {
         DepartmentDto newDepartmentDto = departmentService.create(
                 userToken, universityCode, newDepartment.getCode(),
@@ -58,7 +59,7 @@ public class DepartmentApiController {
             @RequestHeader("user-token") String userToken,
             @PathVariable("university-code") String universityCode,
             @PathVariable("department-code") String departmentCode,
-            @RequestBody DepartmentRequest newDepartment
+            @RequestBody @Valid DepartmentRequest newDepartment
     ) {
         DepartmentDto newDepartmentDto = departmentService.update(
                 userToken, universityCode, departmentCode,

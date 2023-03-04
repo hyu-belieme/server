@@ -1,6 +1,5 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
@@ -36,9 +35,6 @@ public class ItemEntity extends DataEntity {
     @Column(name = "last_history_id")
     private Integer lastHistoryId;
 
-    @Column(name = "next_history_num")
-    private int nextHistoryNum;
-
     @NonNull
     @ManyToOne
     @JoinColumn(name = "stuff_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -68,11 +64,7 @@ public class ItemEntity extends DataEntity {
         return this;
     }
 
-    public int getAndIncrementNextHistoryNum() {
-        return nextHistoryNum++;
-    }
-
-    public ItemDto toItemDto() throws FormatDoesNotMatchException {
+    public ItemDto toItemDto() {
         HistoryDto lastHistoryDto = getLastHistoryDto();
         return new ItemDto(
                 stuff.toStuffDto(),
@@ -81,7 +73,7 @@ public class ItemEntity extends DataEntity {
         );
     }
 
-    public ItemDto toItemDtoNestedToStuff() throws FormatDoesNotMatchException {
+    public ItemDto toItemDtoNestedToStuff() {
         HistoryDto lastHistoryDto = getLastHistoryDto();
         return new ItemDto(
                 StuffDto.nestedEndpoint,
@@ -90,7 +82,7 @@ public class ItemEntity extends DataEntity {
         );
     }
 
-    private HistoryDto getLastHistoryDto() throws FormatDoesNotMatchException {
+    private HistoryDto getLastHistoryDto() {
         if (lastHistory == null) {
             return null;
         }

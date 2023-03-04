@@ -4,7 +4,6 @@ import com.example.beliemeserver.data.entity.MajorEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.MajorDao;
 import com.example.beliemeserver.model.dto.MajorDto;
 import org.springframework.stereotype.Component;
@@ -35,7 +34,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto create(MajorDto newMajor) throws NotFoundException, ConflictException {
+    public MajorDto create(MajorDto newMajor) {
         UniversityEntity university = findUniversityEntity(newMajor.university());
 
         checkMajorConflict(university.getId(), newMajor.code());
@@ -50,7 +49,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto update(String universityCode, String majorCode, MajorDto newMajor) throws NotFoundException, ConflictException {
+    public MajorDto update(String universityCode, String majorCode, MajorDto newMajor) {
         MajorEntity target = findMajorEntity(universityCode, majorCode);
 
         UniversityEntity newUniversity = findUniversityEntity(newMajor.university());
@@ -63,7 +62,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
         return target.toMajorDto();
     }
 
-    private void checkMajorConflict(int universityId, String majorCode) throws ConflictException {
+    private void checkMajorConflict(int universityId, String majorCode) {
         if (majorRepository.existsByUniversityIdAndCode(universityId, majorCode)) {
             throw new ConflictException();
         }

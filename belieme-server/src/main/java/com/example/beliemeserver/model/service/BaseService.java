@@ -1,11 +1,15 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.exception.*;
+import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.exception.TokenExpiredException;
+import com.example.beliemeserver.model.exception.IndexInvalidException;
+import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,53 +54,53 @@ public abstract class BaseService {
         long currentTimestamp = (System.currentTimeMillis() / 1000);
         long expiredTimestamp = user.approvalTimeStamp() + TOKEN_EXPIRED_TIME;
         if (currentTimestamp > expiredTimestamp) {
-            throw new ExpiredTokenException();
+            throw new TokenExpiredException();
         }
     }
 
     protected void checkUserPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkStaffPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkMasterPermission(String token, DepartmentDto department) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkDeveloperPermission(String token) {
         UserDto requester = validateTokenAndGetUser(token);
         if (!requester.isDeveloper()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkUserPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkStaffPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
     protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
-            throw new ForbiddenException();
+            throw new PermissionDeniedException();
         }
     }
 
@@ -104,7 +108,7 @@ public abstract class BaseService {
         try {
             return departmentDao.getByIndex(universityCode, departmentCode);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -112,7 +116,7 @@ public abstract class BaseService {
         try {
             return stuffDao.getByIndex(universityCode, departmentCode, stuffName);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -120,7 +124,7 @@ public abstract class BaseService {
         try {
             return itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 }

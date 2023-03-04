@@ -1,10 +1,7 @@
 package com.example.beliemeserver.exception;
 
-public class BadRequestException extends InternalServerException {
+public class BadRequestException extends ServerException {
     public BadRequestException() {
-    }
-
-    public BadRequestException(String message) {
-        super(message);
+        super(CommonErrorInfo.BAD_REQUEST);
     }
 }

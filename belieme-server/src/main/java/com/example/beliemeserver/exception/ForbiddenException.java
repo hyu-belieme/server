@@ -1,10 +1,7 @@
 package com.example.beliemeserver.exception;
 
-public class ForbiddenException extends InternalServerException {
+public class ForbiddenException extends ServerException {
     public ForbiddenException() {
-    }
-
-    public ForbiddenException(String message) {
-        super(message);
+        super(CommonErrorInfo.FORBIDDEN);
     }
 }

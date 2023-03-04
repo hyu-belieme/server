@@ -1,18 +1,7 @@
 package com.example.beliemeserver.exception;
 
-public abstract class InternalServerException extends RuntimeException {
-    String message;
-
+public class InternalServerException extends ServerException {
     public InternalServerException() {
-        message = "no error message";
-    }
-
-    public InternalServerException(String message) {
-        this.message = message;
-    }
-
-    @Override
-    public String getMessage() {
-        return message;
+        super(CommonErrorInfo.INTERNAL_SERVER_ERROR);
     }
 }

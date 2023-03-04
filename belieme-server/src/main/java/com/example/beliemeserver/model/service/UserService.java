@@ -3,7 +3,6 @@ package com.example.beliemeserver.model.service;
 import com.example.beliemeserver.common.DeveloperInfo;
 import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
@@ -11,6 +10,7 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.util.HttpRequest;
 import lombok.NonNull;
 import org.json.simple.JSONObject;
@@ -72,18 +72,18 @@ public class UserService extends BaseService {
 
         UserDto targetUser = userDao.getByIndex(universityCode, studentId);
         if (targetUser.isDeveloper()) {
-            throw new MethodNotAllowedException();
+            throw new ForbiddenException();
         }
         if (newPermission != null && newPermission.hasDeveloperPermission()) {
-            throw new MethodNotAllowedException();
+            throw new ForbiddenException();
         }
 
         if (!requester.isDeveloper()) {
             if (targetUser.getMaxPermission(department).hasMasterPermission()) {
-                throw new ForbiddenException();
+                throw new PermissionDeniedException();
             }
             if (newPermission != null && newPermission.hasMasterPermission()) {
-                throw new ForbiddenException();
+                throw new PermissionDeniedException();
             }
         }
 

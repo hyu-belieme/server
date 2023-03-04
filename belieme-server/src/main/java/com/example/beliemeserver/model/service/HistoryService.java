@@ -1,10 +1,10 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.exception.InvalidIndexException;
-import com.example.beliemeserver.exception.MethodNotAllowedException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.exception.*;
+import com.example.beliemeserver.model.util.Constants;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +12,6 @@ import java.util.List;
 
 @Service
 public class HistoryService extends BaseService {
-
-    public static final int MAX_LENTAL_COUNT = 3;
-    public static final int MAX_LENTAL_COUNT_ON_SAME_STUFF = 1;
-
     public HistoryService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
@@ -99,19 +95,20 @@ public class HistoryService extends BaseService {
             if (history.status().isClosed()) continue;
             if (history.item().stuff().matchUniqueKey(stuff)) usingSameStuffCount += 1;
             usingItemCount += 1;
-            if (usingItemCount >= MAX_LENTAL_COUNT) throw new MethodNotAllowedException();
-            if (usingSameStuffCount >= MAX_LENTAL_COUNT_ON_SAME_STUFF) throw new MethodNotAllowedException();
+            if (usingItemCount >= Constants.MAX_RENTAL_COUNT) throw new RentalCountLimitExceededException();
+            if (usingSameStuffCount >= Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF)
+                throw new RentalCountOnSameStuffLimitExceededException();
         }
 
         if (itemNum == null) {
             itemNum = stuff.firstUsableItemNum();
         }
-        if (itemNum == 0) throw new MethodNotAllowedException();
+        if (itemNum == 0) throw new UsableItemNotExistedException();
 
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() != ItemDto.ItemStatus.USABLE) throw new MethodNotAllowedException();
+        if (item.status() != ItemDto.ItemStatus.USABLE) throw new ReservationRequestedOnNonUsableItemException();
 
         HistoryDto newHistory = new HistoryDto(
                 item,
@@ -147,7 +144,7 @@ public class HistoryService extends BaseService {
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() == ItemDto.ItemStatus.INACTIVE) throw new MethodNotAllowedException();
+        if (item.status() == ItemDto.ItemStatus.INACTIVE) throw new LostRegistrationRequestedOnLostItemException();
 
         HistoryDto newHistory;
         if (item.status() == ItemDto.ItemStatus.USABLE) {
@@ -194,7 +191,7 @@ public class HistoryService extends BaseService {
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
                 || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
-            throw new MethodNotAllowedException();
+            throw new RespondedOnUnrequestedItemException();
         }
 
         HistoryDto newHistory = lastHistory
@@ -221,7 +218,7 @@ public class HistoryService extends BaseService {
                 || (lastHistory.status() != HistoryDto.HistoryStatus.USING
                 && lastHistory.status() != HistoryDto.HistoryStatus.DELAYED
                 && lastHistory.status() != HistoryDto.HistoryStatus.LOST)) {
-            throw new MethodNotAllowedException();
+            throw new ReturnRegistrationRequestedOnReturnedItemException();
         }
 
         HistoryDto newHistory = lastHistory
@@ -246,7 +243,7 @@ public class HistoryService extends BaseService {
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
                 || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
-            throw new MethodNotAllowedException();
+            throw new RespondedOnUnrequestedItemException();
         }
 
         HistoryDto newHistory = lastHistory
@@ -262,7 +259,7 @@ public class HistoryService extends BaseService {
         try {
             return historyDao.getListByStuff(universityCode, departmentCode, stuffName);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -272,7 +269,7 @@ public class HistoryService extends BaseService {
         try {
             return historyDao.getListByItem(universityCode, departmentCode, stuffName, itemNum);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 
@@ -280,7 +277,7 @@ public class HistoryService extends BaseService {
         try {
             return userDao.getByIndex(universityCode, studentId);
         } catch (NotFoundException e) {
-            throw new InvalidIndexException();
+            throw new IndexInvalidException();
         }
     }
 }

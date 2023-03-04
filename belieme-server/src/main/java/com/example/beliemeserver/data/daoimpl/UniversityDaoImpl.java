@@ -3,7 +3,6 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.UniversityDao;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto getByIndex(String universityCode) throws NotFoundException {
+    public UniversityDto getByIndex(String universityCode) {
         UniversityEntity targetUniversity = findUniversityEntity(universityCode);
         return targetUniversity.toUniversityDto();
     }
@@ -42,7 +41,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto create(UniversityDto newUniversity) throws ConflictException {
+    public UniversityDto create(UniversityDto newUniversity) {
         checkUniversityConflict(newUniversity.code());
 
         UniversityEntity newUniversityEntity = new UniversityEntity(
@@ -56,7 +55,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
     }
 
     @Override
-    public UniversityDto update(String universityCode, UniversityDto newUniversity) throws NotFoundException, ConflictException {
+    public UniversityDto update(String universityCode, UniversityDto newUniversity) {
         UniversityEntity target = findUniversityEntity(universityCode);
         if (doesIndexOfUniversityChange(target, newUniversity)) {
             checkUniversityConflict(newUniversity.code());
@@ -73,7 +72,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
         return !oldUniversity.getCode().equals(newUniversity.code());
     }
 
-    private void checkUniversityConflict(String universityCode) throws ConflictException {
+    private void checkUniversityConflict(String universityCode) {
         if (universityRepository.existsByCode(universityCode)) {
             throw new ConflictException();
         }

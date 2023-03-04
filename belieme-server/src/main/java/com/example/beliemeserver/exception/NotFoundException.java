@@ -1,11 +1,7 @@
 package com.example.beliemeserver.exception;
 
-public class NotFoundException extends InternalServerException {
+public class NotFoundException extends ServerException {
     public NotFoundException() {
-        super();
-    }
-
-    public NotFoundException(String message) {
-        super(message);
+        super(CommonErrorInfo.NOT_FOUND);
     }
 }

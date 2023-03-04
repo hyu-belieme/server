@@ -1,10 +1,7 @@
 package com.example.beliemeserver.exception;
 
-public class UnauthorizedException extends InternalServerException {
+public class UnauthorizedException extends ServerException {
     public UnauthorizedException() {
-    }
-
-    public UnauthorizedException(String message) {
-        super(message);
+        super(CommonErrorInfo.UNAUTHORIZED);
     }
 }

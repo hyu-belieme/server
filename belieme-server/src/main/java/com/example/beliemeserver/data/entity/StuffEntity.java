@@ -1,6 +1,5 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import lombok.*;
@@ -40,9 +39,6 @@ public class StuffEntity extends DataEntity {
     @Column(name = "emoji")
     private String emoji;
 
-    @Column(name = "next_item_num")
-    private int nextItemNum;
-
     @NonNull
     @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -57,7 +53,6 @@ public class StuffEntity extends DataEntity {
         this.departmentId = department.getId();
         this.name = name;
         this.emoji = emoji;
-        this.nextItemNum = 1;
         this.items = new ArrayList<>();
     }
 
@@ -67,11 +62,7 @@ public class StuffEntity extends DataEntity {
         return this;
     }
 
-    public int getAndIncrementNextItemNum() {
-        return nextItemNum++;
-    }
-
-    public StuffDto toStuffDto() throws FormatDoesNotMatchException {
+    public StuffDto toStuffDto() {
         List<ItemDto> itemDtoList = new ArrayList<>();
         for (ItemEntity item : items) {
             itemDtoList.add(item.toItemDtoNestedToStuff());

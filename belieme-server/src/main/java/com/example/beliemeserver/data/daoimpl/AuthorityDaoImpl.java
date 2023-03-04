@@ -4,7 +4,6 @@ import com.example.beliemeserver.data.entity.AuthorityEntity;
 import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.AuthorityDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
@@ -20,7 +19,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public List<AuthorityDto> getAllList() throws FormatDoesNotMatchException {
+    public List<AuthorityDto> getAllList() {
         List<AuthorityDto> output = new ArrayList<>();
 
         for (AuthorityEntity authorityEntity : authorityRepository.findAll()) {
@@ -40,7 +39,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public AuthorityDto create(AuthorityDto authority) throws ConflictException, NotFoundException, FormatDoesNotMatchException {
+    public AuthorityDto create(AuthorityDto authority) {
         DepartmentEntity departmentOfAuthority = findDepartmentEntity(authority.department());
 
         checkAuthorityConflict(departmentOfAuthority.getId(), authority.permission().name());
@@ -54,7 +53,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto newAuthority) throws NotFoundException, ConflictException, FormatDoesNotMatchException {
+    public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto newAuthority) {
         AuthorityEntity target = findAuthorityEntity(universityCode, departmentCode, permission.name());
         DepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department());
 
@@ -77,7 +76,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
                 oldPermission.equals(newAuthority.permission().name()));
     }
 
-    private void checkAuthorityConflict(int departmentId, String permission) throws ConflictException {
+    private void checkAuthorityConflict(int departmentId, String permission) {
         if (authorityRepository.existsByDepartmentIdAndPermission(departmentId, permission)) {
             throw new ConflictException();
         }

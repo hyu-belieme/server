@@ -1,6 +1,5 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -53,7 +52,7 @@ public class AuthorityEntity extends DataEntity {
         return this;
     }
 
-    public AuthorityDto toAuthorityDto() throws FormatDoesNotMatchException {
+    public AuthorityDto toAuthorityDto() {
         return new AuthorityDto(
                 department.toDepartmentDto(),
                 AuthorityDto.Permission.create(permission)

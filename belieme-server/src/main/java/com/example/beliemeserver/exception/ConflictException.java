@@ -1,10 +1,7 @@
 package com.example.beliemeserver.exception;
 
-public class ConflictException extends InternalServerException {
+public class ConflictException extends ServerException {
     public ConflictException() {
-    }
-
-    public ConflictException(String message) {
-        super(message);
+        super(CommonErrorInfo.CONFLICT);
     }
 }

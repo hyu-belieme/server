@@ -33,7 +33,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public List<DepartmentDto> getListByUniversity(String universityCode) throws NotFoundException {
+    public List<DepartmentDto> getListByUniversity(String universityCode) {
         List<DepartmentDto> output = new ArrayList<>();
 
         int universityId = findUniversityEntity(universityCode).getId();
@@ -44,7 +44,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto getByIndex(String universityCode, String departmentCode) throws NotFoundException {
+    public DepartmentDto getByIndex(String universityCode, String departmentCode) {
         DepartmentEntity targetEntity = findDepartmentEntity(universityCode, departmentCode);
         return targetEntity.toDepartmentDto();
     }
@@ -60,7 +60,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto create(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
+    public DepartmentDto create(DepartmentDto newDepartment) {
         DepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
         saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
 
@@ -68,7 +68,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
     }
 
     @Override
-    public DepartmentDto update(String universityCode, String departmentCode, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
+    public DepartmentDto update(String universityCode, String departmentCode, DepartmentDto newDepartment) {
         DepartmentEntity target = findDepartmentEntity(universityCode, departmentCode);
         updateDepartmentOnly(target, newDepartment);
 
@@ -78,7 +78,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
         return target.toDepartmentDto();
     }
 
-    private DepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) throws NotFoundException, ConflictException {
+    private DepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) {
         UniversityEntity university = findUniversityEntity(newDepartment.university());
 
         checkDepartmentConflict(university.getId(), newDepartment.code());
@@ -92,7 +92,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
         return departmentRepository.save(newDepartmentEntity);
     }
 
-    private void updateDepartmentOnly(DepartmentEntity target, DepartmentDto newDepartment) throws NotFoundException, ConflictException {
+    private void updateDepartmentOnly(DepartmentEntity target, DepartmentDto newDepartment) {
         String newUniversityCode = newDepartment.university().code();
         UniversityEntity newUniversityEntity = findUniversityEntity(newUniversityCode);
 
@@ -105,7 +105,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
                 .setUniversity(newUniversityEntity);
     }
 
-    private void saveBaseMajorJoins(DepartmentEntity newDepartmentEntity, List<MajorDto> baseMajors) throws NotFoundException {
+    private void saveBaseMajorJoins(DepartmentEntity newDepartmentEntity, List<MajorDto> baseMajors) {
         for (MajorDto baseMajor : baseMajors) {
             MajorEntity baseMajorEntity = findMajorEntity(baseMajor);
             MajorDepartmentJoinEntity newJoin = new MajorDepartmentJoinEntity(
@@ -129,17 +129,9 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
                 && oldDepartmentCode.equals(newDepartment.code()));
     }
 
-    private void checkDepartmentConflict(int universityId, String departmentCode) throws ConflictException {
+    private void checkDepartmentConflict(int universityId, String departmentCode) {
         if (departmentRepository.existsByUniversityIdAndCode(universityId, departmentCode)) {
             throw new ConflictException();
-        }
-    }
-
-    private void checkBaseMajorConflict(DepartmentEntity targetDepartment, MajorEntity newMajor) throws ConflictException {
-        for (MajorDepartmentJoinEntity majorDepartmentJoin : targetDepartment.getBaseMajorJoin()) {
-            if (majorDepartmentJoin.getMajorId() == newMajor.getId()) {
-                throw new ConflictException();
-            }
         }
     }
 }

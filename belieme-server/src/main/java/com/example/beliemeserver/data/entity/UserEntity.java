@@ -1,6 +1,5 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.exception.FormatDoesNotMatchException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.UserDto;
 import lombok.*;
@@ -86,7 +85,7 @@ public class UserEntity extends DataEntity {
         this.authorityJoin.remove(authority);
     }
 
-    public UserDto toUserDto() throws FormatDoesNotMatchException {
+    public UserDto toUserDto() {
         List<AuthorityDto> authorityDtoList = new ArrayList<>();
         for (AuthorityUserJoinEntity authority : authorityJoin) {
             authorityDtoList.add(authority.getAuthority().toAuthorityDto());

@@ -1,8 +1,8 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.ForbiddenException;
 import com.example.beliemeserver.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.UniversityDto;
+import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.UniversityService;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -97,14 +97,14 @@ public class UniversityServiceTest extends BaseServiceTest {
 
     private abstract class UnivNestedTest extends BaseNestedTest {
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
-        public void accessDenied_ForbiddenException() {
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void accessDenied_PermissionDeniedException() {
             setUpDefault();
             setRequester(randomNonDevUser());
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
 
-            TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 }
