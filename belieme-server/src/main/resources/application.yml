@@ -43,3 +43,11 @@ spring:
 #    username: admin
 #    password: qlfflal1234!
 #    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  messages:
+    basename: messages/message
+    encoding: UTF-8
+    cache-duration: 30
+    always-use-message-format: true
+    use-code-as-default-message: true
+    fallback-to-system-locale: true

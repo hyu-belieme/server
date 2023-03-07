@@ -2,6 +2,8 @@ package com.example.beliemeserver.controller.api;
 
 import com.example.beliemeserver.controller.responsebody.ExceptionResponse;
 import com.example.beliemeserver.exception.*;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,12 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+    private final MessageSource messageSource;
+
+    public ApiExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAllException() {
         return handleExceptionInternal(new InternalServerException());
@@ -41,9 +49,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         ExceptionResponse errorBody = new ExceptionResponse(
                 errorInfo.name(),
-                errorInfo.responseMessage(),
+                getMessage(errorInfo.responseMessage(), null),
                 validationErrorList
         );
         return ResponseEntity.status(errorInfo.httpStatus()).body(errorBody);
+    }
+
+    private String getMessage(String code, Object[] args) {
+        return messageSource.getMessage(code, args, LocaleContextHolder.getLocale());
     }
 }
