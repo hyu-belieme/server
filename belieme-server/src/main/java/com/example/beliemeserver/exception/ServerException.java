@@ -1,5 +1,6 @@
 package com.example.beliemeserver.exception;
 
+import com.example.beliemeserver.common.Message;
 import org.springframework.http.HttpStatus;
 
 public abstract class ServerException extends RuntimeException {
@@ -17,8 +18,7 @@ public abstract class ServerException extends RuntimeException {
         return errorInfo.name();
     }
 
-    @Override
-    public String getMessage() {
+    public Message getResponseMessage() {
         return errorInfo.responseMessage();
     }
 }

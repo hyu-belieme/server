@@ -2,7 +2,6 @@ package com.example.beliemeserver.controller.responsebody;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
-import org.springframework.validation.FieldError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +34,6 @@ public class ExceptionResponse {
         public ValidationError(String field, String message) {
             this.field = field;
             this.message = message;
-        }
-
-        public static ValidationError of(final FieldError fieldError) {
-            return new ValidationError(
-                    fieldError.getField(), fieldError.getDefaultMessage());
         }
     }
 }
