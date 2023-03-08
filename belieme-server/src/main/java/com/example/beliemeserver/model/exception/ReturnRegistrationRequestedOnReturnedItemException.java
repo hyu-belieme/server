@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model.exception;
 
+import com.example.beliemeserver.common.Message;
 import com.example.beliemeserver.exception.ForbiddenException;
 
 public class ReturnRegistrationRequestedOnReturnedItemException extends ForbiddenException {
@@ -9,7 +10,7 @@ public class ReturnRegistrationRequestedOnReturnedItemException extends Forbidde
     }
 
     @Override
-    public String getMessage() {
-        return "해당 물품은 이미 반납되어 있는 상태입니다. 확인 후 다시 시도해 주십시오.";
+    public Message getResponseMessage() {
+        return new Message("error.returnRegistrationRequestedOnReturnedItem.message");
     }
 }
