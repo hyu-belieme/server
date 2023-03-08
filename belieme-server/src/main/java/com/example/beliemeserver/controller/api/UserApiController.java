@@ -10,53 +10,59 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "")
-public class UserApiController {
+public class UserApiController extends BaseApiController {
     private final UserService userService;
-    private final String HYU_UNIV_LOGIN_PATH = "/universities/" + Globals.HANYANG_UNIVERSITY.code() + "/login";
 
     public UserApiController(UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping("/my")
+    @GetMapping("/${api.myInfo}")
     public ResponseEntity<UserResponse> getMyUserInfo(
-            @RequestHeader("user-token") String userToken
+            @RequestHeader("${header.userToken}") String userToken
     ) {
         UserDto userDto = userService.getByToken(userToken);
         UserResponse response = UserResponse.from(userDto);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/universities/{university-code}/users/{student-id}")
+    @GetMapping("/${api.university}/${api.universityIndex}/${api.user}/${api.userIndex}")
     public ResponseEntity<UserResponse> getUserInfo(
-            @RequestHeader("user-token") String userToken,
-            @PathVariable("university-code") String universityCode,
-            @PathVariable("student-id") String studentId
+            @RequestHeader("${header.userToken}") String userToken,
+            @PathVariable Map<String, String> params
     ) {
+        String universityCode = params.get(universityIndexTag);
+        String studentId = params.get(userIndexTag);
+
         UserDto userDto = userService.getByIndex(userToken, universityCode, studentId);
-        UserResponse response = UserResponse.from(userDto);
+        UserResponse response = UserResponse.from(userDto).withoutSecureInfo();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/universities/{university-code}/departments/{department-code}/users")
+    @GetMapping("/${api.university}/${api.universityIndex}/${api.department}/${api.departmentIndex}/${api.user}")
     public ResponseEntity<List<UserResponse>> getUserListOfDepartment(
-            @RequestHeader("user-token") String userToken,
-            @PathVariable("university-code") String universityCode,
-            @PathVariable("department-code") String departmentCode
+            @RequestHeader("${header.userToken}") String userToken,
+            @PathVariable Map<String, String> params
     ) {
+        String universityCode = params.get(universityIndexTag);
+        String departmentCode = params.get(departmentIndexTag);
+
         List<UserDto> userDtoList = userService.getListByDepartment(userToken, universityCode, departmentCode);
-        List<UserResponse> responseList = toResponseList(userDtoList);
+        List<UserResponse> responseList = toResponseWithoutSecureInfoList(userDtoList);
         return ResponseEntity.ok(responseList);
     }
 
-    @PatchMapping("/universities/{university-code}/login")
+    @PatchMapping("/${api.university}/${api.universityIndex}/${api.loginExternalApi}")
     public ResponseEntity<UserResponse> loginByUniversityApi(
-            @RequestHeader("api-token") String apiToken,
-            @PathVariable("university-code") String universityCode
+            @RequestHeader("${header.externalApiToken}") String apiToken,
+            @PathVariable Map<String, String> params
     ) {
+        String universityCode = params.get(universityIndexTag);
+
         if (universityCode.equals(Globals.DEV_UNIVERSITY.code())) {
             UserDto userDto = userService.reloadDeveloperUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
@@ -71,10 +77,10 @@ public class UserApiController {
         throw new BadRequestException();
     }
 
-    private List<UserResponse> toResponseList(List<UserDto> userDtoList) {
+    private List<UserResponse> toResponseWithoutSecureInfoList(List<UserDto> userDtoList) {
         List<UserResponse> responseList = new ArrayList<>();
         for (UserDto dto : userDtoList) {
-            responseList.add(UserResponse.from(dto));
+            responseList.add(UserResponse.from(dto).withoutSecureInfo());
         }
         return responseList;
     }

@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/universities")
-public class UniversityApiController {
+@RequestMapping(path = "/${api.university}")
+public class UniversityApiController extends BaseApiController {
     private final UniversityService universityService;
-
 
     public UniversityApiController(UniversityService universityService) {
         this.universityService = universityService;
@@ -21,7 +21,7 @@ public class UniversityApiController {
 
     @GetMapping("")
     public ResponseEntity<List<UniversityResponse>> getAllUniversities(
-            @RequestHeader("user-token") String userToken
+            @RequestHeader("${header.userToken}") String userToken
     ) {
         List<UniversityDto> universityDtoList = universityService.getAllList(userToken);
         List<UniversityResponse> responseList = toResponseList(universityDtoList);
@@ -29,11 +29,13 @@ public class UniversityApiController {
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/{university-code}")
+    @GetMapping("/${api.universityIndex}")
     public ResponseEntity<UniversityResponse> getUniversity(
-            @RequestHeader("user-token") String userToken,
-            @PathVariable("university-code") String universityCode
+            @RequestHeader("${header.userToken}") String userToken,
+            @PathVariable Map<String, String> params
     ) {
+        String universityCode = params.get(universityIndexTag);
+
         UniversityDto universityDto = universityService.getByIndex(userToken, universityCode);
         UniversityResponse response = UniversityResponse.from(universityDto);
         return ResponseEntity.ok(response);

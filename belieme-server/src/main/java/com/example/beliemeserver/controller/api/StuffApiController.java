@@ -10,48 +10,55 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/universities/{university-code}/departments/{department-code}")
-public class StuffApiController {
+@RequestMapping(path = "/${api.university}/${api.universityIndex}/${api.department}/${api.departmentIndex}")
+public class StuffApiController extends BaseApiController {
     private final StuffService stuffService;
 
     public StuffApiController(StuffService stuffService) {
         this.stuffService = stuffService;
     }
 
-    @GetMapping("/stuffs")
+    @GetMapping("/${api.stuff}")
     public ResponseEntity<List<StuffResponse>> getAllStuffListOfDepartment(
-            @RequestHeader("user-token") String userToken,
-            @PathVariable("university-code") String universityCode,
-            @PathVariable("department-code") String departmentCode
+            @RequestHeader("${header.userToken}") String userToken,
+            @PathVariable Map<String, String> params
     ) {
+        String universityCode = params.get(universityIndexTag);
+        String departmentCode = params.get(departmentIndexTag);
+
         List<StuffDto> stuffDtoList = stuffService.getListByDepartment(
                 userToken, universityCode, departmentCode);
         List<StuffResponse> responseList = toResponseList(stuffDtoList);
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/stuffs/{stuff-name}")
+    @GetMapping("/${api.stuff}/${api.stuffIndex}")
     public ResponseEntity<StuffResponse> getStuff(
-            @RequestHeader("user-token") String userToken,
-            @PathVariable("university-code") String universityCode,
-            @PathVariable("department-code") String departmentCode,
-            @PathVariable("stuff-name") String stuffName
+            @RequestHeader("${header.userToken}") String userToken,
+            @PathVariable Map<String, String> params
     ) {
+        String universityCode = params.get(universityIndexTag);
+        String departmentCode = params.get(departmentIndexTag);
+        String stuffName = params.get(stuffIndexTag);
+
         StuffDto stuffDto = stuffService.getByIndex(
                 userToken, universityCode, departmentCode, stuffName);
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/stuffs")
+    @PostMapping("/${api.stuff}")
     public ResponseEntity<StuffResponse> createNewStuff(
-            @RequestHeader("user-token") String userToken,
-            @PathVariable("university-code") String universityCode,
-            @PathVariable("department-code") String departmentCode,
+            @RequestHeader("${header.userToken}") String userToken,
+            @PathVariable Map<String, String> params,
             @RequestBody @Valid StuffRequest newStuff
     ) {
+        String universityCode = params.get(universityIndexTag);
+        String departmentCode = params.get(departmentIndexTag);
+
         StuffDto stuffDto = stuffService.create(
                 userToken, universityCode, departmentCode,
                 newStuff.getName(), newStuff.getEmoji(), newStuff.getAmount());
@@ -59,14 +66,16 @@ public class StuffApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/stuffs/{stuff-name}")
+    @PatchMapping("/${api.stuff}/${api.stuffIndex}")
     public ResponseEntity<StuffResponse> updateStuff(
-            @RequestHeader("user-token") String userToken,
-            @PathVariable("university-code") String universityCode,
-            @PathVariable("department-code") String departmentCode,
-            @PathVariable("stuff-name") String stuffName,
+            @RequestHeader("${header.userToken}") String userToken,
+            @PathVariable Map<String, String> params,
             @RequestBody @Valid StuffRequest newStuff
     ) {
+        String universityCode = params.get(universityIndexTag);
+        String departmentCode = params.get(departmentIndexTag);
+        String stuffName = params.get(stuffIndexTag);
+
         StuffDto stuffDto = stuffService.update(
                 userToken, universityCode, departmentCode, stuffName,
                 newStuff.getName(), newStuff.getEmoji());
