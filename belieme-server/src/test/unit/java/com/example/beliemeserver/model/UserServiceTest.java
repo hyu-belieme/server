@@ -2,10 +2,10 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.common.DeveloperInfo;
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.BadGatewayException;
-import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.exception.UnauthorizedException;
+import com.example.beliemeserver.error.exception.BadGatewayException;
+import com.example.beliemeserver.error.exception.ForbiddenException;
+import com.example.beliemeserver.error.exception.NotFoundException;
+import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UniversityDto;

@@ -2,9 +2,9 @@ package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.common.DeveloperInfo;
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.ForbiddenException;
-import com.example.beliemeserver.exception.NotFoundException;
-import com.example.beliemeserver.exception.UnauthorizedException;
+import com.example.beliemeserver.error.exception.ForbiddenException;
+import com.example.beliemeserver.error.exception.NotFoundException;
+import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;

@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model.exception;
 
 import com.example.beliemeserver.common.Message;
-import com.example.beliemeserver.exception.BadRequestException;
+import com.example.beliemeserver.error.exception.BadRequestException;
 
 public class IndexInvalidException extends BadRequestException {
     @Override

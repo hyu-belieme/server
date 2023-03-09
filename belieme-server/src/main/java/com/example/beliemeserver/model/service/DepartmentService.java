@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model.service;
 
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.exception.IndexInvalidException;

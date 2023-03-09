@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.UniversityService;

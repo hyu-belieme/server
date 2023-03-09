@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.service.HistoryService;

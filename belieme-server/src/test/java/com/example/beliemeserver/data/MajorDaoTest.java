@@ -1,7 +1,7 @@
 package com.example.beliemeserver.data;
 
-import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.MajorDao;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.util.DummyDataSet;
