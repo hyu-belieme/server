@@ -2,7 +2,7 @@ package com.example.beliemeserver.data.daoimpl;
 
 import com.example.beliemeserver.data.entity.*;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.model.dao.HistoryDao;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.dto.UserDto;

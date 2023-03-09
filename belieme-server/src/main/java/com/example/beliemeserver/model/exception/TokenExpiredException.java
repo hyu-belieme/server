@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model.exception;
 
 import com.example.beliemeserver.common.Message;
-import com.example.beliemeserver.exception.UnauthorizedException;
+import com.example.beliemeserver.error.exception.UnauthorizedException;
 
 public class TokenExpiredException extends UnauthorizedException {
     @Override

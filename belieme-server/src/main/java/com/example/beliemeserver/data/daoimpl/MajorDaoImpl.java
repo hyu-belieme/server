@@ -3,7 +3,7 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.MajorEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.model.dao.MajorDao;
 import com.example.beliemeserver.model.dto.MajorDto;
 import org.springframework.stereotype.Component;

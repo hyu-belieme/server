@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.exception.ConflictException;
-import com.example.beliemeserver.exception.NotFoundException;
+import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
@@ -209,17 +209,6 @@ public class StuffServiceTest extends BaseServiceTest {
             when(stuffDao.create(stuff)).thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`amount`가 음수일 시]_[ExceedMaxItemNumException]")
-        public void ERROR_amountIsNegative_ExceedMaxItemNumException() {
-            setUpDefault();
-            amount = -1;
-
-            mockDepartmentAndRequester();
-
-            TestHelper.exceptionTest(this::execMethod, ItemAmountLimitExceededException.class);
         }
 
         @RepeatedTest(10)

@@ -5,7 +5,7 @@ import com.example.beliemeserver.data.entity.AuthorityUserJoinEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.entity.UserEntity;
 import com.example.beliemeserver.data.repository.*;
-import com.example.beliemeserver.exception.ConflictException;
+import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.model.dao.UserDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.UserDto;

@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model.exception;
 
 import com.example.beliemeserver.common.Message;
-import com.example.beliemeserver.exception.ForbiddenException;
+import com.example.beliemeserver.error.exception.ForbiddenException;
 
 public class UsableItemNotExistedException extends ForbiddenException {
     @Override

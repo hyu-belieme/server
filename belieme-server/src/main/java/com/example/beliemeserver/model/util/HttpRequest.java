@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model.util;
 
 import com.example.beliemeserver.common.Globals;
-import com.example.beliemeserver.exception.BadGatewayException;
+import com.example.beliemeserver.error.exception.BadGatewayException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
