@@ -122,7 +122,7 @@ public class HistoryEntity extends DataEntity {
 
     public HistoryEntity setRequester(UserEntity requester) {
         this.requester = requester;
-        this.requesterId = requester.getId();
+        this.requesterId = getIdOrElse(requester, null);
         return this;
     }
 

@@ -170,6 +170,7 @@ public class HistoryService extends BaseService {
         }
 
         newHistory = item.lastHistory()
+                .withItem(item)
                 .withLostManager(requester)
                 .withLostTimeStamp(System.currentTimeMillis() / 1000);
 
@@ -195,6 +196,7 @@ public class HistoryService extends BaseService {
         }
 
         HistoryDto newHistory = lastHistory
+                .withItem(item)
                 .withApproveManager(requester)
                 .withApproveTimeStamp(System.currentTimeMillis() / 1000);
 
@@ -222,6 +224,7 @@ public class HistoryService extends BaseService {
         }
 
         HistoryDto newHistory = lastHistory
+                .withItem(item)
                 .withReturnManager(requester)
                 .withReturnTimeStamp(System.currentTimeMillis() / 1000);
 
@@ -247,6 +250,7 @@ public class HistoryService extends BaseService {
         }
 
         HistoryDto newHistory = lastHistory
+                .withItem(item)
                 .withCancelManager(requester)
                 .withCancelTimeStamp(System.currentTimeMillis() / 1000);
 
