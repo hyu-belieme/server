@@ -11,16 +11,16 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 public class StuffRequest {
-    @Size(min= 1, max= 30, message = "1 글자에서 30 글자까지 허용됩니다.")
-    @Pattern(regexp = "[\\p{L}\\d() ]+", message = "문자와 숫자 그리고 공백만 허용됩니다.")
+    @Size(min= 1, max= 30, message = "{error.badRequest.outOfSize.message}")
+    @Pattern(regexp = "[\\p{L}\\d() ]+", message = "{error.badRequest.containsNonLetter.message}")
     @JsonProperty("name")
     String name;
 
-    @Size(min= 1, max= 5, message = "1 글자에서 5 글자까지 허용됩니다.")
+    @Size(min= 1, max= 5, message = "{error.badRequest.outOfSize.message}")
     @JsonProperty("emoji")
     String emoji;
 
-    @PositiveOrZero(message = "음수는 허용되지 않습니다.")
+    @PositiveOrZero(message = "{error.badRequest.containsNegative.message}")
     @JsonProperty("amount")
     Integer amount;
 }
