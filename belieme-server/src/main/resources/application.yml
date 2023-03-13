@@ -9,7 +9,7 @@ logging:
 
 spring:
   config:
-    import: classpath:urls/url.yml
+    import: classpath:apis/api.yml
   profiles:
     include: url
   data:
