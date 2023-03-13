@@ -1,12 +1,13 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.common.InitialInfos;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
+import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.model.util.Constants;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,8 @@ import java.util.List;
 
 @Service
 public class ItemService extends BaseService {
-    public ItemService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
-        super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
+    public ItemService(InitialInfos initialInfos, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        super(initialInfos, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public List<ItemDto> getListByStuff(

@@ -16,15 +16,6 @@ public class Globals {
     public static final String HANYANG_API_CLIENT_TOKEN = "a4b1abe746f384c3d43fa82a17f222";
     public static final String HANYANG_API_URL = "https://api.hanyang.ac.kr/rs/user/loginInfo.json";
 
-    public static final List<UniversityDto> universities = List.of(
-            DEV_UNIVERSITY,
-            HANYANG_UNIVERSITY
-    );
-
-    public static final List<DepartmentDto> initialDepartments = List.of(
-            DEV_DEPARTMENT
-    );
-
     public static final List<DeveloperInfo> developers = List.of(
             new DeveloperInfo("c305ee87-a4c7-4b5a-8d71-7e23b6064613", "DEV1", "개발자1")
     );

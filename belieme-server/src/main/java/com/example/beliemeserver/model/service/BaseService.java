@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.common.InitialInfos;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public abstract class BaseService {
+    protected final InitialInfos initialInfos;
+
     protected final UniversityDao universityDao;
     protected final DepartmentDao departmentDao;
     protected final UserDao userDao;
@@ -25,7 +28,8 @@ public abstract class BaseService {
 
     public static final long TOKEN_EXPIRED_TIME = 3L * 30 * 24 * 60 * 60;
 
-    public BaseService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public BaseService(InitialInfos initialInfos, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        this.initialInfos = initialInfos;
         this.universityDao = universityDao;
         this.departmentDao = departmentDao;
         this.userDao = userDao;

@@ -1,0 +1,41 @@
+init :
+  universities :
+    DEV :
+      code : "DEV"
+      name : "DEV"
+      external-api-info :
+        url : "DEV"
+
+    HYU :
+      code : "HYU"
+      name : "\uD55C\uC591\uB300\uD559\uAD50"
+      external-api-info :
+        url : "https://api.hanyang.ac.kr/rs/user/loginInfo.json"
+        cilent-token : "a4b1abe746f384c3d43fa82a17f222"
+
+    CKU :
+      code: "CKU"
+      name: "\uAC00\uD1A8\uB9AD \uAD00\uB3D9\uB300\uD559\uAD50"
+      external-api-info: {}
+
+  departments :
+    DEV_DEV :
+      university-code : "DEV"
+      code : "DEV"
+      name : "DEV"
+      base-majors : []
+
+    DEV_TEST:
+      university-code: "DEV"
+      code: "TEST"
+      name: "TEST"
+      base-majors: []
+
+  users :
+    - api-token : "c305ee87-a4c7-4b5a-8d71-7e23b6064613"
+      student-id : "DEV1"
+      name : "\uAC1C\uBC1C\uC7901"
+      authorities :
+        - university-code : "DEV"
+          department-code : "DEV"
+          permission : "DEVELOPER"
