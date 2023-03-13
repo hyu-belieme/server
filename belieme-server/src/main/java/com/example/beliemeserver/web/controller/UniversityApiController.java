@@ -1,8 +1,8 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.web.responsebody.UniversityResponse;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.service.UniversityService;
+import com.example.beliemeserver.web.responsebody.UniversityResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/${api.university}")
+@RequestMapping(path = "/${api.keyword.university}")
 public class UniversityApiController extends BaseApiController {
     private final UniversityService universityService;
 
@@ -21,7 +21,7 @@ public class UniversityApiController extends BaseApiController {
 
     @GetMapping("")
     public ResponseEntity<List<UniversityResponse>> getAllUniversities(
-            @RequestHeader("${header.userToken}") String userToken
+            @RequestHeader("${api.header.user-token}") String userToken
     ) {
         List<UniversityDto> universityDtoList = universityService.getAllList(userToken);
         List<UniversityResponse> responseList = toResponseList(universityDtoList);
@@ -29,12 +29,12 @@ public class UniversityApiController extends BaseApiController {
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/${api.universityIndex}")
+    @GetMapping("/${api.keyword.university-index}")
     public ResponseEntity<UniversityResponse> getUniversity(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
 
         UniversityDto universityDto = universityService.getByIndex(userToken, universityCode);
         UniversityResponse response = UniversityResponse.from(universityDto);

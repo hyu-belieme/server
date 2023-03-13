@@ -1,0 +1,39 @@
+api :
+  keyword :
+    university : "universities"
+    department : "departments"
+    user : "users"
+    my-info : "my"
+    login-external-api : "login"
+    stuff : "stuffs"
+    item : "items"
+    history : "histories"
+    do-reserve : "reserve"
+    do-approve : "approve"
+    do-return : "return"
+    do-lost : "lost"
+    do-cancel : "cancel"
+
+    university-index: "{${api.variable.university-index}}"
+    department-index: "{${api.variable.department-index}}"
+    user-index: "{${api.variable.user-index}}"
+    stuff-index: "{${api.variable.stuff-index}}"
+    item-index: "{${api.variable.item-index}}"
+    history-index: "{${api.variable.history-index}}"
+
+  variable :
+    university-index : "university-code"
+    department-index : "department-code"
+    user-index : "student-id"
+    stuff-index : "stuff-name"
+    item-index : "item-num"
+    history-index : "history-num"
+
+  query :
+    requester-university-code : "requester-university-code"
+    requester-student-id : "requester-student-id"
+
+  header :
+    user-token : "user-token"
+    external-api-token : "api-token"
+

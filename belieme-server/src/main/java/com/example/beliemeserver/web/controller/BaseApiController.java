@@ -1,25 +1,9 @@
 package com.example.beliemeserver.web.controller;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import com.example.beliemeserver.common.ApiProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@PropertySource("classpath:urls/url.properties")
 public abstract class BaseApiController {
-    @Value("${parameter.universityIndexTag}")
-    protected String universityIndexTag;
-
-    @Value("${parameter.departmentIndexTag}")
-    protected String departmentIndexTag;
-
-    @Value("${parameter.userIndexTag}")
-    protected String userIndexTag;
-
-    @Value("${parameter.stuffIndexTag}")
-    protected String stuffIndexTag;
-
-    @Value("${parameter.itemIndexTag}")
-    protected String itemIndexTag;
-
-    @Value("${parameter.historyIndexTag}")
-    protected String historyIndexTag;
+    @Autowired
+    protected ApiProperties api;
 }

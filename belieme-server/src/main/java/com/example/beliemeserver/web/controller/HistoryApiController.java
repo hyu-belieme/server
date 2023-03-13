@@ -1,9 +1,9 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.web.responsebody.HistoryResponse;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.model.dto.HistoryDto;
 import com.example.beliemeserver.model.service.HistoryService;
+import com.example.beliemeserver.web.responsebody.HistoryResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/${api.university}/${api.universityIndex}/${api.department}/${api.departmentIndex}")
+@RequestMapping(path = "/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}")
 public class HistoryApiController extends BaseApiController {
     private final HistoryService historyService;
 
@@ -20,15 +20,15 @@ public class HistoryApiController extends BaseApiController {
         this.historyService = historyService;
     }
 
-    @GetMapping("/${api.history}")
+    @GetMapping("/${api.keyword.history}")
     public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfDepartment(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params,
-            @RequestParam(value = "${requestQuery.requester.univCode}", required = false) String requesterUniversityCode,
-            @RequestParam(value = "${requestQuery.requester.studentId}", required = false) String requesterStudentId
+            @RequestParam(value = "${api.query.requester-university-code}", required = false) String requesterUniversityCode,
+            @RequestParam(value = "${api.query.requester-student-id}", required = false) String requesterStudentId
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
 
         if (requesterUniversityCode == null && requesterStudentId == null) {
             List<HistoryDto> historyDtoList = historyService.getListByDepartment(
@@ -49,14 +49,14 @@ public class HistoryApiController extends BaseApiController {
         throw new BadRequestException();
     }
 
-    @GetMapping("/${api.stuff}/${api.stuffIndex}/${api.history}")
+    @GetMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.history}")
     public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfStuff(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
 
         List<HistoryDto> historyDtoList = historyService.getListByStuff(
                 userToken, universityCode, departmentCode, stuffName);
@@ -64,15 +64,15 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/${api.stuff}/${api.stuffIndex}/${api.item}/${api.itemIndex}/${api.history}")
+    @GetMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.history}")
     public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfItem(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         List<HistoryDto> historyDtoList = historyService.getListByItem(
                 userToken, universityCode, departmentCode, stuffName, itemNum);
@@ -80,16 +80,16 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/${api.stuff}/${api.stuffIndex}/${api.item}/${api.itemIndex}/${api.history}/${api.historyIndex}")
+    @GetMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.history}/${api.keyword.history-index}")
     public ResponseEntity<HistoryResponse> getHistory(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
-        int historyNum = Integer.parseInt(params.get(historyIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
+        int historyNum = Integer.parseInt(params.get(api.variable().historyIndex()));
 
         HistoryDto historyDto = historyService.getByIndex(
                 userToken, universityCode, departmentCode,
@@ -98,14 +98,14 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.stuff}/${api.stuffIndex}/${api.reserve}")
+    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.do-reserve}")
     public ResponseEntity<HistoryResponse> reserveStuff(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
 
         HistoryDto historyDto = historyService.createReservation(
                 userToken, universityCode, departmentCode,
@@ -114,15 +114,15 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.stuff}/${api.stuffIndex}/${api.item}/${api.itemIndex}/${api.reserve}")
+    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-reserve}")
     public ResponseEntity<HistoryResponse> reserveItem(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         HistoryDto historyDto = historyService.createReservation(
                 userToken, universityCode, departmentCode,
@@ -131,15 +131,15 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.stuff}/${api.stuffIndex}/${api.item}/${api.itemIndex}/${api.lost}")
+    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-lost}")
     public ResponseEntity<HistoryResponse> makeItemLost(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         HistoryDto historyDto = historyService.makeItemLost(
                 userToken, universityCode, departmentCode,
@@ -148,15 +148,15 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.stuff}/${api.stuffIndex}/${api.item}/${api.itemIndex}/${api.approve}")
+    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-approve}")
     public ResponseEntity<HistoryResponse> makeItemApprove(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         HistoryDto historyDto = historyService.makeItemUsing(
                 userToken, universityCode, departmentCode,
@@ -165,15 +165,15 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.stuff}/${api.stuffIndex}/${api.item}/${api.itemIndex}/${api.return}")
+    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-return}")
     public ResponseEntity<HistoryResponse> makeItemReturn(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         HistoryDto historyDto = historyService.makeItemReturn(
                 userToken, universityCode, departmentCode,
@@ -182,15 +182,15 @@ public class HistoryApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.stuff}/${api.stuffIndex}/${api.item}/${api.itemIndex}/${api.cancel}")
+    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-cancel}")
     public ResponseEntity<HistoryResponse> makeItemCancel(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         HistoryDto historyDto = historyService.makeItemCancel(
                 userToken, universityCode, departmentCode,

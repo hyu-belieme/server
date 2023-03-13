@@ -8,6 +8,10 @@ logging:
 
 
 spring:
+  config:
+    import: classpath:urls/url.yml
+  profiles:
+    include: url
   data:
     jdbc:
       repositories.enabled: false

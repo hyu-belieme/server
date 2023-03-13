@@ -6,7 +6,6 @@ import com.example.beliemeserver.web.requestbody.DepartmentRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentUpdateValidationGroup;
 import com.example.beliemeserver.web.responsebody.DepartmentResponse;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@PropertySource("classpath:urls/url.properties")
 @RequestMapping(path = "")
 public class DepartmentApiController extends BaseApiController {
     private final DepartmentService departmentService;
@@ -25,35 +23,35 @@ public class DepartmentApiController extends BaseApiController {
         this.departmentService = departmentService;
     }
 
-    @GetMapping("/${api.department}")
+    @GetMapping("/${api.keyword.department}")
     public ResponseEntity<List<DepartmentResponse>> getAccessibleDepartmentList(
-            @RequestHeader("${header.userToken}") String userToken
+            @RequestHeader("${api.header.user-token}") String userToken
     ) {
         List<DepartmentDto> departmentDtoList = departmentService.getAccessibleList(userToken);
         List<DepartmentResponse> responseList = toResponseList(departmentDtoList);
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/${api.university}/${api.universityIndex}/${api.department}/${api.departmentIndex}")
+    @GetMapping("/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}")
     public ResponseEntity<DepartmentResponse> getDepartment(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
 
         DepartmentDto departmentDto = departmentService.getByIndex(userToken, universityCode, departmentCode);
         DepartmentResponse response = DepartmentResponse.from(departmentDto);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/${api.university}/${api.universityIndex}/${api.department}")
+    @PostMapping("/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}")
     public ResponseEntity<DepartmentResponse> createNewDepartment(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(DepartmentCreateValidationGroup.class) DepartmentRequest newDepartment
     ) {
-        String universityCode = params.get(universityIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
 
         DepartmentDto newDepartmentDto = departmentService.create(
                 userToken, universityCode, newDepartment.getCode(),
@@ -63,14 +61,14 @@ public class DepartmentApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.university}/${api.universityIndex}/${api.department}/${api.departmentIndex}")
+    @PatchMapping("/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}")
     public ResponseEntity<DepartmentResponse> updateDepartment(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(DepartmentUpdateValidationGroup.class) DepartmentRequest newDepartment
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
 
         DepartmentDto newDepartmentDto = departmentService.update(
                 userToken, universityCode, departmentCode,
