@@ -203,29 +203,40 @@ public record HistoryDto(
         return System.currentTimeMillis() / 1000;
     }
 
-    public long expiredTime() {
+    private long expiredTime() {
         return reservedTimeStamp + 15 * 60;
     }
 
-    public long dueTime() {
+    private long dueTime() {
         TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
-        Calendar tmp = Calendar.getInstance();
 
-        tmp.setTime(new Date(approveTimeStamp * 1000));
-        tmp.setTimeZone(timeZone);
-        tmp.add(Calendar.DATE, 7);
-        if (tmp.get(Calendar.HOUR_OF_DAY) > 18) {
-            tmp.add(Calendar.DATE, 1);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(approveTimeStamp * 1000));
+        calendar.setTimeZone(timeZone);
+
+        moveTo7DayAfter17_59(calendar);
+        moveToWeekDay(calendar);
+        return calendar.getTime().getTime() / 1000;
+    }
+
+    private void moveToWeekDay(Calendar calendar) {
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+            calendar.add(Calendar.DATE, 2);
+            return;
         }
-        tmp.set(Calendar.HOUR_OF_DAY, 17);
-        tmp.set(Calendar.MINUTE, 59);
-        tmp.set(Calendar.SECOND, 59);
-        if (tmp.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-            tmp.add(Calendar.DATE, 2);
-        } else if (tmp.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
-            tmp.add(Calendar.DATE, 1);
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+            calendar.add(Calendar.DATE, 1);
         }
-        return tmp.getTime().getTime() / 1000;
+    }
+
+    private void moveTo7DayAfter17_59(Calendar calendar) {
+        calendar.add(Calendar.DATE, 7);
+        if (calendar.get(Calendar.HOUR_OF_DAY) > 18) {
+            calendar.add(Calendar.DATE, 1);
+        }
+        calendar.set(Calendar.HOUR_OF_DAY, 17);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
     }
 
     public enum HistoryStatus {
