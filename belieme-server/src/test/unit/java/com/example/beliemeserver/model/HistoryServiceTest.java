@@ -788,7 +788,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[해당 `item`이 대여 중 분실 되었을 시]_[-]")
         public void SUCCESS_itemIsUnusable() {
             setUpDefault();
-            setItem(randomUnusableItemOnDept(dept));
+            setItem(randomUsingOrDelayedItemByDept(dept));
 
             mockDepartmentAndRequester();
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
@@ -807,6 +807,19 @@ public class HistoryServiceTest extends BaseServiceTest {
             Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
             Assertions.assertThat(historyLostManager).isEqualTo(requester);
             Assertions.assertThat(historyLostTimestamp).isNotZero();
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[`item`이 대여 요청이 들어 온 상태일 시]_[LostRegistrationOnReservedItemException]")
+        public void ERROR_itemIsReserved_LostRegistrationOnReservedItemException() {
+            setUpDefault();
+            setItem(randomReservedItemByDept(dept));
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
+                    .thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, LostRegistrationRequestedOnReservedItemException.class);
         }
 
         @RepeatedTest(10)
@@ -1164,6 +1177,12 @@ public class HistoryServiceTest extends BaseServiceTest {
         return randomSelectAndLog(items);
     }
 
+    private ItemDto randomUsingOrDelayedItemByDept(DepartmentDto dept) {
+        RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
+        items = usingOrDelayedItems(items);
+        return randomSelectAndLog(items);
+    }
+
     private ItemDto randomReturnAbleItemByDept(DepartmentDto dept) {
         RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
         items = returnableItems(items);
@@ -1217,6 +1236,12 @@ public class HistoryServiceTest extends BaseServiceTest {
     private RandomGetter<ItemDto> reservedItems(RandomGetter<ItemDto> items) {
         return items.filter((item) -> item.lastHistory() != null
                 && item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED);
+    }
+
+    private RandomGetter<ItemDto> usingOrDelayedItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.lastHistory() != null
+                && (item.lastHistory().status() == HistoryDto.HistoryStatus.USING
+                || item.lastHistory().status() == HistoryDto.HistoryStatus.DELAYED));
     }
 
     private RandomGetter<ItemDto> returnableItems(RandomGetter<ItemDto> items) {
