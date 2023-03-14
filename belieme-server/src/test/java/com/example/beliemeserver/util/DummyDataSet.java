@@ -77,7 +77,7 @@ public class DummyDataSet {
 
         authorityDummies = new ArrayList<>();
         for (int i = 0; i < departmentDummies.size() - 1; i++) {
-            for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+            for (Permission permission : Permission.values()) {
                 authorityDummies.add(new AuthorityDto(departmentDummies.get(i), permission));
             }
         }

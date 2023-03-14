@@ -113,7 +113,7 @@ public class DepartmentService extends BaseService {
     }
 
     private void createOrUpdateAuthorities(DepartmentDto department) {
-        for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+        for (Permission permission : Permission.values()) {
             if (!authorityDao.checkExistByIndex(department.university().code(), department.code(), permission)) {
                 authorityDao.create(new AuthorityDto(department, permission));
                 continue;

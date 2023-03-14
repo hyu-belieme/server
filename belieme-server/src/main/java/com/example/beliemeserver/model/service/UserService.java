@@ -7,10 +7,7 @@ import com.example.beliemeserver.config.initdata.container.UserInfo;
 import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.UniversityDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.util.HttpRequest;
 import lombok.NonNull;
@@ -41,7 +38,7 @@ public class UserService extends BaseService {
 
         List<UserDto> output = new ArrayList<>();
         for (UserDto user : userDao.getAllList()) {
-            if (user.getMaxPermission(department).hasMorePermission(AuthorityDto.Permission.USER)) {
+            if (user.getMaxPermission(department).hasMorePermission(Permission.USER)) {
                 output.add(user);
             }
         }
@@ -68,7 +65,7 @@ public class UserService extends BaseService {
             @NonNull String universityCode, @NonNull String studentId,
             @NonNull String authorityUniversityCode,
             @NonNull String authorityDepartmentCode,
-            AuthorityDto.Permission newPermission
+            Permission newPermission
     ) {
         UserDto requester = validateTokenAndGetUser(userToken);
 
@@ -189,20 +186,20 @@ public class UserService extends BaseService {
             String departmentCode = authorityInfo.departmentCode();
             String permissionText = authorityInfo.permission();
             DepartmentDto department = departmentDao.getByIndex(universityCode, departmentCode);
-            newAuthorities.add(new AuthorityDto(department, AuthorityDto.Permission.create(permissionText)));
+            newAuthorities.add(new AuthorityDto(department, Permission.valueOf(permissionText)));
         }
         return newAuthorities;
     }
 
     private List<AuthorityDto> makeNewAuthorities(UserDto user, List<String> newMajorCodes) {
         List<AuthorityDto> newAuthorities = user.authorities();
-        newAuthorities.removeIf((authority) -> authority.permission() == AuthorityDto.Permission.DEFAULT);
+        newAuthorities.removeIf((authority) -> authority.permission() == Permission.DEFAULT);
 
         List<DepartmentDto> candidateDepartments = departmentDao.getListByUniversity(user.university().code());
         for (DepartmentDto department : candidateDepartments) {
             if (notContainAnyMajorCodesInBaseMajors(department, newMajorCodes)) continue;
 
-            AuthorityDto newAuthority = new AuthorityDto(department, AuthorityDto.Permission.DEFAULT);
+            AuthorityDto newAuthority = new AuthorityDto(department, Permission.DEFAULT);
             if (!newAuthorities.contains(newAuthority)) {
                 newAuthorities.add(newAuthority);
             }

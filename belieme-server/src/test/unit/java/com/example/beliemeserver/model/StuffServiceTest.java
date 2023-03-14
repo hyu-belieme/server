@@ -2,10 +2,7 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.ItemDto;
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.model.service.StuffService;
 import com.example.beliemeserver.util.TestHelper;
@@ -39,7 +36,7 @@ public class StuffServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
 
             stuffList = getStuffListByDept(dept);
         }
@@ -80,7 +77,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
             setStuff(randomStuffOnDept(dept));
         }
 
@@ -137,7 +134,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setStuff(randomStuffOnDept(dept).withItems(new ArrayList<>()));
             amount = 5;
         }
@@ -158,7 +155,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.USER));
         }
 
         @RepeatedTest(10)
@@ -235,7 +232,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setStuff(randomStuffOnDept(dept));
             newStuffName = "changed";
             newStuffEmoji = "𝌡";
@@ -256,7 +253,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.USER));
         }
 
         @RepeatedTest(10)

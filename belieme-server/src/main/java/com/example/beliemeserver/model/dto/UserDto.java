@@ -88,7 +88,7 @@ public record UserDto(
         return output;
     }
 
-    public UserDto withAuthorityUpdate(DepartmentDto department, AuthorityDto.Permission permission) {
+    public UserDto withAuthorityUpdate(DepartmentDto department, Permission permission) {
         UserDto output = new UserDto(university, studentId, name, token, createTimeStamp, approvalTimeStamp, authorities);
 
         if (permission == null) {
@@ -153,21 +153,21 @@ public record UserDto(
         return false;
     }
 
-    public AuthorityDto.Permission getMaxPermission(DepartmentDto department) {
-        if (isDeveloper()) return AuthorityDto.Permission.DEVELOPER;
+    public Permission getMaxPermission(DepartmentDto department) {
+        if (isDeveloper()) return Permission.DEVELOPER;
 
-        AuthorityDto.Permission maxPermission = AuthorityDto.Permission.BANNED;
+        Permission maxPermission = Permission.BANNED;
         for (AuthorityDto authority : authorities) {
             if (department.equals(authority.department())
-                    && authority.permission() == AuthorityDto.Permission.DEFAULT) {
-                maxPermission = AuthorityDto.Permission.USER;
+                    && authority.permission() == Permission.DEFAULT) {
+                maxPermission = Permission.USER;
                 break;
             }
         }
 
         for (AuthorityDto authority : authorities) {
             if (department.equals(authority.department())
-                    && authority.permission() != AuthorityDto.Permission.DEFAULT) {
+                    && authority.permission() != Permission.DEFAULT) {
                 maxPermission = authority.permission();
                 break;
             }
@@ -177,9 +177,9 @@ public record UserDto(
 
     private void overwriteAuthority(List<AuthorityDto> list, AuthorityDto newAuthority) {
         DepartmentDto targetDepartment = newAuthority.department();
-        AuthorityDto.Permission newPermission = newAuthority.permission();
-        if (newPermission == AuthorityDto.Permission.DEFAULT) {
-            newPermission = AuthorityDto.Permission.USER;
+        Permission newPermission = newAuthority.permission();
+        if (newPermission == Permission.DEFAULT) {
+            newPermission = Permission.USER;
         }
 
         boolean notExist = true;
@@ -188,7 +188,7 @@ public record UserDto(
             if (!department.matchUniqueKey(targetDepartment)) continue;
             notExist = false;
 
-            if (newAuthority.permission() != AuthorityDto.Permission.DEFAULT) {
+            if (newAuthority.permission() != Permission.DEFAULT) {
                 list.set(i, new AuthorityDto(department, newPermission));
             }
             break;

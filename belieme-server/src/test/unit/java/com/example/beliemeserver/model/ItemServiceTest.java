@@ -2,10 +2,7 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.ItemDto;
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.*;
 import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.service.ItemService;
@@ -40,7 +37,7 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
             setStuff(randomStuffOnDept(dept));
 
             itemList = getItemListByStuff(stuff);
@@ -97,7 +94,7 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
             setItem(randomItemOnDept(dept));
         }
 
@@ -153,7 +150,7 @@ public class ItemServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
 
             StuffDto targetStuff = randomStuffOnDept(dept);
             setItem(ItemDto.init(targetStuff, targetStuff.nextItemNum()));
@@ -167,7 +164,7 @@ public class ItemServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.USER));
         }
 
         @Override

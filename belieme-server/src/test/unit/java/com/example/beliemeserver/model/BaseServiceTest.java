@@ -99,7 +99,7 @@ public abstract class BaseServiceTest {
         }
 
         protected void setRequesterAccessDenied() {
-            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.USER);
+            requester = randomUserHaveLessPermissionOnDept(dept, Permission.USER);
         }
 
         protected void mockDepartmentAndRequester() {
@@ -155,7 +155,7 @@ public abstract class BaseServiceTest {
         return new RandomGetter<>(stub.ALL_DEPTS);
     }
 
-    protected RandomGetter<AuthorityDto.Permission> allPermissions() {
+    protected RandomGetter<Permission> allPermissions() {
         return new RandomGetter<>(stub.ALL_PERMISSIONS);
     }
 
@@ -187,15 +187,15 @@ public abstract class BaseServiceTest {
         return rs.filter((user) -> !user.isDeveloper());
     }
 
-    protected RandomGetter<UserDto> usersHaveLessPermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, AuthorityDto.Permission permission) {
+    protected RandomGetter<UserDto> usersHaveLessPermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, Permission permission) {
         return rs.filter((user) -> !user.getMaxPermission(dept).hasMorePermission(permission));
     }
 
-    protected RandomGetter<UserDto> usersHaveMorePermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, AuthorityDto.Permission permission) {
+    protected RandomGetter<UserDto> usersHaveMorePermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, Permission permission) {
         return rs.filter((user) -> user.getMaxPermission(dept).hasMorePermission(permission));
     }
 
-    protected RandomGetter<UserDto> usersHaveExactPermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, AuthorityDto.Permission permission) {
+    protected RandomGetter<UserDto> usersHaveExactPermissionOnDept(RandomGetter<UserDto> rs, DepartmentDto dept, Permission permission) {
         return rs.filter((user) -> user.getMaxPermission(dept) == permission);
     }
 
@@ -233,17 +233,17 @@ public abstract class BaseServiceTest {
         return randomSelectAndLog(usersNotDev(allUsers()));
     }
 
-    protected UserDto randomUserHaveMorePermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+    protected UserDto randomUserHaveMorePermissionOnDept(DepartmentDto dept, Permission permission) {
         return randomSelectAndLog(
                 usersHaveMorePermissionOnDept(allUsers(), dept, permission));
     }
 
-    protected UserDto randomUserHaveLessPermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+    protected UserDto randomUserHaveLessPermissionOnDept(DepartmentDto dept, Permission permission) {
         return randomSelectAndLog(
                 usersHaveLessPermissionOnDept(allUsers(), dept, permission));
     }
 
-    protected UserDto randomUserHaveExactPermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+    protected UserDto randomUserHaveExactPermissionOnDept(DepartmentDto dept, Permission permission) {
         return randomSelectAndLog(
                 usersHaveExactPermissionOnDept(allUsers(), dept, permission));
     }

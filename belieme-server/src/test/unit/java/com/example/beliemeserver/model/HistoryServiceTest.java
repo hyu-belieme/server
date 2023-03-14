@@ -41,7 +41,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
 
             historyList = getHistoryListByDept(dept);
         }
@@ -49,7 +49,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setRequesterAccessDenied() {
             setRequester(randomUserHaveLessPermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
         }
 
         @Override
@@ -92,7 +92,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
             setStuff(randomStuffOnDept(dept));
             historyList = getHistoryListByStuff(stuff);
         }
@@ -105,7 +105,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setRequesterAccessDenied() {
             setRequester(randomUserHaveLessPermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
         }
 
         @Override
@@ -168,7 +168,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
             setItem(randomItemOnDept(dept));
 
             historyList = getHistoryListByItem(item);
@@ -176,7 +176,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.STAFF));
         }
 
         @Override
@@ -233,7 +233,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
 
             setHistoryRequester(requester);
             historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
@@ -276,9 +276,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS_getHistoryListOfOthers() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
             setHistoryRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
             historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
 
             mockDepartmentAndRequester();
@@ -301,9 +301,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_accessDenied_PermissionDeniedException() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.BANNED));
+                    dept, Permission.BANNED));
             setHistoryRequester(randomUserHaveMorePermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -319,9 +319,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_getHistoryListOfOthers_PermissionDeniedException() {
             setDept(TEST_DEPT);
             setHistoryRequester(randomUserHaveMorePermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
             setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
-                    dept, AuthorityDto.Permission.USER, List.of(historyRequester)));
+                    dept, Permission.USER, List.of(historyRequester)));
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -337,9 +337,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_userInvalidIndex_InvalidException() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
             setHistoryRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
 
             mockDepartmentAndRequester();
             when(userDao.getByIndex(
@@ -370,7 +370,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
             setHistory(randomHistoryOnDept(dept));
         }
 
@@ -410,7 +410,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS_getHistoryListOfOthers() {
             setUpDefault();
             setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, AuthorityDto.Permission.STAFF));
+                    dept, Permission.STAFF));
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -428,7 +428,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_accessDenied_PermissionDeniedException() {
             setUpDefault();
             setRequester(randomUserHaveLessPermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -444,7 +444,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_getHistoryListOfOthers_PermissionDeniedException() {
             setUpDefault();
             setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
-                    dept, AuthorityDto.Permission.USER, List.of(history.requester())));
+                    dept, Permission.USER, List.of(history.requester())));
 
             mockDepartmentAndRequester();
             when(historyDao.getByIndex(
@@ -493,7 +493,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         protected void setUpDefault() {
             setDept(TEST_DEPT);
             setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, AuthorityDto.Permission.USER));
+                    dept, Permission.USER));
             setItem(randomNonFirstUsableItemByDept(dept));
         }
 
@@ -737,7 +737,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setItem(randomUsableItemOnDept(dept));
         }
 
@@ -749,7 +749,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
+            requester = randomUserHaveLessPermissionOnDept(dept, Permission.STAFF);
         }
 
         @Override
@@ -851,7 +851,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setItem(randomReservedItemByDept(dept));
         }
 
@@ -863,7 +863,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
+            requester = randomUserHaveLessPermissionOnDept(dept, Permission.STAFF);
         }
 
         @Override
@@ -937,7 +937,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setItem(randomReturnAbleItemByDept(dept));
         }
 
@@ -949,7 +949,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
+            requester = randomUserHaveLessPermissionOnDept(dept, Permission.STAFF);
         }
 
         @Override
@@ -1036,7 +1036,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setItem(randomReservedItemByDept(dept));
         }
 
@@ -1048,7 +1048,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            requester = randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.STAFF);
+            requester = randomUserHaveLessPermissionOnDept(dept, Permission.STAFF);
         }
 
         @Override
@@ -1106,7 +1106,7 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
     }
 
-    private UserDto randomUserHaveExactPermissionOnDeptWithExclude(DepartmentDto dept, AuthorityDto.Permission permission, List<UserDto> exclude) {
+    private UserDto randomUserHaveExactPermissionOnDeptWithExclude(DepartmentDto dept, Permission permission, List<UserDto> exclude) {
         RandomGetter<UserDto> users = usersHaveExactPermissionOnDept(allUsers(), dept, permission);
         users = withExclude(users, exclude);
         return randomSelectAndLog(users);

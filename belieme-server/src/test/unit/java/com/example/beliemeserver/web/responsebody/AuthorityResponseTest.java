@@ -2,6 +2,7 @@ package com.example.beliemeserver.web.responsebody;
 
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.Permission;
 import com.example.beliemeserver.util.RandomGetter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -13,7 +14,7 @@ import java.io.IOException;
 
 public class AuthorityResponseTest extends BaseResponseTest {
     private final RandomGetter<DepartmentDto> deptGetter = new RandomGetter<>(stub.ALL_DEPTS);
-    private final RandomGetter<AuthorityDto.Permission> permissionGetter = new RandomGetter<>(stub.ALL_PERMISSIONS);
+    private final RandomGetter<Permission> permissionGetter = new RandomGetter<>(stub.ALL_PERMISSIONS);
 
     @RepeatedTest(10)
     @DisplayName("[-]_[`authority json serialization` 테스트]_[-]")
