@@ -8,6 +8,8 @@ import org.json.simple.parser.ParseException;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import java.util.Map;
 
 public class HttpRequest {
     public static JSONObject getUserInfoFromHanyangApi(String apiUrl, String clientKey, String apiToken) {
-        Map<String, String> headers = makeHanyangApiHeaders(clientKey, apiToken);
+        Map<String, String> headers = makeHanyangApiHeaders(apiUrl, clientKey, apiToken);
         String response = HttpRequest.sendGetRequest(apiUrl, headers);
 
         JSONParser jsonParser = new JSONParser();
@@ -34,9 +36,9 @@ public class HttpRequest {
         return jsonResponse;
     }
 
-    private static Map<String, String> makeHanyangApiHeaders(String clientKey, String apiToken) {
+    private static Map<String, String> makeHanyangApiHeaders(String apiUrl, String clientKey, String apiToken) {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Host", "https://api.hanyang.ac.kr/");
+        headers.put("Host", getHost(apiUrl));
         headers.put("client_id", clientKey);
         headers.put("swap_key", Long.toString(System.currentTimeMillis() / 1000));
         headers.put("access_token", apiToken);
@@ -71,5 +73,17 @@ public class HttpRequest {
             throw new BadGatewayException();
         }
         return output;
+    }
+
+    private static String getHost(String apiUrl) {
+        String host;
+        try {
+            URI uri = new URI(apiUrl);
+            host = uri.getHost();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            throw new BadGatewayException();
+        }
+        return host;
     }
 }
