@@ -4,7 +4,6 @@ import com.example.beliemeserver.common.InitialInfos;
 import com.example.beliemeserver.error.exception.BadGatewayException;
 import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
@@ -379,22 +378,20 @@ public class UserServiceTest extends BaseServiceTest {
         private String univCode;
         private String apiToken;
         private String studentId;
-        private String name;
 
         private UserDto targetUser;
         private List<DepartmentDto> deptList;
 
         private void setUpDefault() {
-            RandomGetter<InitialInfos.UserInfo> userInfoGetter = new RandomGetter<>(stubInitialInfos.initialInfos.users());
+            RandomGetter<InitialInfos.UserInfo> userInfoGetter = new RandomGetter<>(stubInitialInfos.initialInfos.userInfos());
 
             this.userInfo = userInfoGetter.randomSelect();
             this.apiToken = userInfo.apiToken();
             this.studentId = userInfo.studentId();
-            this.name = userInfo.name();
             this.univCode = userInfo.universityCode();
             this.univ = stubInitialInfos.initialInfos.universities().get(univCode);
 
-            this.targetUser = UserDto.init(univ, studentId, name)
+            this.targetUser = UserDto.init(univ, studentId, userInfo.name())
                     .withApprovalTimeStamp(0);
             this.deptList = stubInitialInfos.initialInfos.departments().values().stream().toList();
         }
@@ -408,7 +405,7 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsAlreadyOnDatabase() {
             setUpDefault();
 
-            when(initialInfos.users()).thenReturn(stubInitialInfos.initialInfos.users());
+            when(initialInfos.userInfos()).thenReturn(stubInitialInfos.initialInfos.userInfos());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
             mockDepartmentDao();
@@ -425,7 +422,7 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_devIsNotOnDatabase() {
             setUpDefault();
 
-            when(initialInfos.users()).thenReturn(stubInitialInfos.initialInfos.users());
+            when(initialInfos.userInfos()).thenReturn(stubInitialInfos.initialInfos.userInfos());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
             mockDepartmentDao();
@@ -443,7 +440,7 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
             apiToken = "";
 
-            when(initialInfos.users()).thenReturn(stubInitialInfos.initialInfos.users());
+            when(initialInfos.userInfos()).thenReturn(stubInitialInfos.initialInfos.userInfos());
 
             TestHelper.objectCompareTest(this::execMethod, null);
         }
@@ -502,6 +499,8 @@ public class UserServiceTest extends BaseServiceTest {
 
         private UniversityDto univ;
         private String univCode;
+        private String apiUrl;
+        private String clientKey;
 
         private UserDto targetUser;
         private String studentId;
@@ -537,8 +536,11 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private void setUniv() {
+            InitialInfos.UniversityInfo hyu = stubInitialInfos.initialInfos.universityInfos().get("HYU");
             univ = stub.HYU_UNIV;
             univCode = stub.HYU_UNIV.code();
+            apiUrl = hyu.externalApiInfo().get("url");
+            clientKey = hyu.externalApiInfo().get("clientKey");
         }
 
         private void setTargetUser(UserDto user) {
@@ -564,7 +566,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsAlreadyCreatedAndNoMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialInfos.universityInfos()).thenReturn(stubInitialInfos.initialInfos.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
@@ -581,7 +584,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsAlreadyCreatedAndNewMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialInfos.universityInfos()).thenReturn(stubInitialInfos.initialInfos.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
@@ -598,7 +602,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsNewAndNoMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialInfos.universityInfos()).thenReturn(stubInitialInfos.initialInfos.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
@@ -615,7 +620,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsNewAndNewMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialInfos.universityInfos()).thenReturn(stubInitialInfos.initialInfos.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
@@ -632,7 +638,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void ERROR_networkProblemOnHanyangApi_BadGateWayException() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenThrow(BadGatewayException.class);
+            when(initialInfos.universityInfos()).thenReturn(stubInitialInfos.initialInfos.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenThrow(BadGatewayException.class);
 
             TestHelper.exceptionTest(this::execMethod, BadGatewayException.class);
         }

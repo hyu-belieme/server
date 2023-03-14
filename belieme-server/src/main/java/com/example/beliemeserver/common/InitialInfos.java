@@ -6,60 +6,71 @@ import com.example.beliemeserver.model.dto.UniversityDto;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "init")
 public class InitialInfos {
-    private final Map<String, UniversityInfo> universities;
-    private final Map<String, DepartmentInfo> departments;
-    private final List<UserInfo> users;
+    private final Map<String, UniversityInfo> universityInfos;
+    private final Map<String, DepartmentInfo> departmentInfos;
+    private final List<UserInfo> userInfos;
 
-    public InitialInfos(Map<String, UniversityInfo> universities, Map<String, DepartmentInfo> departments, List<UserInfo> users) {
-        this.universities = universities;
-        this.departments = departments;
-        this.users = users;
+    public InitialInfos(Map<String, UniversityInfo> universityInfos, Map<String, DepartmentInfo> departmentInfos, List<UserInfo> userInfos) {
+        this.universityInfos = universityInfos;
+        this.departmentInfos = departmentInfos;
+        this.userInfos = userInfos;
+    }
+
+    public Map<String, UniversityInfo> universityInfos() {
+        return new HashMap<>(universityInfos);
+    }
+
+    public Map<String, DepartmentInfo> departmentInfos() {
+        return new HashMap<>(departmentInfos);
+    }
+
+    public List<UserInfo> userInfos() {
+        return new ArrayList<>(userInfos);
     }
 
     public Map<String, UniversityDto> universities() {
         Map<String, UniversityDto> output = new HashMap<>();
-        universities.forEach((s, universityInfo) ->
-                output.put(s, new UniversityDto(
-                        universityInfo.code,
-                        universityInfo.name,
-                        universityInfo.externalApiInfo.getOrDefault("url", null)))
+        universityInfos.forEach((s, universityInfo) ->
+                output.put(s, toUniversityDto(universityInfo))
         );
-
         return output;
     }
 
     public Map<String, DepartmentDto> departments() {
-        Map<String, UniversityDto> universities = universities();
         Map<String, DepartmentDto> output = new HashMap<>();
-        departments.forEach((s, departmentInfo) -> {
-            UniversityDto university = universities.values().stream()
-                    .filter((targetUniversity -> targetUniversity.matchUniqueKey(departmentInfo.universityCode)))
-                    .findFirst()
-                    .orElse(null);
-
-            if (university == null) throw new RuntimeException();
-            List<MajorDto> majors = departmentInfo.baseMajors.stream()
-                    .map((majorCode) -> new MajorDto(university, majorCode))
-                    .toList();
-
-            output.put(s, new DepartmentDto(
-                    university,
-                    departmentInfo.code,
-                    departmentInfo.name,
-                    majors));
-        });
+        departmentInfos.forEach((s, departmentInfo) ->
+                output.put(s, toDepartmentDto(departmentInfo))
+        );
         return output;
     }
 
-    public List<UserInfo> users() {
-        return users;
+    private UniversityDto toUniversityDto(UniversityInfo universityInfo) {
+        if(universityInfo == null) return null;
+        return new UniversityDto(
+                universityInfo.code,
+                universityInfo.name,
+                universityInfo.externalApiInfo.getOrDefault("url", null));
+    }
+
+    private DepartmentDto toDepartmentDto(DepartmentInfo departmentInfo) {
+        if(departmentInfo == null) return null;
+
+        UniversityDto university = universities().get(departmentInfo.universityCode);
+        if (university == null) throw new RuntimeException();
+
+        List<MajorDto> majors = departmentInfo.baseMajors().stream()
+                .map((majorCode) -> new MajorDto(university, majorCode))
+                .toList();
+        return new DepartmentDto(
+                university,
+                departmentInfo.code(),
+                departmentInfo.name(),
+                majors);
     }
 
     public record UniversityInfo(

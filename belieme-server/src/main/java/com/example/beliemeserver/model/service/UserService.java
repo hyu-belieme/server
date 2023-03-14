@@ -1,6 +1,5 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.common.InitialInfos;
 import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.error.exception.NotFoundException;
@@ -22,6 +21,9 @@ import java.util.UUID;
 
 @Service
 public class UserService extends BaseService {
+    public static final String DEVELOPER_UNIVERSITY_KEY = "DEV";
+    public static final String HANYANG_UNIVERSITY_KEY = "HYU";
+
     public UserService(InitialInfos initialInfos, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialInfos, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
@@ -92,7 +94,7 @@ public class UserService extends BaseService {
 
     public @Nullable UserDto reloadInitialUser(@NonNull String universityCode, @NonNull String apiToken) {
         InitialInfos.UserInfo targetUserInfo = null;
-        for (InitialInfos.UserInfo userInfo : initialInfos.users()) {
+        for (InitialInfos.UserInfo userInfo : getInitialUserInfos()) {
             if (universityCode.equals(userInfo.universityCode())
                     && userInfo.apiToken().equals(apiToken)) {
                 targetUserInfo = userInfo;
@@ -104,13 +106,17 @@ public class UserService extends BaseService {
     }
 
     public UserDto reloadHanyangUniversityUser(@NonNull String apiToken) {
-        JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(apiToken);
+        InitialInfos.UniversityInfo hyuInfo = getUniversityInfoByKey(HANYANG_UNIVERSITY_KEY);
+        JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(
+                hyuInfo.externalApiInfo().get("url"),
+                hyuInfo.externalApiInfo().get("client-key"),
+                apiToken);
         String studentId = (String) (jsonResponse.get("gaeinNo"));
         String name = (String) (jsonResponse.get("userNm"));
         String sosokId = (String) jsonResponse.get("sosokId");
         List<String> majorCodes = List.of(sosokId);
 
-        return updateOrCreateUser(Globals.HANYANG_UNIVERSITY.code(), studentId, name, majorCodes);
+        return updateOrCreateUser(hyuInfo.code(), studentId, name, majorCodes);
     }
 
     private UserDto updateOrCreateUser(InitialInfos.UserInfo userInfo) {

@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.common.InitialInfos;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.UserDto;
@@ -70,10 +70,10 @@ public class UserApiController extends BaseApiController {
             return ResponseEntity.ok(response);
         }
 
-        if (universityCode.equals(Globals.DEV_UNIVERSITY.code())) {
+        if (universityCode.equals(userService.getUniversityInfoByKey(UserService.DEVELOPER_UNIVERSITY_KEY).code())) {
             throw new UnauthorizedException();
         }
-        if (universityCode.equals(Globals.HANYANG_UNIVERSITY.code())) {
+        if (universityCode.equals(userService.getUniversityInfoByKey(UserService.HANYANG_UNIVERSITY_KEY).code())) {
             userDto = userService.reloadHanyangUniversityUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);

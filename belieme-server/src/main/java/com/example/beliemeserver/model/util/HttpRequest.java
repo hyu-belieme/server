@@ -1,6 +1,5 @@
 package com.example.beliemeserver.model.util;
 
-import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.error.exception.BadGatewayException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,9 +14,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequest {
-    public static JSONObject getUserInfoFromHanyangApi(String apiToken) {
-        Map<String, String> headers = makeHanyangApiHeaders(apiToken);
-        String response = HttpRequest.sendGetRequest(Globals.HANYANG_API_URL, headers);
+    public static JSONObject getUserInfoFromHanyangApi(String apiUrl, String clientKey, String apiToken) {
+        Map<String, String> headers = makeHanyangApiHeaders(clientKey, apiToken);
+        String response = HttpRequest.sendGetRequest(apiUrl, headers);
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonResponse;
@@ -35,10 +34,10 @@ public class HttpRequest {
         return jsonResponse;
     }
 
-    private static Map<String, String> makeHanyangApiHeaders(String apiToken) {
+    private static Map<String, String> makeHanyangApiHeaders(String clientKey, String apiToken) {
         Map<String, String> headers = new HashMap<>();
         headers.put("Host", "https://api.hanyang.ac.kr/");
-        headers.put("client_id", Globals.HANYANG_API_CLIENT_TOKEN);
+        headers.put("client_id", clientKey);
         headers.put("swap_key", Long.toString(System.currentTimeMillis() / 1000));
         headers.put("access_token", apiToken);
 

@@ -18,7 +18,7 @@ public class DepartmentService extends BaseService {
     }
 
     public void initializeDepartments() {
-        for (DepartmentDto department : initialInfos.departments().values()) {
+        for (DepartmentDto department : getInitialDepartments()) {
             if (departmentDao.checkExistByIndex(department.university().code(), department.code())) {
                 departmentDao.update(department.university().code(), department.code(), department);
                 createOrUpdateAuthorities(department);
