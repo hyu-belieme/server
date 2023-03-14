@@ -1,18 +1,15 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.common.InitialInfos;
+import com.example.beliemeserver.config.initdata.InitialData;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.model.exception.TokenExpiredException;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
+import com.example.beliemeserver.model.exception.TokenExpiredException;
 import com.example.beliemeserver.model.service.BaseService;
-import com.example.beliemeserver.util.RandomGetter;
-import com.example.beliemeserver.util.StubData;
-import com.example.beliemeserver.util.StubInitialInfos;
-import com.example.beliemeserver.util.TestHelper;
+import com.example.beliemeserver.util.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,11 +22,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public abstract class BaseServiceTest {
-    protected StubData stub = new StubData();
-    protected StubInitialInfos stubInitialInfos = new StubInitialInfos();
+    protected StubWithInitialData stub = new StubWithInitialData();
 
     @Mock
-    protected InitialInfos initialInfos;
+    protected InitialData initialData;
 
     @Mock
     protected UniversityDao universityDao;

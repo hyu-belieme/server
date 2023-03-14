@@ -1,24 +1,22 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.common.InitialInfos;
+import com.example.beliemeserver.config.initdata.InitialData;
+import com.example.beliemeserver.config.initdata.InitialDataDtoAdapter;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
-import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.model.exception.TokenExpiredException;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
+import com.example.beliemeserver.model.exception.TokenExpiredException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 public abstract class BaseService {
-    private final InitialInfos initialInfos;
-
+    protected final InitialDataDtoAdapter initialData;
     protected final UniversityDao universityDao;
     protected final DepartmentDao departmentDao;
     protected final UserDao userDao;
@@ -30,8 +28,8 @@ public abstract class BaseService {
 
     public static final long TOKEN_EXPIRED_TIME = 3L * 30 * 24 * 60 * 60;
 
-    public BaseService(InitialInfos initialInfos, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
-        this.initialInfos = initialInfos;
+    public BaseService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        this.initialData = new InitialDataDtoAdapter(initialData);
         this.universityDao = universityDao;
         this.departmentDao = departmentDao;
         this.userDao = userDao;
@@ -40,24 +38,6 @@ public abstract class BaseService {
         this.stuffDao = stuffDao;
         this.itemDao = itemDao;
         this.historyDao = historyDao;
-    }
-
-    public List<UniversityDto> getInitialUniversities() {
-        Map<String, UniversityDto> dtoMap = initialInfos.universities();
-        return new ArrayList<>(dtoMap.values());
-    }
-
-    public List<DepartmentDto> getInitialDepartments() {
-        Map<String, DepartmentDto> output = initialInfos.departments();
-        return new ArrayList<>(output.values());
-    }
-
-    public List<InitialInfos.UserInfo> getInitialUserInfos() {
-        return initialInfos.userInfos();
-    }
-
-    public InitialInfos.UniversityInfo getUniversityInfoByKey(String key) {
-        return initialInfos.universityInfos().get(key);
     }
 
     protected UserDto validateTokenAndGetUser(String token) {

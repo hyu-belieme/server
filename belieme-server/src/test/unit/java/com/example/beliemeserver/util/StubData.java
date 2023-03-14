@@ -39,7 +39,10 @@ public class StubData extends BaseStub {
     public final DepartmentDto CKU_STU_DEPT;
 
     // Users
-    public final UserDto DEV_USER;
+    public final UserDto DEV_1_USER;
+    public final UserDto DEV_2_USER;
+    public final UserDto HYU_CSE_TESTER_1_USER;
+    public final UserDto HYU_ME_TESTER_1_USER;
     public final UserDto HYU_CSE_MASTER_USER;
     public final UserDto HYU_CSE_STAFF_USER;
     public final UserDto HYU_CSE_NORMAL_1_USER;
@@ -67,7 +70,7 @@ public class StubData extends BaseStub {
         List<HistoryDto> tmpAllHistories;
 
         DEV_UNIV = new UniversityDto("DEV", "DEV_UNIV", null);
-        HYU_UNIV = new UniversityDto("HYU", "한양대학교", "https://api.hanyang.ac.kr/oauth/authorize/");
+        HYU_UNIV = new UniversityDto("HYU", "한양대학교", "https://api.hanyang.ac.kr/login");
         CKU_UNIV = new UniversityDto("CKU", "가톨릭관동대학교", null);
         SNU_UNIV = new UniversityDto("SNU", "서울대학교", null);
 
@@ -112,8 +115,14 @@ public class StubData extends BaseStub {
         );
 
         // Users
-        DEV_USER = UserDto.init(DEV_UNIV, "DEV", "개발자")
+        DEV_1_USER = UserDto.init(DEV_UNIV, "DEV1", "개발자 1")
                 .withAuthorityAdd(new AuthorityDto(DEV_DEPT, AuthorityDto.Permission.DEVELOPER));
+        DEV_2_USER = UserDto.init(DEV_UNIV, "DEV2", "개발자 2")
+                .withAuthorityAdd(new AuthorityDto(DEV_DEPT, AuthorityDto.Permission.DEVELOPER));
+        HYU_CSE_TESTER_1_USER = UserDto.init(HYU_UNIV, "CSE-TEST1", "테스터 1")
+                .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.STAFF));
+        HYU_ME_TESTER_1_USER = UserDto.init(HYU_UNIV, "ME-TEST1", "테스터 1")
+                .withAuthorityAdd(new AuthorityDto(HYU_ME_DEPT, AuthorityDto.Permission.USER));
         HYU_CSE_MASTER_USER = UserDto.init(HYU_UNIV, "2018008886", "이석환")
                 .withAuthorityAdd(new AuthorityDto(HYU_CSE_DEPT, AuthorityDto.Permission.DEFAULT))
                 .withAuthorityAdd(new AuthorityDto(HYU_ENG_DEPT, AuthorityDto.Permission.DEFAULT))
@@ -164,10 +173,10 @@ public class StubData extends BaseStub {
                 .withAuthorityAdd(new AuthorityDto(CKU_STU_DEPT, AuthorityDto.Permission.DEFAULT));
 
         tmpAllUsers = List.of(
-                DEV_USER, HYU_CSE_MASTER_USER, HYU_CSE_STAFF_USER, HYU_CSE_NORMAL_1_USER,
-                HYU_CSE_NORMAL_2_USER, HYU_CSE_BANNED_USER, HYU_DUMMY_USER_1, HYU_DUMMY_USER_2,
-                HYU_DUMMY_USER_3, HYU_DUMMY_USER_4, CKU_DUMMY_USER_1, CKU_DUMMY_USER_2,
-                CKU_DUMMY_USER_3, CKU_DUMMY_USER_4, CKU_DUMMY_USER_5
+                DEV_1_USER, DEV_2_USER, HYU_CSE_TESTER_1_USER, HYU_ME_TESTER_1_USER, HYU_CSE_MASTER_USER,
+                HYU_CSE_STAFF_USER, HYU_CSE_NORMAL_1_USER, HYU_CSE_NORMAL_2_USER, HYU_CSE_BANNED_USER,
+                HYU_DUMMY_USER_1, HYU_DUMMY_USER_2, HYU_DUMMY_USER_3, HYU_DUMMY_USER_4, CKU_DUMMY_USER_1,
+                CKU_DUMMY_USER_2, CKU_DUMMY_USER_3, CKU_DUMMY_USER_4, CKU_DUMMY_USER_5
         );
 
         // Permissions
