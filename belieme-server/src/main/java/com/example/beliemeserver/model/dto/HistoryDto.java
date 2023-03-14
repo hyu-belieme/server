@@ -136,39 +136,71 @@ public record HistoryDto(
     }
 
     public HistoryDto.HistoryStatus status() {
-        //TODO 여기 분기 다시 깔끔하게 짜기
-        //TODO ERROR인 조건들 추가하기 ex)item이 널이거나 그런경우?...
-        if (reservedTimeStamp != 0) {
-            if (returnTimeStamp != 0) {
-                if (lostTimeStamp != 0) {
-                    return HistoryDto.HistoryStatus.FOUND;
-                }
-                return HistoryDto.HistoryStatus.RETURNED;
-            } else if (cancelTimeStamp != 0) {
-                return HistoryDto.HistoryStatus.EXPIRED;
-            } else if (approveTimeStamp != 0) {
-                if (lostTimeStamp != 0) {
-                    return HistoryDto.HistoryStatus.LOST;
-                } else if (dueTime() > System.currentTimeMillis() / 1000) {
-                    return HistoryDto.HistoryStatus.USING;
-                } else {
-                    return HistoryDto.HistoryStatus.DELAYED;
-                }
-            } else if (expiredTime() > System.currentTimeMillis() / 1000) {
-                return HistoryDto.HistoryStatus.REQUESTED;
-            } else {
-                return HistoryDto.HistoryStatus.EXPIRED;
-            }
-        } else {
-            if (lostTimeStamp != 0) {
-                if (returnTimeStamp != 0) {
-                    return HistoryDto.HistoryStatus.FOUND;
-                } else {
-                    return HistoryDto.HistoryStatus.LOST;
-                }
-            }
-            return HistoryDto.HistoryStatus.ERROR;
-        }
+        if(isRequested()) return HistoryStatus.REQUESTED;
+        if(isUsing()) return HistoryStatus.USING;
+        if(isDelayed()) return HistoryStatus.DELAYED;
+        if(isLost()) return HistoryStatus.LOST;
+        if(isReturned()) return HistoryStatus.RETURNED;
+        if(isFound()) return HistoryStatus.FOUND;
+        if(isExpired()) return HistoryStatus.EXPIRED;
+        return HistoryStatus.ERROR;
+    }
+
+    private boolean isRequested() {
+        return reservedTimeStamp != 0 && approveTimeStamp == 0
+                && returnTimeStamp == 0 && lostTimeStamp == 0
+                && cancelTimeStamp == 0 && expiredTime() > currentTime();
+    }
+
+    private boolean isExpired() {
+        boolean isExpired = (reservedTimeStamp != 0 && approveTimeStamp == 0
+                && returnTimeStamp == 0 && lostTimeStamp == 0
+                && cancelTimeStamp == 0 && expiredTime() <= currentTime());
+        boolean isCanceled = (reservedTimeStamp != 0 && approveTimeStamp == 0
+                && returnTimeStamp == 0 && lostTimeStamp == 0
+                && cancelTimeStamp != 0);
+
+        return (isExpired || isCanceled);
+    }
+
+    private boolean isUsing() {
+        return (reservedTimeStamp != 0 && approveTimeStamp != 0
+                && returnTimeStamp == 0 && lostTimeStamp == 0
+                && cancelTimeStamp == 0 && dueTime() > currentTime());
+    }
+
+    private boolean isDelayed() {
+        return (reservedTimeStamp != 0 && approveTimeStamp != 0
+                && returnTimeStamp == 0 && lostTimeStamp == 0
+                && cancelTimeStamp == 0 && dueTime() <= currentTime());
+    }
+
+    private boolean isLost() {
+        boolean isLostOnStorage = (reservedTimeStamp == 0 && approveTimeStamp == 0
+                && returnTimeStamp == 0 && lostTimeStamp != 0 && cancelTimeStamp == 0);
+        boolean isLostOnRental = (reservedTimeStamp != 0 && approveTimeStamp != 0
+                && returnTimeStamp == 0 && lostTimeStamp != 0 && cancelTimeStamp == 0);
+
+        return (isLostOnStorage || isLostOnRental);
+    }
+
+    private boolean isReturned() {
+        return (reservedTimeStamp != 0 && approveTimeStamp != 0
+                && returnTimeStamp != 0 && lostTimeStamp == 0
+                && cancelTimeStamp == 0);
+    }
+
+    private boolean isFound() {
+        boolean isReturnedAfterLostOnStorage = reservedTimeStamp == 0 && approveTimeStamp == 0
+                && returnTimeStamp != 0 && lostTimeStamp != 0 && cancelTimeStamp == 0;
+        boolean isReturnedAfterLostOnRental =  reservedTimeStamp != 0 && approveTimeStamp != 0
+                && returnTimeStamp != 0 && lostTimeStamp != 0 && cancelTimeStamp == 0;
+
+        return isReturnedAfterLostOnStorage || isReturnedAfterLostOnRental;
+    }
+
+    private long currentTime() {
+        return System.currentTimeMillis() / 1000;
     }
 
     public long expiredTime() {

@@ -170,6 +170,7 @@ public class HistoryService extends BaseService {
                     stuffName, itemNum, newHistory.num());
         }
 
+        if (item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED) throw new LostRegistrationRequestedOnReservedItemException();
         newHistory = item.lastHistory()
                 .withItem(item)
                 .withLostManager(requester)
