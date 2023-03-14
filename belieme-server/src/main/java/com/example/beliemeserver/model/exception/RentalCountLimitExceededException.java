@@ -13,6 +13,6 @@ public class RentalCountLimitExceededException extends ForbiddenException {
     @Override
     public Message getResponseMessage() {
         Object[] args = {Constants.MAX_RENTAL_COUNT};
-        return new Message("error.rentalCountLimitExceeded.message", args);
+        return new Message("message.error.rentalCountLimitExceeded", args);
     }
 }

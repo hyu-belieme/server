@@ -11,6 +11,6 @@ public class PermissionDeniedException extends ForbiddenException {
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.permissionDenied.message");
+        return new Message("message.error.permissionDenied");
     }
 }

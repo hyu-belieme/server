@@ -11,6 +11,6 @@ public class ReservationRequestedOnNonUsableItemException extends ForbiddenExcep
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.reservationRequestedOnNonUsableItem.message");
+        return new Message("message.error.reservationRequestedOnNonUsableItem");
     }
 }

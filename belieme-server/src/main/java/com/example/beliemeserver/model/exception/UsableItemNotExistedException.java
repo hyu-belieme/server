@@ -11,6 +11,6 @@ public class UsableItemNotExistedException extends ForbiddenException {
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.usableItemNotExisted.message");
+        return new Message("message.error.usableItemNotExisted");
     }
 }

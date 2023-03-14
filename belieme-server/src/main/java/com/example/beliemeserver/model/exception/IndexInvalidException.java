@@ -11,6 +11,6 @@ public class IndexInvalidException extends BadRequestException {
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.indexInvalid.message");
+        return new Message("message.error.indexInvalid");
     }
 }

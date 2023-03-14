@@ -15,25 +15,25 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 public class StuffRequest {
-    @Size(min= 1, max= 30, message = "{error.badRequest.outOfSize.message}",
+    @Size(min= 1, max= 30, message = "{message.error.badRequest.outOfSize}",
             groups = {StuffCreateValidationGroup.class, StuffUpdateValidationGroup.class})
-    @Pattern(regexp = "[\\p{L}\\d() ]+", message = "{error.badRequest.containsNonLetter.message}",
+    @Pattern(regexp = "[\\p{L}\\d() ]+", message = "{message.error.badRequest.containsNonLetter}",
             groups = {StuffCreateValidationGroup.class, StuffUpdateValidationGroup.class})
-    @NotNull(message = "{error.badRequest.notNull.message}",
+    @NotNull(message = "{message.error.badRequest.notNull}",
             groups = StuffCreateValidationGroup.class)
     @JsonProperty("name")
     String name;
 
-    @Size(min= 1, max= 5, message = "{error.badRequest.outOfSize.message}",
+    @Size(min= 1, max= 5, message = "{message.error.badRequest.outOfSize}",
             groups = {StuffCreateValidationGroup.class, StuffUpdateValidationGroup.class})
-    @NotNull(message = "{error.badRequest.notNull.message}",
+    @NotNull(message = "{message.error.badRequest.notNull}",
             groups = StuffCreateValidationGroup.class)
     @JsonProperty("emoji")
     String emoji;
 
-    @PositiveOrZero(message = "{error.badRequest.containsNegative.message}",
+    @PositiveOrZero(message = "{message.error.badRequest.containsNegative}",
             groups = StuffCreateValidationGroup.class)
-    @NotNull(message = "{error.badRequest.notNull.message}",
+    @NotNull(message = "{message.error.badRequest.notNull}",
             groups = StuffCreateValidationGroup.class)
     @JsonProperty("amount")
     Integer amount;

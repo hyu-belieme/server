@@ -11,6 +11,6 @@ public class RespondedOnUnrequestedItemException extends ForbiddenException {
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.respondedOnUnrequestedItem.message");
+        return new Message("message.error.respondedOnUnrequestedItem");
     }
 }

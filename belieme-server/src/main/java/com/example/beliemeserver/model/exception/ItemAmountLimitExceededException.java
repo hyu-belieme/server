@@ -13,6 +13,6 @@ public class ItemAmountLimitExceededException extends ForbiddenException {
     @Override
     public Message getResponseMessage() {
         Object[] args = {Constants.MAX_ITEM_NUM};
-        return new Message("error.itemAmountLimitExceeded.message", args);
+        return new Message("message.error.itemAmountLimitExceeded", args);
     }
 }

@@ -11,6 +11,6 @@ public class LostRegistrationRequestedOnLostItemException extends ForbiddenExcep
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.lostRegistrationRequestedOnLostItem.message");
+        return new Message("message.error.lostRegistrationRequestedOnLostItem");
     }
 }
