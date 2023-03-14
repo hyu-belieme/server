@@ -1,7 +1,6 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.common.DeveloperInfo;
-import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.common.InitialInfos;
 import com.example.beliemeserver.error.exception.BadGatewayException;
 import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.error.exception.NotFoundException;
@@ -370,48 +369,55 @@ public class UserServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    @DisplayName("reloadDeveloperUser()")
+    @DisplayName("reloadInitialUser()")
     public final class TestReloadDeveloperUser {
         @Captor
         private ArgumentCaptor<UserDto> userArgumentCaptor;
 
-        private final UniversityDto univ = Globals.DEV_UNIVERSITY;
-        private final String univCode = Globals.DEV_UNIVERSITY.code();
+        private InitialInfos.UserInfo userInfo;
+        private UniversityDto univ;
+        private String univCode;
         private String apiToken;
         private String studentId;
         private String name;
 
         private UserDto targetUser;
+        private List<DepartmentDto> deptList;
 
         private void setUpDefault() {
-            RandomGetter<DeveloperInfo> devInfoGetter = new RandomGetter<>(Globals.developers);
-            DeveloperInfo devInfo = devInfoGetter.randomSelect();
+            RandomGetter<InitialInfos.UserInfo> userInfoGetter = new RandomGetter<>(stubInitialInfos.initialInfos.users());
 
-            this.apiToken = devInfo.apiToken();
-            this.studentId = devInfo.studentId();
-            this.name = devInfo.name();
+            this.userInfo = userInfoGetter.randomSelect();
+            this.apiToken = userInfo.apiToken();
+            this.studentId = userInfo.studentId();
+            this.name = userInfo.name();
+            this.univCode = userInfo.universityCode();
+            this.univ = stubInitialInfos.initialInfos.universities().get(univCode);
+
             this.targetUser = UserDto.init(univ, studentId, name)
-                    .withApprovalTimeStamp(0)
-                    .withAuthorityAdd(Globals.DEV_AUTHORITY);
+                    .withApprovalTimeStamp(0);
+            this.deptList = stubInitialInfos.initialInfos.departments().values().stream().toList();
         }
 
         private UserDto execMethod() {
-            return userService.reloadDeveloperUser(apiToken);
+            return userService.reloadInitialUser(univCode, apiToken);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[이미 DB에 등록된 developer일 시]_[-]")
-        public void SUCCESS_devIsAlreadyOnDatabase() {
+        @DisplayName("[SUCCESS]_[이미 DB에 등록된 user일 시]_[-]")
+        public void SUCCESS_userIsAlreadyOnDatabase() {
             setUpDefault();
 
+            when(initialInfos.users()).thenReturn(stubInitialInfos.initialInfos.users());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+            mockDepartmentDao();
 
             execMethod();
 
             verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
             UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+            Assertions.assertThat(checkUpdatedUser(newUser, userInfo)).isTrue();
         }
 
         @RepeatedTest(10)
@@ -419,14 +425,16 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_devIsNotOnDatabase() {
             setUpDefault();
 
+            when(initialInfos.users()).thenReturn(stubInitialInfos.initialInfos.users());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+            mockDepartmentDao();
 
             execMethod();
 
             verify(userDao).create(userArgumentCaptor.capture());
             UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+            Assertions.assertThat(checkCreatedUser(newUser, userInfo)).isTrue();
         }
 
         @RepeatedTest(10)
@@ -435,34 +443,51 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
             apiToken = "";
 
-            TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
+            when(initialInfos.users()).thenReturn(stubInitialInfos.initialInfos.users());
+
+            TestHelper.objectCompareTest(this::execMethod, null);
         }
 
-        private boolean checkUpdatedUser(UserDto newUser) {
+        private void mockDepartmentDao() {
+            for (InitialInfos.AuthorityInfo authInfo : userInfo.authorities()) {
+                DepartmentDto targetDept = deptList.stream()
+                        .filter(dept -> dept.matchUniqueKey(authInfo.universityCode(), authInfo.departmentCode()))
+                        .findFirst().orElse(null);
+                when(departmentDao.getByIndex(authInfo.universityCode(), authInfo.departmentCode())).thenReturn(targetDept);
+            }
+        }
+
+        private boolean checkUpdatedUser(UserDto newUser, InitialInfos.UserInfo userInfo) {
             System.out.println(newUser);
-            if (newUser.studentId().equals(studentId)
-                    && newUser.university().equals(univ)
-                    && newUser.name().equals(name)
+            if (newUser.studentId().equals(userInfo.studentId())
+                    && newUser.university().matchUniqueKey(userInfo.universityCode())
+                    && newUser.name().equals(userInfo.name())
                     && !newUser.token().equals(targetUser.token())
                     && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
             ) {
-                return checkDeveloperAuth(newUser);
+                return checkUserAuth(newUser, userInfo.authorities());
             }
             return false;
         }
 
-        private boolean checkCreatedUser(UserDto newUser) {
-            if (newUser.studentId().equals(studentId)
-                    && newUser.university().equals(univ)
-                    && newUser.name().equals(name)) {
-                return checkDeveloperAuth(newUser);
+        private boolean checkCreatedUser(UserDto newUser, InitialInfos.UserInfo userInfo) {
+            System.out.println(newUser);
+            if (newUser.studentId().equals(userInfo.studentId())
+                    && newUser.university().matchUniqueKey(userInfo.universityCode())
+                    && newUser.name().equals(userInfo.name())
+            ) {
+                return checkUserAuth(newUser, userInfo.authorities());
             }
             return false;
         }
 
-        private boolean checkDeveloperAuth(UserDto newUser) {
-            return newUser.authorities().stream()
-                    .anyMatch(authority -> authority.equals(Globals.DEV_AUTHORITY));
+        private boolean checkUserAuth(UserDto newUser, List<InitialInfos.AuthorityInfo> authorityInfos) {
+            return authorityInfos.stream().allMatch(authorityInfo ->
+                    newUser.authorities().stream().anyMatch(authorityDto ->
+                            authorityDto.department().matchUniqueKey(authorityInfo.universityCode(), authorityInfo.departmentCode())
+                                    && authorityDto.permission().toString().equals(authorityInfo.permission())
+                    )
+            );
         }
     }
 

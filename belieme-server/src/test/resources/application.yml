@@ -7,6 +7,8 @@ logging:
     org.hibernate.SQL: debug
 
 spring:
+  config:
+    import: classpath:apis/api.yml, classpath:inits/init.yml
   datasource:
     url: jdbc:h2:mem:test
     username: sa
@@ -21,3 +23,11 @@ spring:
   h2:
     console:
       enabled: true
+
+  messages:
+    basename: messages/message
+    encoding: UTF-8
+    cache-duration: 30
+    always-use-message-format: true
+    use-code-as-default-message: true
+    fallback-to-system-locale: true

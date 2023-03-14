@@ -55,8 +55,11 @@ public class InitialInfos {
                     departmentInfo.name,
                     majors));
         });
-
         return output;
+    }
+
+    public List<UserInfo> users() {
+        return users;
     }
 
     public record UniversityInfo(
@@ -77,6 +80,7 @@ public class InitialInfos {
 
     public record UserInfo(
             String apiToken,
+            String universityCode,
             String studentId,
             String name,
             List<AuthorityInfo> authorities

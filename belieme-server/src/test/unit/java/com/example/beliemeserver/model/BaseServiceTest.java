@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model;
 
+import com.example.beliemeserver.common.InitialInfos;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
@@ -10,6 +11,7 @@ import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.BaseService;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.StubData;
+import com.example.beliemeserver.util.StubInitialInfos;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
@@ -24,6 +26,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public abstract class BaseServiceTest {
     protected StubData stub = new StubData();
+    protected StubInitialInfos stubInitialInfos = new StubInitialInfos();
+
+    @Mock
+    protected InitialInfos initialInfos;
 
     @Mock
     protected UniversityDao universityDao;

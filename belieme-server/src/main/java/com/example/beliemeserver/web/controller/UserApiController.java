@@ -2,6 +2,7 @@ package com.example.beliemeserver.web.controller;
 
 import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.error.exception.BadRequestException;
+import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.UserDto;
 import com.example.beliemeserver.model.service.UserService;
 import com.example.beliemeserver.web.responsebody.UserResponse;
@@ -63,13 +64,17 @@ public class UserApiController extends BaseApiController {
     ) {
         String universityCode = params.get(api.variable().universityIndex());
 
-        if (universityCode.equals(Globals.DEV_UNIVERSITY.code())) {
-            UserDto userDto = userService.reloadDeveloperUser(apiToken);
+        UserDto userDto = userService.reloadInitialUser(universityCode, apiToken);
+        if(userDto != null) {
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);
         }
+
+        if (universityCode.equals(Globals.DEV_UNIVERSITY.code())) {
+            throw new UnauthorizedException();
+        }
         if (universityCode.equals(Globals.HANYANG_UNIVERSITY.code())) {
-            UserDto userDto = userService.reloadHanyangUniversityUser(apiToken);
+            userDto = userService.reloadHanyangUniversityUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);
         }
