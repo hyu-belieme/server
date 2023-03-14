@@ -7,7 +7,7 @@ import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.AuthorityDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.Permission;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

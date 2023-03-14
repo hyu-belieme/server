@@ -1,4 +1,4 @@
-package com.example.beliemeserver.model.dto;
+package com.example.beliemeserver.model.dto.enumeration;
 
 public enum Permission {
     DEFAULT, BANNED, USER, STAFF, MASTER, DEVELOPER;

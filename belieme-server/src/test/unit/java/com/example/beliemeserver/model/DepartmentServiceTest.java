@@ -2,7 +2,11 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.MajorDto;
+import com.example.beliemeserver.model.dto.UniversityDto;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.DepartmentService;

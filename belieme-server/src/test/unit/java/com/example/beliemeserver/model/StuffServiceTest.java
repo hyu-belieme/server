@@ -2,7 +2,10 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.DepartmentDto;
+import com.example.beliemeserver.model.dto.ItemDto;
+import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.model.service.StuffService;
 import com.example.beliemeserver.util.TestHelper;

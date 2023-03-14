@@ -4,6 +4,7 @@ import com.example.beliemeserver.config.initdata.InitialData;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;

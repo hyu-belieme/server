@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model.dto;
 
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import lombok.NonNull;
 
 import java.util.ArrayList;

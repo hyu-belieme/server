@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model.dto;
 
+import com.example.beliemeserver.model.dto.enumeration.HistoryStatus;
 import lombok.NonNull;
 
 import java.util.Calendar;
@@ -135,14 +136,14 @@ public record HistoryDto(
                 '}';
     }
 
-    public HistoryDto.HistoryStatus status() {
-        if(isRequested()) return HistoryStatus.REQUESTED;
-        if(isUsing()) return HistoryStatus.USING;
-        if(isDelayed()) return HistoryStatus.DELAYED;
-        if(isLost()) return HistoryStatus.LOST;
-        if(isReturned()) return HistoryStatus.RETURNED;
-        if(isFound()) return HistoryStatus.FOUND;
-        if(isExpired()) return HistoryStatus.EXPIRED;
+    public HistoryStatus status() {
+        if (isRequested()) return HistoryStatus.REQUESTED;
+        if (isUsing()) return HistoryStatus.USING;
+        if (isDelayed()) return HistoryStatus.DELAYED;
+        if (isLost()) return HistoryStatus.LOST;
+        if (isReturned()) return HistoryStatus.RETURNED;
+        if (isFound()) return HistoryStatus.FOUND;
+        if (isExpired()) return HistoryStatus.EXPIRED;
         return HistoryStatus.ERROR;
     }
 
@@ -193,7 +194,7 @@ public record HistoryDto(
     private boolean isFound() {
         boolean isReturnedAfterLostOnStorage = reservedTimeStamp == 0 && approveTimeStamp == 0
                 && returnTimeStamp != 0 && lostTimeStamp != 0 && cancelTimeStamp == 0;
-        boolean isReturnedAfterLostOnRental =  reservedTimeStamp != 0 && approveTimeStamp != 0
+        boolean isReturnedAfterLostOnRental = reservedTimeStamp != 0 && approveTimeStamp != 0
                 && returnTimeStamp != 0 && lostTimeStamp != 0 && cancelTimeStamp == 0;
 
         return isReturnedAfterLostOnStorage || isReturnedAfterLostOnRental;
@@ -237,17 +238,5 @@ public record HistoryDto(
         calendar.set(Calendar.HOUR_OF_DAY, 17);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
-    }
-
-    public enum HistoryStatus {
-        REQUESTED, USING, DELAYED, LOST, EXPIRED, RETURNED, FOUND, ERROR;
-
-        public boolean isClosed() {
-            return (this == EXPIRED) || (this == RETURNED) || (this == FOUND);
-        }
-
-        public boolean isOpen() {
-            return !isClosed() && (this != ERROR);
-        }
     }
 }

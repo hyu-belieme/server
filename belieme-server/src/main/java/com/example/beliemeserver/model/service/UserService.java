@@ -8,6 +8,7 @@ import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.util.HttpRequest;
 import lombok.NonNull;

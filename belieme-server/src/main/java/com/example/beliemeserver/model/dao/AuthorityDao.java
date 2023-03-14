@@ -1,7 +1,7 @@
 package com.example.beliemeserver.model.dao;
 
 import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.Permission;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

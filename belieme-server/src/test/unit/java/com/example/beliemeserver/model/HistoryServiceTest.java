@@ -2,6 +2,9 @@ package com.example.beliemeserver.model;
 
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.HistoryStatus;
+import com.example.beliemeserver.model.dto.enumeration.ItemStatus;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.service.HistoryService;
 import com.example.beliemeserver.model.util.Constants;
@@ -1222,33 +1225,33 @@ public class HistoryServiceTest extends BaseServiceTest {
     }
 
     private RandomGetter<ItemDto> usableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemDto.ItemStatus.USABLE);
+        return items.filter((item) -> item.status() == ItemStatus.USABLE);
     }
 
     private RandomGetter<ItemDto> unusableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemDto.ItemStatus.UNUSABLE);
+        return items.filter((item) -> item.status() == ItemStatus.UNUSABLE);
     }
 
     private RandomGetter<ItemDto> inactiveItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemDto.ItemStatus.INACTIVE);
+        return items.filter((item) -> item.status() == ItemStatus.INACTIVE);
     }
 
     private RandomGetter<ItemDto> reservedItems(RandomGetter<ItemDto> items) {
         return items.filter((item) -> item.lastHistory() != null
-                && item.lastHistory().status() == HistoryDto.HistoryStatus.REQUESTED);
+                && item.lastHistory().status() == HistoryStatus.REQUESTED);
     }
 
     private RandomGetter<ItemDto> usingOrDelayedItems(RandomGetter<ItemDto> items) {
         return items.filter((item) -> item.lastHistory() != null
-                && (item.lastHistory().status() == HistoryDto.HistoryStatus.USING
-                || item.lastHistory().status() == HistoryDto.HistoryStatus.DELAYED));
+                && (item.lastHistory().status() == HistoryStatus.USING
+                || item.lastHistory().status() == HistoryStatus.DELAYED));
     }
 
     private RandomGetter<ItemDto> returnableItems(RandomGetter<ItemDto> items) {
         return items.filter((item) -> item.lastHistory() != null
-                && (item.lastHistory().status() == HistoryDto.HistoryStatus.USING
-                || item.lastHistory().status() == HistoryDto.HistoryStatus.DELAYED
-                || item.lastHistory().status() == HistoryDto.HistoryStatus.LOST));
+                && (item.lastHistory().status() == HistoryStatus.USING
+                || item.lastHistory().status() == HistoryStatus.DELAYED
+                || item.lastHistory().status() == HistoryStatus.LOST));
     }
 
     private RandomGetter<ItemDto> itemsOnStuff(RandomGetter<ItemDto> items, StuffDto stuff) {

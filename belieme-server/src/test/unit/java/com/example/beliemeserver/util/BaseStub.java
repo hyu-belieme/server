@@ -1,6 +1,7 @@
 package com.example.beliemeserver.util;
 
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 
 import java.util.List;
 

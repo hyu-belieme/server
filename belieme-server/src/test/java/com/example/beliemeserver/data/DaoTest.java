@@ -1,6 +1,7 @@
 package com.example.beliemeserver.data;
 
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.FakeDao;
 import org.junit.jupiter.api.BeforeAll;
