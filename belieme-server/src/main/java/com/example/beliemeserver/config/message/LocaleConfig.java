@@ -1,4 +1,4 @@
-package com.example.beliemeserver.config;
+package com.example.beliemeserver.config.message;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

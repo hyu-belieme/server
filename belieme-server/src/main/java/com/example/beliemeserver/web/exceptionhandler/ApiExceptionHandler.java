@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.exceptionhandler;
 
-import com.example.beliemeserver.common.Message;
+import com.example.beliemeserver.config.message.Message;
 import com.example.beliemeserver.error.info.CommonErrorInfo;
 import com.example.beliemeserver.error.info.ErrorInfo;
 import com.example.beliemeserver.error.exception.ServerException;

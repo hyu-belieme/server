@@ -1,4 +1,4 @@
-package com.example.beliemeserver.common;
+package com.example.beliemeserver.config.message;
 
 import lombok.Getter;
 

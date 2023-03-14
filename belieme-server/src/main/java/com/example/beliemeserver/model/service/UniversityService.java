@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.config.initdata.InitialData;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import lombok.NonNull;
@@ -10,12 +10,12 @@ import java.util.List;
 
 @Service
 public class UniversityService extends BaseService {
-    public UniversityService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
-        super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
+    public UniversityService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public void initializeUniversities() {
-        for (UniversityDto university : Globals.universities) {
+        for (UniversityDto university : initialData.universities().values()) {
             if (universityDao.checkExistByIndex(university.code())) {
                 universityDao.update(university.code(), university);
                 continue;

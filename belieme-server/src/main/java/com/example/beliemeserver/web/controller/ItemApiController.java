@@ -1,8 +1,8 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.web.responsebody.ItemResponse;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.service.ItemService;
+import com.example.beliemeserver.web.responsebody.ItemResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(path = "/${api.university}/${api.universityIndex}/${api.department}/${api.departmentIndex}/${api.stuff}/${api.stuffIndex}")
+@RequestMapping(path = "/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}/${api.keyword.stuff}/${api.keyword.stuff-index}")
 public class ItemApiController extends BaseApiController {
     private final ItemService itemService;
 
@@ -19,14 +19,14 @@ public class ItemApiController extends BaseApiController {
         this.itemService = itemService;
     }
 
-    @GetMapping("/${api.item}")
+    @GetMapping("/${api.keyword.item}")
     public ResponseEntity<List<ItemResponse>> getAllItemsOfStuff(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
 
         List<ItemDto> itemDtoList = itemService.getListByStuff(
                 userToken, universityCode, departmentCode, stuffName);
@@ -34,15 +34,15 @@ public class ItemApiController extends BaseApiController {
         return ResponseEntity.ok(responseList);
     }
 
-    @GetMapping("/${api.item}/${api.itemIndex}")
+    @GetMapping("/${api.keyword.item}/${api.keyword.item-index}")
     public ResponseEntity<ItemResponse> getItem(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
-        int itemNum = Integer.parseInt(params.get(itemIndexTag));
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
+        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         ItemDto itemDto = itemService.getByIndex(
                 userToken, universityCode, departmentCode, stuffName, itemNum);
@@ -50,14 +50,14 @@ public class ItemApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/${api.item}")
+    @PostMapping("/${api.keyword.item}")
     public ResponseEntity<ItemResponse> createNewItem(
-            @RequestHeader("${header.userToken}") String userToken,
+            @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(universityIndexTag);
-        String departmentCode = params.get(departmentIndexTag);
-        String stuffName = params.get(stuffIndexTag);
+        String universityCode = params.get(api.variable().universityIndex());
+        String departmentCode = params.get(api.variable().departmentIndex());
+        String stuffName = params.get(api.variable().stuffIndex());
 
         ItemDto itemDto = itemService.create(
                 userToken, universityCode, departmentCode, stuffName);

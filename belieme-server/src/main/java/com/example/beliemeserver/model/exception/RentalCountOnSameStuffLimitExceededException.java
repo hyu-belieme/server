@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.exception;
 
-import com.example.beliemeserver.common.Message;
+import com.example.beliemeserver.config.message.Message;
 import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.model.util.Constants;
 

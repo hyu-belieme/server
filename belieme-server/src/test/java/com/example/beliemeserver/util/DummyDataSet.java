@@ -1,6 +1,5 @@
 package com.example.beliemeserver.util;
 
-import com.example.beliemeserver.common.Globals;
 import com.example.beliemeserver.model.dto.*;
 
 import java.util.ArrayList;
@@ -22,8 +21,8 @@ public class DummyDataSet {
 
     public static void init() {
         universityDummies = new ArrayList<>(List.of(
-                Globals.DEV_UNIVERSITY,
-                Globals.HANYANG_UNIVERSITY,
+                new UniversityDto("DEV", "DEV", "DEV"),
+                new UniversityDto("HYU", "한양대학교", "https://api.hanyang.ac.kr/rs/user/loginInfo.json"),
                 new UniversityDto("CKU", "가톨릭관동대학교", null),
                 new UniversityDto("SNU", "서울대학교", null)
         ));
@@ -68,7 +67,7 @@ public class DummyDataSet {
         ));
 
         departmentDummies = new ArrayList<>(List.of(
-                Globals.DEV_DEPARTMENT,
+                new DepartmentDto(universityDummies.get(0), "DEV", "DEV", new ArrayList<>()),
                 new DepartmentDto(universityDummies.get(1), "CSE", "컴퓨터소프트웨어학부", HYU_CSE_BASE_MAJORS),
                 new DepartmentDto(universityDummies.get(1), "STU", "총학생회", HYU_STU_BASE_MAJORS),
                 new DepartmentDto(universityDummies.get(2), "MED", "의과대학", CKU_MED_BASE_MAJORS),

@@ -1,10 +1,11 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.common.DeveloperInfo;
-import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.config.initdata.InitialData;
+import com.example.beliemeserver.config.initdata.container.AuthorityInfo;
+import com.example.beliemeserver.config.initdata.container.UniversityInfo;
+import com.example.beliemeserver.config.initdata.container.UserInfo;
 import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
@@ -14,7 +15,7 @@ import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.util.HttpRequest;
 import lombok.NonNull;
 import org.json.simple.JSONObject;
-import org.springframework.data.util.Pair;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,9 +24,13 @@ import java.util.UUID;
 
 @Service
 public class UserService extends BaseService {
-    public UserService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
-        super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
+    public static final String DEVELOPER_UNIVERSITY_KEY = "DEV";
+    public static final String HANYANG_UNIVERSITY_KEY = "HYU";
+
+    public UserService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
+
 
     public List<UserDto> getListByDepartment(
             @NonNull String userToken,
@@ -91,78 +96,102 @@ public class UserService extends BaseService {
         return userDao.update(universityCode, studentId, newUser);
     }
 
-    public UserDto reloadDeveloperUser(@NonNull String apiToken) {
-        DeveloperInfo targetDeveloper = null;
-        for (DeveloperInfo info : Globals.developers) {
-            if (info.apiToken().equals(apiToken)) {
-                targetDeveloper = info;
+    public String getDeveloperUniversityCode() {
+        return initialData.universityInfos().get(UserService.DEVELOPER_UNIVERSITY_KEY).code();
+    }
+
+    public String getHanyangUniversityCode() {
+        return initialData.universityInfos().get(UserService.HANYANG_UNIVERSITY_KEY).code();
+    }
+
+    public @Nullable
+    UserDto reloadInitialUser(@NonNull String universityCode, @NonNull String apiToken) {
+        UserInfo targetUserInfo = null;
+        for (UserInfo userInfo : initialData.userInfos()) {
+            if (universityCode.equals(userInfo.universityCode())
+                    && userInfo.apiToken().equals(apiToken)) {
+                targetUserInfo = userInfo;
                 break;
             }
         }
-        if (targetDeveloper == null) {
-            throw new UnauthorizedException();
-        }
-
-        Pair<Boolean, UserDto> isNewAndUser = getOrMakeDeveloperUser(targetDeveloper.studentId(), targetDeveloper.name());
-        boolean isNew = isNewAndUser.getFirst();
-        UserDto newUser = isNewAndUser.getSecond();
-        newUser = newUser.withApprovalTimeStamp(currentTimestamp())
-                .withToken(UUID.randomUUID().toString());
-
-        if (isNew) return userDao.create(newUser);
-        return userDao.update(Globals.DEV_UNIVERSITY.code(), targetDeveloper.studentId(), newUser);
+        if (targetUserInfo == null) return null;
+        return updateOrCreateUser(targetUserInfo);
     }
 
     public UserDto reloadHanyangUniversityUser(@NonNull String apiToken) {
-        JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(apiToken);
+        UniversityInfo hyuInfo = initialData.universityInfos().get(HANYANG_UNIVERSITY_KEY);
+        JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(
+                hyuInfo.externalApiInfo().get("url"),
+                hyuInfo.externalApiInfo().get("client-key"),
+                apiToken);
         String studentId = (String) (jsonResponse.get("gaeinNo"));
         String name = (String) (jsonResponse.get("userNm"));
         String sosokId = (String) jsonResponse.get("sosokId");
         List<String> majorCodes = List.of(sosokId);
 
-        return updateOrInitAndSave(Globals.HANYANG_UNIVERSITY.code(), studentId, name, majorCodes);
+        return updateOrCreateUser(hyuInfo.code(), studentId, name, majorCodes);
     }
 
-    private UserDto updateOrInitAndSave(String universityCode, String studentId, String name, List<String> majorCodes) {
-        Pair<Boolean, UserDto> isNewAndUser = getOrMakeUser(universityCode, studentId, name);
-        boolean isNew = isNewAndUser.getFirst();
-        UserDto newUser = isNewAndUser.getSecond();
+    private UserDto updateOrCreateUser(UserInfo userInfo) {
+        boolean isNew = false;
+        UniversityDto university = universityDao.getByIndex(userInfo.universityCode());
 
-        List<AuthorityDto> newAuthorities = makeNewAuthorities(newUser, majorCodes);
-        newUser = newUser.withName(name)
+        UserDto targetUser = getOrNull(university, userInfo.studentId());
+        if (targetUser == null) {
+            targetUser = UserDto.init(university, userInfo.studentId(), userInfo.name());
+            isNew = true;
+        }
+
+        targetUser = targetUser
+                .withUniversity(university)
+                .withStudentId(userInfo.studentId())
+                .withName(userInfo.name())
+                .withAuthorities(toAuthorityDtoList(userInfo.authorities()))
+                .withApprovalTimeStamp(currentTimestamp())
+                .withToken(UUID.randomUUID().toString());
+
+        if (isNew) return userDao.create(targetUser);
+        return userDao.update(userInfo.universityCode(), userInfo.studentId(), targetUser);
+    }
+
+    private UserDto updateOrCreateUser(String universityCode, String studentId, String name, List<String> majorCodes) {
+        boolean isNew = false;
+        UniversityDto university = universityDao.getByIndex(universityCode);
+
+        UserDto targetUser = getOrNull(university, studentId);
+        if (targetUser == null) {
+            targetUser = UserDto.init(university, studentId, name);
+            isNew = true;
+        }
+
+        List<AuthorityDto> newAuthorities = makeNewAuthorities(targetUser, majorCodes);
+        targetUser = targetUser.withName(name)
                 .withApprovalTimeStamp(currentTimestamp())
                 .withAuthorities(newAuthorities)
                 .withToken(UUID.randomUUID().toString());
 
-        if (isNew) return userDao.create(newUser);
-        return userDao.update(universityCode, studentId, newUser);
+        if (isNew) return userDao.create(targetUser);
+        return userDao.update(universityCode, studentId, targetUser);
     }
 
-    private Pair<Boolean, UserDto> getOrMakeUser(String universityCode, String studentId, String name) {
-        boolean isNew = false;
-        UserDto newUser;
-        UniversityDto university = universityDao.getByIndex(universityCode);
+    private UserDto getOrNull(UniversityDto university, String studentId) {
         try {
-            newUser = userDao.getByIndex(universityCode, studentId);
+            return userDao.getByIndex(university.code(), studentId);
         } catch (NotFoundException e) {
-            isNew = true;
-            newUser = UserDto.init(university, studentId, name);
+            return null;
         }
-        return Pair.of(isNew, newUser);
     }
 
-    private Pair<Boolean, UserDto> getOrMakeDeveloperUser(String studentId, String name) {
-        boolean isNew = false;
-        UserDto newUser;
-        UniversityDto university = universityDao.getByIndex(Globals.DEV_UNIVERSITY.code());
-        try {
-            newUser = userDao.getByIndex(Globals.DEV_UNIVERSITY.code(), studentId);
-        } catch (NotFoundException e) {
-            isNew = true;
-            newUser = UserDto.init(university, studentId, name);
-            newUser = newUser.withAuthorityAdd(Globals.DEV_AUTHORITY);
+    private List<AuthorityDto> toAuthorityDtoList(List<AuthorityInfo> authorityInfos) {
+        List<AuthorityDto> newAuthorities = new ArrayList<>();
+        for (AuthorityInfo authorityInfo : authorityInfos) {
+            String universityCode = authorityInfo.universityCode();
+            String departmentCode = authorityInfo.departmentCode();
+            String permissionText = authorityInfo.permission();
+            DepartmentDto department = departmentDao.getByIndex(universityCode, departmentCode);
+            newAuthorities.add(new AuthorityDto(department, AuthorityDto.Permission.create(permissionText)));
         }
-        return Pair.of(isNew, newUser);
+        return newAuthorities;
     }
 
     private List<AuthorityDto> makeNewAuthorities(UserDto user, List<String> newMajorCodes) {

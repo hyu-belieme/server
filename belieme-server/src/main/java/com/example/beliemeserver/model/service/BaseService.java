@@ -1,5 +1,7 @@
 package com.example.beliemeserver.model.service;
 
+import com.example.beliemeserver.config.initdata.InitialData;
+import com.example.beliemeserver.config.initdata.InitialDataDtoAdapter;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dao.*;
@@ -7,13 +9,14 @@ import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.ItemDto;
 import com.example.beliemeserver.model.dto.StuffDto;
 import com.example.beliemeserver.model.dto.UserDto;
-import com.example.beliemeserver.model.exception.TokenExpiredException;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
+import com.example.beliemeserver.model.exception.TokenExpiredException;
 import org.springframework.stereotype.Service;
 
 @Service
 public abstract class BaseService {
+    protected final InitialDataDtoAdapter initialData;
     protected final UniversityDao universityDao;
     protected final DepartmentDao departmentDao;
     protected final UserDao userDao;
@@ -25,7 +28,8 @@ public abstract class BaseService {
 
     public static final long TOKEN_EXPIRED_TIME = 3L * 30 * 24 * 60 * 60;
 
-    public BaseService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public BaseService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        this.initialData = new InitialDataDtoAdapter(initialData);
         this.universityDao = universityDao;
         this.departmentDao = departmentDao;
         this.userDao = userDao;

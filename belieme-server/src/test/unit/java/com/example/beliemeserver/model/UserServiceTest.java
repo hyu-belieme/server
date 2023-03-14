@@ -1,11 +1,12 @@
 package com.example.beliemeserver.model;
 
-import com.example.beliemeserver.common.DeveloperInfo;
-import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.config.initdata.InitialDataDtoAdapter;
+import com.example.beliemeserver.config.initdata.container.AuthorityInfo;
+import com.example.beliemeserver.config.initdata.container.UniversityInfo;
+import com.example.beliemeserver.config.initdata.container.UserInfo;
 import com.example.beliemeserver.error.exception.BadGatewayException;
 import com.example.beliemeserver.error.exception.ForbiddenException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
@@ -370,48 +371,53 @@ public class UserServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    @DisplayName("reloadDeveloperUser()")
+    @DisplayName("reloadInitialUser()")
     public final class TestReloadDeveloperUser {
         @Captor
         private ArgumentCaptor<UserDto> userArgumentCaptor;
 
-        private final UniversityDto univ = Globals.DEV_UNIVERSITY;
-        private final String univCode = Globals.DEV_UNIVERSITY.code();
+        private UserInfo userInfo;
+        private UniversityDto univ;
+        private String univCode;
         private String apiToken;
         private String studentId;
-        private String name;
 
         private UserDto targetUser;
+        private List<DepartmentDto> deptList;
 
         private void setUpDefault() {
-            RandomGetter<DeveloperInfo> devInfoGetter = new RandomGetter<>(Globals.developers);
-            DeveloperInfo devInfo = devInfoGetter.randomSelect();
+            RandomGetter<UserInfo> userInfoGetter = new RandomGetter<>(stub.INIT_DATA.userInfos());
+            this.userInfo = userInfoGetter.randomSelect();
+            this.apiToken = userInfo.apiToken();
+            this.studentId = userInfo.studentId();
+            this.univCode = userInfo.universityCode();
 
-            this.apiToken = devInfo.apiToken();
-            this.studentId = devInfo.studentId();
-            this.name = devInfo.name();
-            this.targetUser = UserDto.init(univ, studentId, name)
-                    .withApprovalTimeStamp(0)
-                    .withAuthorityAdd(Globals.DEV_AUTHORITY);
+            InitialDataDtoAdapter initialDataAdapter = new InitialDataDtoAdapter(stub.INIT_DATA);
+            this.univ = initialDataAdapter.universities().get(univCode);
+            this.deptList = new ArrayList<>(initialDataAdapter.departments().values());
+            this.targetUser = UserDto.init(univ, studentId, userInfo.name())
+                    .withApprovalTimeStamp(0);
         }
 
         private UserDto execMethod() {
-            return userService.reloadDeveloperUser(apiToken);
+            return userService.reloadInitialUser(univCode, apiToken);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[이미 DB에 등록된 developer일 시]_[-]")
-        public void SUCCESS_devIsAlreadyOnDatabase() {
+        @DisplayName("[SUCCESS]_[이미 DB에 등록된 user일 시]_[-]")
+        public void SUCCESS_userIsAlreadyOnDatabase() {
             setUpDefault();
 
+            when(initialData.userInfos()).thenReturn(stub.INIT_DATA.userInfos());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+            mockDepartmentDao();
 
             execMethod();
 
             verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
             UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+            Assertions.assertThat(checkUpdatedUser(newUser, userInfo)).isTrue();
         }
 
         @RepeatedTest(10)
@@ -419,14 +425,16 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_devIsNotOnDatabase() {
             setUpDefault();
 
+            when(initialData.userInfos()).thenReturn(stub.INIT_DATA.userInfos());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+            mockDepartmentDao();
 
             execMethod();
 
             verify(userDao).create(userArgumentCaptor.capture());
             UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+            Assertions.assertThat(checkCreatedUser(newUser, userInfo)).isTrue();
         }
 
         @RepeatedTest(10)
@@ -435,34 +443,51 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
             apiToken = "";
 
-            TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
+            when(initialData.userInfos()).thenReturn(stub.INIT_DATA.userInfos());
+
+            TestHelper.objectCompareTest(this::execMethod, null);
         }
 
-        private boolean checkUpdatedUser(UserDto newUser) {
+        private void mockDepartmentDao() {
+            for (AuthorityInfo authInfo : userInfo.authorities()) {
+                DepartmentDto targetDept = deptList.stream()
+                        .filter(dept -> dept.matchUniqueKey(authInfo.universityCode(), authInfo.departmentCode()))
+                        .findFirst().orElse(null);
+                when(departmentDao.getByIndex(authInfo.universityCode(), authInfo.departmentCode())).thenReturn(targetDept);
+            }
+        }
+
+        private boolean checkUpdatedUser(UserDto newUser, UserInfo userInfo) {
             System.out.println(newUser);
-            if (newUser.studentId().equals(studentId)
-                    && newUser.university().equals(univ)
-                    && newUser.name().equals(name)
+            if (newUser.studentId().equals(userInfo.studentId())
+                    && newUser.university().matchUniqueKey(userInfo.universityCode())
+                    && newUser.name().equals(userInfo.name())
                     && !newUser.token().equals(targetUser.token())
                     && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
             ) {
-                return checkDeveloperAuth(newUser);
+                return checkUserAuth(newUser, userInfo.authorities());
             }
             return false;
         }
 
-        private boolean checkCreatedUser(UserDto newUser) {
-            if (newUser.studentId().equals(studentId)
-                    && newUser.university().equals(univ)
-                    && newUser.name().equals(name)) {
-                return checkDeveloperAuth(newUser);
+        private boolean checkCreatedUser(UserDto newUser, UserInfo userInfo) {
+            System.out.println(newUser);
+            if (newUser.studentId().equals(userInfo.studentId())
+                    && newUser.university().matchUniqueKey(userInfo.universityCode())
+                    && newUser.name().equals(userInfo.name())
+            ) {
+                return checkUserAuth(newUser, userInfo.authorities());
             }
             return false;
         }
 
-        private boolean checkDeveloperAuth(UserDto newUser) {
-            return newUser.authorities().stream()
-                    .anyMatch(authority -> authority.equals(Globals.DEV_AUTHORITY));
+        private boolean checkUserAuth(UserDto newUser, List<AuthorityInfo> authorityInfos) {
+            return authorityInfos.stream().allMatch(authorityInfo ->
+                    newUser.authorities().stream().anyMatch(authorityDto ->
+                            authorityDto.department().matchUniqueKey(authorityInfo.universityCode(), authorityInfo.departmentCode())
+                                    && authorityDto.permission().toString().equals(authorityInfo.permission())
+                    )
+            );
         }
     }
 
@@ -477,6 +502,8 @@ public class UserServiceTest extends BaseServiceTest {
 
         private UniversityDto univ;
         private String univCode;
+        private String apiUrl;
+        private String clientKey;
 
         private UserDto targetUser;
         private String studentId;
@@ -512,8 +539,11 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private void setUniv() {
+            UniversityInfo univInfo = stub.HYU_UNIV_INIT_INFO;
             univ = stub.HYU_UNIV;
-            univCode = stub.HYU_UNIV.code();
+            univCode = univ.code();
+            apiUrl = univInfo.externalApiInfo().get("url");
+            clientKey = univInfo.externalApiInfo().get("clientKey");
         }
 
         private void setTargetUser(UserDto user) {
@@ -539,7 +569,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsAlreadyCreatedAndNoMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
@@ -556,7 +587,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsAlreadyCreatedAndNewMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
@@ -573,7 +605,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsNewAndNoMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
@@ -590,7 +623,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_userIsNewAndNewMajorCreate() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenReturn(makeJsonResponse());
+            when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
             when(universityDao.getByIndex(univCode)).thenReturn(univ);
             when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
             when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
@@ -607,12 +641,20 @@ public class UserServiceTest extends BaseServiceTest {
         public void ERROR_networkProblemOnHanyangApi_BadGateWayException() {
             setUpDefault();
 
-            when(HttpRequest.getUserInfoFromHanyangApi(apiToken)).thenThrow(BadGatewayException.class);
+            when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
+            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenThrow(BadGatewayException.class);
 
             TestHelper.exceptionTest(this::execMethod, BadGatewayException.class);
         }
 
         private boolean checkUpdatedUser(UserDto newUser) {
+            System.out.println(newUser.studentId());
+            System.out.println(studentId);
+            System.out.println();
+
+            System.out.println(newUser.university());
+            System.out.println(univ);
+            System.out.println();
             if (newUser.studentId().equals(studentId)
                     && newUser.university().equals(univ)
                     && newUser.name().equals(newName)

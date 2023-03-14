@@ -1,6 +1,6 @@
 package com.example.beliemeserver.model.service;
 
-import com.example.beliemeserver.common.Globals;
+import com.example.beliemeserver.config.initdata.InitialData;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
@@ -13,12 +13,12 @@ import java.util.List;
 
 @Service
 public class DepartmentService extends BaseService {
-    public DepartmentService(UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
-        super(universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
+    public DepartmentService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public void initializeDepartments() {
-        for (DepartmentDto department : Globals.initialDepartments) {
+        for (DepartmentDto department : initialData.departments().values()) {
             if (departmentDao.checkExistByIndex(department.university().code(), department.code())) {
                 departmentDao.update(department.university().code(), department.code(), department);
                 createOrUpdateAuthorities(department);
@@ -114,7 +114,7 @@ public class DepartmentService extends BaseService {
 
     private void createOrUpdateAuthorities(DepartmentDto department) {
         for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
-            if(!authorityDao.checkExistByIndex(department.university().code(), department.code(), permission)) {
+            if (!authorityDao.checkExistByIndex(department.university().code(), department.code(), permission)) {
                 authorityDao.create(new AuthorityDto(department, permission));
                 continue;
             }
