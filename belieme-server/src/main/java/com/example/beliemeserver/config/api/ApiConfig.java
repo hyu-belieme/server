@@ -1,11 +1,11 @@
-package com.example.beliemeserver.common;
+package com.example.beliemeserver.config.api;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "api")
-public record ApiProperties(
+public record ApiConfig(
         Keyword keyword,
         Variable variable,
         Query query,

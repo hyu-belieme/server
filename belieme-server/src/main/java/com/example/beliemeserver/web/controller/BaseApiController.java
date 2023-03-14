@@ -1,9 +1,9 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.common.ApiProperties;
+import com.example.beliemeserver.config.api.ApiConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseApiController {
     @Autowired
-    protected ApiProperties api;
+    protected ApiConfig api;
 }

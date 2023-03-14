@@ -1,6 +1,6 @@
 package com.example.beliemeserver.error.exception;
 
-import com.example.beliemeserver.common.Message;
+import com.example.beliemeserver.config.message.Message;
 import com.example.beliemeserver.error.info.ErrorInfo;
 import org.springframework.http.HttpStatus;
 

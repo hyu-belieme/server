@@ -1,4 +1,4 @@
-package com.example.beliemeserver.config;
+package com.example.beliemeserver.config.security;
 
 import org.springframework.context.annotation.Bean;
 //import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
