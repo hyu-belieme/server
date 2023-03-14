@@ -13,6 +13,6 @@ public class RentalCountOnSameStuffLimitExceededException extends ForbiddenExcep
     @Override
     public Message getResponseMessage() {
         Object[] args = {Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF};
-        return new Message("error.rentalCountOnSameStuffLimitExceeded.message", args);
+        return new Message("message.error.rentalCountOnSameStuffLimitExceeded", args);
     }
 }

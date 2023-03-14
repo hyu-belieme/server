@@ -9,6 +9,8 @@ import java.util.Map;
 
 public interface InitialData {
     Map<String, UniversityInfo> universityInfos();
+
     Map<String, DepartmentInfo> departmentInfos();
+
     List<UserInfo> userInfos();
 }

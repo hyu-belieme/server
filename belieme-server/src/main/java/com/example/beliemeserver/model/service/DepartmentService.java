@@ -4,6 +4,7 @@ import com.example.beliemeserver.config.initdata.InitialData;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -113,7 +114,7 @@ public class DepartmentService extends BaseService {
     }
 
     private void createOrUpdateAuthorities(DepartmentDto department) {
-        for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+        for (Permission permission : Permission.values()) {
             if (!authorityDao.checkExistByIndex(department.university().code(), department.code(), permission)) {
                 authorityDao.create(new AuthorityDto(department, permission));
                 continue;

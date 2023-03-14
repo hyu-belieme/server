@@ -11,6 +11,6 @@ public class ReturnRegistrationRequestedOnReturnedItemException extends Forbidde
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.returnRegistrationRequestedOnReturnedItem.message");
+        return new Message("message.error.returnRegistrationRequestedOnReturnedItem");
     }
 }

@@ -11,6 +11,6 @@ public class TokenExpiredException extends UnauthorizedException {
 
     @Override
     public Message getResponseMessage() {
-        return new Message("error.tokenExpired.message");
+        return new Message("message.error.tokenExpired");
     }
 }

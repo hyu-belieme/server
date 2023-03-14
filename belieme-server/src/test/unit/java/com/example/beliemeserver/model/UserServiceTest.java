@@ -11,6 +11,7 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.UserService;
 import com.example.beliemeserver.model.util.HttpRequest;
@@ -44,7 +45,7 @@ public class UserServiceTest extends BaseServiceTest {
         @Override
         protected void setUpDefault() {
             setDept(randomDept());
-            setRequester(randomUserHaveMorePermissionOnDept(dept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.MASTER));
         }
 
         @Override
@@ -54,7 +55,7 @@ public class UserServiceTest extends BaseServiceTest {
 
         @Override
         protected void setRequesterAccessDenied() {
-            setRequester(randomUserHaveLessPermissionOnDept(dept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.MASTER));
         }
 
         @RepeatedTest(10)
@@ -67,7 +68,7 @@ public class UserServiceTest extends BaseServiceTest {
 
             List<UserDto> expected = new ArrayList<>();
             for (UserDto user : stub.ALL_USERS) {
-                if (user.getMaxPermission(dept).hasMorePermission(AuthorityDto.Permission.USER))
+                if (user.getMaxPermission(dept).hasMorePermission(Permission.USER))
                     expected.add(user);
             }
 
@@ -169,13 +170,13 @@ public class UserServiceTest extends BaseServiceTest {
         private DepartmentDto authDept;
         private String authUnivCode;
         private String authDeptCode;
-        private AuthorityDto.Permission authPermission;
+        private Permission authPermission;
 
         @Override
         protected void setUpDefault() {
             setAuthDept(TEST_DEPT);
             setAuthPermission(randomUnderMasterPermission());
-            setRequester(randomUserHaveExactPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveExactPermissionOnDept(authDept, Permission.MASTER));
             setTargetUser(randomUsersNotHaveAdditionalAuthOnDept(authDept));
         }
 
@@ -191,7 +192,7 @@ public class UserServiceTest extends BaseServiceTest {
             this.authDeptCode = dept.code();
         }
 
-        private void setAuthPermission(AuthorityDto.Permission permission) {
+        private void setAuthPermission(Permission permission) {
             this.authPermission = permission;
         }
 
@@ -214,7 +215,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[`Requester`가 `Master`이고 기존 `dept`의 권한을 변경할 시]_[-]")
         public void SUCCESS_requesterIsMasterAndUpdateAuth() {
             setUpDefault();
-            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, Permission.MASTER));
             setAuthPermission(randomUnderMasterPermission());
 
             mockAndTestHappyPath();
@@ -224,7 +225,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[`Requester`가 `Master`이고 기존 `dept`의 권한을 `default`로 변경할 시]_[-]")
         public void SUCCESS_requesterIsMasterAndPermissionIsNull() {
             setUpDefault();
-            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, Permission.MASTER));
             setAuthPermission(null);
 
             mockAndTestHappyPath();
@@ -235,7 +236,7 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_requesterIsDeveloperAndAddNewAuth() {
             setUpDefault();
             setRequester(randomDevUser());
-            setAuthPermission(AuthorityDto.Permission.MASTER);
+            setAuthPermission(Permission.MASTER);
 
             mockAndTestHappyPath();
         }
@@ -245,7 +246,7 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_requesterIsDeveloperAndUpdateAuth() {
             setUpDefault();
             setRequester(randomDevUser());
-            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.DEVELOPER));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, Permission.DEVELOPER));
             setAuthPermission(randomUnderDevPermission());
 
             mockAndTestHappyPath();
@@ -256,7 +257,7 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS_requesterIsDeveloperAndPermissionIsNull() {
             setUpDefault();
             setRequester(randomDevUser());
-            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, AuthorityDto.Permission.DEVELOPER));
+            setTargetUser(randomUserHaveAdditionalAuthButLessPermissionOnDept(authDept, Permission.DEVELOPER));
             setAuthPermission(null);
 
             mockAndTestHappyPath();
@@ -266,7 +267,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`가 `MASTER`권한을 갖고 있지 않을 시]_[Forbidden]")
         public void ERROR_requesterDoesNotHaveMasterPermission_Forbidden() {
             setUpDefault();
-            setRequester(randomUserHaveLessPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setRequester(randomUserHaveLessPermissionOnDept(authDept, Permission.MASTER));
 
             when(departmentDao.getByIndex(authUnivCode, authDeptCode))
                     .thenReturn(authDept);
@@ -279,7 +280,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`newPermission`이 `DEVELOPER` 일 시]_[ForbiddenException]")
         public void ERROR_newPermissionIsDeveloper_ForbiddenException() {
             setUpDefault();
-            setAuthPermission(AuthorityDto.Permission.DEVELOPER);
+            setAuthPermission(Permission.DEVELOPER);
 
             when(departmentDao.getByIndex(authUnivCode, authDeptCode))
                     .thenReturn(authDept);
@@ -309,7 +310,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데`newPermission`이 `MASTER` 일 시]_[PermissionDeniedException]")
         public void ERROR_requesterIsNotDevAndNewPermissionIsMaster_PermissionDeniedException() {
             setUpDefault();
-            setAuthPermission(AuthorityDto.Permission.MASTER);
+            setAuthPermission(Permission.MASTER);
 
             when(departmentDao.getByIndex(authUnivCode, authDeptCode))
                     .thenReturn(authDept);
@@ -324,7 +325,7 @@ public class UserServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[`requester`이 `DEVELOPER`가 아닌데 `targetUser`가`MASTER`일 시]_[PermissionDeniedException]")
         public void ERROR_requesterIsNotDevAndTargetUserIsMaster_PermissionDeniedException() {
             setUpDefault();
-            setTargetUser(randomUserHaveExactPermissionOnDept(authDept, AuthorityDto.Permission.MASTER));
+            setTargetUser(randomUserHaveExactPermissionOnDept(authDept, Permission.MASTER));
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
@@ -348,11 +349,11 @@ public class UserServiceTest extends BaseServiceTest {
             verify(userDao).update(targetUserUnivCode, targetUserStudentId, newUser);
         }
 
-        private AuthorityDto.Permission randomUnderDevPermission() {
+        private Permission randomUnderDevPermission() {
             return permissionsUnderDev(allPermissions()).randomSelect();
         }
 
-        private AuthorityDto.Permission randomUnderMasterPermission() {
+        private Permission randomUnderMasterPermission() {
             return permissionsUnderMaster(allPermissions()).randomSelect();
         }
 
@@ -362,7 +363,7 @@ public class UserServiceTest extends BaseServiceTest {
             return users.randomSelect();
         }
 
-        private UserDto randomUserHaveAdditionalAuthButLessPermissionOnDept(DepartmentDto dept, AuthorityDto.Permission permission) {
+        private UserDto randomUserHaveAdditionalAuthButLessPermissionOnDept(DepartmentDto dept, Permission permission) {
             RandomGetter<UserDto> users = allUsers();
             users = usersHaveLessPermissionOnDept(users, dept, permission);
             users = usersHaveAdditionalAuthOnDept(users, dept);
@@ -678,7 +679,7 @@ public class UserServiceTest extends BaseServiceTest {
         private boolean checkAuthUpdate(UserDto newUser) {
             for (DepartmentDto dept : newDepartments) {
                 if (newUser.authorities().stream()
-                        .filter(authority -> authority.permission() == AuthorityDto.Permission.DEFAULT)
+                        .filter(authority -> authority.permission() == Permission.DEFAULT)
                         .noneMatch(authority -> authority.department().equals(dept))
                 ) {
                     return false;
@@ -692,11 +693,11 @@ public class UserServiceTest extends BaseServiceTest {
         return randomSelectAndLog(usersOnUniv(allUsers(), univ));
     }
 
-    private RandomGetter<AuthorityDto.Permission> permissionsUnderDev(RandomGetter<AuthorityDto.Permission> rs) {
+    private RandomGetter<Permission> permissionsUnderDev(RandomGetter<Permission> rs) {
         return rs.filter((permission) -> !permission.hasDeveloperPermission());
     }
 
-    private RandomGetter<AuthorityDto.Permission> permissionsUnderMaster(RandomGetter<AuthorityDto.Permission> rs) {
+    private RandomGetter<Permission> permissionsUnderMaster(RandomGetter<Permission> rs) {
         return rs.filter((permission) -> !permission.hasMasterPermission());
     }
 
@@ -708,8 +709,8 @@ public class UserServiceTest extends BaseServiceTest {
         return rs.filter((user) -> {
             for (AuthorityDto auth : user.authorities()) {
                 if (auth.department().matchUniqueKey(dept)
-                        && auth.permission() != AuthorityDto.Permission.DEFAULT) return true;
-                if (auth.permission() == AuthorityDto.Permission.DEVELOPER) return true;
+                        && auth.permission() != Permission.DEFAULT) return true;
+                if (auth.permission() == Permission.DEVELOPER) return true;
             }
             return false;
         });
@@ -719,8 +720,8 @@ public class UserServiceTest extends BaseServiceTest {
         return rs.filter((user) -> {
             for (AuthorityDto auth : user.authorities()) {
                 if (auth.department().matchUniqueKey(dept)
-                        && auth.permission() != AuthorityDto.Permission.DEFAULT) return false;
-                if (auth.permission() == AuthorityDto.Permission.DEVELOPER) return false;
+                        && auth.permission() != Permission.DEFAULT) return false;
+                if (auth.permission() == Permission.DEVELOPER) return false;
             }
             return true;
         });

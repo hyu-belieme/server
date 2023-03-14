@@ -1,6 +1,7 @@
 package com.example.beliemeserver.data;
 
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.FakeDao;
 import org.junit.jupiter.api.BeforeAll;
@@ -72,7 +73,7 @@ public abstract class DaoTest {
     }
 
     protected AuthorityDto getAuthorityDummy(
-            String universityCodeForDepartment, String departmentCode, AuthorityDto.Permission permission) {
+            String universityCodeForDepartment, String departmentCode, Permission permission) {
         FakeDao.FilterMethod<AuthorityDto> compareRoutine = new FakeDao.FilterMethod<>() {
             @Override
             public boolean checkCondition(AuthorityDto target) {

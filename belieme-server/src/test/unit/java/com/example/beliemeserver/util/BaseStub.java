@@ -1,6 +1,7 @@
 package com.example.beliemeserver.util;
 
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ public abstract class BaseStub {
     protected List<MajorDto> ALL_MAJORS;
     protected List<DepartmentDto> ALL_DEPTS;
     protected List<UserDto> ALL_USERS;
-    protected List<AuthorityDto.Permission> ALL_PERMISSIONS;
+    protected List<Permission> ALL_PERMISSIONS;
     protected List<StuffDto> ALL_STUFFS;
     protected List<ItemDto> ALL_ITEMS;
     protected List<HistoryDto> ALL_HISTORIES;

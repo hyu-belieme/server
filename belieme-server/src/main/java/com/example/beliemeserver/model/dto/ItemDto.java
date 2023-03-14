@@ -1,5 +1,6 @@
 package com.example.beliemeserver.model.dto;
 
+import com.example.beliemeserver.model.dto.enumeration.ItemStatus;
 import lombok.NonNull;
 
 public record ItemDto(
@@ -65,7 +66,4 @@ public record ItemDto(
         };
     }
 
-    public enum ItemStatus {
-        USABLE, UNUSABLE, INACTIVE, ERROR
-    }
 }

@@ -4,6 +4,7 @@ import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.AuthorityDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ public class AuthorityDaoTest extends DaoTest {
     public void createTest() {
         AuthorityDto newAuthority = new AuthorityDto(
                 DummyDataSet.departmentDummies.get(5),
-                AuthorityDto.Permission.BANNED
+                Permission.BANNED
         );
 
         testCreatingAuthority(newAuthority);
@@ -35,7 +36,7 @@ public class AuthorityDaoTest extends DaoTest {
     public void createFailByNotFound() {
         AuthorityDto newAuthority = new AuthorityDto(
                 DummyDataSet.notFoundDepartment,
-                AuthorityDto.Permission.MASTER
+                Permission.MASTER
         );
 
         TestHelper.exceptionTest(
@@ -48,7 +49,7 @@ public class AuthorityDaoTest extends DaoTest {
     public void createFailByConflict() {
         AuthorityDto newAuthority = new AuthorityDto(
                 DummyDataSet.departmentDummies.get(3),
-                AuthorityDto.Permission.MASTER
+                Permission.MASTER
         );
 
         TestHelper.exceptionTest(
@@ -61,11 +62,11 @@ public class AuthorityDaoTest extends DaoTest {
     public void updateTest() {
         String universityCode = "CKU";
         String departmentCode = "MED";
-        AuthorityDto.Permission permission = AuthorityDto.Permission.STAFF;
+        Permission permission = Permission.STAFF;
 
         AuthorityDto newAuthority = new AuthorityDto(
                 DummyDataSet.departmentDummies.get(5),
-                AuthorityDto.Permission.STAFF
+                Permission.STAFF
         );
 
         testUpdatingAuthority(universityCode, departmentCode, permission, newAuthority);
@@ -75,10 +76,10 @@ public class AuthorityDaoTest extends DaoTest {
     public void updateFailByNotFound() {
         String universityCode = "CKU";
         String departmentCode = "ME";
-        AuthorityDto.Permission permission = AuthorityDto.Permission.BANNED;
+        Permission permission = Permission.BANNED;
         AuthorityDto newAuthority = new AuthorityDto(
                 DummyDataSet.departmentDummies.get(5),
-                AuthorityDto.Permission.STAFF
+                Permission.STAFF
         );
 
         TestHelper.exceptionTest(
@@ -91,11 +92,11 @@ public class AuthorityDaoTest extends DaoTest {
     public void updateFailByConflict() {
         String universityCode = "CKU";
         String departmentCode = "MED";
-        AuthorityDto.Permission permission = AuthorityDto.Permission.STAFF;
+        Permission permission = Permission.STAFF;
 
         AuthorityDto newAuthority = new AuthorityDto(
                 DummyDataSet.departmentDummies.get(3),
-                AuthorityDto.Permission.MASTER
+                Permission.MASTER
         );
 
         TestHelper.exceptionTest(
@@ -117,7 +118,7 @@ public class AuthorityDaoTest extends DaoTest {
     }
 
     private void testUpdatingAuthority(String universityCode, String departmentCode,
-                                       AuthorityDto.Permission permission, AuthorityDto newAuthority) {
+                                       Permission permission, AuthorityDto newAuthority) {
         TestHelper.objectCompareTest(
                 () -> authorityDao.update(universityCode, departmentCode, permission, newAuthority),
                 newAuthority

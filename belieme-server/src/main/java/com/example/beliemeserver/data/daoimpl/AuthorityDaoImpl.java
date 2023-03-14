@@ -7,6 +7,7 @@ import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.AuthorityDao;
 import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public boolean checkExistByIndex(String universityCode, String departmentCode, AuthorityDto.Permission permission) {
+    public boolean checkExistByIndex(String universityCode, String departmentCode, Permission permission) {
         try {
             int departmentId = findDepartmentEntity(universityCode, departmentCode).getId();
             return authorityRepository.existsByDepartmentIdAndPermission(departmentId, permission.toString());
@@ -53,7 +54,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
     }
 
     @Override
-    public AuthorityDto update(String universityCode, String departmentCode, AuthorityDto.Permission permission, AuthorityDto newAuthority) {
+    public AuthorityDto update(String universityCode, String departmentCode, Permission permission, AuthorityDto newAuthority) {
         AuthorityEntity target = findAuthorityEntity(universityCode, departmentCode, permission.name());
         DepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department());
 

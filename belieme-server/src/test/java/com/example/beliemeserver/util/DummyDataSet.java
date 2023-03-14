@@ -1,6 +1,7 @@
 package com.example.beliemeserver.util;
 
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class DummyDataSet {
 
         authorityDummies = new ArrayList<>();
         for (int i = 0; i < departmentDummies.size() - 1; i++) {
-            for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+            for (Permission permission : Permission.values()) {
                 authorityDummies.add(new AuthorityDto(departmentDummies.get(i), permission));
             }
         }

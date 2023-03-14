@@ -4,6 +4,8 @@ import com.example.beliemeserver.config.initdata.InitialData;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.model.dao.*;
 import com.example.beliemeserver.model.dto.*;
+import com.example.beliemeserver.model.dto.enumeration.HistoryStatus;
+import com.example.beliemeserver.model.dto.enumeration.ItemStatus;
 import com.example.beliemeserver.model.exception.*;
 import com.example.beliemeserver.model.util.Constants;
 import lombok.NonNull;
@@ -109,7 +111,7 @@ public class HistoryService extends BaseService {
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() != ItemDto.ItemStatus.USABLE) throw new ReservationRequestedOnNonUsableItemException();
+        if (item.status() != ItemStatus.USABLE) throw new ReservationRequestedOnNonUsableItemException();
 
         HistoryDto newHistory = new HistoryDto(
                 item,
@@ -145,10 +147,10 @@ public class HistoryService extends BaseService {
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() == ItemDto.ItemStatus.INACTIVE) throw new LostRegistrationRequestedOnLostItemException();
+        if (item.status() == ItemStatus.INACTIVE) throw new LostRegistrationRequestedOnLostItemException();
 
         HistoryDto newHistory;
-        if (item.status() == ItemDto.ItemStatus.USABLE) {
+        if (item.status() == ItemStatus.USABLE) {
             newHistory = new HistoryDto(
                     item,
                     item.nextHistoryNum(),
@@ -170,6 +172,7 @@ public class HistoryService extends BaseService {
                     stuffName, itemNum, newHistory.num());
         }
 
+        if (item.lastHistory().status() == HistoryStatus.REQUESTED) throw new LostRegistrationRequestedOnReservedItemException();
         newHistory = item.lastHistory()
                 .withItem(item)
                 .withLostManager(requester)
@@ -192,7 +195,7 @@ public class HistoryService extends BaseService {
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
-                || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
+                || lastHistory.status() != HistoryStatus.REQUESTED) {
             throw new RespondedOnUnrequestedItemException();
         }
 
@@ -218,9 +221,9 @@ public class HistoryService extends BaseService {
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
-                || (lastHistory.status() != HistoryDto.HistoryStatus.USING
-                && lastHistory.status() != HistoryDto.HistoryStatus.DELAYED
-                && lastHistory.status() != HistoryDto.HistoryStatus.LOST)) {
+                || (lastHistory.status() != HistoryStatus.USING
+                && lastHistory.status() != HistoryStatus.DELAYED
+                && lastHistory.status() != HistoryStatus.LOST)) {
             throw new ReturnRegistrationRequestedOnReturnedItemException();
         }
 
@@ -246,7 +249,7 @@ public class HistoryService extends BaseService {
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
-                || lastHistory.status() != HistoryDto.HistoryStatus.REQUESTED) {
+                || lastHistory.status() != HistoryStatus.REQUESTED) {
             throw new RespondedOnUnrequestedItemException();
         }
 

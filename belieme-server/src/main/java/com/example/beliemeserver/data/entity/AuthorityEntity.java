@@ -1,6 +1,7 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.model.dto.AuthorityDto;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -55,7 +56,7 @@ public class AuthorityEntity extends DataEntity {
     public AuthorityDto toAuthorityDto() {
         return new AuthorityDto(
                 department.toDepartmentDto(),
-                AuthorityDto.Permission.create(permission)
+                Permission.valueOf(permission)
         );
     }
 }

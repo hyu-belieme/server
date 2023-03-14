@@ -6,6 +6,7 @@ import com.example.beliemeserver.model.dto.AuthorityDto;
 import com.example.beliemeserver.model.dto.DepartmentDto;
 import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.model.dto.UniversityDto;
+import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.model.exception.IndexInvalidException;
 import com.example.beliemeserver.model.exception.PermissionDeniedException;
 import com.example.beliemeserver.model.service.DepartmentService;
@@ -180,7 +181,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
             verify(departmentDao).create(dept);
             verify(majorDao, never()).create(any());
-            for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+            for (Permission permission : Permission.values()) {
                 verify(authorityDao).create(new AuthorityDto(dept, permission));
             }
         }
@@ -201,7 +202,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
 
             verify(departmentDao).create(dept);
             verify(majorDao, times(1)).create(baseMajors.get(0));
-            for (AuthorityDto.Permission permission : AuthorityDto.Permission.values()) {
+            for (Permission permission : Permission.values()) {
                 verify(authorityDao).create(new AuthorityDto(dept, permission));
             }
         }
