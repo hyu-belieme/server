@@ -6,9 +6,9 @@ import com.example.beliemeserver.config.initdata.container.AuthorityInfo;
 import com.example.beliemeserver.config.initdata.container.DepartmentInfo;
 import com.example.beliemeserver.config.initdata.container.UniversityInfo;
 import com.example.beliemeserver.config.initdata.container.UserInfo;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.MajorDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 
 import java.util.ArrayList;
 import java.util.HashMap;

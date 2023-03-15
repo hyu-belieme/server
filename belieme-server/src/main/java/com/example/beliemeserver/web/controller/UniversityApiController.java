@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.model.dto.UniversityDto;
-import com.example.beliemeserver.model.service.UniversityService;
+import com.example.beliemeserver.domain.dto.UniversityDto;
+import com.example.beliemeserver.domain.service.UniversityService;
 import com.example.beliemeserver.web.responsebody.UniversityResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

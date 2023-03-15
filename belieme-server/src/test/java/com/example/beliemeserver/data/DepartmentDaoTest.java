@@ -1,10 +1,10 @@
 package com.example.beliemeserver.data;
 
+import com.example.beliemeserver.domain.dao.DepartmentDao;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.MajorDto;
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dao.DepartmentDao;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.MajorDto;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;

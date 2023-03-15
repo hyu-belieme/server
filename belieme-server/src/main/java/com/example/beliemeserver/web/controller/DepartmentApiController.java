@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.service.DepartmentService;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.service.DepartmentService;
 import com.example.beliemeserver.web.requestbody.DepartmentRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentUpdateValidationGroup;

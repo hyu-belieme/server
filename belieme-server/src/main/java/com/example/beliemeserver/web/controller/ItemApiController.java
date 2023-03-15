@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.model.dto.ItemDto;
-import com.example.beliemeserver.model.service.ItemService;
+import com.example.beliemeserver.domain.dto.ItemDto;
+import com.example.beliemeserver.domain.service.ItemService;
 import com.example.beliemeserver.web.responsebody.ItemResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

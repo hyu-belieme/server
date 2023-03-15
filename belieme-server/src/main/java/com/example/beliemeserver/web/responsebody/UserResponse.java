@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 

@@ -3,11 +3,11 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.AuthorityEntity;
 import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.repository.*;
+import com.example.beliemeserver.domain.dao.AuthorityDao;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dao.AuthorityDao;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.enumeration.Permission;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

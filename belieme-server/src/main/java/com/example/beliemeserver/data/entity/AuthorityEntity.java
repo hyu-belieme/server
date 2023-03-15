@@ -1,7 +1,7 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.enumeration.Permission;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;

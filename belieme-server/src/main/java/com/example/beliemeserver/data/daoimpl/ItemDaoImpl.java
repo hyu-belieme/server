@@ -4,10 +4,10 @@ import com.example.beliemeserver.data.entity.HistoryEntity;
 import com.example.beliemeserver.data.entity.ItemEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.repository.*;
+import com.example.beliemeserver.domain.dao.ItemDao;
+import com.example.beliemeserver.domain.dto.HistoryDto;
+import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.error.exception.ConflictException;
-import com.example.beliemeserver.model.dao.ItemDao;
-import com.example.beliemeserver.model.dto.HistoryDto;
-import com.example.beliemeserver.model.dto.ItemDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

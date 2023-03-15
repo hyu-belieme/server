@@ -1,10 +1,10 @@
 package com.example.beliemeserver.data;
 
+import com.example.beliemeserver.domain.dao.AuthorityDao;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dao.AuthorityDao;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.enumeration.Permission;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;

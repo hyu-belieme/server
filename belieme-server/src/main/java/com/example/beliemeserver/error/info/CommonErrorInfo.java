@@ -22,8 +22,8 @@ public enum CommonErrorInfo implements ErrorInfo {
     }
 
     public static ErrorInfo getByHttpStatus(HttpStatus status) {
-        for(ErrorInfo errorInfo : CommonErrorInfo.values()) {
-            if(errorInfo.httpStatus().equals(status)) return errorInfo;
+        for (ErrorInfo errorInfo : CommonErrorInfo.values()) {
+            if (errorInfo.httpStatus().equals(status)) return errorInfo;
         }
         return INTERNAL_SERVER_ERROR;
     }

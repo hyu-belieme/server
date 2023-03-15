@@ -5,11 +5,11 @@ import com.example.beliemeserver.data.entity.MajorDepartmentJoinEntity;
 import com.example.beliemeserver.data.entity.MajorEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
+import com.example.beliemeserver.domain.dao.DepartmentDao;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.MajorDto;
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dao.DepartmentDao;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.MajorDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

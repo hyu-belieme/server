@@ -3,9 +3,9 @@ package com.example.beliemeserver.config.initdata;
 import com.example.beliemeserver.config.initdata.container.DepartmentInfo;
 import com.example.beliemeserver.config.initdata.container.UniversityInfo;
 import com.example.beliemeserver.config.initdata.container.UserInfo;
-import com.example.beliemeserver.model.dto.DepartmentDto;
-import com.example.beliemeserver.model.dto.MajorDto;
-import com.example.beliemeserver.model.dto.UniversityDto;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.MajorDto;
+import com.example.beliemeserver.domain.dto.UniversityDto;
 
 import java.util.HashMap;
 import java.util.List;

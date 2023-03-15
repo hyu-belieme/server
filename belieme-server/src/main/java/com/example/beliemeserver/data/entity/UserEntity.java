@@ -1,7 +1,7 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.UserDto;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
