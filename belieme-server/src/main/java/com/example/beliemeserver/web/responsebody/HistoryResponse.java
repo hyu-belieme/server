@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.model.dto.HistoryDto;
+import com.example.beliemeserver.domain.dto.HistoryDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;

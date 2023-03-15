@@ -1,6 +1,6 @@
 package com.example.beliemeserver.preprocessing;
 
-import com.example.beliemeserver.model.service.DepartmentService;
+import com.example.beliemeserver.domain.service.DepartmentService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;

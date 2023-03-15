@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.domain.dto.StuffDto;
 import com.example.beliemeserver.util.RandomGetter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;

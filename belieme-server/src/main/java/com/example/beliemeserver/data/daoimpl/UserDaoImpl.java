@@ -5,10 +5,10 @@ import com.example.beliemeserver.data.entity.AuthorityUserJoinEntity;
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.entity.UserEntity;
 import com.example.beliemeserver.data.repository.*;
+import com.example.beliemeserver.domain.dao.UserDao;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import com.example.beliemeserver.error.exception.ConflictException;
-import com.example.beliemeserver.model.dao.UserDao;
-import com.example.beliemeserver.model.dto.AuthorityDto;
-import com.example.beliemeserver.model.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,9 +1,9 @@
 package com.example.beliemeserver.data;
 
+import com.example.beliemeserver.domain.dao.UniversityDao;
+import com.example.beliemeserver.domain.dto.UniversityDto;
 import com.example.beliemeserver.error.exception.ConflictException;
 import com.example.beliemeserver.error.exception.NotFoundException;
-import com.example.beliemeserver.model.dao.UniversityDao;
-import com.example.beliemeserver.model.dto.UniversityDto;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

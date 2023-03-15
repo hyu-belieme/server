@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.model.dto.StuffDto;
-import com.example.beliemeserver.model.service.StuffService;
+import com.example.beliemeserver.domain.dto.StuffDto;
+import com.example.beliemeserver.domain.service.StuffService;
 import com.example.beliemeserver.web.requestbody.StuffRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffUpdateValidationGroup;

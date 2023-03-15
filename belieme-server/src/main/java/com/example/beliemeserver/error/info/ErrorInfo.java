@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 
 public interface ErrorInfo {
     String name();
+
     HttpStatus httpStatus();
+
     Message responseMessage();
 }

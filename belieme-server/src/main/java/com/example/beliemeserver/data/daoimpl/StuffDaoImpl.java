@@ -3,9 +3,9 @@ package com.example.beliemeserver.data.daoimpl;
 import com.example.beliemeserver.data.entity.DepartmentEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.repository.*;
+import com.example.beliemeserver.domain.dao.StuffDao;
+import com.example.beliemeserver.domain.dto.StuffDto;
 import com.example.beliemeserver.error.exception.ConflictException;
-import com.example.beliemeserver.model.dao.StuffDao;
-import com.example.beliemeserver.model.dto.StuffDto;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

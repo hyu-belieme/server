@@ -1,7 +1,7 @@
 package com.example.beliemeserver.util;
 
-import com.example.beliemeserver.model.dto.*;
-import com.example.beliemeserver.model.dto.enumeration.Permission;
+import com.example.beliemeserver.domain.dto.*;
+import com.example.beliemeserver.domain.dto.enumeration.Permission;
 
 import java.util.ArrayList;
 import java.util.List;

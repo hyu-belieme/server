@@ -2,9 +2,9 @@ package com.example.beliemeserver.data.daoimpl;
 
 import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.*;
+import com.example.beliemeserver.domain.dao.UniversityDao;
+import com.example.beliemeserver.domain.dto.UniversityDto;
 import com.example.beliemeserver.error.exception.ConflictException;
-import com.example.beliemeserver.model.dao.UniversityDao;
-import com.example.beliemeserver.model.dto.UniversityDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

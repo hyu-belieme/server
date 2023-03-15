@@ -1,9 +1,9 @@
 package com.example.beliemeserver.web.exceptionhandler;
 
 import com.example.beliemeserver.config.message.Message;
+import com.example.beliemeserver.error.exception.ServerException;
 import com.example.beliemeserver.error.info.CommonErrorInfo;
 import com.example.beliemeserver.error.info.ErrorInfo;
-import com.example.beliemeserver.error.exception.ServerException;
 import com.example.beliemeserver.web.responsebody.ExceptionResponse;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

@@ -1,7 +1,7 @@
 package com.example.beliemeserver.data;
 
-import com.example.beliemeserver.model.dao.StuffDao;
-import com.example.beliemeserver.model.dto.StuffDto;
+import com.example.beliemeserver.domain.dao.StuffDao;
+import com.example.beliemeserver.domain.dto.StuffDto;
 import com.example.beliemeserver.util.DummyDataSet;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.Test;

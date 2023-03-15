@@ -1,6 +1,6 @@
 package com.example.beliemeserver.data.entity;
 
-import com.example.beliemeserver.model.dto.UniversityDto;
+import com.example.beliemeserver.domain.dto.UniversityDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
