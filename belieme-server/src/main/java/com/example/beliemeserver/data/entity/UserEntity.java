@@ -45,12 +45,12 @@ public class UserEntity extends DataEntity {
     private String token;
 
     @Setter
-    @Column(name = "create_time_stamp")
-    private long createTimeStamp;
+    @Column(name = "created_at")
+    private long createdAt;
 
     @Setter
-    @Column(name = "approval_time_stamp")
-    private long approvalTimeStamp;
+    @Column(name = "approved_at")
+    private long approvedAt;
 
     @ManyToOne
     @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
@@ -60,14 +60,14 @@ public class UserEntity extends DataEntity {
     @OneToMany(mappedBy = "userId")
     private List<AuthorityUserJoinEntity> authorityJoin;
 
-    public UserEntity(UniversityEntity university, String studentId, String name, String token, long createTimeStamp, long approvalTimeStamp) {
+    public UserEntity(UniversityEntity university, String studentId, String name, String token, long createdAt, long approvedAt) {
         this.university = university;
         this.universityId = university.getId();
         this.studentId = studentId;
         this.name = name;
         this.token = token;
-        this.createTimeStamp = createTimeStamp;
-        this.approvalTimeStamp = approvalTimeStamp;
+        this.createdAt = createdAt;
+        this.approvedAt = approvedAt;
         this.authorityJoin = new ArrayList<>();
     }
 
@@ -96,8 +96,8 @@ public class UserEntity extends DataEntity {
                 studentId,
                 name,
                 token,
-                createTimeStamp,
-                approvalTimeStamp,
+                createdAt,
+                approvedAt,
                 authorityDtoList
         );
     }

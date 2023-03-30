@@ -397,7 +397,7 @@ public class UserServiceTest extends BaseServiceTest {
             this.univ = initialDataAdapter.universities().get(univCode);
             this.deptList = new ArrayList<>(initialDataAdapter.departments().values());
             this.targetUser = UserDto.init(univ, studentId, userInfo.name())
-                    .withApprovalTimeStamp(0);
+                    .withApprovedAt(0);
         }
 
         private UserDto execMethod() {
@@ -464,7 +464,7 @@ public class UserServiceTest extends BaseServiceTest {
                     && newUser.university().matchUniqueKey(userInfo.universityCode())
                     && newUser.name().equals(userInfo.name())
                     && !newUser.token().equals(targetUser.token())
-                    && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
+                    && newUser.approvedAt() > targetUser.approvedAt()
             ) {
                 return checkUserAuth(newUser, userInfo.authorities());
             }
@@ -548,7 +548,7 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private void setTargetUser(UserDto user) {
-            this.targetUser = user.withApprovalTimeStamp(0);
+            this.targetUser = user.withApprovedAt(0);
             this.studentId = user.studentId();
         }
 
@@ -660,7 +660,7 @@ public class UserServiceTest extends BaseServiceTest {
                     && newUser.university().equals(univ)
                     && newUser.name().equals(newName)
                     && !newUser.token().equals(targetUser.token())
-                    && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
+                    && newUser.approvedAt() > targetUser.approvedAt()
             ) {
                 return checkAuthUpdate(newUser);
             }

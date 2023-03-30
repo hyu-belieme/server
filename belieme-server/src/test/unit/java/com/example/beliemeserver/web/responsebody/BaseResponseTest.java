@@ -83,11 +83,11 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("token")).isTrue();
         Assertions.assertThat(json.get("token")).isEqualTo(user.token());
 
-        Assertions.assertThat(json.containsKey("createTimeStamp")).isTrue();
-        Assertions.assertThat(json.get("createTimeStamp")).isEqualTo(user.createTimeStamp());
+        Assertions.assertThat(json.containsKey("createdAt")).isTrue();
+        Assertions.assertThat(json.get("createdAt")).isEqualTo(user.createdAt());
 
-        Assertions.assertThat(json.containsKey("approvalTimeStamp")).isTrue();
-        Assertions.assertThat(json.get("approvalTimeStamp")).isEqualTo(user.approvalTimeStamp());
+        Assertions.assertThat(json.containsKey("approvedAt")).isTrue();
+        Assertions.assertThat(json.get("approvedAt")).isEqualTo(user.approvedAt());
     }
 
     protected void userWithoutSecureInfoJsonCmpAssertions(JSONObject json, UserDto user) {
@@ -99,7 +99,7 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("authorities")).isFalse();
         Assertions.assertThat(json.containsKey("token")).isFalse();
-        Assertions.assertThat(json.containsKey("createTimeStamp")).isFalse();
+        Assertions.assertThat(json.containsKey("createdAt")).isFalse();
         Assertions.assertThat(json.containsKey("approvedAt")).isFalse();
     }
 

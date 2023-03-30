@@ -148,7 +148,7 @@ public class UserService extends BaseService {
                 .withStudentId(userInfo.studentId())
                 .withName(userInfo.name())
                 .withAuthorities(toAuthorityDtoList(userInfo.authorities()))
-                .withApprovalTimeStamp(currentTimestamp())
+                .withApprovedAt(currentTime())
                 .withToken(UUID.randomUUID().toString());
 
         if (isNew) return userDao.create(targetUser);
@@ -167,7 +167,7 @@ public class UserService extends BaseService {
 
         List<AuthorityDto> newAuthorities = makeNewAuthorities(targetUser, majorCodes);
         targetUser = targetUser.withName(name)
-                .withApprovalTimeStamp(currentTimestamp())
+                .withApprovedAt(currentTime())
                 .withAuthorities(newAuthorities)
                 .withToken(UUID.randomUUID().toString());
 
@@ -216,7 +216,7 @@ public class UserService extends BaseService {
                 .noneMatch((major) -> majorCodes.contains(major.code()));
     }
 
-    private long currentTimestamp() {
+    private long currentTime() {
         return System.currentTimeMillis() / 1000;
     }
 }
