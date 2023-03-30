@@ -78,9 +78,9 @@ public abstract class BaseServiceTest {
         @DisplayName("[ERROR]_[토큰이 만료되었을 시]_[ExpiredTokenException]")
         public void ERROR_isExpiredToken_ExpiredTokenException() {
             setUpDefault();
-            long newApprovalTimestamp = requester.approvalTimeStamp() - BaseService.TOKEN_EXPIRED_TIME - 10;
+            long newApprovedAt = requester.approvedAt() - BaseService.TOKEN_EXPIRED_TIME - 10;
 
-            when(userDao.getByToken(userToken)).thenReturn(requester.withApprovalTimeStamp(newApprovalTimestamp));
+            when(userDao.getByToken(userToken)).thenReturn(requester.withApprovedAt(newApprovedAt));
 
             TestHelper.exceptionTest(this::execMethod, TokenExpiredException.class);
         }

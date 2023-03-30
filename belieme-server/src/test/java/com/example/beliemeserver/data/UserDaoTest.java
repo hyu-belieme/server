@@ -78,7 +78,8 @@ public class UserDaoTest extends DaoTest {
         UserDto newUser = UserDto.init(
                 getUniversityDummy("HYU"),
                 "202212345678",
-                "홍길동"
+                "홍길동",
+                2022
         );
 
         testCreatingUser(newUser);
@@ -89,7 +90,8 @@ public class UserDaoTest extends DaoTest {
         UserDto newUser = UserDto.init(
                 DummyDataSet.notFoundUniversity,
                 "202212345678",
-                "홍길동"
+                "홍길동",
+                2022
         );
 
         TestHelper.exceptionTest(
@@ -103,7 +105,8 @@ public class UserDaoTest extends DaoTest {
         UserDto newUser = UserDto.init(
                 getUniversityDummy("HYU"),
                 "2018008886",
-                "홍길동"
+                "홍길동",
+                2018
         );
 
         TestHelper.exceptionTest(
@@ -127,6 +130,7 @@ public class UserDaoTest extends DaoTest {
                 getUniversityDummy("HYU"),
                 "2018008886",
                 "홍길동",
+                2018,
                 "TEST1",
                 1673155358,
                 1673155358,
@@ -151,6 +155,7 @@ public class UserDaoTest extends DaoTest {
                 getUniversityDummy("HYU"),
                 "2018008886",
                 "이석환",
+                2018,
                 "TEST10",
                 1673155358,
                 1673155358,
@@ -174,6 +179,7 @@ public class UserDaoTest extends DaoTest {
                 getUniversityDummy("HYU"),
                 "2018008886",
                 "이석환",
+                2018,
                 "TEST10",
                 1673155358,
                 1673155358,
@@ -196,8 +202,9 @@ public class UserDaoTest extends DaoTest {
 
         UserDto newUser = new UserDto(
                 getUniversityDummy("HYU"),
-                "2018008896",
+                "2022008896",
                 "이석환",
+                2022,
                 "TEST1",
                 1673155356,
                 1673155356,
@@ -215,7 +222,8 @@ public class UserDaoTest extends DaoTest {
         UserDto newUser = UserDto.init(
                 DummyDataSet.universityDummies.get(1),
                 "2022001234",
-                "홍길동"
+                "홍길동",
+                2022
         );
 
         TestHelper.exceptionTest(
@@ -232,7 +240,8 @@ public class UserDaoTest extends DaoTest {
         UserDto newUser = UserDto.init(
                 DummyDataSet.universityDummies.get(1),
                 "2018008887",
-                "홍길동"
+                "홍길동",
+                2018
         );
 
         TestHelper.exceptionTest(

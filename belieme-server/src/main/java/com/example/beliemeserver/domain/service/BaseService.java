@@ -55,9 +55,9 @@ public abstract class BaseService {
     }
 
     private void validateUser(UserDto user) {
-        long currentTimestamp = (System.currentTimeMillis() / 1000);
-        long expiredTimestamp = user.approvalTimeStamp() + TOKEN_EXPIRED_TIME;
-        if (currentTimestamp > expiredTimestamp) {
+        long currentTime = (System.currentTimeMillis() / 1000);
+        long expiredAt = user.approvedAt() + TOKEN_EXPIRED_TIME;
+        if (currentTime > expiredAt) {
             throw new TokenExpiredException();
         }
     }

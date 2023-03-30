@@ -13,29 +13,32 @@ public class UserResponse extends JsonResponse {
     private UniversityResponse university;
     private String studentId;
     private String name;
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private int entranceYear;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<AuthorityResponse> authorities;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String token;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private long createTimeStamp;
+    private long createdAt;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private long approvalTimeStamp;
+    private long approvedAt;
 
     private UserResponse(boolean doesJsonInclude) {
         super(doesJsonInclude);
     }
 
-    private UserResponse(UniversityResponse university, String studentId, String name, List<AuthorityResponse> authorities, String token, long createTimeStamp, long approvalTimeStamp) {
+    private UserResponse(UniversityResponse university, String studentId, String name, int entranceYear, List<AuthorityResponse> authorities, String token, long createdAt, long approvedAt) {
         super(true);
         this.university = university;
         this.studentId = studentId;
         this.name = name;
+        this.entranceYear = entranceYear;
         this.authorities = authorities;
         this.token = token;
-        this.createTimeStamp = createTimeStamp;
-        this.approvalTimeStamp = approvalTimeStamp;
+        this.createdAt = createdAt;
+        this.approvedAt = approvedAt;
     }
 
     public static UserResponse responseWillBeIgnore() {
@@ -57,14 +60,15 @@ public class UserResponse extends JsonResponse {
                 UniversityResponse.from(userDto.university()),
                 userDto.studentId(),
                 userDto.name(),
+                userDto.entranceYear(),
                 authorityResponseList,
                 userDto.token(),
-                userDto.createTimeStamp(),
-                userDto.approvalTimeStamp()
+                userDto.createdAt(),
+                userDto.approvedAt()
         );
     }
 
     public UserResponse withoutSecureInfo() {
-        return new UserResponse(university, studentId, name, null, null, 0, 0);
+        return new UserResponse(university, studentId, name, entranceYear, null, null, 0, 0);
     }
 }

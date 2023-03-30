@@ -396,8 +396,8 @@ public class UserServiceTest extends BaseServiceTest {
             InitialDataDtoAdapter initialDataAdapter = new InitialDataDtoAdapter(stub.INIT_DATA);
             this.univ = initialDataAdapter.universities().get(univCode);
             this.deptList = new ArrayList<>(initialDataAdapter.departments().values());
-            this.targetUser = UserDto.init(univ, studentId, userInfo.name())
-                    .withApprovalTimeStamp(0);
+            this.targetUser = UserDto.init(univ, studentId, userInfo.name(), userInfo.entranceYear())
+                    .withApprovedAt(0);
         }
 
         private UserDto execMethod() {
@@ -463,8 +463,9 @@ public class UserServiceTest extends BaseServiceTest {
             if (newUser.studentId().equals(userInfo.studentId())
                     && newUser.university().matchUniqueKey(userInfo.universityCode())
                     && newUser.name().equals(userInfo.name())
+                    && newUser.entranceYear() == userInfo.entranceYear()
                     && !newUser.token().equals(targetUser.token())
-                    && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
+                    && newUser.approvedAt() > targetUser.approvedAt()
             ) {
                 return checkUserAuth(newUser, userInfo.authorities());
             }
@@ -476,6 +477,7 @@ public class UserServiceTest extends BaseServiceTest {
             if (newUser.studentId().equals(userInfo.studentId())
                     && newUser.university().matchUniqueKey(userInfo.universityCode())
                     && newUser.name().equals(userInfo.name())
+                    && newUser.entranceYear() == userInfo.entranceYear()
             ) {
                 return checkUserAuth(newUser, userInfo.authorities());
             }
@@ -548,7 +550,7 @@ public class UserServiceTest extends BaseServiceTest {
         }
 
         private void setTargetUser(UserDto user) {
-            this.targetUser = user.withApprovalTimeStamp(0);
+            this.targetUser = user.withApprovedAt(0);
             this.studentId = user.studentId();
         }
 
@@ -660,7 +662,7 @@ public class UserServiceTest extends BaseServiceTest {
                     && newUser.university().equals(univ)
                     && newUser.name().equals(newName)
                     && !newUser.token().equals(targetUser.token())
-                    && newUser.approvalTimeStamp() > targetUser.approvalTimeStamp()
+                    && newUser.approvedAt() > targetUser.approvedAt()
             ) {
                 return checkAuthUpdate(newUser);
             }

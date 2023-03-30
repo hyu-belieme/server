@@ -27,8 +27,8 @@ public class StuffRequest {
             groups = {StuffCreateValidationGroup.class, StuffUpdateValidationGroup.class})
     @NotNull(message = "{message.error.badRequest.notNull}",
             groups = StuffCreateValidationGroup.class)
-    @JsonProperty("emoji")
-    String emoji;
+    @JsonProperty("thumbnail")
+    String thumbnail;
 
     @PositiveOrZero(message = "{message.error.badRequest.containsNegative}",
             groups = StuffCreateValidationGroup.class)

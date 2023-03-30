@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 
 @Getter
-@JsonPropertyOrder({"univ", "dept", "item", "num", "status", "reservedTimeStamp", "requester", "approveTimeStamp", "approveManager", "lostTimeStamp", "lostManager", "returnTimeStamp", "returnManager", "cancelTimeStamp", "cancelManager"})
+@JsonPropertyOrder({"univ", "dept", "item", "num", "status", "requestedAt", "requester", "approvedAt", "approveManager", "lostAt", "lostManager", "returnedAt", "returnManager", "canceledAt", "cancelManager"})
 public class HistoryResponse extends JsonResponse {
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private UniversityResponse university;
@@ -29,15 +29,15 @@ public class HistoryResponse extends JsonResponse {
     private UserResponse cancelManager;
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private long reservedTimeStamp;
+    private long requestedAt;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private long approveTimeStamp;
+    private long approvedAt;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private long returnTimeStamp;
+    private long returnedAt;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private long lostTimeStamp;
+    private long lostAt;
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    private long cancelTimeStamp;
+    private long canceledAt;
 
     private String status;
 
@@ -45,7 +45,7 @@ public class HistoryResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private HistoryResponse(UniversityResponse university, DepartmentResponse department, ItemResponse item, int num, UserResponse requester, UserResponse approveManager, UserResponse returnManager, UserResponse lostManager, UserResponse cancelManager, long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp, long lostTimeStamp, long cancelTimeStamp, String status) {
+    private HistoryResponse(UniversityResponse university, DepartmentResponse department, ItemResponse item, int num, UserResponse requester, UserResponse approveManager, UserResponse returnManager, UserResponse lostManager, UserResponse cancelManager, long requestedAt, long approvedAt, long returnedAt, long lostAt, long canceledAt, String status) {
         super(true);
         this.university = university;
         this.department = department;
@@ -56,11 +56,11 @@ public class HistoryResponse extends JsonResponse {
         this.returnManager = returnManager;
         this.lostManager = lostManager;
         this.cancelManager = cancelManager;
-        this.reservedTimeStamp = reservedTimeStamp;
-        this.approveTimeStamp = approveTimeStamp;
-        this.returnTimeStamp = returnTimeStamp;
-        this.lostTimeStamp = lostTimeStamp;
-        this.cancelTimeStamp = cancelTimeStamp;
+        this.requestedAt = requestedAt;
+        this.approvedAt = approvedAt;
+        this.returnedAt = returnedAt;
+        this.lostAt = lostAt;
+        this.canceledAt = canceledAt;
         this.status = status;
     }
 
@@ -84,25 +84,25 @@ public class HistoryResponse extends JsonResponse {
                 toNestedResponse(UserResponse.from(historyDto.returnManager())),
                 toNestedResponse(UserResponse.from(historyDto.lostManager())),
                 toNestedResponse(UserResponse.from(historyDto.cancelManager())),
-                historyDto.reservedTimeStamp(), historyDto.approveTimeStamp(),
-                historyDto.returnTimeStamp(), historyDto.lostTimeStamp(),
-                historyDto.cancelTimeStamp(), historyDto.status().toString());
+                historyDto.requestedAt(), historyDto.approvedAt(),
+                historyDto.returnedAt(), historyDto.lostAt(),
+                historyDto.canceledAt(), historyDto.status().toString());
     }
 
     public HistoryResponse withoutUniversityAndDepartment() {
         return new HistoryResponse(
                 UniversityResponse.responseWillBeIgnore(), DepartmentResponse.responseWillBeIgnore(),
                 item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager, reservedTimeStamp,
-                approveTimeStamp, returnTimeStamp, lostTimeStamp, cancelTimeStamp, status);
+                returnManager, lostManager, cancelManager, requestedAt,
+                approvedAt, returnedAt, lostAt, canceledAt, status);
     }
 
     public HistoryResponse withoutItem() {
         return new HistoryResponse(
                 university, department,
                 ItemResponse.responseWillBeIgnore(), num, requester, approveManager,
-                returnManager, lostManager, cancelManager, reservedTimeStamp,
-                approveTimeStamp, returnTimeStamp, lostTimeStamp, cancelTimeStamp, status);
+                returnManager, lostManager, cancelManager, requestedAt,
+                approvedAt, returnedAt, lostAt, canceledAt, status);
     }
 
     private static UserResponse toNestedResponse(UserResponse user) {

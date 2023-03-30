@@ -8,19 +8,19 @@ import java.util.List;
 
 public record StuffDto(
         @NonNull DepartmentDto department, @NonNull String name,
-        String emoji, @NonNull List<ItemDto> items
+        String thumbnail, @NonNull List<ItemDto> items
 ) {
     public static final StuffDto nestedEndpoint = new StuffDto(DepartmentDto.nestedEndpoint, "-", "-", new ArrayList<>());
 
-    public StuffDto(@NonNull DepartmentDto department, @NonNull String name, String emoji, @NonNull List<ItemDto> items) {
+    public StuffDto(@NonNull DepartmentDto department, @NonNull String name, String thumbnail, @NonNull List<ItemDto> items) {
         this.department = department;
         this.name = name;
-        this.emoji = emoji;
+        this.thumbnail = thumbnail;
         this.items = new ArrayList<>(items);
     }
 
-    public static StuffDto init(@NonNull DepartmentDto department, @NonNull String name, String emoji) {
-        return new StuffDto(department, name, emoji, new ArrayList<>());
+    public static StuffDto init(@NonNull DepartmentDto department, @NonNull String name, String thumbnail) {
+        return new StuffDto(department, name, thumbnail, new ArrayList<>());
     }
 
     @Override
@@ -33,30 +33,30 @@ public record StuffDto(
     }
 
     public StuffDto withDepartment(@NonNull DepartmentDto department) {
-        return new StuffDto(department, name, emoji, items);
+        return new StuffDto(department, name, thumbnail, items);
     }
 
     public StuffDto withName(@NonNull String name) {
-        return new StuffDto(department, name, emoji, items);
+        return new StuffDto(department, name, thumbnail, items);
     }
 
-    public StuffDto withEmoji(String emoji) {
-        return new StuffDto(department, name, emoji, items);
+    public StuffDto withThumbnail(String thumbnail) {
+        return new StuffDto(department, name, thumbnail, items);
     }
 
     public StuffDto withItems(@NonNull List<ItemDto> items) {
-        return new StuffDto(department, name, emoji, items);
+        return new StuffDto(department, name, thumbnail, items);
     }
 
     public StuffDto withItemAdd(ItemDto itemDto) {
-        StuffDto output = new StuffDto(department, name, emoji, items);
+        StuffDto output = new StuffDto(department, name, thumbnail, items);
         output.items.add(itemDto.withStuff(nestedEndpoint));
 
         return output;
     }
 
     public StuffDto withItemRemove(ItemDto itemDto) {
-        StuffDto output = new StuffDto(department, name, emoji, items);
+        StuffDto output = new StuffDto(department, name, thumbnail, items);
         output.items.removeIf(item -> item.matchUniqueKey(itemDto));
 
         return output;
@@ -86,7 +86,7 @@ public record StuffDto(
         return "StuffDto{" +
                 "department=" + department +
                 ", name='" + name + '\'' +
-                ", emoji='" + emoji + '\'' +
+                ", thumbnail='" + thumbnail + '\'' +
                 ", items=" + items +
                 '}';
     }

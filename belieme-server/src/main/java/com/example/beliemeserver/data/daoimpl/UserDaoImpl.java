@@ -79,9 +79,10 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
                 universityEntity,
                 newUser.studentId(),
                 newUser.name(),
+                newUser.entranceYear(),
                 newUser.token(),
-                newUser.createTimeStamp(),
-                newUser.approvalTimeStamp()
+                newUser.createdAt(),
+                newUser.approvedAt()
         );
         return userRepository.save(newUserEntity);
     }
@@ -96,9 +97,10 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
         target.setUniversity(newUniversity)
                 .setStudentId(newUser.studentId())
                 .setName(newUser.name())
+                .setEntranceYear(newUser.entranceYear())
                 .setToken(newUser.token())
-                .setCreateTimeStamp(newUser.createTimeStamp())
-                .setApprovalTimeStamp(newUser.approvalTimeStamp());
+                .setCreatedAt(newUser.createdAt())
+                .setApprovedAt(newUser.approvedAt());
     }
 
     private void saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) {

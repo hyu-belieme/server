@@ -85,7 +85,7 @@ public class StubWithInitialData extends StubData {
         }
 
         return new UserInfo(
-                apiToken, userDto.university().code(),
-                userDto.studentId(), userDto.name(), authorityInfos);
+                apiToken, userDto.university().code(), userDto.studentId(),
+                userDto.name(), userDto.entranceYear(), authorityInfos);
     }
 }

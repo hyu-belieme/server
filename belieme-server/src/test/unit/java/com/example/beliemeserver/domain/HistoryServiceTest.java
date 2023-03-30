@@ -779,12 +779,12 @@ public class HistoryServiceTest extends BaseServiceTest {
             ItemDto historyItem = historyCaptor.getValue().item();
             UserDto historyRequester = historyCaptor.getValue().requester();
             UserDto historyLostManager = historyCaptor.getValue().lostManager();
-            long historyLostTimeStamp = historyCaptor.getValue().lostTimeStamp();
+            long historyLostAt = historyCaptor.getValue().lostAt();
 
             Assertions.assertThat(historyItem).isEqualTo(item);
             Assertions.assertThat(historyRequester).isEqualTo(null);
             Assertions.assertThat(historyLostManager).isEqualTo(requester);
-            Assertions.assertThat(historyLostTimeStamp).isNotZero();
+            Assertions.assertThat(historyLostAt).isNotZero();
         }
 
         @RepeatedTest(10)
@@ -805,11 +805,11 @@ public class HistoryServiceTest extends BaseServiceTest {
 
             int historyNum = integerCaptor.getValue();
             UserDto historyLostManager = historyCaptor.getValue().lostManager();
-            long historyLostTimestamp = historyCaptor.getValue().lostTimeStamp();
+            long historyLostAt = historyCaptor.getValue().lostAt();
 
             Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
             Assertions.assertThat(historyLostManager).isEqualTo(requester);
-            Assertions.assertThat(historyLostTimestamp).isNotZero();
+            Assertions.assertThat(historyLostAt).isNotZero();
         }
 
         @RepeatedTest(10)
@@ -904,11 +904,11 @@ public class HistoryServiceTest extends BaseServiceTest {
 
             int historyNum = integerCaptor.getValue();
             UserDto historyApprovalManage = historyCaptor.getValue().approveManager();
-            long approvalTimestamp = historyCaptor.getValue().approveTimeStamp();
+            long historyApprovedAt = historyCaptor.getValue().approvedAt();
 
             Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
             Assertions.assertThat(historyApprovalManage).isEqualTo(requester);
-            Assertions.assertThat(approvalTimestamp).isNotZero();
+            Assertions.assertThat(historyApprovedAt).isNotZero();
         }
 
         @RepeatedTest(10)
@@ -990,11 +990,11 @@ public class HistoryServiceTest extends BaseServiceTest {
 
             int historyNum = integerCaptor.getValue();
             UserDto historyReturnManger = historyCaptor.getValue().returnManager();
-            long returnTimeStamp = historyCaptor.getValue().returnTimeStamp();
+            long returnedAt = historyCaptor.getValue().returnedAt();
 
             Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
             Assertions.assertThat(historyReturnManger).isEqualTo(requester);
-            Assertions.assertThat(returnTimeStamp).isNotZero();
+            Assertions.assertThat(returnedAt).isNotZero();
         }
 
         @RepeatedTest(10)
@@ -1089,11 +1089,11 @@ public class HistoryServiceTest extends BaseServiceTest {
 
             int historyNum = integerCaptor.getValue();
             UserDto historyCancelManager = historyCaptor.getValue().cancelManager();
-            long cancelTimeStamp = historyCaptor.getValue().cancelTimeStamp();
+            long canceledAt = historyCaptor.getValue().canceledAt();
 
             Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
             Assertions.assertThat(historyCancelManager).isEqualTo(requester);
-            Assertions.assertThat(cancelTimeStamp).isNotZero();
+            Assertions.assertThat(canceledAt).isNotZero();
         }
 
         @RepeatedTest(10)

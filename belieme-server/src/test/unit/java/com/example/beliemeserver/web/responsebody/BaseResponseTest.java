@@ -83,11 +83,11 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("token")).isTrue();
         Assertions.assertThat(json.get("token")).isEqualTo(user.token());
 
-        Assertions.assertThat(json.containsKey("createTimeStamp")).isTrue();
-        Assertions.assertThat(json.get("createTimeStamp")).isEqualTo(user.createTimeStamp());
+        Assertions.assertThat(json.containsKey("createdAt")).isTrue();
+        Assertions.assertThat(json.get("createdAt")).isEqualTo(user.createdAt());
 
-        Assertions.assertThat(json.containsKey("approvalTimeStamp")).isTrue();
-        Assertions.assertThat(json.get("approvalTimeStamp")).isEqualTo(user.approvalTimeStamp());
+        Assertions.assertThat(json.containsKey("approvedAt")).isTrue();
+        Assertions.assertThat(json.get("approvedAt")).isEqualTo(user.approvedAt());
     }
 
     protected void userWithoutSecureInfoJsonCmpAssertions(JSONObject json, UserDto user) {
@@ -99,8 +99,8 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("authorities")).isFalse();
         Assertions.assertThat(json.containsKey("token")).isFalse();
-        Assertions.assertThat(json.containsKey("createTimeStamp")).isFalse();
-        Assertions.assertThat(json.containsKey("approveTimeStamp")).isFalse();
+        Assertions.assertThat(json.containsKey("createdAt")).isFalse();
+        Assertions.assertThat(json.containsKey("approvedAt")).isFalse();
     }
 
     protected void stuffJsonCmpAssertions(JSONObject json, StuffDto stuff) {
@@ -119,8 +119,8 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("name")).isTrue();
         Assertions.assertThat(json.get("name")).isEqualTo(stuff.name());
 
-        Assertions.assertThat(json.containsKey("emoji")).isTrue();
-        Assertions.assertThat(json.get("emoji")).isEqualTo(stuff.emoji());
+        Assertions.assertThat(json.containsKey("thumbnail")).isTrue();
+        Assertions.assertThat(json.get("thumbnail")).isEqualTo(stuff.thumbnail());
 
         Assertions.assertThat(json.containsKey("amount")).isTrue();
         Assertions.assertThat(json.get("amount")).isEqualTo((long) stuff.amount());
@@ -152,8 +152,8 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("stuffName")).isTrue();
         Assertions.assertThat(json.get("stuffName")).isEqualTo(item.stuff().name());
 
-        Assertions.assertThat(json.containsKey("stuffEmoji")).isTrue();
-        Assertions.assertThat(json.get("stuffEmoji")).isEqualTo(item.stuff().emoji());
+        Assertions.assertThat(json.containsKey("stuffThumbnail")).isTrue();
+        Assertions.assertThat(json.get("stuffThumbnail")).isEqualTo(item.stuff().thumbnail());
 
         itemInfoJsonCmpAssertions(json, item);
 
@@ -171,8 +171,8 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("stuffName")).isTrue();
         Assertions.assertThat(json.get("stuffName")).isEqualTo(item.stuff().name());
 
-        Assertions.assertThat(json.containsKey("stuffEmoji")).isTrue();
-        Assertions.assertThat(json.get("stuffEmoji")).isEqualTo(item.stuff().emoji());
+        Assertions.assertThat(json.containsKey("stuffThumbnail")).isTrue();
+        Assertions.assertThat(json.get("stuffThumbnail")).isEqualTo(item.stuff().thumbnail());
 
         itemInfoJsonCmpAssertions(json, item);
 
@@ -193,7 +193,7 @@ public class BaseResponseTest {
         deptWithoutUnivJsonCmpAssertions(deptJson, item.stuff().department());
 
         Assertions.assertThat(json.containsKey("stuffName")).isFalse();
-        Assertions.assertThat(json.containsKey("stuffEmoji")).isFalse();
+        Assertions.assertThat(json.containsKey("stuffThumbnail")).isFalse();
 
         itemInfoJsonCmpAssertions(json, item);
 
@@ -208,7 +208,7 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("university")).isFalse();
         Assertions.assertThat(json.containsKey("department")).isFalse();
         Assertions.assertThat(json.containsKey("stuffName")).isFalse();
-        Assertions.assertThat(json.containsKey("stuffEmoji")).isFalse();
+        Assertions.assertThat(json.containsKey("stuffThumbnail")).isFalse();
 
         itemInfoJsonCmpAssertions(json, item);
 
@@ -304,6 +304,13 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("name")).isTrue();
         Assertions.assertThat(json.get("name")).isEqualTo(user.name());
+
+        if(user.entranceYear() == 0) {
+            Assertions.assertThat(json.containsKey("entranceYear")).isFalse();
+            return;
+        }
+        Assertions.assertThat(json.containsKey("entranceYear")).isTrue();
+        Assertions.assertThat(json.get("entranceYear")).isEqualTo((long) user.entranceYear());
     }
 
     private void itemInfoJsonCmpAssertions(JSONObject json, ItemDto item) {
@@ -324,11 +331,11 @@ public class BaseResponseTest {
         userJsonNestedToHistoryCmpAssertions("lostManager", json, history.lostManager());
         userJsonNestedToHistoryCmpAssertions("cancelManager", json, history.cancelManager());
 
-        timestampOnHistoryJsonCmpAssertions("reservedTimeStamp", json, history.reservedTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("approveTimeStamp", json, history.approveTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("returnTimeStamp", json, history.returnTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("lostTimeStamp", json, history.lostTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("cancelTimeStamp", json, history.cancelTimeStamp());
+        timestampOnHistoryJsonCmpAssertions("requestedAt", json, history.requestedAt());
+        timestampOnHistoryJsonCmpAssertions("approvedAt", json, history.approvedAt());
+        timestampOnHistoryJsonCmpAssertions("returnedAt", json, history.returnedAt());
+        timestampOnHistoryJsonCmpAssertions("lostAt", json, history.lostAt());
+        timestampOnHistoryJsonCmpAssertions("canceledAt", json, history.canceledAt());
 
         Assertions.assertThat(json.containsKey("status")).isTrue();
         Assertions.assertThat(json.get("status")).isEqualTo(history.status().toString());

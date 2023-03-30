@@ -13,7 +13,7 @@ public class StuffResponse extends JsonResponse {
     private UniversityResponse university;
     private DepartmentResponse department;
     private String name;
-    private String emoji;
+    private String thumbnail;
     private int amount;
     private int count;
 
@@ -24,12 +24,12 @@ public class StuffResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private StuffResponse(UniversityResponse university, DepartmentResponse department, String name, String emoji, int amount, int count, List<ItemResponse> itemList) {
+    private StuffResponse(UniversityResponse university, DepartmentResponse department, String name, String thumbnail, int amount, int count, List<ItemResponse> itemList) {
         super(true);
         this.university = university;
         this.department = department;
         this.name = name;
-        this.emoji = emoji;
+        this.thumbnail = thumbnail;
         this.amount = amount;
         this.count = count;
         this.itemList = itemList;
@@ -52,7 +52,7 @@ public class StuffResponse extends JsonResponse {
         return new StuffResponse(
                 UniversityResponse.from(stuffDto.department().university()),
                 DepartmentResponse.from(stuffDto.department()).withoutUniversity(),
-                stuffDto.name(), stuffDto.emoji(), stuffDto.amount(),
+                stuffDto.name(), stuffDto.thumbnail(), stuffDto.amount(),
                 stuffDto.count(), itemResponseList
         );
     }
