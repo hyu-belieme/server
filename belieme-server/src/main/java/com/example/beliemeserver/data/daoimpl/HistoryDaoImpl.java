@@ -86,11 +86,11 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
                 toUserEntityOrNull(newHistory.returnManager()),
                 toUserEntityOrNull(newHistory.lostManager()),
                 toUserEntityOrNull(newHistory.cancelManager()),
-                newHistory.reservedTimeStamp(),
-                newHistory.approveTimeStamp(),
-                newHistory.returnTimeStamp(),
-                newHistory.lostTimeStamp(),
-                newHistory.cancelTimeStamp()
+                newHistory.requestedAt(),
+                newHistory.approvedAt(),
+                newHistory.returnedAt(),
+                newHistory.lostAt(),
+                newHistory.canceledAt()
         );
         return historyRepository.save(newHistoryEntity).toHistoryDto();
     }
@@ -111,11 +111,11 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
                 .setReturnManager(toUserEntityOrNull(newHistory.returnManager()))
                 .setLostManager(toUserEntityOrNull(newHistory.lostManager()))
                 .setCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
-                .setReservedTimeStamp(newHistory.reservedTimeStamp())
-                .setApproveTimeStamp(newHistory.approveTimeStamp())
-                .setReturnTimeStamp(newHistory.returnTimeStamp())
-                .setLostTimeStamp(newHistory.lostTimeStamp())
-                .setCancelTimeStamp(newHistory.cancelTimeStamp());
+                .setRequestedAt(newHistory.requestedAt())
+                .setApprovedAt(newHistory.approvedAt())
+                .setReturnedAt(newHistory.returnedAt())
+                .setLostAt(newHistory.lostAt())
+                .setCanceledAt(newHistory.canceledAt());
         return target.toHistoryDto();
     }
 

@@ -48,24 +48,24 @@ public class HistoryEntity extends DataEntity {
     private Integer cancelManagerId;
 
     @Setter
-    @Column(name = "reserved_time_stamp")
-    private long reservedTimeStamp;
+    @Column(name = "requested_at")
+    private long requestedAt;
 
     @Setter
-    @Column(name = "approve_time_stamp")
-    private long approveTimeStamp;
+    @Column(name = "approved_at")
+    private long approvedAt;
 
     @Setter
-    @Column(name = "return_time_stamp")
-    private long returnTimeStamp;
+    @Column(name = "returned_at")
+    private long returnedAt;
 
     @Setter
-    @Column(name = "lost_time_stamp")
-    private long lostTimeStamp;
+    @Column(name = "lost_at")
+    private long lostAt;
 
     @Setter
-    @Column(name = "cancel_time_stamp")
-    private long cancelTimeStamp;
+    @Column(name = "canceled_at")
+    private long canceledAt;
 
     @NonNull
     @ManyToOne
@@ -95,8 +95,8 @@ public class HistoryEntity extends DataEntity {
     public HistoryEntity(
             @NonNull ItemEntity item, int num, UserEntity requester, UserEntity approveManager,
             UserEntity returnManager, UserEntity lostManager, UserEntity cancelManager,
-            long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp,
-            long lostTimeStamp, long cancelTimeStamp
+            long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
     ) {
         setItem(item);
         setNum(num);
@@ -107,11 +107,11 @@ public class HistoryEntity extends DataEntity {
         setLostManager(lostManager);
         setCancelManager(cancelManager);
 
-        setReservedTimeStamp(reservedTimeStamp);
-        setApproveTimeStamp(approveTimeStamp);
-        setReturnTimeStamp(returnTimeStamp);
-        setLostTimeStamp(lostTimeStamp);
-        setCancelTimeStamp(cancelTimeStamp);
+        setRequestedAt(requestedAt);
+        setApprovedAt(approvedAt);
+        setReturnedAt(returnedAt);
+        setLostAt(lostAt);
+        setCanceledAt(canceledAt);
     }
 
     public HistoryEntity setItem(@NonNull ItemEntity item) {
@@ -159,11 +159,11 @@ public class HistoryEntity extends DataEntity {
                 getUserDtoOrNull(returnManager),
                 getUserDtoOrNull(lostManager),
                 getUserDtoOrNull(cancelManager),
-                reservedTimeStamp,
-                approveTimeStamp,
-                returnTimeStamp,
-                lostTimeStamp,
-                cancelTimeStamp
+                requestedAt,
+                approvedAt,
+                returnedAt,
+                lostAt,
+                canceledAt
         );
     }
 
@@ -176,11 +176,11 @@ public class HistoryEntity extends DataEntity {
                 getUserDtoOrNull(returnManager),
                 getUserDtoOrNull(lostManager),
                 getUserDtoOrNull(cancelManager),
-                reservedTimeStamp,
-                approveTimeStamp,
-                returnTimeStamp,
-                lostTimeStamp,
-                cancelTimeStamp
+                requestedAt,
+                approvedAt,
+                returnedAt,
+                lostAt,
+                canceledAt
         );
     }
 

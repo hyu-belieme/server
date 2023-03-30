@@ -244,33 +244,33 @@ insert into item(id, stuff_id, num, last_history_id)
 values (23, 8, 1, null);
 
 -- insert history
-insert into history(id, item_id, num, requester_id, reserved_time_stamp, approve_manager_id, approve_time_stamp,
-                    return_manager_id, return_time_stamp, lost_manager_id, lost_time_stamp, cancel_manager_id,
-                    cancel_time_stamp)
+insert into history(id, item_id, num, requester_id, requested_at, approve_manager_id, approved_at,
+                    return_manager_id, returned_at, lost_manager_id, lost_at, cancel_manager_id,
+                    canceled_at)
 values (1, 1, 1, 1, 1673155356, 1, 1673155430, 1, 1673159244, null, 0, null, 0);
 update item
 set last_history_id=1
 where id = 1;
 
-insert into history(id, item_id, num, requester_id, reserved_time_stamp, approve_manager_id, approve_time_stamp,
-                    return_manager_id, return_time_stamp, lost_manager_id, lost_time_stamp, cancel_manager_id,
-                    cancel_time_stamp)
+insert into history(id, item_id, num, requester_id, requested_at, approve_manager_id, approved_at,
+                    return_manager_id, returned_at, lost_manager_id, lost_at, cancel_manager_id,
+                    canceled_at)
 values (2, 6, 1, 1, 1673155356, null, 0, null, 0, null, 0, null, 0);
 update item
 set last_history_id=2
 where id = 6;
 
-insert into history(id, item_id, num, requester_id, reserved_time_stamp, approve_manager_id, approve_time_stamp,
-                    return_manager_id, return_time_stamp, lost_manager_id, lost_time_stamp, cancel_manager_id,
-                    cancel_time_stamp)
+insert into history(id, item_id, num, requester_id, requested_at, approve_manager_id, approved_at,
+                    return_manager_id, returned_at, lost_manager_id, lost_at, cancel_manager_id,
+                    canceled_at)
 values (3, 1, 2, 2, 1673172221, 1, 1673172521, null, 0, null, 0, null, 0);
 update item
 set last_history_id=3
 where id = 1;
 
-insert into history(id, item_id, num, requester_id, reserved_time_stamp, approve_manager_id, approve_time_stamp,
-                    return_manager_id, return_time_stamp, lost_manager_id, lost_time_stamp, cancel_manager_id,
-                    cancel_time_stamp)
+insert into history(id, item_id, num, requester_id, requested_at, approve_manager_id, approved_at,
+                    return_manager_id, returned_at, lost_manager_id, lost_at, cancel_manager_id,
+                    canceled_at)
 values (4, 17, 1, 1, 1673172221, null, 0, null, 0, null, 0, 1, 1673172521);
 update item
 set last_history_id=4

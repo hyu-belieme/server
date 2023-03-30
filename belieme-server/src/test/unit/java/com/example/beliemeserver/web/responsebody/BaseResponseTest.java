@@ -100,7 +100,7 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("authorities")).isFalse();
         Assertions.assertThat(json.containsKey("token")).isFalse();
         Assertions.assertThat(json.containsKey("createTimeStamp")).isFalse();
-        Assertions.assertThat(json.containsKey("approveTimeStamp")).isFalse();
+        Assertions.assertThat(json.containsKey("approvedAt")).isFalse();
     }
 
     protected void stuffJsonCmpAssertions(JSONObject json, StuffDto stuff) {
@@ -324,11 +324,11 @@ public class BaseResponseTest {
         userJsonNestedToHistoryCmpAssertions("lostManager", json, history.lostManager());
         userJsonNestedToHistoryCmpAssertions("cancelManager", json, history.cancelManager());
 
-        timestampOnHistoryJsonCmpAssertions("reservedTimeStamp", json, history.reservedTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("approveTimeStamp", json, history.approveTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("returnTimeStamp", json, history.returnTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("lostTimeStamp", json, history.lostTimeStamp());
-        timestampOnHistoryJsonCmpAssertions("cancelTimeStamp", json, history.cancelTimeStamp());
+        timestampOnHistoryJsonCmpAssertions("requestedAt", json, history.requestedAt());
+        timestampOnHistoryJsonCmpAssertions("approvedAt", json, history.approvedAt());
+        timestampOnHistoryJsonCmpAssertions("returnedAt", json, history.returnedAt());
+        timestampOnHistoryJsonCmpAssertions("lostAt", json, history.lostAt());
+        timestampOnHistoryJsonCmpAssertions("canceledAt", json, history.canceledAt());
 
         Assertions.assertThat(json.containsKey("status")).isTrue();
         Assertions.assertThat(json.get("status")).isEqualTo(history.status().toString());

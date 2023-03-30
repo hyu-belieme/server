@@ -10,93 +10,93 @@ import java.util.TimeZone;
 public record HistoryDto(
         @NonNull ItemDto item, int num, UserDto requester, UserDto approveManager,
         UserDto returnManager, UserDto lostManager, UserDto cancelManager,
-        long reservedTimeStamp, long approveTimeStamp, long returnTimeStamp,
-        long lostTimeStamp, long cancelTimeStamp
+        long requestedAt, long approvedAt, long returnedAt,
+        long lostAt, long canceledAt
 ) {
     public static final HistoryDto nestedEndpoint = new HistoryDto(ItemDto.nestedEndpoint, 0, null, null, null, null, null, 0, 0, 0, 0, 0);
 
     public HistoryDto withItem(@NonNull ItemDto item) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
     public HistoryDto withNum(int num) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
     public HistoryDto withRequester(UserDto requester) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
     public HistoryDto withApproveManager(UserDto approveManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
     public HistoryDto withReturnManager(UserDto returnManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
     public HistoryDto withLostManager(UserDto lostManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
     public HistoryDto withCancelManager(UserDto cancelManager) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
-    public HistoryDto withReservedTimeStamp(long reservedTimeStamp) {
+    public HistoryDto withRequestedAt(long requestedAt) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
-    public HistoryDto withApproveTimeStamp(long approveTimeStamp) {
+    public HistoryDto withApprovedAt(long approvedAt) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
-    public HistoryDto withReturnTimeStamp(long returnTimeStamp) {
+    public HistoryDto withReturnedAt(long returnedAt) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
-    public HistoryDto withLostTimeStamp(long lostTimeStamp) {
+    public HistoryDto withLostAt(long lostAt) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
-    public HistoryDto withCancelTimeStamp(long cancelTimeStamp) {
+    public HistoryDto withCanceledAt(long canceledAt) {
         return new HistoryDto(item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager,
-                reservedTimeStamp, approveTimeStamp, returnTimeStamp,
-                lostTimeStamp, cancelTimeStamp);
+                requestedAt, approvedAt, returnedAt,
+                lostAt, canceledAt);
     }
 
     public boolean matchUniqueKey(
@@ -128,11 +128,11 @@ public record HistoryDto(
                 ", returnManager=" + returnManager +
                 ", lostManager=" + lostManager +
                 ", cancelManager=" + cancelManager +
-                ", reservedTimeStamp=" + reservedTimeStamp +
-                ", approveTimeStamp=" + approveTimeStamp +
-                ", returnTimeStamp=" + returnTimeStamp +
-                ", lostTimeStamp=" + lostTimeStamp +
-                ", cancelTimeStamp=" + cancelTimeStamp +
+                ", requestedAt=" + requestedAt +
+                ", approvedAt=" + approvedAt +
+                ", returnedAt=" + returnedAt +
+                ", lostAt=" + lostAt +
+                ", canceledAt=" + canceledAt +
                 '}';
     }
 
@@ -148,54 +148,54 @@ public record HistoryDto(
     }
 
     private boolean isRequested() {
-        return reservedTimeStamp != 0 && approveTimeStamp == 0
-                && returnTimeStamp == 0 && lostTimeStamp == 0
-                && cancelTimeStamp == 0 && expiredTime() > currentTime();
+        return requestedAt != 0 && approvedAt == 0
+                && returnedAt == 0 && lostAt == 0
+                && canceledAt == 0 && expiredTime() > currentTime();
     }
 
     private boolean isExpired() {
-        boolean isExpired = (reservedTimeStamp != 0 && approveTimeStamp == 0
-                && returnTimeStamp == 0 && lostTimeStamp == 0
-                && cancelTimeStamp == 0 && expiredTime() <= currentTime());
-        boolean isCanceled = (reservedTimeStamp != 0 && approveTimeStamp == 0
-                && returnTimeStamp == 0 && lostTimeStamp == 0
-                && cancelTimeStamp != 0);
+        boolean isExpired = (requestedAt != 0 && approvedAt == 0
+                && returnedAt == 0 && lostAt == 0
+                && canceledAt == 0 && expiredTime() <= currentTime());
+        boolean isCanceled = (requestedAt != 0 && approvedAt == 0
+                && returnedAt == 0 && lostAt == 0
+                && canceledAt != 0);
 
         return (isExpired || isCanceled);
     }
 
     private boolean isUsing() {
-        return (reservedTimeStamp != 0 && approveTimeStamp != 0
-                && returnTimeStamp == 0 && lostTimeStamp == 0
-                && cancelTimeStamp == 0 && dueTime() > currentTime());
+        return (requestedAt != 0 && approvedAt != 0
+                && returnedAt == 0 && lostAt == 0
+                && canceledAt == 0 && dueTime() > currentTime());
     }
 
     private boolean isDelayed() {
-        return (reservedTimeStamp != 0 && approveTimeStamp != 0
-                && returnTimeStamp == 0 && lostTimeStamp == 0
-                && cancelTimeStamp == 0 && dueTime() <= currentTime());
+        return (requestedAt != 0 && approvedAt != 0
+                && returnedAt == 0 && lostAt == 0
+                && canceledAt == 0 && dueTime() <= currentTime());
     }
 
     private boolean isLost() {
-        boolean isLostOnStorage = (reservedTimeStamp == 0 && approveTimeStamp == 0
-                && returnTimeStamp == 0 && lostTimeStamp != 0 && cancelTimeStamp == 0);
-        boolean isLostOnRental = (reservedTimeStamp != 0 && approveTimeStamp != 0
-                && returnTimeStamp == 0 && lostTimeStamp != 0 && cancelTimeStamp == 0);
+        boolean isLostOnStorage = (requestedAt == 0 && approvedAt == 0
+                && returnedAt == 0 && lostAt != 0 && canceledAt == 0);
+        boolean isLostOnRental = (requestedAt != 0 && approvedAt != 0
+                && returnedAt == 0 && lostAt != 0 && canceledAt == 0);
 
         return (isLostOnStorage || isLostOnRental);
     }
 
     private boolean isReturned() {
-        return (reservedTimeStamp != 0 && approveTimeStamp != 0
-                && returnTimeStamp != 0 && lostTimeStamp == 0
-                && cancelTimeStamp == 0);
+        return (requestedAt != 0 && approvedAt != 0
+                && returnedAt != 0 && lostAt == 0
+                && canceledAt == 0);
     }
 
     private boolean isFound() {
-        boolean isReturnedAfterLostOnStorage = reservedTimeStamp == 0 && approveTimeStamp == 0
-                && returnTimeStamp != 0 && lostTimeStamp != 0 && cancelTimeStamp == 0;
-        boolean isReturnedAfterLostOnRental = reservedTimeStamp != 0 && approveTimeStamp != 0
-                && returnTimeStamp != 0 && lostTimeStamp != 0 && cancelTimeStamp == 0;
+        boolean isReturnedAfterLostOnStorage = requestedAt == 0 && approvedAt == 0
+                && returnedAt != 0 && lostAt != 0 && canceledAt == 0;
+        boolean isReturnedAfterLostOnRental = requestedAt != 0 && approvedAt != 0
+                && returnedAt != 0 && lostAt != 0 && canceledAt == 0;
 
         return isReturnedAfterLostOnStorage || isReturnedAfterLostOnRental;
     }
@@ -205,14 +205,14 @@ public record HistoryDto(
     }
 
     private long expiredTime() {
-        return reservedTimeStamp + 15 * 60;
+        return requestedAt + 15 * 60;
     }
 
     private long dueTime() {
         TimeZone timeZone = TimeZone.getTimeZone("Asia/Seoul");
 
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date(approveTimeStamp * 1000));
+        calendar.setTime(new Date(approvedAt * 1000));
         calendar.setTimeZone(timeZone);
 
         moveTo7DayAfter17_59(calendar);
