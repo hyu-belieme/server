@@ -51,7 +51,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
         StuffEntity newStuffEntity = new StuffEntity(
                 departmentOfNewStuff,
                 newStuff.name(),
-                newStuff.emoji()
+                newStuff.thumbnail()
         );
         return stuffRepository.save(newStuffEntity).toStuffDto();
     }
@@ -67,7 +67,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
 
         target.setDepartment(departmentOfNewStuff)
                 .setName(newStuff.name())
-                .setEmoji(newStuff.emoji());
+                .setThumbnail(newStuff.thumbnail());
         return target.toStuffDto();
     }
 

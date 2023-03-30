@@ -130,7 +130,7 @@ public class StuffServiceTest extends BaseServiceTest {
     public final class TestCreate extends StuffNestedTest {
         private StuffDto stuff;
         private String stuffName;
-        private String stuffEmoji;
+        private String stuffThumbnail;
 
         private Integer amount;
 
@@ -145,14 +145,14 @@ public class StuffServiceTest extends BaseServiceTest {
         private void setStuff(StuffDto stuff) {
             this.stuff = stuff;
             this.stuffName = stuff.name();
-            this.stuffEmoji = stuff.emoji();
+            this.stuffThumbnail = stuff.thumbnail();
         }
 
         @Override
         protected StuffDto execMethod() {
             return stuffService.create(
                     userToken, univCode, deptCode,
-                    stuffName, stuffEmoji, amount
+                    stuffName, stuffThumbnail, amount
             );
         }
 
@@ -230,7 +230,7 @@ public class StuffServiceTest extends BaseServiceTest {
         private String targetStuffName;
 
         private String newStuffName;
-        private String newStuffEmoji;
+        private String newStuffThumbnail;
 
         @Override
         protected void setUpDefault() {
@@ -238,7 +238,7 @@ public class StuffServiceTest extends BaseServiceTest {
             setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setStuff(randomStuffOnDept(dept));
             newStuffName = "changed";
-            newStuffEmoji = "𝌡";
+            newStuffThumbnail = "𝌡";
         }
 
         private void setStuff(StuffDto stuff) {
@@ -250,7 +250,7 @@ public class StuffServiceTest extends BaseServiceTest {
         protected StuffDto execMethod() {
             return stuffService.update(
                     userToken, univCode, deptCode,
-                    targetStuffName, newStuffName, newStuffEmoji
+                    targetStuffName, newStuffName, newStuffThumbnail
             );
         }
 
@@ -260,13 +260,13 @@ public class StuffServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffEmoji`가 모두 `null`이 아닐 시]")
+        @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffThumbnail`가 모두 `null`이 아닐 시]")
         public void SUCCESS_allMemberIsNotNull() {
             setUpDefault();
-            StuffDto newStuff = StuffDto.init(dept, newStuffName, newStuffEmoji);
+            StuffDto newStuff = StuffDto.init(dept, newStuffName, newStuffThumbnail);
             StuffDto expected = targetStuff
                     .withName(newStuffName)
-                    .withEmoji(newStuffEmoji);
+                    .withThumbnail(newStuffThumbnail);
 
             mockDepartmentAndRequester();
             when(stuffDao.getByIndex(univCode, deptCode, targetStuffName))
@@ -280,11 +280,11 @@ public class StuffServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffEmoji`가 모두 `null`일 시]")
+        @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffThumbnail`가 모두 `null`일 시]")
         public void SUCCESS_allMemberIsNull() {
             setUpDefault();
             newStuffName = null;
-            newStuffEmoji = null;
+            newStuffThumbnail = null;
             StuffDto expected = targetStuff;
 
             mockDepartmentAndRequester();
@@ -301,9 +301,9 @@ public class StuffServiceTest extends BaseServiceTest {
         public void SUCCESS_someMemberIsNull() {
             setUpDefault();
             newStuffName = null;
-            StuffDto newStuff = StuffDto.init(dept, targetStuffName, newStuffEmoji);
+            StuffDto newStuff = StuffDto.init(dept, targetStuffName, newStuffThumbnail);
             StuffDto expected = targetStuff
-                    .withEmoji(newStuffEmoji);
+                    .withThumbnail(newStuffThumbnail);
 
             mockDepartmentAndRequester();
             when(stuffDao.getByIndex(univCode, deptCode, targetStuffName))
@@ -332,7 +332,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[해당 `index`의 `stuff`가 이미 존재할 시]_[ConflictException]")
         public void ERROR_stuffConflict_ConflictException() {
             setUpDefault();
-            StuffDto newStuff = StuffDto.init(dept, newStuffName, newStuffEmoji);
+            StuffDto newStuff = StuffDto.init(dept, newStuffName, newStuffThumbnail);
 
             mockDepartmentAndRequester();
             when(stuffDao.update(univCode, deptCode, targetStuffName, newStuff))

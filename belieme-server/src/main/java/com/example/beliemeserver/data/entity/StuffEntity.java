@@ -36,8 +36,8 @@ public class StuffEntity extends DataEntity {
 
     @NonNull
     @Setter
-    @Column(name = "emoji")
-    private String emoji;
+    @Column(name = "thumbnail")
+    private String thumbnail;
 
     @NonNull
     @ManyToOne
@@ -48,11 +48,11 @@ public class StuffEntity extends DataEntity {
     @OneToMany(mappedBy = "stuff")
     private List<ItemEntity> items;
 
-    public StuffEntity(@NonNull DepartmentEntity department, @NonNull String name, @NonNull String emoji) {
+    public StuffEntity(@NonNull DepartmentEntity department, @NonNull String name, @NonNull String thumbnail) {
         this.department = department;
         this.departmentId = department.getId();
         this.name = name;
-        this.emoji = emoji;
+        this.thumbnail = thumbnail;
         this.items = new ArrayList<>();
     }
 
@@ -71,7 +71,7 @@ public class StuffEntity extends DataEntity {
         return new StuffDto(
                 department.toDepartmentDto(),
                 name,
-                emoji,
+                thumbnail,
                 itemDtoList
         );
     }

@@ -41,12 +41,12 @@ public class StuffService extends BaseService {
     public StuffDto create(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String name, @NonNull String emoji, Integer amount
+            @NonNull String name, @NonNull String thumbnail, Integer amount
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         checkStaffPermission(userToken, department);
 
-        StuffDto newStuff = StuffDto.init(department, name, emoji);
+        StuffDto newStuff = StuffDto.init(department, name, thumbnail);
         StuffDto output = newStuff;
         newStuff = stuffDao.create(newStuff);
 
@@ -63,18 +63,18 @@ public class StuffService extends BaseService {
     public StuffDto update(
             @NonNull String userToken,
             @NonNull String universityCode, @NonNull String departmentCode, @NonNull String name,
-            String newName, String newEmoji
+            String newName, String newThumbnail
     ) {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         checkStaffPermission(userToken, department);
 
         StuffDto oldStuff = stuffDao.getByIndex(universityCode, departmentCode, name);
 
-        if (newName == null && newEmoji == null) return oldStuff;
+        if (newName == null && newThumbnail == null) return oldStuff;
         if (newName == null) newName = oldStuff.name();
-        if (newEmoji == null) newEmoji = oldStuff.emoji();
+        if (newThumbnail == null) newThumbnail = oldStuff.thumbnail();
 
-        StuffDto newStuff = StuffDto.init(department, newName, newEmoji);
+        StuffDto newStuff = StuffDto.init(department, newName, newThumbnail);
         return stuffDao.update(universityCode, departmentCode, name, newStuff);
     }
 }

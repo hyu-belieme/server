@@ -15,7 +15,7 @@ public class ItemResponse extends JsonResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String stuffName;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String stuffEmoji;
+    private String stuffThumbnail;
     private int num;
     private String status;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
@@ -25,12 +25,12 @@ public class ItemResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private ItemResponse(UniversityResponse university, DepartmentResponse department, String stuffName, String stuffEmoji, int num, String status, HistoryResponse lastHistory) {
+    private ItemResponse(UniversityResponse university, DepartmentResponse department, String stuffName, String stuffThumbnail, int num, String status, HistoryResponse lastHistory) {
         super(true);
         this.university = university;
         this.department = department;
         this.stuffName = stuffName;
-        this.stuffEmoji = stuffEmoji;
+        this.stuffThumbnail = stuffThumbnail;
         this.num = num;
         this.status = status;
         this.lastHistory = lastHistory;
@@ -47,17 +47,17 @@ public class ItemResponse extends JsonResponse {
         }
 
         String stuffName = null;
-        String stuffEmoji = null;
+        String stuffThumbnail = null;
         if (!itemDto.stuff().equals(StuffDto.nestedEndpoint)) {
             stuffName = itemDto.stuff().name();
-            stuffEmoji = itemDto.stuff().emoji();
+            stuffThumbnail = itemDto.stuff().thumbnail();
         }
 
         return new ItemResponse(
                 UniversityResponse.from(itemDto.stuff().department().university()),
                 DepartmentResponse.from(itemDto.stuff().department()).withoutUniversity(),
                 stuffName,
-                stuffEmoji,
+                stuffThumbnail,
                 itemDto.num(),
                 itemDto.status().toString(),
                 toNestedResponse(HistoryResponse.from(itemDto.lastHistory()))
@@ -68,7 +68,7 @@ public class ItemResponse extends JsonResponse {
         return new ItemResponse(
                 UniversityResponse.responseWillBeIgnore(),
                 DepartmentResponse.responseWillBeIgnore(),
-                stuffName, stuffEmoji, num, status, lastHistory);
+                stuffName, stuffThumbnail, num, status, lastHistory);
     }
 
     public ItemResponse withoutStuffInfo() {
@@ -80,7 +80,7 @@ public class ItemResponse extends JsonResponse {
     public ItemResponse withoutLastHistory() {
         return new ItemResponse(
                 university, department, stuffName,
-                stuffEmoji, num, status, HistoryResponse.responseWillBeIgnore());
+                stuffThumbnail, num, status, HistoryResponse.responseWillBeIgnore());
     }
 
     private static HistoryResponse toNestedResponse(HistoryResponse history) {

@@ -177,21 +177,21 @@ insert into authority_user_join(user_id, authority_id)
 values (5, 25);
 
 -- insert stuff
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (1, 2, '우산', '☂');
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (2, 2, '블루투스스피커', '📻');
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (3, 2, '축구공', '⚽️');
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (4, 2, '농구공', '🏀');
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (5, 3, '축구공', '⚽️');
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (6, 3, '농구공', '🏀');
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (7, 4, '볼펜', '🖋️');
-insert into stuff(id, department_id, name, emoji)
+insert into stuff(id, department_id, name, thumbnail)
 values (8, 4, '스케이트보드', '🛹');
 
 

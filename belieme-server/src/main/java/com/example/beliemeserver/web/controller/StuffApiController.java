@@ -63,7 +63,7 @@ public class StuffApiController extends BaseApiController {
 
         StuffDto stuffDto = stuffService.create(
                 userToken, universityCode, departmentCode,
-                newStuff.getName(), newStuff.getEmoji(), newStuff.getAmount());
+                newStuff.getName(), newStuff.getThumbnail(), newStuff.getAmount());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
     }
@@ -80,7 +80,7 @@ public class StuffApiController extends BaseApiController {
 
         StuffDto stuffDto = stuffService.update(
                 userToken, universityCode, departmentCode, stuffName,
-                newStuff.getName(), newStuff.getEmoji());
+                newStuff.getName(), newStuff.getThumbnail());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
     }
