@@ -41,6 +41,11 @@ public class UserEntity extends DataEntity {
 
     @NonNull
     @Setter
+    @Column(name = "entrance_year")
+    private int entranceYear;
+
+    @NonNull
+    @Setter
     @Column(name = "token")
     private String token;
 
@@ -60,11 +65,12 @@ public class UserEntity extends DataEntity {
     @OneToMany(mappedBy = "userId")
     private List<AuthorityUserJoinEntity> authorityJoin;
 
-    public UserEntity(UniversityEntity university, String studentId, String name, String token, long createdAt, long approvedAt) {
+    public UserEntity(UniversityEntity university, String studentId, String name, int entranceYear, String token, long createdAt, long approvedAt) {
         this.university = university;
         this.universityId = university.getId();
         this.studentId = studentId;
         this.name = name;
+        this.entranceYear = entranceYear;
         this.token = token;
         this.createdAt = createdAt;
         this.approvedAt = approvedAt;
@@ -95,6 +101,7 @@ public class UserEntity extends DataEntity {
                 university.toUniversityDto(),
                 studentId,
                 name,
+                entranceYear,
                 token,
                 createdAt,
                 approvedAt,

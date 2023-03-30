@@ -84,16 +84,16 @@ public class DummyDataSet {
         }
 
         userDummies = new ArrayList<>(List.of(
-                new UserDto(universityDummies.get(1), "2018008886", "이석환", "TEST1",
-                        1673155358, 1673155358, new ArrayList<>()),
-                new UserDto(universityDummies.get(1), "2018008887", "이석현", "TEST2",
-                        1673155358, 1673155358, new ArrayList<>()),
-                new UserDto(universityDummies.get(1), "2019008887", "강백호", "TEST3",
-                        1673155358, 1673155358, new ArrayList<>()),
-                new UserDto(universityDummies.get(2), "2018008886", "이석환", "TEST4",
-                        1673155358, 1673155358, new ArrayList<>()),
-                new UserDto(universityDummies.get(2), "2018008887", "이석환", "TEST5",
-                        1673155358, 1673155358, new ArrayList<>())
+                new UserDto(universityDummies.get(1), "2018008886", "이석환", 2018,
+                        "TEST1", 1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(1), "2018008887", "이석현", 2018,
+                        "TEST2", 1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(1), "2019008887", "강백호", 2019,
+                        "TEST3", 1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(2), "2018008886", "이석환", 2018,
+                        "TEST4", 1673155358, 1673155358, new ArrayList<>()),
+                new UserDto(universityDummies.get(2), "2018008887", "이석환", 2018,
+                        "TEST5", 1673155358, 1673155358, new ArrayList<>())
         ));
 
         userDummies.set(0, userDummies.get(0).withAuthorityAdd(authorityDummies.get(1 * 6 + 0)));

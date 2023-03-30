@@ -304,6 +304,13 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("name")).isTrue();
         Assertions.assertThat(json.get("name")).isEqualTo(user.name());
+
+        if(user.entranceYear() == 0) {
+            Assertions.assertThat(json.containsKey("entranceYear")).isFalse();
+            return;
+        }
+        Assertions.assertThat(json.containsKey("entranceYear")).isTrue();
+        Assertions.assertThat(json.get("entranceYear")).isEqualTo((long) user.entranceYear());
     }
 
     private void itemInfoJsonCmpAssertions(JSONObject json, ItemDto item) {

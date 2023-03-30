@@ -7,6 +7,7 @@ public record UserInfo(
         String universityCode,
         String studentId,
         String name,
+        int entranceYear,
         List<AuthorityInfo> authorities) {
 
 }

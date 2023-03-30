@@ -13,6 +13,8 @@ public class UserResponse extends JsonResponse {
     private UniversityResponse university;
     private String studentId;
     private String name;
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private int entranceYear;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<AuthorityResponse> authorities;
 
@@ -27,11 +29,12 @@ public class UserResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private UserResponse(UniversityResponse university, String studentId, String name, List<AuthorityResponse> authorities, String token, long createdAt, long approvedAt) {
+    private UserResponse(UniversityResponse university, String studentId, String name, int entranceYear, List<AuthorityResponse> authorities, String token, long createdAt, long approvedAt) {
         super(true);
         this.university = university;
         this.studentId = studentId;
         this.name = name;
+        this.entranceYear = entranceYear;
         this.authorities = authorities;
         this.token = token;
         this.createdAt = createdAt;
@@ -57,6 +60,7 @@ public class UserResponse extends JsonResponse {
                 UniversityResponse.from(userDto.university()),
                 userDto.studentId(),
                 userDto.name(),
+                userDto.entranceYear(),
                 authorityResponseList,
                 userDto.token(),
                 userDto.createdAt(),
@@ -65,6 +69,6 @@ public class UserResponse extends JsonResponse {
     }
 
     public UserResponse withoutSecureInfo() {
-        return new UserResponse(university, studentId, name, null, null, 0, 0);
+        return new UserResponse(university, studentId, name, entranceYear, null, null, 0, 0);
     }
 }

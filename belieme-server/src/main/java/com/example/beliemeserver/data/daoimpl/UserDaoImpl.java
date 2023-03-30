@@ -79,6 +79,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
                 universityEntity,
                 newUser.studentId(),
                 newUser.name(),
+                newUser.entranceYear(),
                 newUser.token(),
                 newUser.createdAt(),
                 newUser.approvedAt()
@@ -96,6 +97,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
         target.setUniversity(newUniversity)
                 .setStudentId(newUser.studentId())
                 .setName(newUser.name())
+                .setEntranceYear(newUser.entranceYear())
                 .setToken(newUser.token())
                 .setCreatedAt(newUser.createdAt())
                 .setApprovedAt(newUser.approvedAt());

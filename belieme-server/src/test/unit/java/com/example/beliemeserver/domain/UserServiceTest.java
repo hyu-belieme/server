@@ -396,7 +396,7 @@ public class UserServiceTest extends BaseServiceTest {
             InitialDataDtoAdapter initialDataAdapter = new InitialDataDtoAdapter(stub.INIT_DATA);
             this.univ = initialDataAdapter.universities().get(univCode);
             this.deptList = new ArrayList<>(initialDataAdapter.departments().values());
-            this.targetUser = UserDto.init(univ, studentId, userInfo.name())
+            this.targetUser = UserDto.init(univ, studentId, userInfo.name(), userInfo.entranceYear())
                     .withApprovedAt(0);
         }
 
@@ -463,6 +463,7 @@ public class UserServiceTest extends BaseServiceTest {
             if (newUser.studentId().equals(userInfo.studentId())
                     && newUser.university().matchUniqueKey(userInfo.universityCode())
                     && newUser.name().equals(userInfo.name())
+                    && newUser.entranceYear() == userInfo.entranceYear()
                     && !newUser.token().equals(targetUser.token())
                     && newUser.approvedAt() > targetUser.approvedAt()
             ) {
@@ -476,6 +477,7 @@ public class UserServiceTest extends BaseServiceTest {
             if (newUser.studentId().equals(userInfo.studentId())
                     && newUser.university().matchUniqueKey(userInfo.universityCode())
                     && newUser.name().equals(userInfo.name())
+                    && newUser.entranceYear() == userInfo.entranceYear()
             ) {
                 return checkUserAuth(newUser, userInfo.authorities());
             }

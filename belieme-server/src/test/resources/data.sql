@@ -134,16 +134,16 @@ insert into authority(id, department_id, permission)
 values (30, 5, 'DEVELOPER');
 
 -- insert user
-insert into user(id, university_id, student_id, name, token, created_at, approved_at)
-values (1, 2, '2018008886', '이석환', 'TEST1', 1673155358, 1673155358);
-insert into user(id, university_id, student_id, name, token, created_at, approved_at)
-values (2, 2, '2018008887', '이석현', 'TEST2', 1673155358, 1673155358);
-insert into user(id, university_id, student_id, name, token, created_at, approved_at)
-values (3, 2, '2019008887', '강백호', 'TEST3', 1673155358, 1673155358);
-insert into user(id, university_id, student_id, name, token, created_at, approved_at)
-values (4, 3, '2018008886', '이석환', 'TEST4', 1673155358, 1673155358);
-insert into user(id, university_id, student_id, name, token, created_at, approved_at)
-values (5, 3, '2018008887', '이석환', 'TEST5', 1673155358, 1673155358);
+insert into user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values (1, 2, '2018008886', '이석환', 2018, 'TEST1', 1673155358, 1673155358);
+insert into user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values (2, 2, '2018008887', '이석현', 2018, 'TEST2', 1673155358, 1673155358);
+insert into user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values (3, 2, '2019008887', '강백호', 2019, 'TEST3', 1673155358, 1673155358);
+insert into user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values (4, 3, '2018008886', '이석환', 2018, 'TEST4', 1673155358, 1673155358);
+insert into user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values (5, 3, '2018008887', '이석환', 2018, 'TEST5', 1673155358, 1673155358);
 
 insert into authority_user_join(user_id, authority_id)
 values (1, 7);

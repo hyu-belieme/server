@@ -28,6 +28,9 @@ public class UserService extends BaseService {
     public static final String DEVELOPER_UNIVERSITY_KEY = "DEV";
     public static final String HANYANG_UNIVERSITY_KEY = "HYU";
 
+    public static final int HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND = 1900;
+    public static final int HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND = 2500;
+
     public UserService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
@@ -128,9 +131,22 @@ public class UserService extends BaseService {
         String studentId = (String) (jsonResponse.get("gaeinNo"));
         String name = (String) (jsonResponse.get("userNm"));
         String sosokId = (String) jsonResponse.get("sosokId");
+        int entranceYear = extractEntranceYearFromStudentId(studentId);
+
         List<String> majorCodes = List.of(sosokId);
 
-        return updateOrCreateUser(hyuInfo.code(), studentId, name, majorCodes);
+        return updateOrCreateUser(hyuInfo.code(), studentId, name, entranceYear, majorCodes);
+    }
+
+    private int extractEntranceYearFromStudentId(String studentId) {
+        int entranceYear = 0;
+        try {
+            entranceYear = Integer.parseInt(studentId.substring(0, 4));
+        } catch (Exception ignored) { }
+
+        if(entranceYear > HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND
+                && entranceYear < HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND) return entranceYear;
+        return 0;
     }
 
     private UserDto updateOrCreateUser(UserInfo userInfo) {
@@ -139,7 +155,7 @@ public class UserService extends BaseService {
 
         UserDto targetUser = getOrNull(university, userInfo.studentId());
         if (targetUser == null) {
-            targetUser = UserDto.init(university, userInfo.studentId(), userInfo.name());
+            targetUser = UserDto.init(university, userInfo.studentId(), userInfo.name(), userInfo.entranceYear());
             isNew = true;
         }
 
@@ -147,6 +163,7 @@ public class UserService extends BaseService {
                 .withUniversity(university)
                 .withStudentId(userInfo.studentId())
                 .withName(userInfo.name())
+                .withEntranceYear(userInfo.entranceYear())
                 .withAuthorities(toAuthorityDtoList(userInfo.authorities()))
                 .withApprovedAt(currentTime())
                 .withToken(UUID.randomUUID().toString());
@@ -155,18 +172,19 @@ public class UserService extends BaseService {
         return userDao.update(userInfo.universityCode(), userInfo.studentId(), targetUser);
     }
 
-    private UserDto updateOrCreateUser(String universityCode, String studentId, String name, List<String> majorCodes) {
+    private UserDto updateOrCreateUser(String universityCode, String studentId, String name, int entranceYear, List<String> majorCodes) {
         boolean isNew = false;
         UniversityDto university = universityDao.getByIndex(universityCode);
 
         UserDto targetUser = getOrNull(university, studentId);
         if (targetUser == null) {
-            targetUser = UserDto.init(university, studentId, name);
+            targetUser = UserDto.init(university, studentId, name, entranceYear);
             isNew = true;
         }
 
         List<AuthorityDto> newAuthorities = makeNewAuthorities(targetUser, majorCodes);
         targetUser = targetUser.withName(name)
+                .withEntranceYear(entranceYear)
                 .withApprovedAt(currentTime())
                 .withAuthorities(newAuthorities)
                 .withToken(UUID.randomUUID().toString());
