@@ -1,6 +1,6 @@
 package com.example.beliemeserver.error.info;
 
-import com.example.beliemeserver.config.message.Message;
+import com.example.beliemeserver.util.message.Message;
 import org.springframework.http.HttpStatus;
 
 public interface ErrorInfo {
