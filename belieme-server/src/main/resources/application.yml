@@ -9,7 +9,7 @@ logging:
 
 spring:
   config:
-    import: classpath:apis/api.yml, classpath:inits/init.yml
+    import: classpath:apis/api.yml, classpath:inits/init.yml, classpath:cors/cors.yml
   data:
     jdbc:
       repositories.enabled: false
