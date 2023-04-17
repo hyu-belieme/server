@@ -116,24 +116,51 @@ public class BaseResponseTest {
         JSONObject deptJson = (JSONObject) json.get("department");
         deptWithoutUnivJsonCmpAssertions(deptJson, stuff.department());
 
-        Assertions.assertThat(json.containsKey("name")).isTrue();
-        Assertions.assertThat(json.get("name")).isEqualTo(stuff.name());
-
-        Assertions.assertThat(json.containsKey("thumbnail")).isTrue();
-        Assertions.assertThat(json.get("thumbnail")).isEqualTo(stuff.thumbnail());
-
-        Assertions.assertThat(json.containsKey("amount")).isTrue();
-        Assertions.assertThat(json.get("amount")).isEqualTo((long) stuff.amount());
-
-        Assertions.assertThat(json.containsKey("count")).isTrue();
-        Assertions.assertThat(json.get("count")).isEqualTo((long) stuff.count());
-
-        Assertions.assertThat(json.containsKey("itemList")).isTrue();
-        JSONArray jsonArray = (JSONArray) json.get("itemList");
+        Assertions.assertThat(json.containsKey("items")).isTrue();
+        JSONArray jsonArray = (JSONArray) json.get("items");
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject itemJson = (JSONObject) jsonArray.get(i);
             itemJsonWithoutUnivAndDeptAndStuffInfoCmpAssertions(itemJson, stuff.items().get(i));
         }
+
+        stuffInfoJsonCmpAssertions(json, stuff);
+    }
+
+    protected void stuffJsonWithoutUnivAndDeptInfoCmpAssertions(JSONObject json, StuffDto stuff) {
+        System.out.println("DTO : " + stuff);
+        System.out.println("JSON : " + json.toString());
+        System.out.println();
+
+        Assertions.assertThat(json.containsKey("university")).isFalse();
+
+        Assertions.assertThat(json.containsKey("department")).isFalse();
+
+        Assertions.assertThat(json.containsKey("items")).isTrue();
+        JSONArray jsonArray = (JSONArray) json.get("items");
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject itemJson = (JSONObject) jsonArray.get(i);
+            itemJsonWithoutUnivAndDeptAndStuffInfoCmpAssertions(itemJson, stuff.items().get(i));
+        }
+
+        stuffInfoJsonCmpAssertions(json, stuff);
+    }
+
+    protected void stuffJsonWithoutItemsCmpAssertions(JSONObject json, StuffDto stuff) {
+        System.out.println("DTO : " + stuff);
+        System.out.println("JSON : " + json.toString());
+        System.out.println();
+
+        Assertions.assertThat(json.containsKey("university")).isTrue();
+        JSONObject univJson = (JSONObject) json.get("university");
+        basicUnivJsonCmpAssertions(univJson, stuff.department().university());
+
+        Assertions.assertThat(json.containsKey("department")).isTrue();
+        JSONObject deptJson = (JSONObject) json.get("department");
+        deptWithoutUnivJsonCmpAssertions(deptJson, stuff.department());
+
+        Assertions.assertThat(json.containsKey("items")).isFalse();
+
+        stuffInfoJsonCmpAssertions(json, stuff);
     }
 
     protected void itemJsonCmpAssertions(JSONObject json, ItemDto item) {
@@ -311,6 +338,20 @@ public class BaseResponseTest {
         }
         Assertions.assertThat(json.containsKey("entranceYear")).isTrue();
         Assertions.assertThat(json.get("entranceYear")).isEqualTo((long) user.entranceYear());
+    }
+
+    private void stuffInfoJsonCmpAssertions(JSONObject json, StuffDto stuff) {
+        Assertions.assertThat(json.containsKey("name")).isTrue();
+        Assertions.assertThat(json.get("name")).isEqualTo(stuff.name());
+
+        Assertions.assertThat(json.containsKey("thumbnail")).isTrue();
+        Assertions.assertThat(json.get("thumbnail")).isEqualTo(stuff.thumbnail());
+
+        Assertions.assertThat(json.containsKey("amount")).isTrue();
+        Assertions.assertThat(json.get("amount")).isEqualTo((long) stuff.amount());
+
+        Assertions.assertThat(json.containsKey("count")).isTrue();
+        Assertions.assertThat(json.get("count")).isEqualTo((long) stuff.count());
     }
 
     private void itemInfoJsonCmpAssertions(JSONObject json, ItemDto item) {
