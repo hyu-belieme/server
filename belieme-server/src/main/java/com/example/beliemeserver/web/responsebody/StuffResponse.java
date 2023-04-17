@@ -10,7 +10,9 @@ import java.util.List;
 
 @Getter
 public class StuffResponse extends JsonResponse {
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private UniversityResponse university;
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private DepartmentResponse department;
     private String name;
     private String thumbnail;
@@ -55,5 +57,18 @@ public class StuffResponse extends JsonResponse {
                 stuffDto.name(), stuffDto.thumbnail(), stuffDto.amount(),
                 stuffDto.count(), itemResponseList
         );
+    }
+
+    public StuffResponse withoutUniversityAndDepartment() {
+        return new StuffResponse(
+                UniversityResponse.responseWillBeIgnore(),
+                DepartmentResponse.responseWillBeIgnore(),
+                name, thumbnail, amount, count, itemList);
+    }
+
+    public StuffResponse withoutItems() {
+        return new StuffResponse(
+                university, department, name, thumbnail,
+                amount, count, null);
     }
 }

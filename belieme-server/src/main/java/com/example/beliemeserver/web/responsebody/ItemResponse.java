@@ -11,11 +11,9 @@ public class ItemResponse extends JsonResponse {
     private UniversityResponse university;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private DepartmentResponse department;
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
+    private StuffResponse stuff;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String stuffName;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String stuffThumbnail;
     private int num;
     private String status;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
@@ -25,12 +23,11 @@ public class ItemResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private ItemResponse(UniversityResponse university, DepartmentResponse department, String stuffName, String stuffThumbnail, int num, String status, HistoryResponse lastHistory) {
+    private ItemResponse(UniversityResponse university, DepartmentResponse department, StuffResponse stuff, int num, String status, HistoryResponse lastHistory) {
         super(true);
         this.university = university;
         this.department = department;
-        this.stuffName = stuffName;
-        this.stuffThumbnail = stuffThumbnail;
+        this.stuff = stuff;
         this.num = num;
         this.status = status;
         this.lastHistory = lastHistory;
@@ -46,18 +43,10 @@ public class ItemResponse extends JsonResponse {
             return responseWillBeIgnore();
         }
 
-        String stuffName = null;
-        String stuffThumbnail = null;
-        if (!itemDto.stuff().equals(StuffDto.nestedEndpoint)) {
-            stuffName = itemDto.stuff().name();
-            stuffThumbnail = itemDto.stuff().thumbnail();
-        }
-
         return new ItemResponse(
                 UniversityResponse.from(itemDto.stuff().department().university()),
                 DepartmentResponse.from(itemDto.stuff().department()).withoutUniversity(),
-                stuffName,
-                stuffThumbnail,
+                StuffResponse.from(itemDto.stuff()).withoutUniversityAndDepartment().withoutItems(),
                 itemDto.num(),
                 itemDto.status().toString(),
                 toNestedResponse(HistoryResponse.from(itemDto.lastHistory()))
@@ -68,19 +57,19 @@ public class ItemResponse extends JsonResponse {
         return new ItemResponse(
                 UniversityResponse.responseWillBeIgnore(),
                 DepartmentResponse.responseWillBeIgnore(),
-                stuffName, stuffThumbnail, num, status, lastHistory);
+                stuff, num, status, lastHistory);
     }
 
     public ItemResponse withoutStuffInfo() {
         return new ItemResponse(
-                university, department, null, null,
+                university, department, StuffResponse.responseWillBeIgnore(),
                 num, status, lastHistory);
     }
 
     public ItemResponse withoutLastHistory() {
         return new ItemResponse(
-                university, department, stuffName,
-                stuffThumbnail, num, status, HistoryResponse.responseWillBeIgnore());
+                university, department, stuff,
+                num, status, HistoryResponse.responseWillBeIgnore());
     }
 
     private static HistoryResponse toNestedResponse(HistoryResponse history) {
