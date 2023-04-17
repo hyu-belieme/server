@@ -176,11 +176,9 @@ public class BaseResponseTest {
         JSONObject deptJson = (JSONObject) json.get("department");
         deptWithoutUnivJsonCmpAssertions(deptJson, item.stuff().department());
 
-        Assertions.assertThat(json.containsKey("stuffName")).isTrue();
-        Assertions.assertThat(json.get("stuffName")).isEqualTo(item.stuff().name());
-
-        Assertions.assertThat(json.containsKey("stuffThumbnail")).isTrue();
-        Assertions.assertThat(json.get("stuffThumbnail")).isEqualTo(item.stuff().thumbnail());
+        Assertions.assertThat(json.containsKey("stuff")).isTrue();
+        JSONObject stuffJson = (JSONObject) json.get("stuff");
+        stuffInfoJsonCmpAssertions(stuffJson, item.stuff());
 
         itemInfoJsonCmpAssertions(json, item);
 
@@ -195,11 +193,9 @@ public class BaseResponseTest {
         Assertions.assertThat(json.containsKey("university")).isFalse();
         Assertions.assertThat(json.containsKey("department")).isFalse();
 
-        Assertions.assertThat(json.containsKey("stuffName")).isTrue();
-        Assertions.assertThat(json.get("stuffName")).isEqualTo(item.stuff().name());
-
-        Assertions.assertThat(json.containsKey("stuffThumbnail")).isTrue();
-        Assertions.assertThat(json.get("stuffThumbnail")).isEqualTo(item.stuff().thumbnail());
+        Assertions.assertThat(json.containsKey("stuff")).isTrue();
+        JSONObject stuffJson = (JSONObject) json.get("stuff");
+        stuffInfoJsonCmpAssertions(stuffJson, item.stuff());
 
         itemInfoJsonCmpAssertions(json, item);
 
@@ -219,8 +215,7 @@ public class BaseResponseTest {
         JSONObject deptJson = (JSONObject) json.get("department");
         deptWithoutUnivJsonCmpAssertions(deptJson, item.stuff().department());
 
-        Assertions.assertThat(json.containsKey("stuffName")).isFalse();
-        Assertions.assertThat(json.containsKey("stuffThumbnail")).isFalse();
+        Assertions.assertThat(json.containsKey("stuff")).isFalse();
 
         itemInfoJsonCmpAssertions(json, item);
 
@@ -234,8 +229,7 @@ public class BaseResponseTest {
 
         Assertions.assertThat(json.containsKey("university")).isFalse();
         Assertions.assertThat(json.containsKey("department")).isFalse();
-        Assertions.assertThat(json.containsKey("stuffName")).isFalse();
-        Assertions.assertThat(json.containsKey("stuffThumbnail")).isFalse();
+        Assertions.assertThat(json.containsKey("stuff")).isFalse();
 
         itemInfoJsonCmpAssertions(json, item);
 
