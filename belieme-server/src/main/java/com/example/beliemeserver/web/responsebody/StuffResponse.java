@@ -10,7 +10,9 @@ import java.util.List;
 
 @Getter
 public class StuffResponse extends JsonResponse {
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private UniversityResponse university;
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private DepartmentResponse department;
     private String name;
     private String thumbnail;
@@ -18,13 +20,13 @@ public class StuffResponse extends JsonResponse {
     private int count;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<ItemResponse> itemList;
+    private List<ItemResponse> items;
 
     private StuffResponse(boolean doesJsonInclude) {
         super(doesJsonInclude);
     }
 
-    private StuffResponse(UniversityResponse university, DepartmentResponse department, String name, String thumbnail, int amount, int count, List<ItemResponse> itemList) {
+    private StuffResponse(UniversityResponse university, DepartmentResponse department, String name, String thumbnail, int amount, int count, List<ItemResponse> items) {
         super(true);
         this.university = university;
         this.department = department;
@@ -32,7 +34,7 @@ public class StuffResponse extends JsonResponse {
         this.thumbnail = thumbnail;
         this.amount = amount;
         this.count = count;
-        this.itemList = itemList;
+        this.items = items;
     }
 
     public static StuffResponse responseWillBeIgnore() {
@@ -55,5 +57,18 @@ public class StuffResponse extends JsonResponse {
                 stuffDto.name(), stuffDto.thumbnail(), stuffDto.amount(),
                 stuffDto.count(), itemResponseList
         );
+    }
+
+    public StuffResponse withoutUniversityAndDepartment() {
+        return new StuffResponse(
+                UniversityResponse.responseWillBeIgnore(),
+                DepartmentResponse.responseWillBeIgnore(),
+                name, thumbnail, amount, count, items);
+    }
+
+    public StuffResponse withoutItems() {
+        return new StuffResponse(
+                university, department, name, thumbnail,
+                amount, count, null);
     }
 }

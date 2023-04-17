@@ -88,7 +88,7 @@ public class StuffApiController extends BaseApiController {
     private List<StuffResponse> toResponseList(List<StuffDto> stuffDtoList) {
         List<StuffResponse> responseList = new ArrayList<>();
         for (StuffDto dto : stuffDtoList) {
-            responseList.add(StuffResponse.from(dto));
+            responseList.add(StuffResponse.from(dto).withoutItems());
         }
         return responseList;
     }
