@@ -1170,7 +1170,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     private ItemDto randomInactiveItemByDept(DepartmentDto dept) {
         RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
-        items = inactiveItems(items);
+        items = lostItems(items);
         return randomSelectAndLog(items);
     }
 
@@ -1225,33 +1225,28 @@ public class HistoryServiceTest extends BaseServiceTest {
     }
 
     private RandomGetter<ItemDto> usableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemStatus.USABLE);
+        return items.filter(ItemDto::isUsable);
     }
 
     private RandomGetter<ItemDto> unusableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemStatus.UNUSABLE);
+        return items.filter(ItemDto::isUnusable);
     }
 
-    private RandomGetter<ItemDto> inactiveItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemStatus.INACTIVE);
+    private RandomGetter<ItemDto> lostItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.status() == ItemStatus.LOST);
     }
 
     private RandomGetter<ItemDto> reservedItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.lastHistory() != null
-                && item.lastHistory().status() == HistoryStatus.REQUESTED);
+        return items.filter((item) -> item.status() == ItemStatus.REQUESTED);
     }
 
     private RandomGetter<ItemDto> usingOrDelayedItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.lastHistory() != null
-                && (item.lastHistory().status() == HistoryStatus.USING
-                || item.lastHistory().status() == HistoryStatus.DELAYED));
+        return items.filter((item) -> item.status() == ItemStatus.USING);
     }
 
     private RandomGetter<ItemDto> returnableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.lastHistory() != null
-                && (item.lastHistory().status() == HistoryStatus.USING
-                || item.lastHistory().status() == HistoryStatus.DELAYED
-                || item.lastHistory().status() == HistoryStatus.LOST));
+        return items.filter((item) -> item.status() == ItemStatus.USING
+                || item.status() == ItemStatus.LOST);
     }
 
     private RandomGetter<ItemDto> itemsOnStuff(RandomGetter<ItemDto> items, StuffDto stuff) {

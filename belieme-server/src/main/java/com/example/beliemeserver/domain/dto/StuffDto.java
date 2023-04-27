@@ -1,6 +1,5 @@
 package com.example.beliemeserver.domain.dto;
 
-import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import lombok.NonNull;
 
 import java.util.ArrayList;
@@ -93,8 +92,7 @@ public record StuffDto(
 
     public int firstUsableItemNum() {
         for (ItemDto item : items) {
-            if (item.status() == ItemStatus.USABLE)
-                return item.num();
+            if (item.isUsable()) return item.num();
         }
         return 0;
     }
@@ -110,23 +108,10 @@ public record StuffDto(
     }
 
     public int amount() {
-        int amount = 0;
-        for (ItemDto item : items) {
-            if (item.status() == ItemStatus.USABLE
-                    || item.status() == ItemStatus.UNUSABLE) {
-                amount++;
-            }
-        }
-        return amount;
+        return items.size();
     }
 
     public int count() {
-        int count = 0;
-        for (ItemDto item : items) {
-            if (item.status() == ItemStatus.USABLE) {
-                count++;
-            }
-        }
-        return count;
+        return (int) items.stream().filter(ItemDto::isUsable).count();
     }
 }

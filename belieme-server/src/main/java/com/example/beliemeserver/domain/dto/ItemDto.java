@@ -1,5 +1,6 @@
 package com.example.beliemeserver.domain.dto;
 
+import com.example.beliemeserver.domain.dto.enumeration.HistoryStatus;
 import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import lombok.NonNull;
 
@@ -53,17 +54,27 @@ public record ItemDto(
         return lastHistory.num() + 1;
     }
 
+    public boolean isUsable() {
+        return status() == ItemStatus.USABLE;
+    }
+
+    public boolean isUnusable() {
+        return !isUsable();
+    }
+
     public ItemStatus status() {
-        if (lastHistory == null) {
+        if (lastHistory == null
+                || lastHistory.status() == HistoryStatus.RETURNED
+                || lastHistory.status() == HistoryStatus.FOUND
+                || lastHistory.status() == HistoryStatus.EXPIRED
+        ) {
             return ItemStatus.USABLE;
         }
 
-        return switch (lastHistory.status()) {
-            case REQUESTED, USING, DELAYED -> ItemStatus.UNUSABLE;
-            case RETURNED, EXPIRED, FOUND -> ItemStatus.USABLE;
-            case LOST -> ItemStatus.INACTIVE;
-            default -> ItemStatus.ERROR;
-        };
+        if(lastHistory.status() == HistoryStatus.REQUESTED) return ItemStatus.REQUESTED;
+        if(lastHistory.status() == HistoryStatus.USING || lastHistory.status() == HistoryStatus.DELAYED) return ItemStatus.USING;
+        if(lastHistory.status() == HistoryStatus.LOST) return ItemStatus.LOST;
+        return ItemStatus.ERROR;
     }
 
 }

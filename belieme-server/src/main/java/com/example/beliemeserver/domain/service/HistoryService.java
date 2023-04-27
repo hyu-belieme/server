@@ -111,7 +111,7 @@ public class HistoryService extends BaseService {
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() != ItemStatus.USABLE) throw new ReservationRequestedOnNonUsableItemException();
+        if (item.isUnusable()) throw new ReservationRequestedOnNonUsableItemException();
 
         HistoryDto newHistory = new HistoryDto(
                 item,
@@ -147,10 +147,10 @@ public class HistoryService extends BaseService {
         ItemDto item = getItemOrThrowInvalidIndexException(
                 universityCode, departmentCode, stuffName, itemNum);
 
-        if (item.status() == ItemStatus.INACTIVE) throw new LostRegistrationRequestedOnLostItemException();
+        if (item.status() == ItemStatus.LOST) throw new LostRegistrationRequestedOnLostItemException();
 
         HistoryDto newHistory;
-        if (item.status() == ItemStatus.USABLE) {
+        if (item.isUsable()) {
             newHistory = new HistoryDto(
                     item,
                     item.nextHistoryNum(),
