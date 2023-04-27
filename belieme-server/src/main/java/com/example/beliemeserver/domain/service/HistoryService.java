@@ -150,7 +150,10 @@ public class HistoryService extends BaseService {
         if (item.status() == ItemStatus.LOST) throw new LostRegistrationRequestedOnLostItemException();
 
         HistoryDto newHistory;
-        if (item.isUsable()) {
+        if (item.isUsable() || item.status() == ItemStatus.REQUESTED) {
+            if (item.isUnusable() && item.lastHistory().status() == HistoryStatus.REQUESTED) {
+                makeItemCancel(userToken, universityCode, departmentCode, stuffName, itemNum);
+            }
             newHistory = new HistoryDto(
                     item,
                     item.nextHistoryNum(),
@@ -172,13 +175,10 @@ public class HistoryService extends BaseService {
                     stuffName, itemNum, newHistory.num());
         }
 
-        if (item.lastHistory().status() == HistoryStatus.REQUESTED)
-            throw new LostRegistrationRequestedOnReservedItemException();
         newHistory = item.lastHistory()
                 .withItem(item)
                 .withLostManager(requester)
                 .withLostAt(System.currentTimeMillis() / 1000);
-
         return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
     }
 

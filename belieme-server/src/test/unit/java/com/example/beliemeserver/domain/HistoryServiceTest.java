@@ -788,6 +788,45 @@ public class HistoryServiceTest extends BaseServiceTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[`item`이 대여 요청이 들어 온 상태일 시]_[]")
+        public void SUCCESS_itemIsReserved() {
+            setUpDefault();
+            setItem(randomReservedItemByDept(dept));
+
+            mockDepartmentAndRequester();
+            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
+                    .thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).update(
+                    eq(univCode), eq(deptCode), eq(stuffName),
+                    eq(itemNum), integerCaptor.capture(), historyCaptor.capture());
+
+            int historyNum = integerCaptor.getValue();
+            UserDto historyCancelManager = historyCaptor.getValue().cancelManager();
+            long canceledAt = historyCaptor.getValue().canceledAt();
+
+            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
+            Assertions.assertThat(historyCancelManager).isEqualTo(requester);
+            Assertions.assertThat(canceledAt).isNotZero();
+
+            verify(historyDao).create(historyCaptor.capture());
+            verify(itemDao).update(eq(univCode), eq(deptCode),
+                    eq(stuffName), eq(itemNum), itemCaptor.capture());
+
+            ItemDto historyItem = historyCaptor.getValue().item();
+            UserDto historyRequester = historyCaptor.getValue().requester();
+            UserDto historyLostManager = historyCaptor.getValue().lostManager();
+            long historyLostAt = historyCaptor.getValue().lostAt();
+
+            Assertions.assertThat(historyItem).isEqualTo(item);
+            Assertions.assertThat(historyRequester).isEqualTo(null);
+            Assertions.assertThat(historyLostManager).isEqualTo(requester);
+            Assertions.assertThat(historyLostAt).isNotZero();
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[SUCCESS]_[해당 `item`이 대여 중 분실 되었을 시]_[-]")
         public void SUCCESS_itemIsUnusable() {
             setUpDefault();
@@ -810,19 +849,6 @@ public class HistoryServiceTest extends BaseServiceTest {
             Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
             Assertions.assertThat(historyLostManager).isEqualTo(requester);
             Assertions.assertThat(historyLostAt).isNotZero();
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 대여 요청이 들어 온 상태일 시]_[LostRegistrationOnReservedItemException]")
-        public void ERROR_itemIsReserved_LostRegistrationOnReservedItemException() {
-            setUpDefault();
-            setItem(randomReservedItemByDept(dept));
-
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
-
-            TestHelper.exceptionTest(this::execMethod, LostRegistrationRequestedOnReservedItemException.class);
         }
 
         @RepeatedTest(10)
