@@ -1,6 +1,6 @@
 package com.example.beliemeserver.domain.exception;
 
-import com.example.beliemeserver.config.message.Message;
+import com.example.beliemeserver.util.message.Message;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 
 public class TokenExpiredException extends UnauthorizedException {
