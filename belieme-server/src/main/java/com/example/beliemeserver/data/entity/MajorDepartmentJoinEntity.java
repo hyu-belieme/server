@@ -18,11 +18,9 @@ public class MajorDepartmentJoinEntity extends DataEntity {
     @Column
     private int id;
 
-    @NonNull
     @Column(name = "major_id")
     private int majorId;
 
-    @NonNull
     @Column(name = "department_id")
     private int departmentId;
 

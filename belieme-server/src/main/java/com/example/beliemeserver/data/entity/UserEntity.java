@@ -39,7 +39,6 @@ public class UserEntity extends DataEntity {
     @Column(name = "name")
     private String name;
 
-    @NonNull
     @Setter
     @Column(name = "entrance_year")
     private int entranceYear;

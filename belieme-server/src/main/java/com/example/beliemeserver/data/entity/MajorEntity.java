@@ -22,7 +22,6 @@ public class MajorEntity extends DataEntity {
     @Column(name = "id")
     private int id;
 
-    @NonNull
     @Column(name = "university_id")
     private int universityId;
 

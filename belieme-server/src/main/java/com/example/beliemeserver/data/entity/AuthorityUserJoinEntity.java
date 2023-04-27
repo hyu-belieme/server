@@ -18,11 +18,9 @@ public class AuthorityUserJoinEntity {
     @Column
     private int id;
 
-    @NonNull
     @Column(name = "authority_id")
     private int authorityId;
 
-    @NonNull
     @Column(name = "user_id")
     private int userId;
 
