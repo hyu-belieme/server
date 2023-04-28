@@ -36,11 +36,6 @@ public class NewUniversityEntity extends NewDataEntity<UUID> {
         this.apiUrl = apiUrl;
     }
 
-    public NewUniversityEntity setId(@NonNull UUID id) {
-        this.id = id;
-        return this;
-    }
-
     public NewUniversityEntity setName(@NonNull String name) {
         this.name = name;
         return this;

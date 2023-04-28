@@ -50,11 +50,6 @@ public class NewDepartmentEntity extends NewDataEntity<UUID> {
         this.baseMajorJoin = new ArrayList<>();
     }
 
-    public NewDepartmentEntity setId(UUID id) {
-        this.id = id;
-        return this;
-    }
-
     public NewDepartmentEntity setUniversity(NewUniversityEntity university) {
         this.university = university;
         this.universityId = university.getId();

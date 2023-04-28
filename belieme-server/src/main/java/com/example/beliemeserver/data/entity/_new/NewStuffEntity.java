@@ -59,11 +59,6 @@ public class NewStuffEntity extends NewDataEntity<UUID> {
         this.items = new ArrayList<>();
     }
 
-    public NewStuffEntity setId(@NonNull UUID id) {
-        this.id = id;
-        return this;
-    }
-
     public NewStuffEntity setDepartment(@NonNull NewDepartmentEntity department) {
         this.department = department;
         this.departmentId = department.getId();
