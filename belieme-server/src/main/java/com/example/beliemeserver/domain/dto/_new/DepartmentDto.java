@@ -20,8 +20,8 @@ public record DepartmentDto(
         this.baseMajors = new ArrayList<>(baseMajors);
     }
 
-    public static DepartmentDto init(@NonNull UUID id, @NonNull UniversityDto university, @NonNull String name) {
-        return new DepartmentDto(id, university, name, new ArrayList<>());
+    public static DepartmentDto init(@NonNull UniversityDto university, @NonNull String name, @NonNull List<MajorDto> baseMajors) {
+        return new DepartmentDto(UUID.randomUUID(), university, name, baseMajors);
     }
 
     @Override
