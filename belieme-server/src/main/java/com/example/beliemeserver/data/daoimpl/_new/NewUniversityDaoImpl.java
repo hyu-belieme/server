@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDao {
@@ -36,6 +37,12 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
     }
 
     @Override
+    public UniversityDto getById(UUID id) {
+        NewUniversityEntity target = findUniversityEntity(id);
+        return target.toUniversityDto();
+    }
+
+    @Override
     public boolean checkExistByIndex(String universityName) {
         return universityRepository.existsByName(universityName);
     }
@@ -57,6 +64,19 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
     @Override
     public UniversityDto update(String universityName, UniversityDto newUniversity) {
         NewUniversityEntity target = findUniversityEntity(universityName);
+        if (doesIndexOfUniversityChange(target, newUniversity)) {
+            checkUniversityConflict(newUniversity.name());
+        }
+
+        target.setName(newUniversity.name())
+                .setApiUrl(newUniversity.apiUrl());
+
+        return target.toUniversityDto();
+    }
+
+    @Override
+    public UniversityDto update(UUID id, UniversityDto newUniversity) {
+        NewUniversityEntity target = findUniversityEntity(id);
         if (doesIndexOfUniversityChange(target, newUniversity)) {
             checkUniversityConflict(newUniversity.name());
         }

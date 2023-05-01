@@ -45,8 +45,23 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     @Override
+    public List<UserDto> getListByUniversity(UUID universityId) {
+        List<UserDto> output = new ArrayList<>();
+
+        for (NewUserEntity userEntity : userRepository.findByUniversityId(universityId)) {
+            output.add(userEntity.toUserDto());
+        }
+        return output;
+    }
+
+    @Override
     public UserDto getByToken(String token) {
         return findUserEntityByToken(token).toUserDto();
+    }
+
+    @Override
+    public UserDto getById(UUID userId) {
+        return findUserEntity(userId).toUserDto();
     }
 
     @Override
@@ -71,8 +86,17 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
         return target.toUserDto();
     }
 
+    @Override
+    public UserDto update(UUID userId, UserDto newUser) {
+        NewUserEntity target = findUserEntity(userId);
+        updateUserOnly(target, newUser);
+        removeAllAuthorityJoins(target);
+        saveAuthorityJoins(target, newUser.authorities());
+        return target.toUserDto();
+    }
+
     private NewUserEntity saveUserOnly(UserDto newUser) {
-        NewUniversityEntity universityEntity = findUniversityEntity(newUser.university());
+        NewUniversityEntity universityEntity = findUniversityEntity(newUser.university().id());
 
         checkUserConflict(universityEntity.getId(), newUser.studentId());
 
@@ -90,7 +114,7 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     private void updateUserOnly(NewUserEntity target, UserDto newUser) {
-        NewUniversityEntity newUniversity = findUniversityEntity(newUser.university());
+        NewUniversityEntity newUniversity = findUniversityEntity(newUser.university().id());
 
         if (doesIndexChange(target, newUser)) {
             checkUserConflict(newUniversity.getId(), newUser.studentId());
@@ -107,7 +131,8 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
 
     private void saveAuthorityJoins(NewUserEntity newUserEntity, List<AuthorityDto> authorities) {
         for (AuthorityDto authority : authorities) {
-            NewAuthorityEntity authorityEntity = findAuthorityEntity(authority);
+            NewAuthorityEntity authorityEntity = findAuthorityEntity(
+                    authority.department().id(), authority.permission().name());
             NewAuthorityUserJoinEntity newJoin = new NewAuthorityUserJoinEntity(
                     authorityEntity,
                     newUserEntity

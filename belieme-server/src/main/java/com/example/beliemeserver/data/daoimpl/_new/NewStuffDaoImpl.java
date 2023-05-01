@@ -28,6 +28,15 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     }
 
     @Override
+    public List<StuffDto> getListByDepartment(UUID departmentId) {
+        List<StuffDto> output = new ArrayList<>();
+        for (NewStuffEntity stuffEntity : stuffRepository.findByDepartmentId(departmentId)) {
+            output.add(stuffEntity.toStuffDto());
+        }
+        return output;
+    }
+
+    @Override
     public List<StuffDto> getListByDepartment(String universityName, String departmentName) {
         NewDepartmentEntity departmentOfTarget = findDepartmentEntity(universityName, departmentName);
 
@@ -39,13 +48,18 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     }
 
     @Override
+    public StuffDto getById(UUID stuffId) {
+        return findStuffEntity(stuffId).toStuffDto();
+    }
+
+    @Override
     public StuffDto getByIndex(String universityName, String departmentName, String stuffName) {
         return findStuffEntity(universityName, departmentName, stuffName).toStuffDto();
     }
 
     @Override
     public StuffDto create(StuffDto newStuff) {
-        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department());
+        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department().id());
 
         checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
 
@@ -59,9 +73,24 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     }
 
     @Override
+    public StuffDto update(UUID stuffId, StuffDto newStuff) {
+        NewStuffEntity target = findStuffEntity(stuffId);
+        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department().id());
+
+        if (doesIndexChange(target, newStuff)) {
+            checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
+        }
+
+        target.setDepartment(departmentOfNewStuff)
+                .setName(newStuff.name())
+                .setThumbnail(newStuff.thumbnail());
+        return target.toStuffDto();
+    }
+
+    @Override
     public StuffDto update(String universityName, String departmentName, String stuffName, StuffDto newStuff) {
         NewStuffEntity target = findStuffEntity(universityName, departmentName, stuffName);
-        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department());
+        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department().id());
 
         if (doesIndexChange(target, newStuff)) {
             checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());

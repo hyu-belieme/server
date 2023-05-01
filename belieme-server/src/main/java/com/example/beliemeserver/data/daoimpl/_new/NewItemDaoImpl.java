@@ -30,6 +30,15 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
     }
 
     @Override
+    public List<ItemDto> getListByStuff(UUID stuffId) {
+        List<ItemDto> output = new ArrayList<>();
+        for (NewItemEntity itemEntity : itemRepository.findByStuffId(stuffId)) {
+            output.add(itemEntity.toItemDto());
+        }
+        return output;
+    }
+
+    @Override
     public List<ItemDto> getListByStuff(String universityName, String departmentName, String stuffName) {
         NewStuffEntity targetStuff = findStuffEntity(universityName, departmentName, stuffName);
         List<ItemDto> output = new ArrayList<>();
@@ -40,13 +49,18 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
     }
 
     @Override
+    public ItemDto getById(UUID itemId) {
+        return findItemEntity(itemId).toItemDto();
+    }
+
+    @Override
     public ItemDto getByIndex(String universityName, String departmentName, String stuffName, int itemNum) {
         return findItemEntity(universityName, departmentName, stuffName, itemNum).toItemDto();
     }
 
     @Override
     public ItemDto create(ItemDto newItem) {
-        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff());
+        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff().id());
 
         checkItemConflict(stuffOfNewItem.getId(), newItem.num());
 
@@ -62,7 +76,23 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
     @Override
     public ItemDto update(String universityName, String departmentName, String stuffName, int itemNum, ItemDto newItem) {
         NewItemEntity target = findItemEntity(universityName, departmentName, stuffName, itemNum);
-        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff());
+        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff().id());
+        NewHistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
+
+        if (doesIndexChange(target, newItem)) {
+            checkItemConflict(stuffOfNewItem.getId(), newItem.num());
+        }
+
+        target.setStuff(stuffOfNewItem)
+                .setNum(newItem.num())
+                .setLastHistory(lastHistoryOfNewItem);
+        return target.toItemDto();
+    }
+
+    @Override
+    public ItemDto update(UUID itemId, ItemDto newItem) {
+        NewItemEntity target = findItemEntity(itemId);
+        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff().id());
         NewHistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
 
         if (doesIndexChange(target, newItem)) {
@@ -79,7 +109,7 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
         if (historyDto == null) {
             return null;
         }
-        return findHistoryEntity(historyDto);
+        return findHistoryEntity(historyDto.id());
     }
 
     private boolean doesIndexChange(NewItemEntity target, ItemDto newItem) {

@@ -45,6 +45,21 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     @Override
+    public List<DepartmentDto> getListByUniversity(UUID universityId) {
+        List<DepartmentDto> output = new ArrayList<>();
+
+        for (NewDepartmentEntity departmentEntity : departmentRepository.findByUniversityId(universityId)) {
+            output.add(departmentEntity.toDepartmentDto());
+        }
+        return output;
+    }
+
+    @Override
+    public DepartmentDto getById(UUID departmentId) {
+        return findDepartmentEntity(departmentId).toDepartmentDto();
+    }
+
+    @Override
     public DepartmentDto getByIndex(String universityName, String departmentName) {
         NewDepartmentEntity targetEntity = findDepartmentEntity(universityName, departmentName);
         return targetEntity.toDepartmentDto();
@@ -79,8 +94,19 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
         return target.toDepartmentDto();
     }
 
+    @Override
+    public DepartmentDto update(UUID departmentId, DepartmentDto newDepartment) {
+        NewDepartmentEntity target = findDepartmentEntity(departmentId);
+        updateDepartmentOnly(target, newDepartment);
+
+        removeAllBaseMajorJoins(target);
+        saveBaseMajorJoins(target, newDepartment.baseMajors());
+
+        return target.toDepartmentDto();
+    }
+
     private NewDepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) {
-        NewUniversityEntity university = findUniversityEntity(newDepartment.university());
+        NewUniversityEntity university = findUniversityEntity(newDepartment.university().id());
 
         checkDepartmentConflict(university.getId(), newDepartment.name());
 
@@ -94,8 +120,7 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     private void updateDepartmentOnly(NewDepartmentEntity target, DepartmentDto newDepartment) {
-        String newUniversityName = newDepartment.university().name();
-        NewUniversityEntity newUniversityEntity = findUniversityEntity(newUniversityName);
+        NewUniversityEntity newUniversityEntity = findUniversityEntity(newDepartment.university().id());
 
         if (doesIndexOfDepartmentChange(target, newDepartment)) {
             checkDepartmentConflict(newUniversityEntity.getId(), newDepartment.name());
@@ -107,7 +132,7 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
 
     private void saveBaseMajorJoins(NewDepartmentEntity newDepartmentEntity, List<MajorDto> baseMajors) {
         for (MajorDto baseMajor : baseMajors) {
-            NewMajorEntity baseMajorEntity = findMajorEntity(baseMajor);
+            NewMajorEntity baseMajorEntity = findMajorEntity(baseMajor.id());
             NewMajorDepartmentJoinEntity newJoin = new NewMajorDepartmentJoinEntity(
                     baseMajorEntity,
                     newDepartmentEntity
@@ -123,9 +148,9 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     private boolean doesIndexOfDepartmentChange(NewDepartmentEntity target, DepartmentDto newDepartment) {
-        String oldUniversityName = target.getUniversity().getName();
+        UUID oldUniversityId = target.getUniversity().getId();
         String oldDepartmentName = target.getName();
-        return !(oldUniversityName.equals(newDepartment.university().name())
+        return !(oldUniversityId.equals(newDepartment.university().id())
                 && oldDepartmentName.equals(newDepartment.name()));
     }
 

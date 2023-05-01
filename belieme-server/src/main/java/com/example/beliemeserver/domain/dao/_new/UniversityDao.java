@@ -4,6 +4,7 @@ import com.example.beliemeserver.domain.dto._new.UniversityDto;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UniversityDao {
     @Transactional
@@ -13,6 +14,9 @@ public interface UniversityDao {
     UniversityDto getByIndex(String name);
 
     @Transactional
+    UniversityDto getById(UUID id);
+
+    @Transactional
     boolean checkExistByIndex(String universityName);
 
     @Transactional
@@ -20,4 +24,7 @@ public interface UniversityDao {
 
     @Transactional
     UniversityDto update(String name, UniversityDto newUniversityDto);
+
+    @Transactional
+    UniversityDto update(UUID id, UniversityDto newUniversityDto);
 }

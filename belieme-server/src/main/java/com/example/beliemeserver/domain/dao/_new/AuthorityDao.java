@@ -5,6 +5,7 @@ import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AuthorityDao {
     @Transactional
@@ -19,4 +20,7 @@ public interface AuthorityDao {
     @Transactional
     AuthorityDto update(String universityName, String departmentName,
                         Permission permission, AuthorityDto authority);
+
+    @Transactional
+    AuthorityDto update(UUID departmentId, Permission permission, AuthorityDto authority);
 }

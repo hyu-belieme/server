@@ -29,6 +29,11 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
     }
 
     @Override
+    public MajorDto getById(UUID majorId) {
+        return findMajorEntity(majorId).toMajorDto();
+    }
+
+    @Override
     public MajorDto getByIndex(String universityName, String majorCode) {
         NewMajorEntity targetEntity = findMajorEntity(universityName, majorCode);
         return targetEntity.toMajorDto();
@@ -36,7 +41,7 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
 
     @Override
     public MajorDto create(MajorDto newMajor) {
-        NewUniversityEntity university = findUniversityEntity(newMajor.university());
+        NewUniversityEntity university = findUniversityEntity(newMajor.university().id());
 
         checkMajorConflict(university.getId(), newMajor.code());
 
@@ -54,7 +59,7 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
     public MajorDto update(String universityName, String majorCode, MajorDto newMajor) {
         NewMajorEntity target = findMajorEntity(universityName, majorCode);
 
-        NewUniversityEntity newUniversity = findUniversityEntity(newMajor.university());
+        NewUniversityEntity newUniversity = findUniversityEntity(newMajor.university().id());
 
         checkMajorConflict(newUniversity.getId(), newMajor.code());
 
@@ -62,6 +67,30 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
                 .setCode(newMajor.code());
 
         return target.toMajorDto();
+    }
+
+    @Override
+    public MajorDto update(UUID majorId, MajorDto newMajor) {
+        NewMajorEntity target = findMajorEntity(majorId);
+
+        NewUniversityEntity newUniversity = findUniversityEntity(newMajor.university().id());
+
+        if (doesIndexChange(target, newMajor)) {
+            checkMajorConflict(newUniversity.getId(), newMajor.code());
+        }
+
+        target.setUniversity(newUniversity)
+                .setCode(newMajor.code());
+
+        return target.toMajorDto();
+    }
+
+    private boolean doesIndexChange(NewMajorEntity target, MajorDto newMajor) {
+        UUID oldUniversityId = target.getUniversity().getId();
+        String oldCode = target.getCode();
+
+        return !(oldUniversityId.equals(newMajor.university().id())
+                && oldCode.equals(newMajor.code()));
     }
 
     private void checkMajorConflict(UUID universityId, String majorCode) {

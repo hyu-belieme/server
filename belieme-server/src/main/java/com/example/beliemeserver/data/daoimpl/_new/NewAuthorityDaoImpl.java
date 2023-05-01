@@ -42,7 +42,7 @@ public class NewAuthorityDaoImpl extends NewBaseDaoImpl implements AuthorityDao 
 
     @Override
     public AuthorityDto create(AuthorityDto authority) {
-        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(authority.department());
+        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(authority.department().id());
 
         checkAuthorityConflict(departmentOfAuthority.getId(), authority.permission().name());
 
@@ -57,7 +57,21 @@ public class NewAuthorityDaoImpl extends NewBaseDaoImpl implements AuthorityDao 
     @Override
     public AuthorityDto update(String universityName, String departmentName, Permission permission, AuthorityDto newAuthority) {
         NewAuthorityEntity target = findAuthorityEntity(universityName, departmentName, permission.name());
-        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department());
+        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department().id());
+
+        if (doesIndexChange(target, newAuthority)) {
+            checkAuthorityConflict(departmentOfAuthority.getId(), newAuthority.permission().name());
+        }
+
+        target.setDepartment(departmentOfAuthority)
+                .setPermission(newAuthority.permission().name());
+        return target.toAuthorityDto();
+    }
+
+    @Override
+    public AuthorityDto update(UUID departmentId, Permission permission, AuthorityDto newAuthority) {
+        NewAuthorityEntity target = findAuthorityEntity(departmentId, permission.name());
+        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department().id());
 
         if (doesIndexChange(target, newAuthority)) {
             checkAuthorityConflict(departmentOfAuthority.getId(), newAuthority.permission().name());
@@ -69,12 +83,10 @@ public class NewAuthorityDaoImpl extends NewBaseDaoImpl implements AuthorityDao 
     }
 
     private boolean doesIndexChange(NewAuthorityEntity target, AuthorityDto newAuthority) {
-        String oldUniversityName = target.getDepartment().getUniversity().getName();
-        String oldDepartmentName = target.getDepartment().getName();
+        UUID oldDepartmentId = target.getDepartment().getId();
         String oldPermission = target.getPermission();
 
-        return !(oldUniversityName.equals(newAuthority.department().university().name()) &&
-                oldDepartmentName.equals(newAuthority.department().name()) &&
+        return !(oldDepartmentId.equals(newAuthority.department().id()) &&
                 oldPermission.equals(newAuthority.permission().name()));
     }
 

@@ -3,7 +3,6 @@ package com.example.beliemeserver.data.daoimpl._new;
 import com.example.beliemeserver.data.daoimpl._new.util.NewIndexAdapter;
 import com.example.beliemeserver.data.entity._new.*;
 import com.example.beliemeserver.data.repository._new.*;
-import com.example.beliemeserver.domain.dto._new.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,13 +35,16 @@ public abstract class NewBaseDaoImpl {
         this.historyRepository = historyRepository;
     }
 
+    protected NewUniversityEntity findUniversityEntity(UUID id) {
+        return NewIndexAdapter.getUniversityEntity(universityRepository, id);
+    }
+
     protected NewUniversityEntity findUniversityEntity(String universityName) {
         return NewIndexAdapter.getUniversityEntity(universityRepository, universityName);
     }
 
-    protected NewUniversityEntity findUniversityEntity(UniversityDto universityDto) {
-        String universityName = universityDto.name();
-        return findUniversityEntity(universityName);
+    protected NewDepartmentEntity findDepartmentEntity(UUID id) {
+        return NewIndexAdapter.getDepartmentEntity(departmentRepository, id);
     }
 
     protected NewDepartmentEntity findDepartmentEntity(String universityName, String departmentName) {
@@ -51,11 +53,8 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getDepartmentEntity(departmentRepository, universityId, departmentName);
     }
 
-    protected NewDepartmentEntity findDepartmentEntity(DepartmentDto departmentDto) {
-        String universityName = departmentDto.university().name();
-        String departmentName = departmentDto.name();
-
-        return findDepartmentEntity(universityName, departmentName);
+    protected NewUserEntity findUserEntity(UUID id) {
+        return NewIndexAdapter.getUserEntity(userRepository, id);
     }
 
     protected NewUserEntity findUserEntity(String universityName, String studentId) {
@@ -64,15 +63,12 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getUserEntity(userRepository, universityId, studentId);
     }
 
-    protected NewUserEntity findUserEntity(UserDto userDto) {
-        String universityName = userDto.university().name();
-        String studentId = userDto.studentId();
-
-        return findUserEntity(universityName, studentId);
-    }
-
     protected NewUserEntity findUserEntityByToken(String token) {
         return NewIndexAdapter.getUserEntityByToken(userRepository, token);
+    }
+
+    protected NewMajorEntity findMajorEntity(UUID id) {
+        return NewIndexAdapter.getMajorEntity(majorRepository, id);
     }
 
     protected NewMajorEntity findMajorEntity(String universityName, String majorCode) {
@@ -81,11 +77,8 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getMajorEntity(majorRepository, universityId, majorCode);
     }
 
-    protected NewMajorEntity findMajorEntity(MajorDto majorDto) {
-        String universityName = majorDto.university().name();
-        String majorCode = majorDto.code();
-
-        return findMajorEntity(universityName, majorCode);
+    protected NewAuthorityEntity findAuthorityEntity(UUID departmentId, String permission) {
+        return NewIndexAdapter.getAuthorityEntity(authorityRepository, departmentId, permission);
     }
 
     protected NewAuthorityEntity findAuthorityEntity(String universityName, String departmentName, String permission) {
@@ -94,12 +87,8 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getAuthorityEntity(authorityRepository, departmentId, permission);
     }
 
-    protected NewAuthorityEntity findAuthorityEntity(AuthorityDto authorityDto) {
-        String universityName = authorityDto.department().university().name();
-        String departmentName = authorityDto.department().name();
-        String permission = authorityDto.permission().toString();
-
-        return findAuthorityEntity(universityName, departmentName, permission);
+    protected NewStuffEntity findStuffEntity(UUID stuffId) {
+        return NewIndexAdapter.getStuffEntity(stuffRepository, stuffId);
     }
 
     protected NewStuffEntity findStuffEntity(String universityName, String departmentName, String stuffName) {
@@ -108,12 +97,8 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getStuffEntity(stuffRepository, departmentId, stuffName);
     }
 
-    protected NewStuffEntity findStuffEntity(StuffDto stuffDto) {
-        String universityName = stuffDto.department().university().name();
-        String departmentName = stuffDto.department().name();
-        String stuffName = stuffDto.name();
-
-        return findStuffEntity(universityName, departmentName, stuffName);
+    protected NewItemEntity findItemEntity(UUID itemId) {
+        return NewIndexAdapter.getItemEntity(itemRepository, itemId);
     }
 
     protected NewItemEntity findItemEntity(String universityName, String departmentName, String stuffName, int itemNum) {
@@ -122,28 +107,13 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getItemEntity(itemRepository, stuffId, itemNum);
     }
 
-    protected NewItemEntity findItemEntity(ItemDto itemDto) {
-        String universityName = itemDto.stuff().department().university().name();
-        String departmentName = itemDto.stuff().department().name();
-        String stuffName = itemDto.stuff().name();
-        int itemNum = itemDto.num();
-
-        return findItemEntity(universityName, departmentName, stuffName, itemNum);
+    protected NewHistoryEntity findHistoryEntity(UUID historyId) {
+        return NewIndexAdapter.getHistoryEntity(historyRepository, historyId);
     }
 
     protected NewHistoryEntity findHistoryEntity(String universityName, String departmentName, String stuffName, int itemNum, int historyNum) {
         UUID itemId = findItemEntity(universityName, departmentName, stuffName, itemNum).getId();
 
         return NewIndexAdapter.getHistoryEntity(historyRepository, itemId, historyNum);
-    }
-
-    protected NewHistoryEntity findHistoryEntity(HistoryDto historyDto) {
-        String universityName = historyDto.item().stuff().department().university().name();
-        String departmentName = historyDto.item().stuff().department().name();
-        String stuffName = historyDto.item().stuff().name();
-        int itemNum = historyDto.item().num();
-        int historyNum = historyDto.num();
-
-        return findHistoryEntity(universityName, departmentName, stuffName, itemNum, historyNum);
     }
 }
