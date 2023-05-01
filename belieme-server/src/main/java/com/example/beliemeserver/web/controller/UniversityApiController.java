@@ -1,8 +1,8 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto.UniversityDto;
-import com.example.beliemeserver.domain.service.UniversityService;
-import com.example.beliemeserver.web.responsebody.UniversityResponse;
+import com.example.beliemeserver.domain.dto._new.UniversityDto;
+import com.example.beliemeserver.domain.service._new.NewUniversityService;
+import com.example.beliemeserver.web.responsebody._new.UniversityResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +13,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/${api.keyword.university}")
 public class UniversityApiController extends BaseApiController {
-    private final UniversityService universityService;
+    private final NewUniversityService universityService;
 
-    public UniversityApiController(UniversityService universityService) {
+    public UniversityApiController(NewUniversityService universityService) {
         this.universityService = universityService;
     }
 
@@ -34,9 +34,9 @@ public class UniversityApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
 
-        UniversityDto universityDto = universityService.getByIndex(userToken, universityCode);
+        UniversityDto universityDto = universityService.getByIndex(userToken, universityName);
         UniversityResponse response = UniversityResponse.from(universityDto);
         return ResponseEntity.ok(response);
     }

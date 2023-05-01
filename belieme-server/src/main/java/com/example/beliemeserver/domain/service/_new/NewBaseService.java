@@ -15,7 +15,7 @@ import com.example.beliemeserver.error.exception.UnauthorizedException;
 import org.springframework.stereotype.Service;
 
 @Service
-public abstract class BaseService {
+public abstract class NewBaseService {
     protected final InitialDataDtoAdapter initialData;
     protected final UniversityDao universityDao;
     protected final DepartmentDao departmentDao;
@@ -28,7 +28,7 @@ public abstract class BaseService {
 
     public static final long TOKEN_EXPIRED_TIME = 3L * 30 * 24 * 60 * 60;
 
-    public BaseService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public NewBaseService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         this.initialData = new InitialDataDtoAdapter(initialData);
         this.universityDao = universityDao;
         this.departmentDao = departmentDao;

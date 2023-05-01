@@ -1,10 +1,10 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto.UserDto;
-import com.example.beliemeserver.domain.service.UserService;
+import com.example.beliemeserver.domain.dto._new.UserDto;
+import com.example.beliemeserver.domain.service._new.NewUserService;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
-import com.example.beliemeserver.web.responsebody.UserResponse;
+import com.example.beliemeserver.web.responsebody._new.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +15,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "")
 public class UserApiController extends BaseApiController {
-    private final UserService userService;
+    private final NewUserService userService;
 
-    public UserApiController(UserService userService) {
+    public UserApiController(NewUserService userService) {
         this.userService = userService;
     }
 
@@ -35,10 +35,10 @@ public class UserApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String studentId = params.get(api.variable().userIndex());
 
-        UserDto userDto = userService.getByIndex(userToken, universityCode, studentId);
+        UserDto userDto = userService.getByIndex(userToken, universityName, studentId);
         UserResponse response = UserResponse.from(userDto).withoutSecureInfo();
         return ResponseEntity.ok(response);
     }
@@ -48,10 +48,10 @@ public class UserApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
 
-        List<UserDto> userDtoList = userService.getListByDepartment(userToken, universityCode, departmentCode);
+        List<UserDto> userDtoList = userService.getListByDepartment(userToken, universityName, departmentCode);
         List<UserResponse> responseList = toResponseWithoutSecureInfoList(userDtoList);
         return ResponseEntity.ok(responseList);
     }
@@ -61,18 +61,18 @@ public class UserApiController extends BaseApiController {
             @RequestHeader("${api.header.external-api-token}") String apiToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
 
-        UserDto userDto = userService.reloadInitialUser(universityCode, apiToken);
+        UserDto userDto = userService.reloadInitialUser(universityName, apiToken);
         if (userDto != null) {
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);
         }
 
-        if (universityCode.equals(userService.getDeveloperUniversityCode())) {
+        if (universityName.equals(userService.getDeveloperUniversityName())) {
             throw new UnauthorizedException();
         }
-        if (universityCode.equals(userService.getHanyangUniversityCode())) {
+        if (universityName.equals(userService.getHanyangUniversityName())) {
             userDto = userService.reloadHanyangUniversityUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);

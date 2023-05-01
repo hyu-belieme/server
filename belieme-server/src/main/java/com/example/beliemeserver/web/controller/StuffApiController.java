@@ -1,11 +1,11 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto.StuffDto;
-import com.example.beliemeserver.domain.service.StuffService;
-import com.example.beliemeserver.web.requestbody.StuffRequest;
+import com.example.beliemeserver.domain.dto._new.StuffDto;
+import com.example.beliemeserver.domain.service._new.NewStuffService;
+import com.example.beliemeserver.web.requestbody._new.StuffRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffUpdateValidationGroup;
-import com.example.beliemeserver.web.responsebody.StuffResponse;
+import com.example.beliemeserver.web.responsebody._new.StuffResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +17,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}")
 public class StuffApiController extends BaseApiController {
-    private final StuffService stuffService;
+    private final NewStuffService stuffService;
 
-    public StuffApiController(StuffService stuffService) {
+    public StuffApiController(NewStuffService stuffService) {
         this.stuffService = stuffService;
     }
 
@@ -28,11 +28,11 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
 
         List<StuffDto> stuffDtoList = stuffService.getListByDepartment(
-                userToken, universityCode, departmentCode);
+                userToken, universityName, departmentCode);
         List<StuffResponse> responseList = toResponseList(stuffDtoList);
         return ResponseEntity.ok(responseList);
     }
@@ -42,12 +42,12 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
         String stuffName = params.get(api.variable().stuffIndex());
 
         StuffDto stuffDto = stuffService.getByIndex(
-                userToken, universityCode, departmentCode, stuffName);
+                userToken, universityName, departmentCode, stuffName);
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
     }
@@ -58,11 +58,11 @@ public class StuffApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(StuffCreateValidationGroup.class) StuffRequest newStuff
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
 
         StuffDto stuffDto = stuffService.create(
-                userToken, universityCode, departmentCode,
+                userToken, universityName, departmentCode,
                 newStuff.getName(), newStuff.getThumbnail(), newStuff.getAmount());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
@@ -74,12 +74,12 @@ public class StuffApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(StuffUpdateValidationGroup.class) StuffRequest newStuff
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
         String stuffName = params.get(api.variable().stuffIndex());
 
         StuffDto stuffDto = stuffService.update(
-                userToken, universityCode, departmentCode, stuffName,
+                userToken, universityName, departmentCode, stuffName,
                 newStuff.getName(), newStuff.getThumbnail());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);

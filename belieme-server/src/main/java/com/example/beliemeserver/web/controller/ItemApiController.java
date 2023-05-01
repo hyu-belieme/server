@@ -1,8 +1,8 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto.ItemDto;
-import com.example.beliemeserver.domain.service.ItemService;
-import com.example.beliemeserver.web.responsebody.ItemResponse;
+import com.example.beliemeserver.domain.dto._new.ItemDto;
+import com.example.beliemeserver.domain.service._new.NewItemService;
+import com.example.beliemeserver.web.responsebody._new.ItemResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +13,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}/${api.keyword.stuff}/${api.keyword.stuff-index}")
 public class ItemApiController extends BaseApiController {
-    private final ItemService itemService;
+    private final NewItemService itemService;
 
-    public ItemApiController(ItemService itemService) {
+    public ItemApiController(NewItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -24,12 +24,12 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
         String stuffName = params.get(api.variable().stuffIndex());
 
         List<ItemDto> itemDtoList = itemService.getListByStuff(
-                userToken, universityCode, departmentCode, stuffName);
+                userToken, universityName, departmentCode, stuffName);
         List<ItemResponse> responseList = toResponseList(itemDtoList);
         return ResponseEntity.ok(responseList);
     }
@@ -39,13 +39,13 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
         String stuffName = params.get(api.variable().stuffIndex());
         int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
 
         ItemDto itemDto = itemService.getByIndex(
-                userToken, universityCode, departmentCode, stuffName, itemNum);
+                userToken, universityName, departmentCode, stuffName, itemNum);
         ItemResponse response = ItemResponse.from(itemDto);
         return ResponseEntity.ok(response);
     }
@@ -55,12 +55,12 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
         String stuffName = params.get(api.variable().stuffIndex());
 
         ItemDto itemDto = itemService.create(
-                userToken, universityCode, departmentCode, stuffName);
+                userToken, universityName, departmentCode, stuffName);
         ItemResponse response = ItemResponse.from(itemDto);
         return ResponseEntity.ok(response);
     }

@@ -1,11 +1,11 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto.DepartmentDto;
-import com.example.beliemeserver.domain.service.DepartmentService;
-import com.example.beliemeserver.web.requestbody.DepartmentRequest;
+import com.example.beliemeserver.domain.dto._new.DepartmentDto;
+import com.example.beliemeserver.domain.service._new.NewDepartmentService;
+import com.example.beliemeserver.web.requestbody._new.DepartmentRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentUpdateValidationGroup;
-import com.example.beliemeserver.web.responsebody.DepartmentResponse;
+import com.example.beliemeserver.web.responsebody._new.DepartmentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +17,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "")
 public class DepartmentApiController extends BaseApiController {
-    private final DepartmentService departmentService;
+    private final NewDepartmentService departmentService;
 
-    public DepartmentApiController(DepartmentService departmentService) {
+    public DepartmentApiController(NewDepartmentService departmentService) {
         this.departmentService = departmentService;
     }
 
@@ -37,10 +37,10 @@ public class DepartmentApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
 
-        DepartmentDto departmentDto = departmentService.getByIndex(userToken, universityCode, departmentCode);
+        DepartmentDto departmentDto = departmentService.getByIndex(userToken, universityName, departmentCode);
         DepartmentResponse response = DepartmentResponse.from(departmentDto);
         return ResponseEntity.ok(response);
     }
@@ -51,11 +51,10 @@ public class DepartmentApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(DepartmentCreateValidationGroup.class) DepartmentRequest newDepartment
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
 
         DepartmentDto newDepartmentDto = departmentService.create(
-                userToken, universityCode, newDepartment.getCode(),
-                newDepartment.getName(), newDepartment.getBaseMajors()
+                userToken, universityName, newDepartment.getName(), newDepartment.getBaseMajors()
         );
         DepartmentResponse response = DepartmentResponse.from(newDepartmentDto);
         return ResponseEntity.ok(response);
@@ -67,13 +66,12 @@ public class DepartmentApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(DepartmentUpdateValidationGroup.class) DepartmentRequest newDepartment
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityName = params.get(api.variable().universityIndex());
         String departmentCode = params.get(api.variable().departmentIndex());
 
         DepartmentDto newDepartmentDto = departmentService.update(
-                userToken, universityCode, departmentCode,
-                newDepartment.getCode(), newDepartment.getName(),
-                newDepartment.getBaseMajors()
+                userToken, universityName, departmentCode,
+                newDepartment.getName(), newDepartment.getBaseMajors()
         );
         DepartmentResponse response = DepartmentResponse.from(newDepartmentDto);
         return ResponseEntity.ok(response);

@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class UserService extends BaseService {
+public class NewUserService extends NewBaseService {
     public static final String DEVELOPER_UNIVERSITY_KEY = "DEV";
     public static final String HANYANG_UNIVERSITY_KEY = "HYU";
 
     public static final int HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND = 1900;
     public static final int HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND = 2500;
 
-    public UserService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public NewUserService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
@@ -101,11 +101,11 @@ public class UserService extends BaseService {
     }
 
     public String getDeveloperUniversityName() {
-        return initialData.universityInfos().get(UserService.DEVELOPER_UNIVERSITY_KEY).name();
+        return initialData.universityInfos().get(NewUserService.DEVELOPER_UNIVERSITY_KEY).name();
     }
 
     public String getHanyangUniversityName() {
-        return initialData.universityInfos().get(UserService.HANYANG_UNIVERSITY_KEY).name();
+        return initialData.universityInfos().get(NewUserService.HANYANG_UNIVERSITY_KEY).name();
     }
 
     public @Nullable
