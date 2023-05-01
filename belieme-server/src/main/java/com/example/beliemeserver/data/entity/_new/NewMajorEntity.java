@@ -11,7 +11,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "new_major", uniqueConstraints = {
         @UniqueConstraint(
-                name = "major_index",
+                name = "new_major_index",
                 columnNames = {"university_id", "code"}
         )
 })

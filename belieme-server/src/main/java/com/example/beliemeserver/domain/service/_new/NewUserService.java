@@ -204,10 +204,9 @@ public class NewUserService extends NewBaseService {
     private List<AuthorityDto> toAuthorityDtoList(List<AuthorityInfo> authorityInfos) {
         List<AuthorityDto> newAuthorities = new ArrayList<>();
         for (AuthorityInfo authorityInfo : authorityInfos) {
-            String universityName = authorityInfo.universityName();
-            String departmentName = authorityInfo.departmentName();
+            UUID departmentId = authorityInfo.departmentId();
             String permissionText = authorityInfo.permission();
-            DepartmentDto department = departmentDao.getByIndex(universityName, departmentName);
+            DepartmentDto department = departmentDao.getById(departmentId);
             newAuthorities.add(new AuthorityDto(department, Permission.valueOf(permissionText)));
         }
         return newAuthorities;

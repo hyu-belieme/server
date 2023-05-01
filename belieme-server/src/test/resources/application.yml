@@ -8,7 +8,7 @@ logging:
 
 spring:
   config:
-    import: classpath:apis/api.yml, classpath:inits/init.yml
+    import: classpath:apis/api.yml, classpath:inits/init.yml, classpath:inits/newinit.yml, classpath:cors/cors.yml
   datasource:
     url: jdbc:h2:mem:test
     username: sa

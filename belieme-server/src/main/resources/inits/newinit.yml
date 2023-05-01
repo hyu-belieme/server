@@ -1,46 +1,50 @@
 newinit :
   university-infos :
     DEV :
+      id : "34453032-3531-3342-4643-444434464445"
       name : "DEV"
       external-api-info :
         url : "DEV"
     HYU :
+      id : "37364342-4345-3342-4143-344334433445"
       name : "\uD55C\uC591\uB300\uD559\uAD50"
       external-api-info :
         url : "https://api.hanyang.ac.kr/rs/user/loginInfo.json"
         client-key : "a4b1abe746f384c3d43fa82a17f222"
     CKU :
+      id : "41463146-4639-4435-4244-463734353333"
       name: "\uAC00\uD1A8\uB9AD\uAD00\uB3D9\uB300\uD559\uAD50"
       external-api-info: {}
 
   department-infos :
     DEV_DEV :
+      id : "37434636-4339-3345-3946-313634443633"
       university-name : "DEV"
       name : "DEV"
       base-majors : []
 
   user-infos :
-    - api-token : "c305ee87-a4c7-4b5a-8d71-7e23b6064613"
+    - id : "38433142-3134-3231-3741-384234424539"
+      api-token : "c305ee87-a4c7-4b5a-8d71-7e23b6064613"
       university-name: "DEV"
       student-id : "DEV1"
       name : "\uAC1C\uBC1C\uC7901"
       authorities :
-        - university-name : "DEV"
-          department-name : "DEV"
+        - department-id : "37434636-4339-3345-3946-313634443633"
           permission : "DEVELOPER"
-    - api-token: "8e8b460e-aa98-4cc1-b1ee-6f055b538102"
+    - id : "31313446-4336-3943-3136-453534334641"
+      api-token: "8e8b460e-aa98-4cc1-b1ee-6f055b538102"
       university-name: "DEV"
       student-id: "DEV2"
       name: "\uAC1C\uBC1C\uC7902"
       authorities:
-        - university-name: "DEV"
-          department-name: "DEV"
+        - department-id: "37434636-4339-3345-3946-313634443633"
           permission: "DEVELOPER"
-    - api-token: "c305ee87-a4c7-4b5a-8d71-7e98b6064613"
+    - id : "31383941-3930-3237-3036-464534333241"
+      api-token: "c305ee87-a4c7-4b5a-8d71-7e98b6064613"
       university-name: "DEV"
       student-id: "DEV3"
       name: "\uAC1C\uBC1C\uC7903"
       authorities:
-        - university-name: "DEV"
-          department-name: "DEV"
+        - department-id: "37434636-4339-3345-3946-313634443633"
           permission: "DEVELOPER"

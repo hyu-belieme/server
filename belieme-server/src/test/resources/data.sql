@@ -1,3 +1,48 @@
+-- insert new university
+insert into new_university(id, name, api_url)
+values ('34453032353133424643444434464445', 'DEV', 'DEV');
+insert into new_university(id, name, api_url)
+values ('37364342434533424143344334433445', '한양대학교', 'https://api.hanyang.ac.kr/rs/user/loginInfo.json');
+insert into new_university(id, name, api_url)
+values ('41463146463944354244463734353333', '가톨릭관동대학교', null);
+
+-- insert new department
+insert into new_department(id, university_id, name)
+values ('37434636433933453946313634443633', '34453032353133424643444434464445', 'DEV');
+
+-- insert new authority
+insert into new_authority(id, department_id, permission)
+values (1, '37434636433933453946313634443633', 'DEFAULT');
+insert into new_authority(id, department_id, permission)
+values (2, '37434636433933453946313634443633', 'BANNED');
+insert into new_authority(id, department_id, permission)
+values (3, '37434636433933453946313634443633', 'USER');
+insert into new_authority(id, department_id, permission)
+values (4, '37434636433933453946313634443633', 'STAFF');
+insert into new_authority(id, department_id, permission)
+values (5, '37434636433933453946313634443633', 'MASTER');
+insert into new_authority(id, department_id, permission)
+values (6, '37434636433933453946313634443633', 'DEVELOPER');
+
+-- insert new user
+insert into new_user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values ('38433142313432313741384234424539', '34453032353133424643444434464445', 'DEV1', '개발자1', 0, '9a2275f70d8944aaa2ae4d1b72dfc297', 1673155358, 1673155358);
+
+insert into new_user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values ('31313446433639433136453534334641', '34453032353133424643444434464445', 'DEV2', '개발자2', 0, 'af2de8f1791c478cb3a15647206f8ab5', 1673155358, 1673155358);
+
+insert into new_user(id, university_id, student_id, name, entrance_year, token, created_at, approved_at)
+values ('31383941393032373036464534333241', '34453032353133424643444434464445', 'DEV3', '개발자3', 0, '6cd203ed868e45838575d2cc9741d0de', 1673155358, 1673155358);
+
+insert into new_authority_user_join(user_id, authority_id)
+values ('38433142313432313741384234424539', 6);
+
+insert into new_authority_user_join(user_id, authority_id)
+values ('31313446433639433136453534334641', 6);
+
+insert into new_authority_user_join(user_id, authority_id)
+values ('31383941393032373036464534333241', 6);
+
 -- insert university
 insert into university(id, code, name, api_url)
 values (1, 'DEV', 'DEV', 'DEV');

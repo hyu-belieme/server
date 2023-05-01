@@ -50,7 +50,7 @@ public class InitialDataDtoAdapter implements InitialData {
     private UniversityDto toUniversityDto(UniversityInfo universityInfo) {
         if (universityInfo == null) return null;
         return new UniversityDto(
-                UUID.randomUUID(),
+                universityInfo.id(),
                 universityInfo.name(),
                 universityInfo.externalApiInfo().getOrDefault("url", null));
     }
@@ -62,10 +62,10 @@ public class InitialDataDtoAdapter implements InitialData {
         if (university == null) throw new RuntimeException();
 
         List<MajorDto> majors = departmentInfo.baseMajors().stream()
-                .map((majorCode) -> new MajorDto(UUID.randomUUID(), university, majorCode))
+                .map((majorInfo) -> new MajorDto(majorInfo.id(), university, majorInfo.code()))
                 .toList();
         return new DepartmentDto(
-                UUID.randomUUID(),
+                departmentInfo.id(),
                 university,
                 departmentInfo.name(),
                 majors);

@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "new_user", uniqueConstraints = {
         @UniqueConstraint(
-                name = "user_index",
+                name = "new_user_index",
                 columnNames = {"university_id", "student_id"}
         )
 })
