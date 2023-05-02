@@ -43,15 +43,12 @@ public class NewMajorEntity extends NewDataEntity<UUID> {
         this.code = code;
     }
 
-    public NewMajorEntity setUniversity(@NonNull NewUniversityEntity university) {
-        this.university = university;
-        this.universityId = university.getId();
-        return this;
+    public NewMajorEntity withUniversity(@NonNull NewUniversityEntity university) {
+        return new NewMajorEntity(id, university, code);
     }
 
-    public NewMajorEntity setCode(@NonNull String code) {
-        this.code = code;
-        return this;
+    public NewMajorEntity withCode(@NonNull String code) {
+        return new NewMajorEntity(id, university, code);
     }
 
     public MajorDto toMajorDto() {

@@ -78,31 +78,31 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     @Override
     public DepartmentDto create(DepartmentDto newDepartment) {
         NewDepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
-        saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
+        newDepartmentEntity = saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
 
-        return newDepartmentEntity.toDepartmentDto();
+        return departmentRepository.save(newDepartmentEntity).toDepartmentDto();
     }
 
     @Override
     public DepartmentDto update(String universityName, String departmentName, DepartmentDto newDepartment) {
         NewDepartmentEntity target = findDepartmentEntity(universityName, departmentName);
-        updateDepartmentOnly(target, newDepartment);
+        target = updateDepartmentOnly(target, newDepartment);
 
-        removeAllBaseMajorJoins(target);
-        saveBaseMajorJoins(target, newDepartment.baseMajors());
+        target = removeAllBaseMajorJoins(target);
+        target = saveBaseMajorJoins(target, newDepartment.baseMajors());
 
-        return target.toDepartmentDto();
+        return departmentRepository.save(target).toDepartmentDto();
     }
 
     @Override
     public DepartmentDto update(UUID departmentId, DepartmentDto newDepartment) {
         NewDepartmentEntity target = findDepartmentEntity(departmentId);
-        updateDepartmentOnly(target, newDepartment);
+        target = updateDepartmentOnly(target, newDepartment);
 
-        removeAllBaseMajorJoins(target);
-        saveBaseMajorJoins(target, newDepartment.baseMajors());
+        target = removeAllBaseMajorJoins(target);
+        target = saveBaseMajorJoins(target, newDepartment.baseMajors());
 
-        return target.toDepartmentDto();
+        return departmentRepository.save(target).toDepartmentDto();
     }
 
     private NewDepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) {
@@ -119,32 +119,34 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
         return departmentRepository.save(newDepartmentEntity);
     }
 
-    private void updateDepartmentOnly(NewDepartmentEntity target, DepartmentDto newDepartment) {
+    private NewDepartmentEntity updateDepartmentOnly(NewDepartmentEntity target, DepartmentDto newDepartment) {
         NewUniversityEntity newUniversityEntity = findUniversityEntity(newDepartment.university().id());
 
         if (doesIndexOfDepartmentChange(target, newDepartment)) {
             checkDepartmentConflict(newUniversityEntity.getId(), newDepartment.name());
         }
 
-        target.setName(newDepartment.name())
-                .setUniversity(newUniversityEntity);
+        return target
+                .withName(newDepartment.name())
+                .withUniversity(newUniversityEntity);
     }
 
-    private void saveBaseMajorJoins(NewDepartmentEntity newDepartmentEntity, List<MajorDto> baseMajors) {
+    private NewDepartmentEntity saveBaseMajorJoins(NewDepartmentEntity newDepartmentEntity, List<MajorDto> baseMajors) {
         for (MajorDto baseMajor : baseMajors) {
             NewMajorEntity baseMajorEntity = findMajorEntity(baseMajor.id());
             NewMajorDepartmentJoinEntity newJoin = new NewMajorDepartmentJoinEntity(
                     baseMajorEntity,
                     newDepartmentEntity
             );
-            majorDepartmentJoinRepository.save(newJoin);
+            NewMajorDepartmentJoinEntity newMajorJoin = majorDepartmentJoinRepository.save(newJoin);
+            newDepartmentEntity = newDepartmentEntity.withBaseMajorAdd(newMajorJoin);
         }
+        return newDepartmentEntity;
     }
 
-    private void removeAllBaseMajorJoins(NewDepartmentEntity department) {
-        while (department.getBaseMajorJoin().size() > 0) {
-            majorDepartmentJoinRepository.delete(department.getBaseMajorJoin().get(0));
-        }
+    private NewDepartmentEntity removeAllBaseMajorJoins(NewDepartmentEntity department) {
+        majorDepartmentJoinRepository.deleteAll(department.getBaseMajorJoin());
+        return department.withBaseMajorClear();
     }
 
     private boolean doesIndexOfDepartmentChange(NewDepartmentEntity target, DepartmentDto newDepartment) {

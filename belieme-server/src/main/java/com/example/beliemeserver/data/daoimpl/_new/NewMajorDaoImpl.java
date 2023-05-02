@@ -63,10 +63,11 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
 
         checkMajorConflict(newUniversity.getId(), newMajor.code());
 
-        target.setUniversity(newUniversity)
-                .setCode(newMajor.code());
+        NewMajorEntity updatedMajor = target
+                .withUniversity(newUniversity)
+                .withCode(newMajor.code());
 
-        return target.toMajorDto();
+        return majorRepository.save(updatedMajor).toMajorDto();
     }
 
     @Override
@@ -79,10 +80,11 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
             checkMajorConflict(newUniversity.getId(), newMajor.code());
         }
 
-        target.setUniversity(newUniversity)
-                .setCode(newMajor.code());
+        NewMajorEntity updatedMajor = target
+                .withUniversity(newUniversity)
+                .withCode(newMajor.code());
 
-        return target.toMajorDto();
+        return majorRepository.save(updatedMajor).toMajorDto();
     }
 
     private boolean doesIndexChange(NewMajorEntity target, MajorDto newMajor) {

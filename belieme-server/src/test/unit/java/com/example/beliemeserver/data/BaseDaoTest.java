@@ -3,11 +3,14 @@ package com.example.beliemeserver.data;
 import com.example.beliemeserver.data.entity._new.*;
 import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dto._new.*;
+import com.example.beliemeserver.util.ArgumentMatchHelper;
 import com.example.beliemeserver.util.EntityStubData;
 import com.example.beliemeserver.util.RandomGetter;
 import org.mockito.Mock;
 
 import java.util.List;
+
+import static org.mockito.ArgumentMatchers.argThat;
 
 public abstract class BaseDaoTest {
     protected EntityStubData stub = new EntityStubData();
@@ -75,6 +78,10 @@ public abstract class BaseDaoTest {
         return output;
     }
 
+    protected RandomGetter<NewDepartmentEntity> deptsOnUniv(RandomGetter<NewDepartmentEntity> rs, NewUniversityEntity univ) {
+        return rs.filter((dept) -> dept.getUniversity().getId().equals(univ.getId()));
+    }
+
     protected RandomGetter<NewStuffEntity> stuffsOnDept(RandomGetter<NewStuffEntity> rs, NewDepartmentEntity dept) {
         return rs.filter((stuff) -> stuff.getDepartment().getId().equals(dept.getId()));
     }
@@ -94,6 +101,11 @@ public abstract class BaseDaoTest {
     protected NewDepartmentEntity randomDept() {
         return randomSelectAndLog(allDepts());
     }
+
+    protected NewDepartmentEntity randomDeptOnUniv(NewUniversityEntity univ) {
+        return randomSelectAndLog(deptsOnUniv(allDepts(), univ));
+    }
+
 
     protected NewUserEntity randomUser() {
         return randomSelectAndLog(allUsers());
@@ -141,5 +153,45 @@ public abstract class BaseDaoTest {
 
     protected List<HistoryDto> toHistoryDtoList(List<NewHistoryEntity> historyEntityList) {
         return historyEntityList.stream().map(NewHistoryEntity::toHistoryDto).toList();
+    }
+
+    protected NewUniversityEntity mockArg(NewUniversityEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewDepartmentEntity mockArg(NewDepartmentEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewMajorEntity mockArg(NewMajorEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewMajorDepartmentJoinEntity mockArg(NewMajorDepartmentJoinEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewUserEntity mockArg(NewUserEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewAuthorityEntity mockArg(NewAuthorityEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewAuthorityUserJoinEntity mockArg(NewAuthorityUserJoinEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewStuffEntity mockArg(NewStuffEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewItemEntity mockArg(NewItemEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
+    }
+
+    protected NewHistoryEntity mockArg(NewHistoryEntity target) {
+        return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 }

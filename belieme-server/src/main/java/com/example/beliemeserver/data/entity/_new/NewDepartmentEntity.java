@@ -44,21 +44,52 @@ public class NewDepartmentEntity extends NewDataEntity<UUID> {
 
     public NewDepartmentEntity(UUID id, NewUniversityEntity university, String name) {
         this.id = id;
-        this.name = name;
         this.university = university;
         this.universityId = university.getId();
+        this.name = name;
         this.baseMajorJoin = new ArrayList<>();
     }
 
-    public NewDepartmentEntity setUniversity(NewUniversityEntity university) {
+    private NewDepartmentEntity(UUID id, NewUniversityEntity university, String name, List<NewMajorDepartmentJoinEntity> baseMajorJoin) {
+        this.id = id;
         this.university = university;
         this.universityId = university.getId();
-        return this;
+        this.name = name;
+        this.baseMajorJoin = new ArrayList<>(baseMajorJoin);
     }
 
-    public NewDepartmentEntity setName(String name) {
-        this.name = name;
-        return this;
+    public List<NewMajorDepartmentJoinEntity> getBaseMajorJoin() {
+        return new ArrayList<>(baseMajorJoin);
+    }
+
+    public NewDepartmentEntity withUniversity(NewUniversityEntity university) {
+        return new NewDepartmentEntity(id, university, name, baseMajorJoin);
+    }
+
+    public NewDepartmentEntity withName(String name) {
+        return new NewDepartmentEntity(id, university, name, baseMajorJoin);
+    }
+
+    public NewDepartmentEntity withBaseMajor(List<NewMajorDepartmentJoinEntity> baseMajors) {
+        return new NewDepartmentEntity(id, university, name, new ArrayList<>(baseMajorJoin));
+    }
+
+    public NewDepartmentEntity withBaseMajorAdd(NewMajorDepartmentJoinEntity baseMajor) {
+        List<NewMajorDepartmentJoinEntity> newBaseMajors = new ArrayList<>(baseMajorJoin);
+        newBaseMajors.add(baseMajor);
+        return new NewDepartmentEntity(id, university, name, newBaseMajors);
+    }
+
+    public NewDepartmentEntity withBaseMajorRemove(int index) {
+        List<NewMajorDepartmentJoinEntity> newBaseMajors = new ArrayList<>(baseMajorJoin);
+        newBaseMajors.remove(index);
+        return new NewDepartmentEntity(id, university, name, newBaseMajors);
+    }
+
+    public NewDepartmentEntity withBaseMajorClear() {
+        List<NewMajorDepartmentJoinEntity> newBaseMajors = new ArrayList<>(baseMajorJoin);
+        newBaseMajors.clear();
+        return new NewDepartmentEntity(id, university, name, newBaseMajors);
     }
 
     public DepartmentDto toDepartmentDto() {

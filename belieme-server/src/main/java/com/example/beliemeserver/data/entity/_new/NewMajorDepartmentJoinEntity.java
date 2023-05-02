@@ -24,11 +24,11 @@ public class NewMajorDepartmentJoinEntity extends NewDataEntity<Integer> {
     private UUID majorId;
 
     @NonNull
+    @ToString.Exclude
     @Column(name = "department_id", columnDefinition = "BINARY(16)")
     private UUID departmentId;
 
     @NonNull
-    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "major_id", referencedColumnName = "id", insertable = false, updatable = false)
     private NewMajorEntity major;
@@ -44,15 +44,5 @@ public class NewMajorDepartmentJoinEntity extends NewDataEntity<Integer> {
         this.majorId = major.getId();
         this.department = department;
         this.departmentId = department.getId();
-    }
-
-    @PreRemove
-    private void commitToDepartmentBeforeRemove() {
-        department.getBaseMajorJoin().remove(this);
-    }
-
-    @PrePersist
-    private void commitOnDepartmentAfterCreate() {
-        department.getBaseMajorJoin().add(this);
     }
 }
