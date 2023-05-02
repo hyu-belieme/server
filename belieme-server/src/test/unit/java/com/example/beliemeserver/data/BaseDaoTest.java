@@ -106,6 +106,9 @@ public abstract class BaseDaoTest {
         return randomSelectAndLog(deptsOnUniv(allDepts(), univ));
     }
 
+    protected NewMajorEntity randomMajor() {
+        return randomSelectAndLog(allMajors());
+    }
 
     protected NewUserEntity randomUser() {
         return randomSelectAndLog(allUsers());
