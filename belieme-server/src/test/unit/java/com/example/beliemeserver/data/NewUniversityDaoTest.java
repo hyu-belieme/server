@@ -128,7 +128,7 @@ public class NewUniversityDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[동일한 `name`을 갖는 `university`가 존재할 시]_[ConflictException]")
+        @DisplayName("[ERROR]_[동일한 `name`을 갖는 `university`가 존재할 시]_[ConflictException]")
         public void ERROR_NameConflict_ConflictException() {
             setUniv(randomUniv());
 
