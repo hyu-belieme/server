@@ -78,16 +78,16 @@ public class NewUniversityDaoTest extends BaseDaoTest {
     @Nested
     @DisplayName("checkExistByIndex()")
     public class TestCheckByIndex {
-        private final String univName = "";
+        private final UUID id = UUID.randomUUID();
 
         protected boolean execMethod() {
-            return universityDao.checkExistByIndex(univName);
+            return universityDao.checkExistById(id);
         }
 
         @Test()
         @DisplayName("[SUCCESS]_[공통된 이름을 가진 `university`가 존재할 시]_[-]")
         public void SUCCESS_exist() {
-            when(univRepository.existsByName(univName)).thenReturn(true);
+            when(univRepository.existsById(id)).thenReturn(true);
 
             TestHelper.objectCompareTest(this::execMethod, true);
         }
@@ -95,7 +95,7 @@ public class NewUniversityDaoTest extends BaseDaoTest {
         @Test()
         @DisplayName("[SUCCESS]_[공통된 이름을 가진 `university`가 존재하지 않을 시]_[-]")
         public void SUCCESS_notExist() {
-            when(univRepository.existsByName(univName)).thenReturn(false);
+            when(univRepository.existsById(id)).thenReturn(false);
 
             TestHelper.objectCompareTest(this::execMethod, false);
         }

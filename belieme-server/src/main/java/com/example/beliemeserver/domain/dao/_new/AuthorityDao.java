@@ -12,15 +12,8 @@ public interface AuthorityDao {
     List<AuthorityDto> getAllList();
 
     @Transactional
-    boolean checkExistByIndex(String universityName, String departmentName, Permission permission);
+    boolean checkExistByIndex(UUID departmentId, Permission permission);
 
     @Transactional
     AuthorityDto create(AuthorityDto authority);
-
-    @Transactional
-    AuthorityDto update(String universityName, String departmentName,
-                        Permission permission, AuthorityDto authority);
-
-    @Transactional
-    AuthorityDto update(UUID departmentId, Permission permission, AuthorityDto authority);
 }

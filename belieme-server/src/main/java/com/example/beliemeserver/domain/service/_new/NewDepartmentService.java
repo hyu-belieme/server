@@ -20,8 +20,8 @@ public class NewDepartmentService extends NewBaseService {
 
     public void initializeDepartments() {
         for (DepartmentDto department : initialData.departments().values()) {
-            if (departmentDao.checkExistByIndex(department.university().name(), department.name())) {
-                departmentDao.update(department.university().name(), department.name(), department);
+            if (departmentDao.checkExistById(department.id())) {
+                departmentDao.update(department.id(), department);
                 createOrUpdateAuthorities(department);
                 continue;
             }
@@ -112,11 +112,8 @@ public class NewDepartmentService extends NewBaseService {
 
     private void createOrUpdateAuthorities(DepartmentDto department) {
         for (Permission permission : Permission.values()) {
-            if (!authorityDao.checkExistByIndex(department.university().name(), department.name(), permission)) {
-                authorityDao.create(new AuthorityDto(department, permission));
-                continue;
-            }
-            authorityDao.update(department.university().name(), department.name(), permission, new AuthorityDto(department, permission));
+            if (authorityDao.checkExistByIndex(department.id(), permission)) continue;
+            authorityDao.create(new AuthorityDto(department, permission));
         }
     }
 }

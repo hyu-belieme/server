@@ -16,7 +16,7 @@ public class NewUniversityService extends NewBaseService {
 
     public void initializeUniversities() {
         for (UniversityDto university : initialData.universities().values()) {
-            if (universityDao.checkExistByIndex(university.name())) {
+            if (universityDao.checkExistById(university.id())) {
                 universityDao.update(university.name(), university);
                 continue;
             }

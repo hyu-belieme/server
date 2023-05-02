@@ -23,7 +23,7 @@ public interface DepartmentDao {
     DepartmentDto getByIndex(String universityName, String departmentName);
 
     @Transactional
-    boolean checkExistByIndex(String universityName, String departmentName);
+    boolean checkExistById(UUID id);
 
     @Transactional
     DepartmentDto create(DepartmentDto newDepartment);

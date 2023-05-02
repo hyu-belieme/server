@@ -7,7 +7,6 @@ import com.example.beliemeserver.domain.dao._new.AuthorityDao;
 import com.example.beliemeserver.domain.dto._new.AuthorityDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.error.exception.ConflictException;
-import com.example.beliemeserver.error.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -31,13 +30,8 @@ public class NewAuthorityDaoImpl extends NewBaseDaoImpl implements AuthorityDao 
     }
 
     @Override
-    public boolean checkExistByIndex(String universityName, String departmentName, Permission permission) {
-        try {
-            UUID departmentId = findDepartmentEntity(universityName, departmentName).getId();
-            return authorityRepository.existsByDepartmentIdAndPermission(departmentId, permission.toString());
-        } catch (NotFoundException e) {
-            return false;
-        }
+    public boolean checkExistByIndex(UUID departmentId, Permission permission) {
+        return authorityRepository.existsByDepartmentIdAndPermission(departmentId, permission.toString());
     }
 
     @Override
@@ -52,42 +46,6 @@ public class NewAuthorityDaoImpl extends NewBaseDaoImpl implements AuthorityDao 
         );
 
         return authorityRepository.save(newAuthority).toAuthorityDto();
-    }
-
-    @Override
-    public AuthorityDto update(String universityName, String departmentName, Permission permission, AuthorityDto newAuthority) {
-        NewAuthorityEntity target = findAuthorityEntity(universityName, departmentName, permission.name());
-        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department().id());
-
-        if (doesIndexChange(target, newAuthority)) {
-            checkAuthorityConflict(departmentOfAuthority.getId(), newAuthority.permission().name());
-        }
-
-        target.setDepartment(departmentOfAuthority)
-                .setPermission(newAuthority.permission().name());
-        return target.toAuthorityDto();
-    }
-
-    @Override
-    public AuthorityDto update(UUID departmentId, Permission permission, AuthorityDto newAuthority) {
-        NewAuthorityEntity target = findAuthorityEntity(departmentId, permission.name());
-        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(newAuthority.department().id());
-
-        if (doesIndexChange(target, newAuthority)) {
-            checkAuthorityConflict(departmentOfAuthority.getId(), newAuthority.permission().name());
-        }
-
-        target.setDepartment(departmentOfAuthority)
-                .setPermission(newAuthority.permission().name());
-        return target.toAuthorityDto();
-    }
-
-    private boolean doesIndexChange(NewAuthorityEntity target, AuthorityDto newAuthority) {
-        UUID oldDepartmentId = target.getDepartment().getId();
-        String oldPermission = target.getPermission();
-
-        return !(oldDepartmentId.equals(newAuthority.department().id()) &&
-                oldPermission.equals(newAuthority.permission().name()));
     }
 
     private void checkAuthorityConflict(UUID departmentId, String permission) {

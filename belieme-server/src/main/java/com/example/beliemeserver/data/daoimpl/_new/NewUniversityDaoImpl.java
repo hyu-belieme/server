@@ -43,8 +43,8 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
     }
 
     @Override
-    public boolean checkExistByIndex(String universityName) {
-        return universityRepository.existsByName(universityName);
+    public boolean checkExistById(UUID id) {
+        return universityRepository.existsById(id);
     }
 
     @Override

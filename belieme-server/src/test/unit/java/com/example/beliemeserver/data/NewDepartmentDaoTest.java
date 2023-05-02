@@ -113,50 +113,34 @@ public class NewDepartmentDaoTest  extends BaseDaoTest {
     @Nested
     @DisplayName("checkExistByIndex()")
     public class TestCheckByIndex {
-        private NewUniversityEntity univ;
-        private UUID univId;
-        private String univName;
+        private NewDepartmentEntity dept;
+        private UUID deptId;
 
-        private final String deptName = "";
-
-        private void setUniv(NewUniversityEntity univ) {
-            this.univ = univ;
-            this.univId = univ.getId();
-            this.univName = univ.getName();
+        private void setDept(NewDepartmentEntity dept) {
+            this.dept = dept;
+            this.deptId = dept.getId();
         }
 
         protected boolean execMethod() {
-            return departmentDao.checkExistByIndex(univName, deptName);
+            return departmentDao.checkExistById(deptId);
         }
 
         @Test()
-        @DisplayName("[SUCCESS]_[`index`에 대응하는 `department`가 존재할 시]_[-]")
+        @DisplayName("[SUCCESS]_[`id`에 대응하는 `department`가 존재할 시]_[-]")
         public void SUCCESS_exist() {
-            setUniv(randomUniv());
+            setDept(randomDept());
 
-            when(univRepository.findByName(univName)).thenReturn(Optional.of(univ));
-            when(deptRepository.existsByUniversityIdAndName(univId, deptName)).thenReturn(true);
+            when(deptRepository.existsById(deptId)).thenReturn(true);
 
             TestHelper.objectCompareTest(this::execMethod, true);
         }
 
         @Test()
-        @DisplayName("[SUCCESS]_[`index`에 대응하는 `university`는 존재하나 `department`가 존재하지 않을 시]_[-]")
-        public void SUCCESS_onlyUnivExist() {
-            setUniv(randomUniv());
+        @DisplayName("[SUCCESS]_[`index`에 대응하는 `department`가 존재하지 않을 시]_[-]")
+        public void SUCCESS_notExist() {
+            setDept(randomDept());
 
-            when(univRepository.findByName(univName)).thenReturn(Optional.of(univ));
-            when(deptRepository.existsByUniversityIdAndName(univId, deptName)).thenReturn(false);
-
-            TestHelper.objectCompareTest(this::execMethod, false);
-        }
-
-        @Test()
-        @DisplayName("[SUCCESS]_[`index`에 대응하는 `university`가 존재하지 않을 시]_[-]")
-        public void SUCCESS_evenUnivNotExist() {
-            setUniv(randomUniv());
-
-            when(univRepository.findByName(univName)).thenReturn(Optional.empty());
+            when(deptRepository.existsById(deptId)).thenReturn(false);
 
             TestHelper.objectCompareTest(this::execMethod, false);
         }

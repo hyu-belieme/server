@@ -17,7 +17,7 @@ public interface UniversityDao {
     UniversityDto getById(UUID id);
 
     @Transactional
-    boolean checkExistByIndex(String universityName);
+    boolean checkExistById(UUID id);
 
     @Transactional
     UniversityDto create(UniversityDto newUniversity);

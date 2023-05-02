@@ -66,13 +66,8 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     @Override
-    public boolean checkExistByIndex(String universityName, String departmentName) {
-        try {
-            UUID universityId = findUniversityEntity(universityName).getId();
-            return departmentRepository.existsByUniversityIdAndName(universityId, departmentName);
-        } catch (NotFoundException e) {
-            return false;
-        }
+    public boolean checkExistById(UUID departmentId) {
+        return departmentRepository.existsById(departmentId);
     }
 
     @Override
