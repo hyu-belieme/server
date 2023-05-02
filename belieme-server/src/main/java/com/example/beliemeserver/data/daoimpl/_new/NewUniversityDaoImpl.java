@@ -68,10 +68,11 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
             checkUniversityConflict(newUniversity.name());
         }
 
-        target.setName(newUniversity.name())
-                .setApiUrl(newUniversity.apiUrl());
+        NewUniversityEntity updatedUniversity = target
+                .withName(newUniversity.name())
+                .withApiUrl(newUniversity.apiUrl());
 
-        return target.toUniversityDto();
+        return universityRepository.save(updatedUniversity).toUniversityDto();
     }
 
     @Override
@@ -81,10 +82,11 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
             checkUniversityConflict(newUniversity.name());
         }
 
-        target.setName(newUniversity.name())
-                .setApiUrl(newUniversity.apiUrl());
+        NewUniversityEntity updatedUniversity = target
+                .withName(newUniversity.name())
+                .withApiUrl(newUniversity.apiUrl());
 
-        return target.toUniversityDto();
+        return universityRepository.save(updatedUniversity).toUniversityDto();
     }
 
     private boolean doesIndexOfUniversityChange(NewUniversityEntity oldUniversity, UniversityDto newUniversity) {

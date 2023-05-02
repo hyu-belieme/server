@@ -1,9 +1,7 @@
 package com.example.beliemeserver.data.entity._new;
 
 import com.example.beliemeserver.domain.dto._new.UniversityDto;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -16,6 +14,8 @@ import java.util.UUID;
         )
 })
 @NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 @Getter
 public class NewUniversityEntity extends NewDataEntity<UUID> {
     @Id
@@ -36,14 +36,12 @@ public class NewUniversityEntity extends NewDataEntity<UUID> {
         this.apiUrl = apiUrl;
     }
 
-    public NewUniversityEntity setName(@NonNull String name) {
-        this.name = name;
-        return this;
+    public NewUniversityEntity withName(@NonNull String name) {
+        return new NewUniversityEntity(id, name, apiUrl);
     }
 
-    public NewUniversityEntity setApiUrl(String apiUrl) {
-        this.apiUrl = apiUrl;
-        return this;
+    public NewUniversityEntity withApiUrl(String apiUrl) {
+        return new NewUniversityEntity(id, name, apiUrl);
     }
 
     public UniversityDto toUniversityDto() {
