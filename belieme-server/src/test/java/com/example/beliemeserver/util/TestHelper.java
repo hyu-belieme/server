@@ -22,6 +22,8 @@ public class TestHelper {
         List<T> result;
         try {
             result = routine.method();
+            System.out.println("result " + result);
+            System.out.println("expected " + expected);
         } catch (Exception e) {
             e.printStackTrace();
             assert false;
