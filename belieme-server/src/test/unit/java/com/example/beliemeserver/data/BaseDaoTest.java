@@ -114,6 +114,10 @@ public abstract class BaseDaoTest {
         return randomSelectAndLog(allUsers());
     }
 
+    protected NewAuthorityEntity randomAuth() {
+        return randomSelectAndLog(allAuths());
+    }
+
     protected NewStuffEntity randomStuffOnDept(NewDepartmentEntity dept) {
         return randomSelectAndLog(stuffsOnDept(allStuffs(), dept));
     }
