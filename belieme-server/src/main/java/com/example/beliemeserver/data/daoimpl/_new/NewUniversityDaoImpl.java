@@ -31,12 +31,6 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
     }
 
     @Override
-    public UniversityDto getByIndex(String universityName) {
-        NewUniversityEntity targetUniversity = findUniversityEntity(universityName);
-        return targetUniversity.toUniversityDto();
-    }
-
-    @Override
     public UniversityDto getById(UUID id) {
         NewUniversityEntity target = findUniversityEntity(id);
         return target.toUniversityDto();
@@ -59,20 +53,6 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
 
         NewUniversityEntity savedUniversityEntity = universityRepository.save(newUniversityEntity);
         return savedUniversityEntity.toUniversityDto();
-    }
-
-    @Override
-    public UniversityDto update(String universityName, UniversityDto newUniversity) {
-        NewUniversityEntity target = findUniversityEntity(universityName);
-        if (doesIndexOfUniversityChange(target, newUniversity)) {
-            checkUniversityConflict(newUniversity.name());
-        }
-
-        NewUniversityEntity updatedUniversity = target
-                .withName(newUniversity.name())
-                .withApiUrl(newUniversity.apiUrl());
-
-        return universityRepository.save(updatedUniversity).toUniversityDto();
     }
 
     @Override

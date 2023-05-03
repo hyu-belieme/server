@@ -7,6 +7,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NewUniversityService extends NewBaseService {
@@ -17,7 +18,7 @@ public class NewUniversityService extends NewBaseService {
     public void initializeUniversities() {
         for (UniversityDto university : initialData.universities().values()) {
             if (universityDao.checkExistById(university.id())) {
-                universityDao.update(university.name(), university);
+                universityDao.update(university.id(), university);
                 continue;
             }
             universityDao.create(university);
@@ -30,10 +31,10 @@ public class NewUniversityService extends NewBaseService {
         return universityDao.getAllList();
     }
 
-    public UniversityDto getByIndex(
-            @NonNull String userToken, @NonNull String universityName
+    public UniversityDto getById(
+            @NonNull String userToken, @NonNull UUID universityId
     ) {
         checkDeveloperPermission(userToken);
-        return universityDao.getByIndex(universityName);
+        return universityDao.getById(universityId);
     }
 }

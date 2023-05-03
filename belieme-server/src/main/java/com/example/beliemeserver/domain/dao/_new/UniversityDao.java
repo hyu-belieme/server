@@ -11,9 +11,6 @@ public interface UniversityDao {
     List<UniversityDto> getAllList();
 
     @Transactional
-    UniversityDto getByIndex(String name);
-
-    @Transactional
     UniversityDto getById(UUID id);
 
     @Transactional
@@ -21,9 +18,6 @@ public interface UniversityDao {
 
     @Transactional
     UniversityDto create(UniversityDto newUniversity);
-
-    @Transactional
-    UniversityDto update(String name, UniversityDto newUniversityDto);
 
     @Transactional
     UniversityDto update(UUID id, UniversityDto newUniversityDto);
