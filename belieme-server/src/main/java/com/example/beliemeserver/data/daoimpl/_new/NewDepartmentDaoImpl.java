@@ -9,7 +9,6 @@ import com.example.beliemeserver.domain.dao._new.DepartmentDao;
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.domain.dto._new.MajorDto;
 import com.example.beliemeserver.error.exception.ConflictException;
-import com.example.beliemeserver.error.exception.NotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,17 +27,6 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
         List<DepartmentDto> output = new ArrayList<>();
 
         for (NewDepartmentEntity departmentEntity : departmentRepository.findAll()) {
-            output.add(departmentEntity.toDepartmentDto());
-        }
-        return output;
-    }
-
-    @Override
-    public List<DepartmentDto> getListByUniversity(String universityName) {
-        List<DepartmentDto> output = new ArrayList<>();
-
-        UUID universityId = findUniversityEntity(universityName).getId();
-        for (NewDepartmentEntity departmentEntity : departmentRepository.findByUniversityId(universityId)) {
             output.add(departmentEntity.toDepartmentDto());
         }
         return output;
@@ -76,17 +64,6 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
         newDepartmentEntity = saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
 
         return departmentRepository.save(newDepartmentEntity).toDepartmentDto();
-    }
-
-    @Override
-    public DepartmentDto update(String universityName, String departmentName, DepartmentDto newDepartment) {
-        NewDepartmentEntity target = findDepartmentEntity(universityName, departmentName);
-        target = updateDepartmentOnly(target, newDepartment);
-
-        target = removeAllBaseMajorJoins(target);
-        target = saveBaseMajorJoins(target, newDepartment.baseMajors());
-
-        return departmentRepository.save(target).toDepartmentDto();
     }
 
     @Override

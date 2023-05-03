@@ -14,13 +14,10 @@ public interface MajorDao {
     MajorDto getById(UUID majorId);
 
     @Transactional
-    MajorDto getByIndex(String universityName, String majorCode);
+    MajorDto getByIndex(UUID universityId, String majorCode);
 
     @Transactional
     MajorDto create(MajorDto newMajor);
-
-    @Transactional
-    MajorDto update(String universityName, String majorCode, MajorDto newMajor);
 
     @Transactional
     MajorDto update(UUID majorId, MajorDto newMajor);

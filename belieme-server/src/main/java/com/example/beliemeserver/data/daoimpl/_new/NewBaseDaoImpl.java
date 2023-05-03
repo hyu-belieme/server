@@ -71,9 +71,7 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getMajorEntity(majorRepository, id);
     }
 
-    protected NewMajorEntity findMajorEntity(String universityName, String majorCode) {
-        UUID universityId = findUniversityEntity(universityName).getId();
-
+    protected NewMajorEntity findMajorEntity(UUID universityId, String majorCode) {
         return NewIndexAdapter.getMajorEntity(majorRepository, universityId, majorCode);
     }
 

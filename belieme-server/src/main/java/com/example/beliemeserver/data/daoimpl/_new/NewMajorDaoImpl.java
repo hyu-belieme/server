@@ -34,8 +34,8 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto getByIndex(String universityName, String majorCode) {
-        NewMajorEntity targetEntity = findMajorEntity(universityName, majorCode);
+    public MajorDto getByIndex(UUID universityId, String majorCode) {
+        NewMajorEntity targetEntity = findMajorEntity(universityId, majorCode);
         return targetEntity.toMajorDto();
     }
 
@@ -53,21 +53,6 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
 
         NewMajorEntity savedMajorEntity = majorRepository.save(newMajorEntity);
         return savedMajorEntity.toMajorDto();
-    }
-
-    @Override
-    public MajorDto update(String universityName, String majorCode, MajorDto newMajor) {
-        NewMajorEntity target = findMajorEntity(universityName, majorCode);
-
-        NewUniversityEntity newUniversity = findUniversityEntity(newMajor.university().id());
-
-        checkMajorConflict(newUniversity.getId(), newMajor.code());
-
-        NewMajorEntity updatedMajor = target
-                .withUniversity(newUniversity)
-                .withCode(newMajor.code());
-
-        return majorRepository.save(updatedMajor).toMajorDto();
     }
 
     @Override

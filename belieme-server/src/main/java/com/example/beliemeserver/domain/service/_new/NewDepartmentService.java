@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NewDepartmentService extends NewBaseService {
@@ -44,20 +45,21 @@ public class NewDepartmentService extends NewBaseService {
         return output;
     }
 
-    public DepartmentDto getByIndex(
-            @NonNull String userToken, @NonNull String universityName, @NonNull String departmentName
+    public DepartmentDto getById(
+            @NonNull String userToken, @NonNull UUID departmentId
     ) {
         checkDeveloperPermission(userToken);
-        return departmentDao.getByIndex(universityName, departmentName);
+
+        return departmentDao.getById(departmentId);
     }
 
     public DepartmentDto create(
-            @NonNull String userToken, @NonNull String universityName,
+            @NonNull String userToken, @NonNull UUID universityId,
             @NonNull String departmentName, @NonNull List<String> majorCodes
     ) {
         checkDeveloperPermission(userToken);
 
-        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityName);
+        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityId);
         List<MajorDto> baseMajors = new ArrayList<>();
         for (String majorCode : majorCodes) {
             baseMajors.add(getMajorOrCreate(university, majorCode));
@@ -70,33 +72,32 @@ public class NewDepartmentService extends NewBaseService {
     }
 
     public DepartmentDto update(
-            @NonNull String userToken, @NonNull String universityName, @NonNull String departmentName,
+            @NonNull String userToken, @NonNull UUID departmentId,
             String newDepartmentName, List<String> newMajorCodes
     ) {
         checkDeveloperPermission(userToken);
 
-        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityName);
-        DepartmentDto oldDepartment = departmentDao.getByIndex(universityName, departmentName);
+        DepartmentDto oldDepartment = departmentDao.getById(departmentId);
 
         if (newDepartmentName == null && newMajorCodes == null) return oldDepartment;
 
         if (newDepartmentName == null) newDepartmentName = oldDepartment.name();
-        List<MajorDto> newBaseMajors = oldDepartment.baseMajors();
 
+        List<MajorDto> newBaseMajors = oldDepartment.baseMajors();
         if (newMajorCodes != null) {
             newBaseMajors = new ArrayList<>();
             for (String majorCode : newMajorCodes) {
-                newBaseMajors.add(getMajorOrCreate(university, majorCode));
+                newBaseMajors.add(getMajorOrCreate(oldDepartment.university(), majorCode));
             }
         }
 
-        DepartmentDto newDepartment = new DepartmentDto(oldDepartment.id(), university, newDepartmentName, newBaseMajors);
-        return departmentDao.update(universityName, departmentName, newDepartment);
+        DepartmentDto newDepartment = new DepartmentDto(departmentId, oldDepartment.university(), newDepartmentName, newBaseMajors);
+        return departmentDao.update(departmentId, newDepartment);
     }
 
-    private UniversityDto getUniversityOrThrowInvalidIndexException(String universityName) {
+    private UniversityDto getUniversityOrThrowInvalidIndexException(UUID universityId) {
         try {
-            return universityDao.getByIndex(universityName);
+            return universityDao.getById(universityId);
         } catch (NotFoundException e) {
             throw new IndexInvalidException();
         }
@@ -104,7 +105,7 @@ public class NewDepartmentService extends NewBaseService {
 
     private MajorDto getMajorOrCreate(UniversityDto university, String majorCode) {
         try {
-            return majorDao.getByIndex(university.name(), majorCode);
+            return majorDao.getByIndex(university.id(), majorCode);
         } catch (NotFoundException e) {
             return majorDao.create(MajorDto.init(university, majorCode));
         }
