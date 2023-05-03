@@ -110,9 +110,10 @@ public class EntityStubData extends BaseEntityStub {
         List<Permission> permissions = Arrays.stream(Permission.values()).toList();
 
         tmpAllAuths = new ArrayList<>();
+        int cnt = 1;
         for(NewDepartmentEntity dept: tmpAllDepts) {
             for(Permission permission : permissions) {
-                tmpAllAuths.add(new NewAuthorityEntity(dept, permission.name()));
+                tmpAllAuths.add(new NewAuthorityEntity(cnt++, dept, permission.name()));
             }
         }
 
