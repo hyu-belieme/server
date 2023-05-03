@@ -81,10 +81,10 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
             checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
         }
 
-        target.setDepartment(departmentOfNewStuff)
-                .setName(newStuff.name())
-                .setThumbnail(newStuff.thumbnail());
-        return target.toStuffDto();
+        target = target.withDepartment(departmentOfNewStuff)
+                .withName(newStuff.name())
+                .withThumbnail(newStuff.thumbnail());
+        return stuffRepository.save(target).toStuffDto();
     }
 
     @Override
@@ -96,10 +96,10 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
             checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
         }
 
-        target.setDepartment(departmentOfNewStuff)
-                .setName(newStuff.name())
-                .setThumbnail(newStuff.thumbnail());
-        return target.toStuffDto();
+        target = target.withDepartment(departmentOfNewStuff)
+                .withName(newStuff.name())
+                .withThumbnail(newStuff.thumbnail());
+        return stuffRepository.save(target).toStuffDto();
     }
 
     private boolean doesIndexChange(NewStuffEntity target, StuffDto newStuff) {

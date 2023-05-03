@@ -20,7 +20,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 @Getter
-@Accessors(chain = true)
 public class NewStuffEntity extends NewDataEntity<UUID> {
     @Id
     @NonNull
@@ -32,12 +31,10 @@ public class NewStuffEntity extends NewDataEntity<UUID> {
     private UUID departmentId;
 
     @NonNull
-    @Setter
     @Column(name = "name")
     private String name;
 
     @NonNull
-    @Setter
     @Column(name = "thumbnail")
     private String thumbnail;
 
@@ -59,10 +56,25 @@ public class NewStuffEntity extends NewDataEntity<UUID> {
         this.items = new ArrayList<>();
     }
 
-    public NewStuffEntity setDepartment(@NonNull NewDepartmentEntity department) {
+    private NewStuffEntity(@NonNull UUID id, @NonNull NewDepartmentEntity department, @NonNull String name, @NonNull String thumbnail, @NonNull List<NewItemEntity> items) {
+        this.id = id;
         this.department = department;
         this.departmentId = department.getId();
-        return this;
+        this.name = name;
+        this.thumbnail = thumbnail;
+        this.items = new ArrayList<>(items);
+    }
+
+    public NewStuffEntity withDepartment(@NonNull NewDepartmentEntity department) {
+        return new NewStuffEntity(id, department, name, thumbnail, items);
+    }
+
+    public NewStuffEntity withName(@NonNull String name) {
+        return new NewStuffEntity(id, department, name, thumbnail, items);
+    }
+
+    public NewStuffEntity withThumbnail(@NonNull String thumbnail) {
+        return new NewStuffEntity(id, department, name, thumbnail, items);
     }
 
     public StuffDto toStuffDto() {
