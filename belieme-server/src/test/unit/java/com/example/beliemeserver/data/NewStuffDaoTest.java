@@ -183,7 +183,7 @@ public class NewStuffDaoTest extends BaseDaoTest {
         @DisplayName("[SUCCESS]_[`index`를 변경하지 않을 시]_[-]")
         public void SUCCESS_notChangeIndex() {
             setTarget(randomStuff());
-            newStuff = randomStuff()
+            newStuff = target
                     .withThumbnail("_");
 
             when(stuffRepository.findById(targetId)).thenReturn(Optional.of(target));
