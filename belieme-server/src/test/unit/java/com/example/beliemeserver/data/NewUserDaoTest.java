@@ -108,6 +108,42 @@ public class NewUserDaoTest  extends BaseDaoTest {
     }
 
     @Nested
+    @DisplayName("getByIndex()")
+    public class TestGetByIndex {
+        private NewUserEntity user;
+        private UUID univId;
+        private String studentId;
+
+        private void setUser(NewUserEntity user) {
+            this.user = user;
+            this.univId = user.getUniversityId();
+            this.studentId = user.getStudentId();
+        }
+
+        protected UserDto execMethod() {
+            return userDao.getByIndex(univId, studentId);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUser(randomUser());
+
+            when(userRepository.findByUniversityIdAndStudentId(univId, studentId)).thenReturn(Optional.of(user));
+            TestHelper.objectCompareTest(this::execMethod, user.toUserDto());
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`index`에 해당하는 `user`가 존재하지 않을 시]_[NotFoundException]")
+        public void ERROR_notFound_NotFoundException() {
+            setUser(randomUser());
+
+            when(userRepository.findByUniversityIdAndStudentId(univId, studentId)).thenReturn(Optional.empty());
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+        }
+    }
+
+    @Nested
     @DisplayName("getByToken()")
     public class TestGetByToken {
         private NewUserEntity user;

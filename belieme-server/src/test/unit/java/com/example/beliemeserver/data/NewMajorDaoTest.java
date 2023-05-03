@@ -76,6 +76,42 @@ public class NewMajorDaoTest  extends BaseDaoTest {
     }
 
     @Nested
+    @DisplayName("getByIndex()")
+    public class TestGetByIndex {
+        private NewMajorEntity major;
+        private UUID univId;
+        private String majorCode;
+
+        private void setMajor(NewMajorEntity major) {
+            this.major = major;
+            this.univId = major.getUniversityId();
+            this.majorCode = major.getCode();
+        }
+
+        protected MajorDto execMethod() {
+            return majorDao.getByIndex(univId, majorCode);
+        }
+
+        @Test
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setMajor(randomMajor());
+
+            when(majorRepository.findByUniversityIdAndCode(univId, majorCode)).thenReturn(Optional.of(major));
+            TestHelper.objectCompareTest(this::execMethod, major.toMajorDto());
+        }
+
+        @Test
+        @DisplayName("[ERROR]_[`index`에 해당하는 `major`가 존재하지 않을 시]_[NotFoundException]")
+        public void ERROR_notFound_NotFoundException() {
+            setMajor(randomMajor());
+
+            when(majorRepository.findByUniversityIdAndCode(univId, majorCode)).thenReturn(Optional.empty());
+            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+        }
+    }
+
+    @Nested
     @DisplayName("create()")
     public class TestCreate {
         private NewMajorEntity major;
