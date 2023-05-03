@@ -39,23 +39,8 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public List<ItemDto> getListByStuff(String universityName, String departmentName, String stuffName) {
-        NewStuffEntity targetStuff = findStuffEntity(universityName, departmentName, stuffName);
-        List<ItemDto> output = new ArrayList<>();
-        for (NewItemEntity itemEntity : itemRepository.findByStuffId(targetStuff.getId())) {
-            output.add(itemEntity.toItemDto());
-        }
-        return output;
-    }
-
-    @Override
     public ItemDto getById(UUID itemId) {
         return findItemEntity(itemId).toItemDto();
-    }
-
-    @Override
-    public ItemDto getByIndex(String universityName, String departmentName, String stuffName, int itemNum) {
-        return findItemEntity(universityName, departmentName, stuffName, itemNum).toItemDto();
     }
 
     @Override
@@ -71,22 +56,6 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
                 null
         );
         return itemRepository.save(newItemEntity).toItemDto();
-    }
-
-    @Override
-    public ItemDto update(String universityName, String departmentName, String stuffName, int itemNum, ItemDto newItem) {
-        NewItemEntity target = findItemEntity(universityName, departmentName, stuffName, itemNum);
-        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff().id());
-        NewHistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
-
-        if (doesIndexChange(target, newItem)) {
-            checkItemConflict(stuffOfNewItem.getId(), newItem.num());
-        }
-
-        target = target.withStuff(stuffOfNewItem)
-                .withNum(newItem.num())
-                .withLastHistory(lastHistoryOfNewItem);
-        return itemRepository.save(target).toItemDto();
     }
 
     @Override

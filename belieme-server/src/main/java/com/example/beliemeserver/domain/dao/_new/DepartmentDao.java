@@ -17,9 +17,6 @@ public interface DepartmentDao {
     DepartmentDto getById(UUID departmentId);
 
     @Transactional
-    DepartmentDto getByIndex(String universityName, String departmentName);
-
-    @Transactional
     boolean checkExistById(UUID id);
 
     @Transactional

@@ -1,6 +1,9 @@
 package com.example.beliemeserver.data.daoimpl._new;
 
-import com.example.beliemeserver.data.entity._new.*;
+import com.example.beliemeserver.data.entity._new.NewHistoryEntity;
+import com.example.beliemeserver.data.entity._new.NewItemEntity;
+import com.example.beliemeserver.data.entity._new.NewStuffEntity;
+import com.example.beliemeserver.data.entity._new.NewUserEntity;
 import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.HistoryDao;
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
@@ -24,36 +27,12 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByDepartment(String universityName, String departmentName) {
-        List<HistoryDto> output = new ArrayList<>();
-        NewDepartmentEntity targetDepartment = findDepartmentEntity(universityName, departmentName);
-
-        for (NewStuffEntity stuff : stuffRepository.findByDepartmentId(targetDepartment.getId())) {
-            for (NewItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
-                output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
-            }
-        }
-        return output;
-    }
-
-    @Override
     public List<HistoryDto> getListByDepartment(UUID departmentId) {
         List<HistoryDto> output = new ArrayList<>();
         for (NewStuffEntity stuff : stuffRepository.findByDepartmentId(departmentId)) {
             for (NewItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
                 output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
             }
-        }
-        return output;
-    }
-
-    @Override
-    public List<HistoryDto> getListByStuff(String universityName, String departmentName, String stuffName) {
-        List<HistoryDto> output = new ArrayList<>();
-        NewStuffEntity targetStuff = findStuffEntity(universityName, departmentName, stuffName);
-
-        for (NewItemEntity item : itemRepository.findByStuffId(targetStuff.getId())) {
-            output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
         }
         return output;
     }
@@ -68,29 +47,8 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByItem(String universityName, String departmentName, String stuffName, int itemNum) {
-        NewItemEntity targetItem = findItemEntity(universityName, departmentName, stuffName, itemNum);
-        return toHistoryDtoList(historyRepository.findByItemId(targetItem.getId()));
-    }
-
-    @Override
     public List<HistoryDto> getListByItem(UUID itemId) {
         return toHistoryDtoList(historyRepository.findByItemId(itemId));
-    }
-
-    @Override
-    public List<HistoryDto> getListByDepartmentAndRequester(String universityNameForDepartment, String departmentName, String universityNameForUser, String requesterStudentId) {
-        List<HistoryDto> output = new ArrayList<>();
-        NewDepartmentEntity targetDepartment = findDepartmentEntity(universityNameForDepartment, departmentName);
-        NewUserEntity targetRequester = findUserEntity(universityNameForUser, requesterStudentId);
-
-        for (NewHistoryEntity historyEntity : historyRepository.findByRequesterId(targetRequester.getId())) {
-            if (historyEntity.getItem().getStuff().getDepartment().getId() == targetDepartment.getId()) {
-                output.add(historyEntity.toHistoryDto());
-            }
-        }
-
-        return output;
     }
 
     @Override
@@ -103,11 +61,6 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
         }
 
         return output;
-    }
-
-    @Override
-    public HistoryDto getByIndex(String universityName, String departmentName, String stuffName, int itemNum, int historyNum) {
-        return findHistoryEntity(universityName, departmentName, stuffName, itemNum, historyNum).toHistoryDto();
     }
 
     @Override
@@ -137,30 +90,6 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
                 newHistory.canceledAt()
         );
         return historyRepository.save(newHistoryEntity).toHistoryDto();
-    }
-
-    @Override
-    public HistoryDto update(String universityName, String departmentName, String stuffName, int itemNum, int historyNum, HistoryDto newHistory) {
-        NewHistoryEntity target = findHistoryEntity(universityName, departmentName, stuffName, itemNum, historyNum);
-        NewItemEntity itemOfNewHistory = findItemEntity(newHistory.item().id());
-
-        if (doesIndexChange(target, newHistory)) {
-            checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
-        }
-
-        target = target.withItem(itemOfNewHistory)
-                .withNum(newHistory.num())
-                .withRequester(toUserEntityOrNull(newHistory.requester()))
-                .withApproveManager(toUserEntityOrNull(newHistory.approveManager()))
-                .withReturnManager(toUserEntityOrNull(newHistory.returnManager()))
-                .withLostManager(toUserEntityOrNull(newHistory.lostManager()))
-                .withCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
-                .withRequestedAt(newHistory.requestedAt())
-                .withApprovedAt(newHistory.approvedAt())
-                .withReturnedAt(newHistory.returnedAt())
-                .withLostAt(newHistory.lostAt())
-                .withCanceledAt(newHistory.canceledAt());
-        return historyRepository.save(target).toHistoryDto();
     }
 
     @Override

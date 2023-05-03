@@ -37,24 +37,8 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     }
 
     @Override
-    public List<StuffDto> getListByDepartment(String universityName, String departmentName) {
-        NewDepartmentEntity departmentOfTarget = findDepartmentEntity(universityName, departmentName);
-
-        List<StuffDto> output = new ArrayList<>();
-        for (NewStuffEntity stuffEntity : stuffRepository.findByDepartmentId(departmentOfTarget.getId())) {
-            output.add(stuffEntity.toStuffDto());
-        }
-        return output;
-    }
-
-    @Override
     public StuffDto getById(UUID stuffId) {
         return findStuffEntity(stuffId).toStuffDto();
-    }
-
-    @Override
-    public StuffDto getByIndex(String universityName, String departmentName, String stuffName) {
-        return findStuffEntity(universityName, departmentName, stuffName).toStuffDto();
     }
 
     @Override
@@ -75,21 +59,6 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     @Override
     public StuffDto update(UUID stuffId, StuffDto newStuff) {
         NewStuffEntity target = findStuffEntity(stuffId);
-        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department().id());
-
-        if (doesIndexChange(target, newStuff)) {
-            checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
-        }
-
-        target = target.withDepartment(departmentOfNewStuff)
-                .withName(newStuff.name())
-                .withThumbnail(newStuff.thumbnail());
-        return stuffRepository.save(target).toStuffDto();
-    }
-
-    @Override
-    public StuffDto update(String universityName, String departmentName, String stuffName, StuffDto newStuff) {
-        NewStuffEntity target = findStuffEntity(universityName, departmentName, stuffName);
         NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department().id());
 
         if (doesIndexChange(target, newStuff)) {

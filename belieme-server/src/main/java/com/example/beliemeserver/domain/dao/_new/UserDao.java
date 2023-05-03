@@ -11,9 +11,6 @@ public interface UserDao {
     List<UserDto> getAllList();
 
     @Transactional
-    List<UserDto> getListByUniversity(String universityName);
-
-    @Transactional
     List<UserDto> getListByUniversity(UUID universityId);
 
     @Transactional
@@ -26,14 +23,7 @@ public interface UserDao {
     UserDto getByIndex(UUID universityId, String studentId);
 
     @Transactional
-    UserDto getByIndex(String universityName, String studentId);
-
-    @Transactional
     UserDto create(UserDto user);
-
-    @Transactional
-    UserDto update(String universityName,
-                   String studentId, UserDto newUser);
 
     @Transactional
     UserDto update(UUID userId, UserDto newUser);

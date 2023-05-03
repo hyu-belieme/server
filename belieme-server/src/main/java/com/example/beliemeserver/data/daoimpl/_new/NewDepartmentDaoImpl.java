@@ -48,12 +48,6 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     @Override
-    public DepartmentDto getByIndex(String universityName, String departmentName) {
-        NewDepartmentEntity targetEntity = findDepartmentEntity(universityName, departmentName);
-        return targetEntity.toDepartmentDto();
-    }
-
-    @Override
     public boolean checkExistById(UUID departmentId) {
         return departmentRepository.existsById(departmentId);
     }

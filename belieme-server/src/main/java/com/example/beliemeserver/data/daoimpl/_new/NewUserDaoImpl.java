@@ -34,17 +34,6 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     @Override
-    public List<UserDto> getListByUniversity(String universityName) {
-        List<UserDto> output = new ArrayList<>();
-
-        UUID universityId = findUniversityEntity(universityName).getId();
-        for (NewUserEntity userEntity : userRepository.findByUniversityId(universityId)) {
-            output.add(userEntity.toUserDto());
-        }
-        return output;
-    }
-
-    @Override
     public List<UserDto> getListByUniversity(UUID universityId) {
         List<UserDto> output = new ArrayList<>();
 
@@ -70,25 +59,11 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto getByIndex(String universityName, String studentId) {
-        return findUserEntity(universityName, studentId).toUserDto();
-    }
-
-    @Override
     public UserDto create(UserDto user) {
         NewUserEntity newUserEntity = saveUserOnly(user);
         newUserEntity = saveAuthorityJoins(newUserEntity, user.authorities());
 
         return newUserEntity.toUserDto();
-    }
-
-    @Override
-    public UserDto update(String universityName, String studentId, UserDto newUser) {
-        NewUserEntity target = findUserEntity(universityName, studentId);
-        target = updateUserOnly(target, newUser);
-        target = removeAllAuthorityJoins(target);
-        target = saveAuthorityJoins(target, newUser.authorities());
-        return userRepository.save(target).toUserDto();
     }
 
     @Override
