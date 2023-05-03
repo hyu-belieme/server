@@ -48,14 +48,4 @@ public class NewAuthorityUserJoinEntity extends NewDataEntity<Integer> {
     public Integer getId() {
         return id;
     }
-
-    @PreRemove
-    private void commitToUserBeforeRemove() {
-        user.removeAuthority(this);
-    }
-
-    @PrePersist
-    private void commitOnUserAfterCreate() {
-        user.addAuthority(this);
-    }
 }

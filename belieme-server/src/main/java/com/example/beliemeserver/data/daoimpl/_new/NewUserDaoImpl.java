@@ -72,7 +72,7 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     @Override
     public UserDto create(UserDto user) {
         NewUserEntity newUserEntity = saveUserOnly(user);
-        saveAuthorityJoins(newUserEntity, user.authorities());
+        newUserEntity = saveAuthorityJoins(newUserEntity, user.authorities());
 
         return newUserEntity.toUserDto();
     }
@@ -80,19 +80,19 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     @Override
     public UserDto update(String universityName, String studentId, UserDto newUser) {
         NewUserEntity target = findUserEntity(universityName, studentId);
-        updateUserOnly(target, newUser);
-        removeAllAuthorityJoins(target);
-        saveAuthorityJoins(target, newUser.authorities());
-        return target.toUserDto();
+        target = updateUserOnly(target, newUser);
+        target = removeAllAuthorityJoins(target);
+        target = saveAuthorityJoins(target, newUser.authorities());
+        return userRepository.save(target).toUserDto();
     }
 
     @Override
     public UserDto update(UUID userId, UserDto newUser) {
         NewUserEntity target = findUserEntity(userId);
-        updateUserOnly(target, newUser);
-        removeAllAuthorityJoins(target);
-        saveAuthorityJoins(target, newUser.authorities());
-        return target.toUserDto();
+        target = updateUserOnly(target, newUser);
+        target = removeAllAuthorityJoins(target);
+        target = saveAuthorityJoins(target, newUser.authorities());
+        return userRepository.save(target).toUserDto();
     }
 
     private NewUserEntity saveUserOnly(UserDto newUser) {
@@ -113,23 +113,24 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
         return userRepository.save(newUserEntity);
     }
 
-    private void updateUserOnly(NewUserEntity target, UserDto newUser) {
+    private NewUserEntity updateUserOnly(NewUserEntity target, UserDto newUser) {
         NewUniversityEntity newUniversity = findUniversityEntity(newUser.university().id());
 
         if (doesIndexChange(target, newUser)) {
             checkUserConflict(newUniversity.getId(), newUser.studentId());
         }
 
-        target.setUniversity(newUniversity)
-                .setStudentId(newUser.studentId())
-                .setName(newUser.name())
-                .setEntranceYear(newUser.entranceYear())
-                .setToken(newUser.token())
-                .setCreatedAt(newUser.createdAt())
-                .setApprovedAt(newUser.approvedAt());
+        return target
+                .withUniversity(newUniversity)
+                .withStudentId(newUser.studentId())
+                .withName(newUser.name())
+                .withEntranceYear(newUser.entranceYear())
+                .withToken(newUser.token())
+                .withCreatedAt(newUser.createdAt())
+                .withApprovedAt(newUser.approvedAt());
     }
 
-    private void saveAuthorityJoins(NewUserEntity newUserEntity, List<AuthorityDto> authorities) {
+    private NewUserEntity saveAuthorityJoins(NewUserEntity newUserEntity, List<AuthorityDto> authorities) {
         for (AuthorityDto authority : authorities) {
             NewAuthorityEntity authorityEntity = findAuthorityEntity(
                     authority.department().id(), authority.permission().name());
@@ -137,14 +138,15 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
                     authorityEntity,
                     newUserEntity
             );
-            authorityUserJoinRepository.save(newJoin);
+            NewAuthorityUserJoinEntity newAuthJoin = authorityUserJoinRepository.save(newJoin);
+            newUserEntity = newUserEntity.withAuthorityAdd(newAuthJoin);
         }
+        return newUserEntity;
     }
 
-    private void removeAllAuthorityJoins(NewUserEntity user) {
-        while (user.getAuthorityJoin().size() > 0) {
-            authorityUserJoinRepository.delete(user.getAuthorityJoin().get(0));
-        }
+    private NewUserEntity removeAllAuthorityJoins(NewUserEntity user) {
+        authorityUserJoinRepository.deleteAll(user.getAuthorityJoin());
+        return user.withAuthorityClear();
     }
 
     private boolean doesIndexChange(NewUserEntity target, UserDto newUser) {

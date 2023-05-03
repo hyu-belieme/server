@@ -45,15 +45,11 @@ public class NewAuthorityEntity extends NewDataEntity<Integer> {
         this.permission = permission; // TODO : validate Permission String
     }
 
-    public NewAuthorityEntity setDepartment(@NonNull NewDepartmentEntity department) {
+    public NewAuthorityEntity(int id, @NonNull NewDepartmentEntity department, @NonNull String permission) {
+        this.id = id;
         this.department = department;
         this.departmentId = department.getId();
-        return this;
-    }
-
-    public NewAuthorityEntity setPermission(@NonNull String permission) {
         this.permission = permission; // TODO : validate Permission String
-        return this;
     }
 
     public AuthorityDto toAuthorityDto() {
