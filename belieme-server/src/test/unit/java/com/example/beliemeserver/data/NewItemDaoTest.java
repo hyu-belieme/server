@@ -262,7 +262,7 @@ public class NewItemDaoTest extends BaseDaoTest {
             setTarget(randomItem());
             newItem = randomItem()
                     .withStuff(randomStuff())
-                    .withNum(2);
+                    .withNum(999);
 
             when(itemRepository.findById(targetId)).thenReturn(Optional.of(target));
             when(stuffRepository.findById(newItem.getStuffId())).thenReturn(Optional.of(newItem.getStuff()));
@@ -273,7 +273,5 @@ public class NewItemDaoTest extends BaseDaoTest {
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
-
-        // TODO last History 검증 하기
     }
 }
