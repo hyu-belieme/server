@@ -132,23 +132,23 @@ public class NewHistoryEntity extends NewDataEntity<UUID> {
         return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
-    public NewHistoryEntity withRequester(@NonNull NewUserEntity requester) {
+    public NewHistoryEntity withRequester(NewUserEntity requester) {
         return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
-    public NewHistoryEntity withApproveManager(@NonNull NewUserEntity approveManager) {
+    public NewHistoryEntity withApproveManager(NewUserEntity approveManager) {
         return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
-    public NewHistoryEntity withReturnManager(@NonNull NewUserEntity returnManager) {
+    public NewHistoryEntity withReturnManager(NewUserEntity returnManager) {
         return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
-    public NewHistoryEntity withLostManager(@NonNull NewUserEntity lostManager) {
+    public NewHistoryEntity withLostManager(NewUserEntity lostManager) {
         return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
-    public NewHistoryEntity withCancelManager(@NonNull NewUserEntity cancelManager) {
+    public NewHistoryEntity withCancelManager(NewUserEntity cancelManager) {
         return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
