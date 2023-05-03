@@ -11,6 +11,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NewStuffService extends NewBaseService {
@@ -19,31 +20,28 @@ public class NewStuffService extends NewBaseService {
     }
 
     public List<StuffDto> getListByDepartment(
-            @NonNull String userToken,
-            @NonNull String universityName, @NonNull String departmentName
+            @NonNull String userToken, @NonNull UUID departmentId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityName, departmentName);
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
         checkUserPermission(userToken, department);
 
-        return stuffDao.getListByDepartment(universityName, departmentName);
+        return stuffDao.getListByDepartment(departmentId);
     }
 
-    public StuffDto getByIndex(
-            @NonNull String userToken,
-            @NonNull String universityName, @NonNull String departmentName, @NonNull String name
+    public StuffDto getById(
+            @NonNull String userToken, @NonNull UUID stuffId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityName, departmentName);
-        checkUserPermission(userToken, department);
+        StuffDto stuff = stuffDao.getById(stuffId);
+        checkUserPermission(userToken, stuff.department());
 
-        return stuffDao.getByIndex(universityName, departmentName, name);
+        return stuff;
     }
 
     public StuffDto create(
-            @NonNull String userToken,
-            @NonNull String universityName, @NonNull String departmentName,
+            @NonNull String userToken, @NonNull UUID departmentId,
             @NonNull String name, @NonNull String thumbnail, Integer amount
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityName, departmentName);
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
         checkStaffPermission(userToken, department);
 
         StuffDto newStuff = StuffDto.init(department, name, thumbnail);
@@ -61,20 +59,17 @@ public class NewStuffService extends NewBaseService {
     }
 
     public StuffDto update(
-            @NonNull String userToken,
-            @NonNull String universityName, @NonNull String departmentName, @NonNull String name,
+            @NonNull String userToken, @NonNull UUID stuffId,
             String newName, String newThumbnail
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityName, departmentName);
-        checkStaffPermission(userToken, department);
-
-        StuffDto oldStuff = stuffDao.getByIndex(universityName, departmentName, name);
+        StuffDto oldStuff = stuffDao.getById(stuffId);
+        checkStaffPermission(userToken, oldStuff.department());
 
         if (newName == null && newThumbnail == null) return oldStuff;
         if (newName == null) newName = oldStuff.name();
         if (newThumbnail == null) newThumbnail = oldStuff.thumbnail();
 
-        StuffDto newStuff = StuffDto.init(department, newName, newThumbnail);
-        return stuffDao.update(universityName, departmentName, name, newStuff);
+        StuffDto newStuff = StuffDto.init(oldStuff.department(), newName, newThumbnail);
+        return stuffDao.update(stuffId, newStuff);
     }
 }

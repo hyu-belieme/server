@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}")
+@RequestMapping(path = "")
 public class StuffApiController extends BaseApiController {
     private final NewStuffService stuffService;
 
@@ -26,13 +27,10 @@ public class StuffApiController extends BaseApiController {
     @GetMapping("/${api.keyword.stuff}")
     public ResponseEntity<List<StuffResponse>> getAllStuffListOfDepartment(
             @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
+            @RequestParam(value = "${api.query.department-id}") String departmentId
     ) {
-        String universityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-
         List<StuffDto> stuffDtoList = stuffService.getListByDepartment(
-                userToken, universityName, departmentCode);
+                userToken, getUuidFromString(departmentId));
         List<StuffResponse> responseList = toResponseList(stuffDtoList);
         return ResponseEntity.ok(responseList);
     }
@@ -42,12 +40,9 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
+        UUID stuffId = getUuidFromString(params.get(api.variable().stuffIndex()));
 
-        StuffDto stuffDto = stuffService.getByIndex(
-                userToken, universityName, departmentCode, stuffName);
+        StuffDto stuffDto = stuffService.getById(userToken, stuffId);
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
     }
@@ -55,14 +50,10 @@ public class StuffApiController extends BaseApiController {
     @PostMapping("/${api.keyword.stuff}")
     public ResponseEntity<StuffResponse> createNewStuff(
             @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params,
             @RequestBody @Validated(StuffCreateValidationGroup.class) StuffRequest newStuff
     ) {
-        String universityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-
         StuffDto stuffDto = stuffService.create(
-                userToken, universityName, departmentCode,
+                userToken, getUuidFromString(newStuff.getDepartmentId()),
                 newStuff.getName(), newStuff.getThumbnail(), newStuff.getAmount());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
@@ -74,12 +65,9 @@ public class StuffApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(StuffUpdateValidationGroup.class) StuffRequest newStuff
     ) {
-        String universityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
+        UUID stuffId = getUuidFromString(params.get(api.variable().stuffIndex()));
 
-        StuffDto stuffDto = stuffService.update(
-                userToken, universityName, departmentCode, stuffName,
+        StuffDto stuffDto = stuffService.update(userToken, stuffId,
                 newStuff.getName(), newStuff.getThumbnail());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
