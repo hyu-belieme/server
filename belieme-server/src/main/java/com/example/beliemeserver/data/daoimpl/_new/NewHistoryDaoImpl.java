@@ -111,7 +111,7 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public HistoryDto getByIndex(UUID historyId) {
+    public HistoryDto getById(UUID historyId) {
         return findHistoryEntity(historyId).toHistoryDto();
     }
 

@@ -44,7 +44,7 @@ public interface HistoryDao {
                           String stuffName, int itemNum, int historyNum);
 
     @Transactional
-    HistoryDto getByIndex(UUID historyId);
+    HistoryDto getById(UUID historyId);
 
     @Transactional
     HistoryDto create(HistoryDto newHistory);
