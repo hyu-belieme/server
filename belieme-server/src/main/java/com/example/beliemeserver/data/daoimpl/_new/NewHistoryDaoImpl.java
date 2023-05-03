@@ -148,19 +148,19 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
             checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
         }
 
-        target.setItem(itemOfNewHistory)
-                .setNum(newHistory.num())
-                .setRequester(toUserEntityOrNull(newHistory.requester()))
-                .setApproveManager(toUserEntityOrNull(newHistory.approveManager()))
-                .setReturnManager(toUserEntityOrNull(newHistory.returnManager()))
-                .setLostManager(toUserEntityOrNull(newHistory.lostManager()))
-                .setCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
-                .setRequestedAt(newHistory.requestedAt())
-                .setApprovedAt(newHistory.approvedAt())
-                .setReturnedAt(newHistory.returnedAt())
-                .setLostAt(newHistory.lostAt())
-                .setCanceledAt(newHistory.canceledAt());
-        return target.toHistoryDto();
+        target = target.withItem(itemOfNewHistory)
+                .withNum(newHistory.num())
+                .withRequester(toUserEntityOrNull(newHistory.requester()))
+                .withApproveManager(toUserEntityOrNull(newHistory.approveManager()))
+                .withReturnManager(toUserEntityOrNull(newHistory.returnManager()))
+                .withLostManager(toUserEntityOrNull(newHistory.lostManager()))
+                .withCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
+                .withRequestedAt(newHistory.requestedAt())
+                .withApprovedAt(newHistory.approvedAt())
+                .withReturnedAt(newHistory.returnedAt())
+                .withLostAt(newHistory.lostAt())
+                .withCanceledAt(newHistory.canceledAt());
+        return historyRepository.save(target).toHistoryDto();
     }
 
     @Override
@@ -172,19 +172,19 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
             checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
         }
 
-        target.setItem(itemOfNewHistory)
-                .setNum(newHistory.num())
-                .setRequester(toUserEntityOrNull(newHistory.requester()))
-                .setApproveManager(toUserEntityOrNull(newHistory.approveManager()))
-                .setReturnManager(toUserEntityOrNull(newHistory.returnManager()))
-                .setLostManager(toUserEntityOrNull(newHistory.lostManager()))
-                .setCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
-                .setRequestedAt(newHistory.requestedAt())
-                .setApprovedAt(newHistory.approvedAt())
-                .setReturnedAt(newHistory.returnedAt())
-                .setLostAt(newHistory.lostAt())
-                .setCanceledAt(newHistory.canceledAt());
-        return target.toHistoryDto();
+        target = target.withItem(itemOfNewHistory)
+                .withNum(newHistory.num())
+                .withRequester(toUserEntityOrNull(newHistory.requester()))
+                .withApproveManager(toUserEntityOrNull(newHistory.approveManager()))
+                .withReturnManager(toUserEntityOrNull(newHistory.returnManager()))
+                .withLostManager(toUserEntityOrNull(newHistory.lostManager()))
+                .withCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
+                .withRequestedAt(newHistory.requestedAt())
+                .withApprovedAt(newHistory.approvedAt())
+                .withReturnedAt(newHistory.returnedAt())
+                .withLostAt(newHistory.lostAt())
+                .withCanceledAt(newHistory.canceledAt());
+        return historyRepository.save(target).toHistoryDto();
     }
 
     private List<HistoryDto> toHistoryDtoList(Iterable<NewHistoryEntity> historyEntities) {

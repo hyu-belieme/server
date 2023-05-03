@@ -3,8 +3,10 @@ package com.example.beliemeserver.data.entity._new;
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.domain.dto._new.UserDto;
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -19,7 +21,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 @Getter
-@Accessors(chain = true)
 public class NewHistoryEntity extends NewDataEntity<UUID> {
     @Id
     @NonNull
@@ -30,7 +31,6 @@ public class NewHistoryEntity extends NewDataEntity<UUID> {
     @Column(name = "item_id", columnDefinition = "BINARY(16)")
     private UUID itemId;
 
-    @Setter
     @Column(name = "num")
     private int num;
 
@@ -49,23 +49,18 @@ public class NewHistoryEntity extends NewDataEntity<UUID> {
     @Column(name = "cancel_manager_id", columnDefinition = "BINARY(16)")
     private UUID cancelManagerId;
 
-    @Setter
     @Column(name = "requested_at")
     private long requestedAt;
 
-    @Setter
     @Column(name = "approved_at")
     private long approvedAt;
 
-    @Setter
     @Column(name = "returned_at")
     private long returnedAt;
 
-    @Setter
     @Column(name = "lost_at")
     private long lostAt;
 
-    @Setter
     @Column(name = "canceled_at")
     private long canceledAt;
 
@@ -101,57 +96,79 @@ public class NewHistoryEntity extends NewDataEntity<UUID> {
             long lostAt, long canceledAt
     ) {
         this.id = id;
+
         this.item = item;
         this.itemId = item.getId();
+
         this.num = num;
 
-        setRequester(requester);
-        setApproveManager(approveManager);
-        setReturnManager(returnManager);
-        setLostManager(lostManager);
-        setCancelManager(cancelManager);
-
-        setRequestedAt(requestedAt);
-        setApprovedAt(approvedAt);
-        setReturnedAt(returnedAt);
-        setLostAt(lostAt);
-        setCanceledAt(canceledAt);
-    }
-
-    public NewHistoryEntity setItem(@NonNull NewItemEntity item) {
-        this.item = item;
-        this.itemId = item.getId();
-        return this;
-    }
-
-    public NewHistoryEntity setRequester(NewUserEntity requester) {
         this.requester = requester;
         this.requesterId = getIdOrElse(requester, null);
-        return this;
-    }
 
-    public NewHistoryEntity setApproveManager(NewUserEntity approveManager) {
         this.approveManager = approveManager;
         this.approveManagerId = getIdOrElse(approveManager, null);
-        return this;
-    }
 
-    public NewHistoryEntity setReturnManager(NewUserEntity returnManager) {
         this.returnManager = returnManager;
         this.returnManagerId = getIdOrElse(returnManager, null);
-        return this;
-    }
 
-    public NewHistoryEntity setLostManager(NewUserEntity lostManager) {
         this.lostManager = lostManager;
         this.lostManagerId = getIdOrElse(lostManager, null);
-        return this;
-    }
 
-    public NewHistoryEntity setCancelManager(NewUserEntity cancelManager) {
         this.cancelManager = cancelManager;
         this.cancelManagerId = getIdOrElse(cancelManager, null);
-        return this;
+
+        this.requestedAt = requestedAt;
+        this.approvedAt = approvedAt;
+        this.returnedAt = returnedAt;
+        this.lostAt = lostAt;
+        this.canceledAt = canceledAt;
+    }
+
+    public NewHistoryEntity withItem(@NonNull NewItemEntity item) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withNum(int num) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withRequester(@NonNull NewUserEntity requester) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withApproveManager(@NonNull NewUserEntity approveManager) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withReturnManager(@NonNull NewUserEntity returnManager) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withLostManager(@NonNull NewUserEntity lostManager) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withCancelManager(@NonNull NewUserEntity cancelManager) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withRequestedAt(long requestedAt) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withApprovedAt(long approvedAt) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+    public NewHistoryEntity withReturnedAt(long returnedAt) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withLostAt(long lostAt) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public NewHistoryEntity withCanceledAt(long canceledAt) {
+        return new NewHistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto toHistoryDto() {
