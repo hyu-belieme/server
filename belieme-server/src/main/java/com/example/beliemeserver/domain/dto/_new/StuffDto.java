@@ -75,11 +75,11 @@ public record StuffDto(
                 && this.name.equals(oth.name());
     }
 
-    public int firstUsableItemNum() {
+    public ItemDto firstUsableItem() {
         for (ItemDto item : items) {
-            if (item.isUsable()) return item.num();
+            if (item.isUsable()) return item;
         }
-        return 0;
+        return null;
     }
 
     public int nextItemNum() {

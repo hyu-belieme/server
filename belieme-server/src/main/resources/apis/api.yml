@@ -31,10 +31,9 @@ api :
 
   query :
     requester-id : "requester-id"
-    requester-university-code : "requester-university-code"
-    requester-student-id : "requester-student-id"
     department-id : "department-id"
     stuff-id : "stuff-id"
+    item-id : "item-id"
 
   header :
     user-token : "user-token"

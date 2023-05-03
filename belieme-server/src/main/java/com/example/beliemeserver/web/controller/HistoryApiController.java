@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}")
+@RequestMapping(path = "")
 public class HistoryApiController extends BaseApiController {
     private final NewHistoryService historyService;
 
@@ -23,180 +24,61 @@ public class HistoryApiController extends BaseApiController {
     @GetMapping("/${api.keyword.history}")
     public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfDepartment(
             @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params,
-            @RequestParam(value = "${api.query.requester-university-code}", required = false) String requesterUniversityName,
-            @RequestParam(value = "${api.query.requester-student-id}", required = false) String requesterStudentId
+            @RequestParam(value = "${api.query.department-id}", required = false) String departmentId,
+            @RequestParam(value = "${api.query.requester-id}", required = false) String requesterId,
+            @RequestParam(value = "${api.query.stuff-id}", required = false) String stuffId,
+            @RequestParam(value = "${api.query.item-id}", required = false) String itemId
     ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-
-        if (requesterUniversityName == null && requesterStudentId == null) {
-            List<HistoryDto> historyDtoList = historyService.getListByDepartment(
-                    userToken, UniversityName, departmentCode);
-            List<HistoryResponse> responseList = toResponseList(historyDtoList);
-            return ResponseEntity.ok(responseList);
+        if (departmentId != null && stuffId == null && itemId == null) {
+            return getListByDepartment(userToken, departmentId, requesterId);
         }
-
-        if (requesterUniversityName != null && requesterStudentId != null) {
-            List<HistoryDto> historyDtoList = historyService.getListByDepartmentAndRequester(
-                    userToken, UniversityName, departmentCode,
-                    requesterUniversityName, requesterStudentId
-            );
-            List<HistoryResponse> responseList = toResponseList(historyDtoList);
-            return ResponseEntity.ok(responseList);
+        if (stuffId != null && departmentId == null && requesterId == null && itemId == null) {
+            return getListByStuff(userToken, stuffId);
+        }
+        if (itemId != null && departmentId == null && requesterId == null && stuffId == null) {
+            return getListByItem(userToken, itemId);
         }
 
         throw new BadRequestException();
     }
 
-    @GetMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.history}")
-    public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfStuff(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-
-        List<HistoryDto> historyDtoList = historyService.getListByStuff(
-                userToken, UniversityName, departmentCode, stuffName);
-        List<HistoryResponse> responseList = toResponseList(historyDtoList);
-        return ResponseEntity.ok(responseList);
-    }
-
-    @GetMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.history}")
-    public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfItem(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
-
-        List<HistoryDto> historyDtoList = historyService.getListByItem(
-                userToken, UniversityName, departmentCode, stuffName, itemNum);
-        List<HistoryResponse> responseList = toResponseList(historyDtoList);
-        return ResponseEntity.ok(responseList);
-    }
-
-    @GetMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.history}/${api.keyword.history-index}")
+    @GetMapping("/${api.keyword.history}/${api.keyword.history-index}")
     public ResponseEntity<HistoryResponse> getHistory(
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
-        int historyNum = Integer.parseInt(params.get(api.variable().historyIndex()));
+        UUID historyId = getUuidFromString(params.get(api.variable().historyIndex()));
 
-        HistoryDto historyDto = historyService.getByIndex(
-                userToken, UniversityName, departmentCode,
-                stuffName, itemNum, historyNum);
+        HistoryDto historyDto = historyService.getById(userToken, historyId);
         HistoryResponse response = HistoryResponse.from(historyDto);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.do-reserve}")
-    public ResponseEntity<HistoryResponse> reserveStuff(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
+    private ResponseEntity<List<HistoryResponse>> getListByDepartment(String userToken, String departmentId, String requesterId) {
+        if (requesterId == null) {
+            List<HistoryDto> historyDtoList = historyService.getListByDepartment(userToken, getUuidFromString(departmentId));
+            List<HistoryResponse> responseList = toResponseList(historyDtoList);
+            return ResponseEntity.ok(responseList);
+        }
 
-        HistoryDto historyDto = historyService.createReservation(
-                userToken, UniversityName, departmentCode,
-                stuffName, null);
-        HistoryResponse response = HistoryResponse.from(historyDto);
-        return ResponseEntity.ok(response);
+        List<HistoryDto> historyDtoList = historyService.getListByDepartmentAndRequester(
+                userToken, getUuidFromString(departmentId), getUuidFromString(requesterId));
+        List<HistoryResponse> responseList = toResponseList(historyDtoList);
+        return ResponseEntity.ok(responseList);
     }
 
-    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-reserve}")
-    public ResponseEntity<HistoryResponse> reserveItem(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
-
-        HistoryDto historyDto = historyService.createReservation(
-                userToken, UniversityName, departmentCode,
-                stuffName, itemNum);
-        HistoryResponse response = HistoryResponse.from(historyDto);
-        return ResponseEntity.ok(response);
+    private ResponseEntity<List<HistoryResponse>> getListByStuff(String userToken, String stuffId) {
+        List<HistoryDto> historyDtoList = historyService.getListByStuff(
+                userToken, getUuidFromString(stuffId));
+        List<HistoryResponse> responseList = toResponseList(historyDtoList);
+        return ResponseEntity.ok(responseList);
     }
 
-    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-lost}")
-    public ResponseEntity<HistoryResponse> makeItemLost(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
-
-        HistoryDto historyDto = historyService.makeItemLost(
-                userToken, UniversityName, departmentCode,
-                stuffName, itemNum);
-        HistoryResponse response = HistoryResponse.from(historyDto);
-        return ResponseEntity.ok(response);
-    }
-
-    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-approve}")
-    public ResponseEntity<HistoryResponse> makeItemApprove(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
-
-        HistoryDto historyDto = historyService.makeItemUsing(
-                userToken, UniversityName, departmentCode,
-                stuffName, itemNum);
-        HistoryResponse response = HistoryResponse.from(historyDto);
-        return ResponseEntity.ok(response);
-    }
-
-    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-return}")
-    public ResponseEntity<HistoryResponse> makeItemReturn(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
-
-        HistoryDto historyDto = historyService.makeItemReturn(
-                userToken, UniversityName, departmentCode,
-                stuffName, itemNum);
-        HistoryResponse response = HistoryResponse.from(historyDto);
-        return ResponseEntity.ok(response);
-    }
-
-    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.item}/${api.keyword.item-index}/${api.keyword.do-cancel}")
-    public ResponseEntity<HistoryResponse> makeItemCancel(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String UniversityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-        String stuffName = params.get(api.variable().stuffIndex());
-        int itemNum = Integer.parseInt(params.get(api.variable().itemIndex()));
-
-        HistoryDto historyDto = historyService.makeItemCancel(
-                userToken, UniversityName, departmentCode,
-                stuffName, itemNum);
-        HistoryResponse response = HistoryResponse.from(historyDto);
-        return ResponseEntity.ok(response);
+    private ResponseEntity<List<HistoryResponse>> getListByItem(String userToken, String itemId) {
+        List<HistoryDto> historyDtoList = historyService.getListByItem(
+                userToken, getUuidFromString(itemId));
+        List<HistoryResponse> responseList = toResponseList(historyDtoList);
+        return ResponseEntity.ok(responseList);
     }
 
     private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {

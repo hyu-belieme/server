@@ -1,10 +1,13 @@
 package com.example.beliemeserver.web.controller;
 
+import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
+import com.example.beliemeserver.domain.service._new.NewHistoryService;
 import com.example.beliemeserver.domain.service._new.NewStuffService;
 import com.example.beliemeserver.web.requestbody._new.StuffRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffUpdateValidationGroup;
+import com.example.beliemeserver.web.responsebody._new.HistoryResponse;
 import com.example.beliemeserver.web.responsebody._new.StuffResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,9 +22,11 @@ import java.util.UUID;
 @RequestMapping(path = "")
 public class StuffApiController extends BaseApiController {
     private final NewStuffService stuffService;
+    private final NewHistoryService historyService;
 
-    public StuffApiController(NewStuffService stuffService) {
+    public StuffApiController(NewStuffService stuffService, NewHistoryService historyService) {
         this.stuffService = stuffService;
+        this.historyService = historyService;
     }
 
     @GetMapping("/${api.keyword.stuff}")
@@ -79,5 +84,17 @@ public class StuffApiController extends BaseApiController {
             responseList.add(StuffResponse.from(dto).withoutItems());
         }
         return responseList;
+    }
+
+    @PatchMapping("/${api.keyword.stuff}/${api.keyword.stuff-index}/${api.keyword.do-reserve}")
+    public ResponseEntity<HistoryResponse> reserveStuff(
+            @RequestHeader("${api.header.user-token}") String userToken,
+            @PathVariable Map<String, String> params
+    ) {
+        UUID stuffId = getUuidFromString(params.get(api.variable().stuffIndex()));
+
+        HistoryDto historyDto = historyService.createReservationOnStuff(userToken, stuffId);
+        HistoryResponse response = HistoryResponse.from(historyDto);
+        return ResponseEntity.ok(response);
     }
 }
