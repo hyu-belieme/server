@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 public class StuffRequest {
     @NotNull(message = "{message.error.badRequest.notNull}",
             groups = StuffCreateValidationGroup.class)
-    @JsonProperty("university-id")
+    @JsonProperty("department-id")
     String departmentId;
 
     @Size(min = 1, max = 30, message = "{message.error.badRequest.outOfSize}",

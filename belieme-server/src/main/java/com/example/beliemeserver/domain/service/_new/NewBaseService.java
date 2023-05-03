@@ -126,6 +126,14 @@ public abstract class NewBaseService {
         }
     }
 
+    protected StuffDto getStuffOrThrowInvalidIndexException(UUID stuffId) {
+        try {
+            return stuffDao.getById(stuffId);
+        } catch (NotFoundException e) {
+            throw new IndexInvalidException();
+        }
+    }
+
     protected StuffDto getStuffOrThrowInvalidIndexException(String universityName, String departmentName, String stuffName) {
         try {
             return stuffDao.getByIndex(universityName, departmentName, stuffName);

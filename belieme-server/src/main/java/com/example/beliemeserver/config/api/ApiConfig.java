@@ -50,7 +50,8 @@ public record ApiConfig(
             String requesterId,
             String requesterUniversityCode,
             String requesterStudentId,
-            String departmentId
+            String departmentId,
+            String stuffId
     ) {
 
     }
