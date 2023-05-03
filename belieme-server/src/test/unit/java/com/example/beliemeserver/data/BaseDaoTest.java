@@ -82,10 +82,6 @@ public abstract class BaseDaoTest {
         return rs.filter((dept) -> dept.getUniversity().getId().equals(univ.getId()));
     }
 
-    protected RandomGetter<NewStuffEntity> stuffsOnDept(RandomGetter<NewStuffEntity> rs, NewDepartmentEntity dept) {
-        return rs.filter((stuff) -> stuff.getDepartment().getId().equals(dept.getId()));
-    }
-
     protected RandomGetter<NewItemEntity> itemsOnDept(RandomGetter<NewItemEntity> rs, NewDepartmentEntity dept) {
         return rs.filter((item) -> item.getStuff().getDepartment().getId().equals(dept.getId()));
     }
@@ -118,8 +114,8 @@ public abstract class BaseDaoTest {
         return randomSelectAndLog(allAuths());
     }
 
-    protected NewStuffEntity randomStuffOnDept(NewDepartmentEntity dept) {
-        return randomSelectAndLog(stuffsOnDept(allStuffs(), dept));
+    protected NewStuffEntity randomStuff() {
+        return randomSelectAndLog(allStuffs());
     }
 
     protected NewItemEntity randomItemOnDept(NewDepartmentEntity dept) {
