@@ -31,18 +31,18 @@ public class InitialDataDtoAdapter implements InitialData {
         return initialData.userInfos();
     }
 
-    public Map<String, UniversityDto> universities() {
-        Map<String, UniversityDto> output = new HashMap<>();
+    public Map<UUID, UniversityDto> universities() {
+        Map<UUID, UniversityDto> output = new HashMap<>();
         initialData.universityInfos().forEach((s, universityInfo) ->
-                output.put(s, toUniversityDto(universityInfo))
+                output.put(universityInfo.id(), toUniversityDto(universityInfo))
         );
         return output;
     }
 
-    public Map<String, DepartmentDto> departments() {
-        Map<String, DepartmentDto> output = new HashMap<>();
+    public Map<UUID, DepartmentDto> departments() {
+        Map<UUID, DepartmentDto> output = new HashMap<>();
         initialData.departmentInfos().forEach((s, departmentInfo) ->
-                output.put(s, toDepartmentDto(departmentInfo))
+                output.put(departmentInfo.id(), toDepartmentDto(departmentInfo))
         );
         return output;
     }
@@ -58,7 +58,7 @@ public class InitialDataDtoAdapter implements InitialData {
     private DepartmentDto toDepartmentDto(DepartmentInfo departmentInfo) {
         if (departmentInfo == null) return null;
 
-        UniversityDto university = universities().get(departmentInfo.universityName());
+        UniversityDto university = universities().get(departmentInfo.universityId());
         if (university == null) throw new RuntimeException();
 
         List<MajorDto> majors = departmentInfo.baseMajors().stream()

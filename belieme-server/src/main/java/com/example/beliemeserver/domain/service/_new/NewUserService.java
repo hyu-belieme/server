@@ -112,7 +112,7 @@ public class NewUserService extends NewBaseService {
     UserDto reloadInitialUser(@NonNull String universityName, @NonNull String apiToken) {
         UserInfo targetUserInfo = null;
         for (UserInfo userInfo : initialData.userInfos()) {
-            if (universityName.equals(userInfo.universityName())
+            if (universityName.equals(userInfo.universityId().toString())
                     && userInfo.apiToken().equals(apiToken)) {
                 targetUserInfo = userInfo;
                 break;
@@ -151,7 +151,7 @@ public class NewUserService extends NewBaseService {
 
     private UserDto updateOrCreateUser(UserInfo userInfo) {
         boolean isNew = false;
-        UniversityDto university = universityDao.getByIndex(userInfo.universityName());
+        UniversityDto university = universityDao.getById(userInfo.universityId());
 
         UserDto targetUser = getOrNull(university, userInfo.studentId());
         if (targetUser == null) {
@@ -169,7 +169,7 @@ public class NewUserService extends NewBaseService {
                 .withToken(UUID.randomUUID().toString());
 
         if (isNew) return userDao.create(targetUser);
-        return userDao.update(userInfo.universityName(), userInfo.studentId(), targetUser);
+        return userDao.update(userInfo.id(), targetUser);
     }
 
     private UserDto updateOrCreateUser(String universityName, String studentId, String name, int entranceYear, List<String> majorCodes) {

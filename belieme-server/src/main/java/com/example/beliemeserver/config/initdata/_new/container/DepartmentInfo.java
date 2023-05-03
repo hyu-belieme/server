@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record DepartmentInfo(
         UUID id,
-        String universityName,
+        UUID universityId,
         String name,
         List<MajorInfo> baseMajors) {
 

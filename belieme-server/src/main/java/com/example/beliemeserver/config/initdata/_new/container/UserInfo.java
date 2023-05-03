@@ -6,7 +6,7 @@ import java.util.UUID;
 public record UserInfo(
         UUID id,
         String apiToken,
-        String universityName,
+        UUID universityId,
         String studentId,
         String name,
         int entranceYear,
