@@ -23,6 +23,9 @@ public interface UserDao {
     UserDto getById(UUID userId);
 
     @Transactional
+    UserDto getByIndex(UUID universityId, String studentId);
+
+    @Transactional
     UserDto getByIndex(String universityName, String studentId);
 
     @Transactional

@@ -33,6 +33,7 @@ api :
     requester-id : "requester-id"
     requester-university-code : "requester-university-code"
     requester-student-id : "requester-student-id"
+    department-id : "department-id"
 
   header :
     user-token : "user-token"

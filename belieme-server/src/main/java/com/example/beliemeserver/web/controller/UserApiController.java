@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "")
@@ -19,6 +20,34 @@ public class UserApiController extends BaseApiController {
 
     public UserApiController(NewUserService userService) {
         this.userService = userService;
+    }
+
+    @GetMapping("/${api.keyword.user}")
+    public ResponseEntity<List<UserResponse>> getUserListOfDepartment(
+            @RequestHeader("${api.header.user-token}") String userToken,
+            @RequestParam(value = "${api.query.department-id}", required = false) String departmentId
+    ) {
+        if(departmentId == null) {
+            List<UserDto> userDtoList = userService.getAllList(userToken);
+            List<UserResponse> responseList = toResponseWithoutSecureInfoList(userDtoList);
+            return ResponseEntity.ok(responseList);
+        }
+
+        List<UserDto> userDtoList = userService.getListByDepartment(userToken, getUuidFromString(departmentId));
+        List<UserResponse> responseList = toResponseWithoutSecureInfoList(userDtoList);
+        return ResponseEntity.ok(responseList);
+    }
+
+    @GetMapping("/${api.keyword.user}/${api.keyword.user-index}")
+    public ResponseEntity<UserResponse> getUserInfo(
+            @RequestHeader("${api.header.user-token}") String userToken,
+            @PathVariable Map<String, String> params
+    ) {
+        UUID userId = getUuidFromString(params.get(api.variable().userIndex()));
+
+        UserDto userDto = userService.getById(userToken, userId);
+        UserResponse response = UserResponse.from(userDto).withoutSecureInfo();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/${api.keyword.my-info}")
@@ -30,49 +59,23 @@ public class UserApiController extends BaseApiController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.user}/${api.keyword.user-index}")
-    public ResponseEntity<UserResponse> getUserInfo(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String universityName = params.get(api.variable().universityIndex());
-        String studentId = params.get(api.variable().userIndex());
-
-        UserDto userDto = userService.getByIndex(userToken, universityName, studentId);
-        UserResponse response = UserResponse.from(userDto).withoutSecureInfo();
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.department}/${api.keyword.department-index}/${api.keyword.user}")
-    public ResponseEntity<List<UserResponse>> getUserListOfDepartment(
-            @RequestHeader("${api.header.user-token}") String userToken,
-            @PathVariable Map<String, String> params
-    ) {
-        String universityName = params.get(api.variable().universityIndex());
-        String departmentCode = params.get(api.variable().departmentIndex());
-
-        List<UserDto> userDtoList = userService.getListByDepartment(userToken, universityName, departmentCode);
-        List<UserResponse> responseList = toResponseWithoutSecureInfoList(userDtoList);
-        return ResponseEntity.ok(responseList);
-    }
-
     @PatchMapping("/${api.keyword.university}/${api.keyword.university-index}/${api.keyword.login-external-api}")
     public ResponseEntity<UserResponse> loginByUniversityApi(
             @RequestHeader("${api.header.external-api-token}") String apiToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityName = params.get(api.variable().universityIndex());
+        UUID universityId = getUuidFromString(params.get(api.variable().universityIndex()));
 
-        UserDto userDto = userService.reloadInitialUser(universityName, apiToken);
+        UserDto userDto = userService.reloadInitialUser(universityId, apiToken);
         if (userDto != null) {
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);
         }
 
-        if (universityName.equals(userService.getDeveloperUniversityName())) {
+        if (universityId.equals(userService.getDeveloperUniversityId())) {
             throw new UnauthorizedException();
         }
-        if (universityName.equals(userService.getHanyangUniversityName())) {
+        if (universityId.equals(userService.getHanyangUniversityId())) {
             userDto = userService.reloadHanyangUniversityUser(apiToken);
             UserResponse response = UserResponse.from(userDto);
             return ResponseEntity.ok(response);

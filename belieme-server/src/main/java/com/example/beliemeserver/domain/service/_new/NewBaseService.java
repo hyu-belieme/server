@@ -14,6 +14,8 @@ import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public abstract class NewBaseService {
     protected final InitialDataDtoAdapter initialData;
@@ -105,6 +107,14 @@ public abstract class NewBaseService {
     protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
             throw new PermissionDeniedException();
+        }
+    }
+
+    protected DepartmentDto getDepartmentOrThrowInvalidIndexException(UUID departmentId) {
+        try {
+            return departmentDao.getById(departmentId);
+        } catch (NotFoundException e) {
+            throw new IndexInvalidException();
         }
     }
 

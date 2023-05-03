@@ -57,6 +57,10 @@ public abstract class NewBaseDaoImpl {
         return NewIndexAdapter.getUserEntity(userRepository, id);
     }
 
+    protected NewUserEntity findUserEntity(UUID universityId, String studentId) {
+        return NewIndexAdapter.getUserEntity(userRepository, universityId, studentId);
+    }
+
     protected NewUserEntity findUserEntity(String universityName, String studentId) {
         UUID universityId = findUniversityEntity(universityName).getId();
 

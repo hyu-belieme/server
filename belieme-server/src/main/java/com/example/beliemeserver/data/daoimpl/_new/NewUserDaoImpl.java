@@ -65,6 +65,11 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     @Override
+    public UserDto getByIndex(UUID universityId, String studentId) {
+        return findUserEntity(universityId, studentId).toUserDto();
+    }
+
+    @Override
     public UserDto getByIndex(String universityName, String studentId) {
         return findUserEntity(universityName, studentId).toUserDto();
     }
