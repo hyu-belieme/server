@@ -21,22 +21,23 @@ public class BaseEntityStub {
 
     private void setLastHistoryOfItems(List<NewItemEntity> items, List<NewHistoryEntity> histories) {
         for (NewHistoryEntity history : histories) {
-            for (NewItemEntity item : items) {
-                updateLastHistory(item, history);
+            for (int i = 0; i < items.size(); i++) {
+                NewItemEntity item = items.get(i);
+                items.set(i, updateLastHistory(item, history));
             }
         }
     }
 
-    private void updateLastHistory(NewItemEntity item, NewHistoryEntity history) {
+    private NewItemEntity updateLastHistory(NewItemEntity item, NewHistoryEntity history) {
         if (item.getId().equals(history.getItemId())) {
             if(item.getLastHistory() == null) {
-                item.setLastHistory(history);
-                return;
+                return item.withLastHistory(history);
             }
 
             if(item.getLastHistory().getNum() < history.getNum()) {
-                item.setLastHistory(history);
+                return item.withLastHistory(history);
             }
         }
+        return item;
     }
 }

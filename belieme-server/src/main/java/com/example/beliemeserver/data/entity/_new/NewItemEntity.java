@@ -4,7 +4,6 @@ import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.UUID;
@@ -19,7 +18,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @ToString
 @Getter
-@Accessors(chain = true)
 public class NewItemEntity extends NewDataEntity<UUID> {
     @Id
     @NonNull
@@ -55,16 +53,16 @@ public class NewItemEntity extends NewDataEntity<UUID> {
         this.lastHistoryId = getIdOrElse(lastHistory, null);
     }
 
-    public NewItemEntity setStuff(@NonNull NewStuffEntity stuff) {
-        this.stuff = stuff;
-        this.stuffId = stuff.getId();
-        return this;
+    public NewItemEntity withStuff(@NonNull NewStuffEntity stuff) {
+        return new NewItemEntity(id, stuff, num, lastHistory);
     }
 
-    public NewItemEntity setLastHistory(NewHistoryEntity lastHistory) {
-        this.lastHistory = lastHistory;
-        this.lastHistoryId = getIdOrElse(lastHistory, null);
-        return this;
+    public NewItemEntity withNum(int num) {
+        return new NewItemEntity(id, stuff, num, lastHistory);
+    }
+
+    public NewItemEntity withLastHistory(NewHistoryEntity lastHistory) {
+        return new NewItemEntity(id, stuff, num, lastHistory);
     }
 
     public ItemDto toItemDto() {

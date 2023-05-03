@@ -83,10 +83,10 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
             checkItemConflict(stuffOfNewItem.getId(), newItem.num());
         }
 
-        target.setStuff(stuffOfNewItem)
-                .setNum(newItem.num())
-                .setLastHistory(lastHistoryOfNewItem);
-        return target.toItemDto();
+        target = target.withStuff(stuffOfNewItem)
+                .withNum(newItem.num())
+                .withLastHistory(lastHistoryOfNewItem);
+        return itemRepository.save(target).toItemDto();
     }
 
     @Override
@@ -99,10 +99,10 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
             checkItemConflict(stuffOfNewItem.getId(), newItem.num());
         }
 
-        target.setStuff(stuffOfNewItem)
-                .setNum(newItem.num())
-                .setLastHistory(lastHistoryOfNewItem);
-        return target.toItemDto();
+        target = target.withStuff(stuffOfNewItem)
+                .withNum(newItem.num())
+                .withLastHistory(lastHistoryOfNewItem);
+        return itemRepository.save(target).toItemDto();
     }
 
     private NewHistoryEntity toHistoryEntityOrNull(HistoryDto historyDto) {
