@@ -69,7 +69,7 @@ public class ArgumentMatchHelper {
         return canMatch(a.getStuff(), b.getStuff())
                 && a.getId().equals(b.getId())
                 && a.getNum() == b.getNum()
-                && a.getLastHistoryId().equals(b.getLastHistoryId());
+                && canMatch(a.getLastHistory(), b.getLastHistory());
     }
 
     public static boolean canMatch(NewHistoryEntity a, NewHistoryEntity b) {

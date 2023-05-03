@@ -82,14 +82,6 @@ public abstract class BaseDaoTest {
         return rs.filter((dept) -> dept.getUniversity().getId().equals(univ.getId()));
     }
 
-    protected RandomGetter<NewItemEntity> itemsOnDept(RandomGetter<NewItemEntity> rs, NewDepartmentEntity dept) {
-        return rs.filter((item) -> item.getStuff().getDepartment().getId().equals(dept.getId()));
-    }
-
-    protected RandomGetter<NewHistoryEntity> historiesOnDept(RandomGetter<NewHistoryEntity> rs, NewDepartmentEntity dept) {
-        return rs.filter((history) -> history.getItem().getStuff().getDepartment().getId().equals(dept.getId()));
-    }
-
     protected NewUniversityEntity randomUniv() {
         return randomSelectAndLog(allUnivs());
     }
@@ -118,12 +110,12 @@ public abstract class BaseDaoTest {
         return randomSelectAndLog(allStuffs());
     }
 
-    protected NewItemEntity randomItemOnDept(NewDepartmentEntity dept) {
-        return randomSelectAndLog(itemsOnDept(allItems(), dept));
+    protected NewItemEntity randomItem() {
+        return randomSelectAndLog(allItems());
     }
 
-    protected NewHistoryEntity randomHistoryOnDept(NewDepartmentEntity dept) {
-        return randomSelectAndLog(historiesOnDept(allHistories(), dept));
+    protected NewHistoryEntity randomHistory() {
+        return randomSelectAndLog(allHistories());
     }
 
     protected List<UniversityDto> toUniversityDtoList(List<NewUniversityEntity> universityEntityList) {
