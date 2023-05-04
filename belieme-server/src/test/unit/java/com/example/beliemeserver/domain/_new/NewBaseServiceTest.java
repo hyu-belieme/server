@@ -4,7 +4,7 @@ import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.*;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.exception.TokenExpiredException;
 import com.example.beliemeserver.domain.service._new.NewBaseService;
@@ -115,7 +115,7 @@ public abstract class NewBaseServiceTest {
             when(userDao.getByToken(userToken)).thenReturn(requester);
             when(departmentDao.getById(deptId)).thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

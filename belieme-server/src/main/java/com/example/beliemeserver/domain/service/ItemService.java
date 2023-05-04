@@ -5,7 +5,7 @@ import com.example.beliemeserver.domain.dao.*;
 import com.example.beliemeserver.domain.dto.DepartmentDto;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.StuffDto;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.util.Constants;
 import com.example.beliemeserver.error.exception.NotFoundException;
@@ -60,7 +60,7 @@ public class ItemService extends BaseService {
         try {
             return itemDao.getListByStuff(universityCode, departmentCode, stuffName);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 }

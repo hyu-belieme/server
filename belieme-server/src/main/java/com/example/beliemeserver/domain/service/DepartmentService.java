@@ -4,7 +4,7 @@ import com.example.beliemeserver.config.initdata.InitialData;
 import com.example.beliemeserver.domain.dao.*;
 import com.example.beliemeserver.domain.dto.*;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -101,7 +101,7 @@ public class DepartmentService extends BaseService {
         try {
             return universityDao.getByIndex(universityCode);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 

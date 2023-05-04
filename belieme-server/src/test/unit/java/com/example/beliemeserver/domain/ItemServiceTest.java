@@ -4,7 +4,7 @@ import com.example.beliemeserver.domain.dto.DepartmentDto;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.StuffDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.service.ItemService;
 import com.example.beliemeserver.domain.util.Constants;
@@ -77,7 +77,7 @@ public class ItemServiceTest extends BaseServiceTest {
             when(itemDao.getListByStuff(univCode, deptCode, stuffName))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         private List<ItemDto> getItemListByStuff(StuffDto stuff) {
@@ -199,7 +199,7 @@ public class ItemServiceTest extends BaseServiceTest {
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

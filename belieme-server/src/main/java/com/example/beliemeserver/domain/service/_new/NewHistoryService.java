@@ -7,6 +7,7 @@ import com.example.beliemeserver.domain.dto.enumeration.HistoryStatus;
 import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import com.example.beliemeserver.domain.exception.*;
 import com.example.beliemeserver.domain.util.Constants;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
@@ -283,7 +284,7 @@ public class NewHistoryService extends NewBaseService {
         try {
             return userDao.getById(userId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 }

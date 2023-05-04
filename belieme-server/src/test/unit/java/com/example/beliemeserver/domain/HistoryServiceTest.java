@@ -1,12 +1,12 @@
 package com.example.beliemeserver.domain;
 
 import com.example.beliemeserver.domain.dto.*;
-import com.example.beliemeserver.domain.dto.enumeration.HistoryStatus;
 import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.*;
 import com.example.beliemeserver.domain.service.HistoryService;
 import com.example.beliemeserver.domain.util.Constants;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
@@ -142,7 +142,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(historyDao.getListByStuff(univCode, deptCode, stuffName))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         private List<HistoryDto> getHistoryListByStuff(StuffDto stuff) {
@@ -213,7 +213,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(historyDao.getListByItem(univCode, deptCode, stuffName, itemNum))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         private List<HistoryDto> getHistoryListByItem(ItemDto item) {
@@ -350,7 +350,7 @@ public class HistoryServiceTest extends BaseServiceTest {
                     historyRequesterStudentId)
             ).thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         private List<HistoryDto> getHistoryListByDeptAndRequester(DepartmentDto dept, UserDto requester) {
@@ -649,7 +649,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(stuffDao.getByIndex(univCode, deptCode, stuffName))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
@@ -663,7 +663,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         private List<HistoryDto> makeHistoryListWithSameStuff() {
@@ -873,7 +873,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -959,7 +959,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -1058,7 +1058,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -1144,7 +1144,7 @@ public class HistoryServiceTest extends BaseServiceTest {
             when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 

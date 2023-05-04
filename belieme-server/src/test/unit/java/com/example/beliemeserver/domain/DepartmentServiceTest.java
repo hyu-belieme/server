@@ -5,7 +5,7 @@ import com.example.beliemeserver.domain.dto.DepartmentDto;
 import com.example.beliemeserver.domain.dto.MajorDto;
 import com.example.beliemeserver.domain.dto.UniversityDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.DepartmentService;
 import com.example.beliemeserver.error.exception.ConflictException;
@@ -216,7 +216,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(universityDao.getByIndex(univCode))
                     .thenThrow(NotFoundException.class);
 
-            assertThrows(IndexInvalidException.class, this::execMethod);
+            assertThrows(InvalidIndexException.class, this::execMethod);
         }
 
         @RepeatedTest(10)
@@ -377,7 +377,7 @@ public class DepartmentServiceTest extends BaseServiceTest {
             when(universityDao.getByIndex(targetUnivCode))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

@@ -5,6 +5,7 @@ import com.example.beliemeserver.data.entity._new.NewUniversityEntity;
 import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.MajorDao;
 import com.example.beliemeserver.domain.dto._new.MajorDto;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.ConflictException;
 import org.springframework.stereotype.Component;
 

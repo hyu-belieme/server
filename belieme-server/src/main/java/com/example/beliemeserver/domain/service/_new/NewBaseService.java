@@ -6,7 +6,7 @@ import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
 import com.example.beliemeserver.domain.dto._new.UserDto;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.exception.TokenExpiredException;
 import com.example.beliemeserver.error.exception.NotFoundException;
@@ -91,7 +91,7 @@ public abstract class NewBaseService {
         try {
             return departmentDao.getById(departmentId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 
@@ -99,7 +99,7 @@ public abstract class NewBaseService {
         try {
             return stuffDao.getById(stuffId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 
@@ -107,7 +107,7 @@ public abstract class NewBaseService {
         try {
             return itemDao.getById(itemId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 
