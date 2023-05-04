@@ -4,6 +4,7 @@ import com.example.beliemeserver.data.daoimpl._new.NewHistoryDaoImpl;
 import com.example.beliemeserver.data.entity._new.*;
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -261,13 +262,13 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`itemId`에 해당하는 `item`이 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_universityNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`itemId`에 해당하는 `item`이 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_universityNotFound_InvalidIndexException() {
             setHistory(randomHistory());
 
             when(itemRepository.findById(history.getItemId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
@@ -294,15 +295,15 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`userId`에 해당하는 `user`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_wrongUnivId_NotFoundException() {
+        @DisplayName("[ERROR]_[`userId`에 해당하는 `user`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_wrongUnivId_InvalidIndexException() {
             setHistory(randomHistory());
 
             when(itemRepository.findById(history.getItemId())).thenReturn(Optional.of(history.getItem()));
             when(historyRepository.existsByItemIdAndNum(history.getItemId(), history.getNum())).thenReturn(false);
             when(userRepository.findById(any())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -413,8 +414,8 @@ public class NewHistoryDaoTest extends BaseDaoTest {
 
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`itemId`에 해당하는 `item`이 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_itemNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`itemId`에 해당하는 `item`이 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_itemNotFound_InvalidIndexException() {
             setTarget(randomHistory());
             newHistory = randomHistory()
                     .withItem(randomItem())
@@ -425,12 +426,12 @@ public class NewHistoryDaoTest extends BaseDaoTest {
             when(historyRepository.findById(targetId)).thenReturn(Optional.of(target));
             when(itemRepository.findById(newHistory.getItemId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`userId`에 해당하는 `user`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_wrongUnivId_NotFoundException() {
+        @DisplayName("[ERROR]_[`userId`에 해당하는 `user`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_wrongUnivId_InvalidIndexException() {
             setTarget(randomHistory());
             newHistory = randomHistory()
                     .withItem(randomItem())
@@ -443,7 +444,7 @@ public class NewHistoryDaoTest extends BaseDaoTest {
             when(historyRepository.existsByItemIdAndNum(newHistory.getItemId(), newHistory.getNum())).thenReturn(false);
             when(userRepository.findById(any())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

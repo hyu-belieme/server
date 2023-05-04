@@ -4,6 +4,7 @@ import com.example.beliemeserver.data.daoimpl._new.NewMajorDaoImpl;
 import com.example.beliemeserver.data.entity._new.NewMajorEntity;
 import com.example.beliemeserver.domain.dto._new.MajorDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -140,13 +141,13 @@ public class NewMajorDaoTest  extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`universityId`에 해당하는 `university`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_universityNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`universityId`에 해당하는 `university`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_universityNotFound_InvalidIndexException() {
             setMajor(randomMajor());
 
             when(univRepository.findById(major.getUniversityId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
@@ -228,8 +229,8 @@ public class NewMajorDaoTest  extends BaseDaoTest {
 
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`universityId`에 해당하는 `university`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_universityNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`universityId`에 해당하는 `university`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_universityNotFound_InvalidIndexException() {
             setTarget(randomMajor());
             newMajor = randomMajor()
                     .withUniversity(randomUniv())
@@ -238,7 +239,7 @@ public class NewMajorDaoTest  extends BaseDaoTest {
             when(majorRepository.findById(targetId)).thenReturn(Optional.of(target));
             when(univRepository.findById(newMajor.getUniversityId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

@@ -77,7 +77,7 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     private NewUserEntity saveUserOnly(UUID userId, UUID universityId, String studentId, String name, int entranceYear, String token, long createdAt, long approvedAt) {
-        NewUniversityEntity universityEntity = findUniversityEntity(universityId);
+        NewUniversityEntity universityEntity = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
         checkUserIdConflict(userId);
         checkUserConflict(universityEntity.getId(), studentId);
@@ -96,7 +96,7 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     private NewUserEntity updateUserOnly(NewUserEntity target, UUID universityId, String studentId, String name, int entranceYear, String token, long createdAt, long approvedAt) {
-        NewUniversityEntity newUniversity = findUniversityEntity(universityId);
+        NewUniversityEntity newUniversity = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
         if (doesIndexChange(target, universityId, studentId)) {
             checkUserConflict(newUniversity.getId(), studentId);

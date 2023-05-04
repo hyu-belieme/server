@@ -45,7 +45,7 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
 
     @Override
     public ItemDto create(@NonNull UUID itemId, @NonNull UUID stuffId, int num) {
-        NewStuffEntity stuffOfNewItem = findStuffEntity(stuffId);
+        NewStuffEntity stuffOfNewItem = getStuffEntityOrThrowInvalidIndexException(stuffId);
 
         checkItemIdConflict(itemId);
         checkItemConflict(stuffOfNewItem.getId(), num);
@@ -62,7 +62,7 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
     @Override
     public ItemDto update(@NonNull UUID itemId, @NonNull UUID stuffId, int num, UUID lastHistoryId) {
         NewItemEntity target = findItemEntity(itemId);
-        NewStuffEntity stuffOfNewItem = findStuffEntity(stuffId);
+        NewStuffEntity stuffOfNewItem = getStuffEntityOrThrowInvalidIndexException(stuffId);
         NewHistoryEntity lastHistoryOfNewItem = getHistoryEntityIfIdIsNotNull(lastHistoryId);
 
         if (doesIndexChange(target, stuffId, num)) {
@@ -79,7 +79,7 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
         if (historyId == null) {
             return null;
         }
-        return findHistoryEntity(historyId);
+        return getHistoryEntityOrThrowInvalidIndexException(historyId);
     }
 
     private boolean doesIndexChange(NewItemEntity target, UUID stuffId, int num) {

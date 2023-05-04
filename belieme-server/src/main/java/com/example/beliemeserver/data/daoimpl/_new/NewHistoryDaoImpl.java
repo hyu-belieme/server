@@ -75,7 +75,7 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
             UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
             long lostAt, long canceledAt
     ) {
-        NewItemEntity itemOfNewHistory = findItemEntity(itemId);
+        NewItemEntity itemOfNewHistory = getItemEntityOrThrowInvalidIndexException(itemId);
 
         checkHistoryIdConflict(historyId);
         checkHistoryConflict(itemId, num);
@@ -106,7 +106,7 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
             long lostAt, long canceledAt
     ) {
         NewHistoryEntity target = findHistoryEntity(historyId);
-        NewItemEntity itemOfNewHistory = findItemEntity(itemId);
+        NewItemEntity itemOfNewHistory = getItemEntityOrThrowInvalidIndexException(itemId);
 
         if (doesIndexChange(target, itemId, num)) {
             checkHistoryConflict(itemOfNewHistory.getId(), num);
@@ -136,6 +136,13 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
         return output;
     }
 
+    private NewUserEntity getUserEntityIfIdIsNotNull(UUID userId) {
+        if (userId == null) {
+            return null;
+        }
+        return getUserEntityOrThrowInvalidIndexException(userId);
+    }
+
     private boolean doesIndexChange(NewHistoryEntity target, UUID newItemId, int newHistoryNum) {
         return !(target.getItemId().equals(newItemId) && target.getNum() == newHistoryNum);
     }
@@ -150,12 +157,5 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
         if (historyRepository.existsByItemIdAndNum(itemId, historyNum)) {
             throw new ConflictException();
         }
-    }
-
-    private NewUserEntity getUserEntityIfIdIsNotNull(UUID userId) {
-        if (userId == null) {
-            return null;
-        }
-        return findUserEntity(userId);
     }
 }

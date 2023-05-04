@@ -3,6 +3,8 @@ package com.example.beliemeserver.data.daoimpl._new;
 import com.example.beliemeserver.data.daoimpl._new.util.NewIndexAdapter;
 import com.example.beliemeserver.data.entity._new.*;
 import com.example.beliemeserver.data.repository._new.*;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
+import com.example.beliemeserver.error.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -117,5 +119,53 @@ public abstract class NewBaseDaoImpl {
         UUID itemId = findItemEntity(universityName, departmentName, stuffName, itemNum).getId();
 
         return NewIndexAdapter.getHistoryEntity(historyRepository, itemId, historyNum);
+    }
+
+    protected NewUniversityEntity getUniversityEntityOrThrowInvalidIndexException(UUID universityId) {
+        try {
+            return findUniversityEntity(universityId);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    protected NewDepartmentEntity getDepartmentEntityOrThrowInvalidIndexException(UUID departmentId) {
+        try {
+            return findDepartmentEntity(departmentId);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    protected NewUserEntity getUserEntityOrThrowInvalidIndexException(UUID userId) {
+        try {
+            return findUserEntity(userId);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    protected NewStuffEntity getStuffEntityOrThrowInvalidIndexException(UUID stuffId) {
+        try {
+            return findStuffEntity(stuffId);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    protected NewItemEntity getItemEntityOrThrowInvalidIndexException(UUID itemId) {
+        try {
+            return findItemEntity(itemId);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
+    }
+
+    protected NewHistoryEntity getHistoryEntityOrThrowInvalidIndexException(UUID historyId) {
+        try {
+            return findHistoryEntity(historyId);
+        } catch (NotFoundException e) {
+            throw new InvalidIndexException();
+        }
     }
 }

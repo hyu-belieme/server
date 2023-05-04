@@ -5,6 +5,7 @@ import com.example.beliemeserver.data.entity._new.NewAuthorityEntity;
 import com.example.beliemeserver.domain.dto._new.AuthorityDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -101,13 +102,13 @@ public class NewAuthorityDaoTest  extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`departmentId`에 해당하는 `department`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_universityNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`departmentId`에 해당하는 `department`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_universityNotFound_InvalidIndexException() {
             setAuth(randomAuth());
 
             when(deptRepository.findById(auth.getDepartmentId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

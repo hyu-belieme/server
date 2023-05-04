@@ -44,7 +44,7 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
 
     @Override
     public StuffDto create(@NonNull UUID stuffId, @NonNull UUID departmentId, @NonNull String name, String thumbnail) {
-        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(departmentId);
+        NewDepartmentEntity departmentOfNewStuff = getDepartmentEntityOrThrowInvalidIndexException(departmentId);
 
         checkStuffIdConflict(stuffId);
         checkStuffConflict(departmentId, name);
@@ -61,7 +61,7 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     @Override
     public StuffDto update(@NonNull UUID stuffId, @NonNull UUID newDepartmentId, @NonNull String newName, String newThumbnail) {
         NewStuffEntity target = findStuffEntity(stuffId);
-        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newDepartmentId);
+        NewDepartmentEntity departmentOfNewStuff = getDepartmentEntityOrThrowInvalidIndexException(newDepartmentId);
 
         if (doesIndexChange(target, newDepartmentId, newName)) {
             checkStuffConflict(departmentOfNewStuff.getId(), newName);

@@ -4,6 +4,7 @@ import com.example.beliemeserver.data.daoimpl._new.NewItemDaoImpl;
 import com.example.beliemeserver.data.entity._new.NewItemEntity;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -127,13 +128,13 @@ public class NewItemDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`stuffId`에 해당하는 `stuff`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_universityNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`stuffId`에 해당하는 `stuff`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_universityNotFound_InvalidIndexException() {
             setItem(randomItem());
 
             when(stuffRepository.findById(item.getStuffId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
@@ -238,8 +239,8 @@ public class NewItemDaoTest extends BaseDaoTest {
 
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`stuffId`에 해당하는 `stuff`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_stuffNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`stuffId`에 해당하는 `stuff`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_stuffNotFound_InvalidIndexException() {
             setTarget(randomItem());
             newItem = randomItem()
                     .withStuff(randomStuff())
@@ -248,12 +249,12 @@ public class NewItemDaoTest extends BaseDaoTest {
             when(itemRepository.findById(targetId)).thenReturn(Optional.of(target));
             when(stuffRepository.findById(newItem.getStuffId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`lastHistoryId`에 해당하는 `history`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_wrongLastHistoryId_NotFoundException() {
+        @DisplayName("[ERROR]_[`lastHistoryId`에 해당하는 `history`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_wrongLastHistoryId_InvalidIndexException() {
             setTarget(randomItem());
             newItem = randomItem()
                     .withStuff(randomStuff())
@@ -266,7 +267,7 @@ public class NewItemDaoTest extends BaseDaoTest {
                 when(historyRepository.findById(newItem.getLastHistoryId())).thenReturn(Optional.empty());
             }
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

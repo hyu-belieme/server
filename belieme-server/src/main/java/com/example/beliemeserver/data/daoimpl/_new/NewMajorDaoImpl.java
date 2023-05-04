@@ -5,7 +5,6 @@ import com.example.beliemeserver.data.entity._new.NewUniversityEntity;
 import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.MajorDao;
 import com.example.beliemeserver.domain.dto._new.MajorDto;
-import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.ConflictException;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +41,8 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
 
     @Override
     public MajorDto create(UUID majorId, UUID universityId, String majorCode) {
-        NewUniversityEntity university = findUniversityEntity(universityId);
+        NewUniversityEntity university;
+        university = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
         checkMajorIdConflict(majorId);
         checkMajorConflict(university.getId(), majorCode);
@@ -60,7 +60,7 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
     @Override
     public MajorDto update(UUID majorId, UUID universityId, String majorCode) {
         NewMajorEntity target = findMajorEntity(majorId);
-        NewUniversityEntity newUniversity = findUniversityEntity(universityId);
+        NewUniversityEntity newUniversity = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
         if (doesIndexChange(target, universityId, majorCode)) {
             checkMajorConflict(newUniversity.getId(), majorCode);

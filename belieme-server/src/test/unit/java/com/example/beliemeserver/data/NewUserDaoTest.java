@@ -4,6 +4,7 @@ import com.example.beliemeserver.data.daoimpl._new.NewUserDaoImpl;
 import com.example.beliemeserver.data.entity._new.*;
 import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
@@ -244,13 +245,13 @@ public class NewUserDaoTest  extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`index`에 해당하는 `university`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_universityNotExist_NotFoundException() {
+        @DisplayName("[ERROR]_[`index`에 해당하는 `university`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_universityNotExist_InvalidIndexException() {
             setUser(randomUser());
 
             when(univRepository.findById(user.getUniversityId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -371,8 +372,8 @@ public class NewUserDaoTest  extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`NewUser`의 `index`에 해당하는 `university`가 없을 시]_[NotFoundException]")
-        public void ERROR_univOfNewDeptNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`NewUser`의 `index`에 해당하는 `university`가 없을 시]_[InvalidIndexException]")
+        public void ERROR_univOfNewDeptNotFound_InvalidIndexException() {
             setTarget(randomUser());
 
             newUser = target
@@ -385,7 +386,7 @@ public class NewUserDaoTest  extends BaseDaoTest {
             when(userRepository.findById(targetId)).thenReturn(Optional.of(target));
             when(univRepository.findById(newUser.getUniversityId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

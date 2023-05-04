@@ -5,6 +5,7 @@ import com.example.beliemeserver.data.entity._new.NewDepartmentEntity;
 import com.example.beliemeserver.data.entity._new.NewStuffEntity;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -136,13 +137,13 @@ public class NewStuffDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`departmentId`에 해당하는 `department`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_universityNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`departmentId`에 해당하는 `department`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_universityNotFound_InvalidIndexException() {
             setStuff(randomStuff());
 
             when(deptRepository.findById(stuff.getDepartmentId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
@@ -243,8 +244,8 @@ public class NewStuffDaoTest extends BaseDaoTest {
 
 
         @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`departmentId`에 해당하는 `department`가 존재하지 않을 시]_[NotFoundException]")
-        public void ERROR_departmentNotFound_NotFoundException() {
+        @DisplayName("[ERROR]_[`departmentId`에 해당하는 `department`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_departmentNotFound_InvalidIndexException() {
             setTarget(randomStuff());
             newStuff = randomStuff()
                     .withDepartment(randomDept())
@@ -254,7 +255,7 @@ public class NewStuffDaoTest extends BaseDaoTest {
             when(stuffRepository.findById(targetId)).thenReturn(Optional.of(target));
             when(deptRepository.findById(newStuff.getDepartmentId())).thenReturn(Optional.empty());
 
-            TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)

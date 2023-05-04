@@ -7,7 +7,6 @@ import com.example.beliemeserver.data.entity._new.NewUniversityEntity;
 import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.DepartmentDao;
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
-import com.example.beliemeserver.domain.dto._new.MajorDto;
 import com.example.beliemeserver.error.exception.ConflictException;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -73,7 +72,7 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     private NewDepartmentEntity saveDepartmentOnly(UUID departmentId, UUID universityId, String name) {
-        NewUniversityEntity university = findUniversityEntity(universityId);
+        NewUniversityEntity university = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
         checkDepartmentIdConflict(departmentId);
         checkDepartmentConflict(university.getId(), name);
@@ -83,7 +82,7 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     private NewDepartmentEntity updateDepartmentOnly(NewDepartmentEntity target, UUID universityId, String name) {
-        NewUniversityEntity newUniversityEntity = findUniversityEntity(universityId);
+        NewUniversityEntity newUniversityEntity = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
         if (doesIndexOfDepartmentChange(target, universityId, name)) {
             checkDepartmentConflict(universityId, name);

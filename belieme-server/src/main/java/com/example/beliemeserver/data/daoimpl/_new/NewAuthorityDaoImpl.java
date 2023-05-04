@@ -37,7 +37,7 @@ public class NewAuthorityDaoImpl extends NewBaseDaoImpl implements AuthorityDao 
 
     @Override
     public AuthorityDto create(@NonNull UUID departmentId, @NonNull Permission permission) {
-        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(departmentId);
+        NewDepartmentEntity departmentOfAuthority = getDepartmentEntityOrThrowInvalidIndexException(departmentId);
 
         checkAuthorityConflict(departmentOfAuthority.getId(), permission.name());
 
