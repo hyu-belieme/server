@@ -47,7 +47,7 @@ public class HistoryApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID historyId = getUuidFromString(params.get(api.variable().historyIndex()));
+        UUID historyId = toUUID(params.get(api.variable().historyIndex()));
 
         HistoryDto historyDto = historyService.getById(userToken, historyId);
         HistoryResponse response = HistoryResponse.from(historyDto);
@@ -56,27 +56,27 @@ public class HistoryApiController extends BaseApiController {
 
     private ResponseEntity<List<HistoryResponse>> getListByDepartment(String userToken, String departmentId, String requesterId) {
         if (requesterId == null) {
-            List<HistoryDto> historyDtoList = historyService.getListByDepartment(userToken, getUuidFromString(departmentId));
+            List<HistoryDto> historyDtoList = historyService.getListByDepartment(userToken, toUUID(departmentId));
             List<HistoryResponse> responseList = toResponseList(historyDtoList);
             return ResponseEntity.ok(responseList);
         }
 
         List<HistoryDto> historyDtoList = historyService.getListByDepartmentAndRequester(
-                userToken, getUuidFromString(departmentId), getUuidFromString(requesterId));
+                userToken, toUUID(departmentId), toUUID(requesterId));
         List<HistoryResponse> responseList = toResponseList(historyDtoList);
         return ResponseEntity.ok(responseList);
     }
 
     private ResponseEntity<List<HistoryResponse>> getListByStuff(String userToken, String stuffId) {
         List<HistoryDto> historyDtoList = historyService.getListByStuff(
-                userToken, getUuidFromString(stuffId));
+                userToken, toUUID(stuffId));
         List<HistoryResponse> responseList = toResponseList(historyDtoList);
         return ResponseEntity.ok(responseList);
     }
 
     private ResponseEntity<List<HistoryResponse>> getListByItem(String userToken, String itemId) {
         List<HistoryDto> historyDtoList = historyService.getListByItem(
-                userToken, getUuidFromString(itemId));
+                userToken, toUUID(itemId));
         List<HistoryResponse> responseList = toResponseList(historyDtoList);
         return ResponseEntity.ok(responseList);
     }

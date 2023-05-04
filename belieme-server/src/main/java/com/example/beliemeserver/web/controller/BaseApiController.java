@@ -10,7 +10,7 @@ public abstract class BaseApiController {
     @Autowired
     protected ApiConfig api;
 
-    protected UUID getUuidFromString(String id) {
+    protected UUID toUUID(String id) {
         try {
             return UUID.fromString(id);
         } catch (IllegalArgumentException e) {

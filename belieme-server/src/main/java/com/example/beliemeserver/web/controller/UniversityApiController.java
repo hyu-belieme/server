@@ -36,7 +36,7 @@ public class UniversityApiController extends BaseApiController {
     ) {
         String universityId = params.get(api.variable().universityIndex());
 
-        UniversityDto universityDto = universityService.getById(userToken, getUuidFromString(universityId));
+        UniversityDto universityDto = universityService.getById(userToken, toUUID(universityId));
         UniversityResponse response = UniversityResponse.from(universityDto);
         return ResponseEntity.ok(response);
     }

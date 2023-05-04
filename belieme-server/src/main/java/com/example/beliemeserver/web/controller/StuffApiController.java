@@ -35,7 +35,7 @@ public class StuffApiController extends BaseApiController {
             @RequestParam(value = "${api.query.department-id}") String departmentId
     ) {
         List<StuffDto> stuffDtoList = stuffService.getListByDepartment(
-                userToken, getUuidFromString(departmentId));
+                userToken, toUUID(departmentId));
         List<StuffResponse> responseList = toResponseList(stuffDtoList);
         return ResponseEntity.ok(responseList);
     }
@@ -45,7 +45,7 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID stuffId = getUuidFromString(params.get(api.variable().stuffIndex()));
+        UUID stuffId = toUUID(params.get(api.variable().stuffIndex()));
 
         StuffDto stuffDto = stuffService.getById(userToken, stuffId);
         StuffResponse response = StuffResponse.from(stuffDto);
@@ -58,7 +58,7 @@ public class StuffApiController extends BaseApiController {
             @RequestBody @Validated(StuffCreateValidationGroup.class) StuffRequest newStuff
     ) {
         StuffDto stuffDto = stuffService.create(
-                userToken, getUuidFromString(newStuff.getDepartmentId()),
+                userToken, toUUID(newStuff.getDepartmentId()),
                 newStuff.getName(), newStuff.getThumbnail(), newStuff.getAmount());
         StuffResponse response = StuffResponse.from(stuffDto);
         return ResponseEntity.ok(response);
@@ -70,7 +70,7 @@ public class StuffApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(StuffUpdateValidationGroup.class) StuffRequest newStuff
     ) {
-        UUID stuffId = getUuidFromString(params.get(api.variable().stuffIndex()));
+        UUID stuffId = toUUID(params.get(api.variable().stuffIndex()));
 
         StuffDto stuffDto = stuffService.update(userToken, stuffId,
                 newStuff.getName(), newStuff.getThumbnail());
@@ -91,7 +91,7 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID stuffId = getUuidFromString(params.get(api.variable().stuffIndex()));
+        UUID stuffId = toUUID(params.get(api.variable().stuffIndex()));
 
         HistoryDto historyDto = historyService.createReservationOnStuff(userToken, stuffId);
         HistoryResponse response = HistoryResponse.from(historyDto);
