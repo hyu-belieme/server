@@ -48,7 +48,8 @@ public class NewDepartmentService extends NewBaseService {
     public DepartmentDto getById(
             @NonNull String userToken, @NonNull UUID departmentId
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
 
         return departmentDao.getById(departmentId);
     }
@@ -57,7 +58,8 @@ public class NewDepartmentService extends NewBaseService {
             @NonNull String userToken, @NonNull UUID universityId,
             @NonNull String departmentName, @NonNull List<String> majorCodes
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
 
         UniversityDto university = getUniversityOrThrowInvalidIndexException(universityId);
         List<MajorDto> baseMajors = new ArrayList<>();
@@ -75,7 +77,8 @@ public class NewDepartmentService extends NewBaseService {
             @NonNull String userToken, @NonNull UUID departmentId,
             String newDepartmentName, List<String> newMajorCodes
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
 
         DepartmentDto oldDepartment = departmentDao.getById(departmentId);
 

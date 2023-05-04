@@ -5,6 +5,7 @@ import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
+import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.util.Constants;
 import lombok.NonNull;
@@ -22,8 +23,9 @@ public class NewStuffService extends NewBaseService {
     public List<StuffDto> getListByDepartment(
             @NonNull String userToken, @NonNull UUID departmentId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
-        checkUserPermission(userToken, department);
+        checkUserPermission(requester, department);
 
         return stuffDao.getListByDepartment(departmentId);
     }
@@ -31,8 +33,9 @@ public class NewStuffService extends NewBaseService {
     public StuffDto getById(
             @NonNull String userToken, @NonNull UUID stuffId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         StuffDto stuff = stuffDao.getById(stuffId);
-        checkUserPermission(userToken, stuff.department());
+        checkUserPermission(requester, stuff.department());
 
         return stuff;
     }
@@ -41,8 +44,9 @@ public class NewStuffService extends NewBaseService {
             @NonNull String userToken, @NonNull UUID departmentId,
             @NonNull String name, @NonNull String thumbnail, Integer amount
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
-        checkStaffPermission(userToken, department);
+        checkStaffPermission(requester, department);
 
         StuffDto newStuff = StuffDto.init(department, name, thumbnail);
         StuffDto output = newStuff;
@@ -62,8 +66,9 @@ public class NewStuffService extends NewBaseService {
             @NonNull String userToken, @NonNull UUID stuffId,
             String newName, String newThumbnail
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         StuffDto oldStuff = stuffDao.getById(stuffId);
-        checkStaffPermission(userToken, oldStuff.department());
+        checkStaffPermission(requester, oldStuff.department());
 
         if (newName == null && newThumbnail == null) return oldStuff;
         if (newName == null) newName = oldStuff.name();

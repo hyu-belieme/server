@@ -3,6 +3,7 @@ package com.example.beliemeserver.domain.service._new;
 import com.example.beliemeserver.config.initdata._new.InitialData;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.UniversityDto;
+import com.example.beliemeserver.domain.dto._new.UserDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,8 @@ public class NewUniversityService extends NewBaseService {
     }
 
     public List<UniversityDto> getAllList(@NonNull String userToken) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
 
         return universityDao.getAllList();
     }
@@ -34,7 +36,8 @@ public class NewUniversityService extends NewBaseService {
     public UniversityDto getById(
             @NonNull String userToken, @NonNull UUID universityId
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
         return universityDao.getById(universityId);
     }
 }

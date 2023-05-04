@@ -64,48 +64,26 @@ public abstract class NewBaseService {
         }
     }
 
-    protected void checkUserPermission(String token, DepartmentDto department) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkUserPermission(UserDto requester, DepartmentDto department) {
         if (!requester.getMaxPermission(department).hasUserPermission()) {
             throw new PermissionDeniedException();
         }
     }
 
-    protected void checkStaffPermission(String token, DepartmentDto department) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkStaffPermission(UserDto requester, DepartmentDto department) {
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
             throw new PermissionDeniedException();
         }
     }
 
-    protected void checkMasterPermission(String token, DepartmentDto department) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkMasterPermission(UserDto requester, DepartmentDto department) {
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
             throw new PermissionDeniedException();
         }
     }
 
-    protected void checkDeveloperPermission(String token) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkDeveloperPermission(UserDto requester) {
         if (!requester.isDeveloper()) {
-            throw new PermissionDeniedException();
-        }
-    }
-
-    protected void checkUserPermission(DepartmentDto department, UserDto requester) {
-        if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new PermissionDeniedException();
-        }
-    }
-
-    protected void checkStaffPermission(DepartmentDto department, UserDto requester) {
-        if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new PermissionDeniedException();
-        }
-    }
-
-    protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
-        if (!requester.getMaxPermission(department).hasMasterPermission()) {
             throw new PermissionDeniedException();
         }
     }

@@ -38,15 +38,17 @@ public class NewUserService extends NewBaseService {
     public List<UserDto> getAllList(
             @NonNull String userToken
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
         return userDao.getAllList();
     }
 
     public List<UserDto> getListByDepartment(
             @NonNull String userToken, @NonNull UUID departmentId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
-        checkMasterPermission(userToken, department);
+        checkMasterPermission(requester, department);
 
         List<UserDto> output = new ArrayList<>();
         for (UserDto user : userDao.getAllList()) {
@@ -61,7 +63,8 @@ public class NewUserService extends NewBaseService {
     public UserDto getById(
             @NonNull String userToken, @NonNull UUID userId
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
         return userDao.getById(userId);
     }
 
@@ -80,7 +83,7 @@ public class NewUserService extends NewBaseService {
         UserDto requester = validateTokenAndGetUser(userToken);
 
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
-        checkMasterPermission(department, requester);
+        checkMasterPermission(requester, department);
 
         UserDto targetUser = userDao.getById(userId);
         if (targetUser.isDeveloper()) {

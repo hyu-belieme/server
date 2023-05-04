@@ -23,24 +23,27 @@ public class NewHistoryService extends NewBaseService {
     public List<HistoryDto> getListByDepartment(
             @NonNull String userToken, @NonNull UUID departmentId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
-        checkStaffPermission(userToken, department);
+        checkStaffPermission(requester, department);
         return historyDao.getListByDepartment(departmentId);
     }
 
     public List<HistoryDto> getListByStuff(
             @NonNull String userToken, @NonNull UUID stuffId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
-        checkStaffPermission(userToken, stuff.department());
+        checkStaffPermission(requester, stuff.department());
         return historyDao.getListByStuff(stuffId);
     }
 
     public List<HistoryDto> getListByItem(
             @NonNull String userToken, @NonNull UUID itemId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         ItemDto item = getItemOrThrowInvalidIndexException(itemId);
-        checkStaffPermission(userToken, item.stuff().department());
+        checkStaffPermission(requester, item.stuff().department());
         return historyDao.getListByItem(itemId);
     }
 
@@ -52,9 +55,9 @@ public class NewHistoryService extends NewBaseService {
         UserDto historyRequester = getUserOrThrowInvalidIndexException(userId);
 
         if (!requester.matchUniqueKey(historyRequester)) {
-            checkStaffPermission(department, requester);
+            checkStaffPermission(requester, department);
         }
-        checkUserPermission(department, requester);
+        checkUserPermission(requester, department);
 
         return historyDao.getListByDepartmentAndRequester(departmentId, userId);
     }
@@ -64,9 +67,9 @@ public class NewHistoryService extends NewBaseService {
 
         HistoryDto history = historyDao.getById(historyId);
         if (!requester.matchUniqueKey(history.requester())) {
-            checkStaffPermission(history.item().stuff().department(), requester);
+            checkStaffPermission(requester, history.item().stuff().department());
         }
-        checkUserPermission(history.item().stuff().department(), requester);
+        checkUserPermission(requester, history.item().stuff().department());
         return history;
     }
 
@@ -77,7 +80,7 @@ public class NewHistoryService extends NewBaseService {
 
         StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
         DepartmentDto department = stuff.department();
-        checkUserPermission(department, requester);
+        checkUserPermission(requester, department);
         checkRequesterRentalList(stuff, requester);
 
         ItemDto item = stuff.firstUsableItem();
@@ -93,7 +96,7 @@ public class NewHistoryService extends NewBaseService {
 
         ItemDto item = getItemOrThrowInvalidIndexException(itemId);
         DepartmentDto department = item.stuff().department();
-        checkUserPermission(department, requester);
+        checkUserPermission(requester, department);
         checkRequesterRentalList(item.stuff(), requester);
 
         return createRentalHistory(requester, item);
@@ -106,7 +109,7 @@ public class NewHistoryService extends NewBaseService {
 
         ItemDto item = getItemOrThrowInvalidIndexException(itemId);
         DepartmentDto department = item.stuff().department();
-        checkStaffPermission(department, requester);
+        checkStaffPermission(requester, department);
 
         if (item.status() == ItemStatus.LOST) throw new LostRegistrationRequestedOnLostItemException();
 
@@ -149,7 +152,7 @@ public class NewHistoryService extends NewBaseService {
 
         ItemDto item = getItemOrThrowInvalidIndexException(itemId);
         DepartmentDto department = item.stuff().department();
-        checkStaffPermission(department, requester);
+        checkStaffPermission(requester, department);
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
@@ -171,7 +174,7 @@ public class NewHistoryService extends NewBaseService {
 
         ItemDto item = getItemOrThrowInvalidIndexException(itemId);
         DepartmentDto department = item.stuff().department();
-        checkStaffPermission(department, requester);
+        checkStaffPermission(requester, department);
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
@@ -195,7 +198,7 @@ public class NewHistoryService extends NewBaseService {
 
         ItemDto item = getItemOrThrowInvalidIndexException(itemId);
         DepartmentDto department = item.stuff().department();
-        checkStaffPermission(department, requester);
+        checkStaffPermission(requester, department);
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null

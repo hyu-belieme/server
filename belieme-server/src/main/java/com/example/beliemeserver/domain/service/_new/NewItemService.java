@@ -4,6 +4,7 @@ import com.example.beliemeserver.config.initdata._new.InitialData;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
+import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.domain.exception.IndexInvalidException;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.util.Constants;
@@ -23,25 +24,27 @@ public class NewItemService extends NewBaseService {
     public List<ItemDto> getListByStuff(
             @NonNull String userToken, @NonNull UUID stuffId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         StuffDto targetStuff = getStuffOrThrowInvalidIndexException(stuffId);
-        checkUserPermission(userToken, targetStuff.department());
-
+        checkUserPermission(requester, targetStuff.department());
         return getItemListByStuffOrThrowInvalidIndexException(stuffId);
     }
 
     public ItemDto getById(
             @NonNull String userToken, @NonNull UUID itemId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         ItemDto item = itemDao.getById(itemId);
-        checkUserPermission(userToken, item.stuff().department());
+        checkUserPermission(requester, item.stuff().department());
         return item;
     }
 
     public ItemDto create(
             @NonNull String userToken, @NonNull UUID stuffId
     ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
         StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
-        checkStaffPermission(userToken, stuff.department());
+        checkStaffPermission(requester, stuff.department());
 
         ItemDto newItem = ItemDto.init(stuff, stuff.nextItemNum());
         if (newItem.num() > Constants.MAX_ITEM_NUM) {
