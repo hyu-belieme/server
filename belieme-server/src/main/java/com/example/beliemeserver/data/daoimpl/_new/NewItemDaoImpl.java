@@ -5,9 +5,9 @@ import com.example.beliemeserver.data.entity._new.NewItemEntity;
 import com.example.beliemeserver.data.entity._new.NewStuffEntity;
 import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.ItemDao;
-import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public List<ItemDto> getListByStuff(UUID stuffId) {
+    public List<ItemDto> getListByStuff(@NonNull UUID stuffId) {
         List<ItemDto> output = new ArrayList<>();
         for (NewItemEntity itemEntity : itemRepository.findByStuffId(stuffId)) {
             output.add(itemEntity.toItemDto());
@@ -39,58 +39,57 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public ItemDto getById(UUID itemId) {
+    public ItemDto getById(@NonNull UUID itemId) {
         return findItemEntity(itemId).toItemDto();
     }
 
     @Override
-    public ItemDto create(ItemDto newItem) {
-        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff().id());
+    public ItemDto create(@NonNull UUID itemId, @NonNull UUID stuffId, int num) {
+        NewStuffEntity stuffOfNewItem = findStuffEntity(stuffId);
 
-        checkItemConflict(stuffOfNewItem.getId(), newItem.num());
+        checkItemIdConflict(itemId);
+        checkItemConflict(stuffOfNewItem.getId(), num);
 
         NewItemEntity newItemEntity = new NewItemEntity(
-                newItem.id(),
+                itemId,
                 stuffOfNewItem,
-                newItem.num(),
+                num,
                 null
         );
         return itemRepository.save(newItemEntity).toItemDto();
     }
 
     @Override
-    public ItemDto update(UUID itemId, ItemDto newItem) {
+    public ItemDto update(@NonNull UUID itemId, @NonNull UUID stuffId, int num, UUID lastHistoryId) {
         NewItemEntity target = findItemEntity(itemId);
-        NewStuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff().id());
-        NewHistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
+        NewStuffEntity stuffOfNewItem = findStuffEntity(stuffId);
+        NewHistoryEntity lastHistoryOfNewItem = getHistoryEntityIfIdIsNotNull(lastHistoryId);
 
-        if (doesIndexChange(target, newItem)) {
-            checkItemConflict(stuffOfNewItem.getId(), newItem.num());
+        if (doesIndexChange(target, stuffId, num)) {
+            checkItemConflict(stuffId, num);
         }
 
         target = target.withStuff(stuffOfNewItem)
-                .withNum(newItem.num())
+                .withNum(num)
                 .withLastHistory(lastHistoryOfNewItem);
         return itemRepository.save(target).toItemDto();
     }
 
-    private NewHistoryEntity toHistoryEntityOrNull(HistoryDto historyDto) {
-        if (historyDto == null) {
+    private NewHistoryEntity getHistoryEntityIfIdIsNotNull(UUID historyId) {
+        if (historyId == null) {
             return null;
         }
-        return findHistoryEntity(historyDto.id());
+        return findHistoryEntity(historyId);
     }
 
-    private boolean doesIndexChange(NewItemEntity target, ItemDto newItem) {
-        String oldUniversityName = target.getStuff().getDepartment().getUniversity().getName();
-        String oldDepartmentName = target.getStuff().getDepartment().getName();
-        String oldStuffName = target.getStuff().getName();
-        int oldItemNum = target.getNum();
+    private boolean doesIndexChange(NewItemEntity target, UUID stuffId, int num) {
+        return !(target.getStuffId().equals(stuffId) && target.getNum() == num);
+    }
 
-        return !(oldUniversityName.equals(newItem.stuff().department().university().name())
-                && oldDepartmentName.equals(newItem.stuff().department().name())
-                && oldStuffName.equals(newItem.stuff().name())
-                && oldItemNum == newItem.num());
+    private void checkItemIdConflict(UUID itemId) {
+        if (itemRepository.existsById(itemId)) {
+            throw new ConflictException();
+        }
     }
 
     private void checkItemConflict(UUID stuffId, int num) {

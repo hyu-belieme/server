@@ -5,6 +5,7 @@ import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.UniversityDao;
 import com.example.beliemeserver.domain.dto._new.UniversityDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,46 +32,49 @@ public class NewUniversityDaoImpl extends NewBaseDaoImpl implements UniversityDa
     }
 
     @Override
-    public UniversityDto getById(UUID id) {
+    public UniversityDto getById(@NonNull UUID id) {
         NewUniversityEntity target = findUniversityEntity(id);
         return target.toUniversityDto();
     }
 
     @Override
-    public boolean checkExistById(UUID id) {
+    public boolean checkExistById(@NonNull UUID id) {
         return universityRepository.existsById(id);
     }
 
     @Override
-    public UniversityDto create(UniversityDto newUniversity) {
-        checkUniversityConflict(newUniversity.name());
+    public UniversityDto create(@NonNull UUID id, @NonNull String name, String apiUrl) {
+        checkUniversityIdConflict(id);
+        checkUniversityConflict(name);
 
-        NewUniversityEntity newUniversityEntity = new NewUniversityEntity(
-                newUniversity.id(),
-                newUniversity.name(),
-                newUniversity.apiUrl()
-        );
+        NewUniversityEntity newUniversityEntity = new NewUniversityEntity(id, name, apiUrl);
 
         NewUniversityEntity savedUniversityEntity = universityRepository.save(newUniversityEntity);
         return savedUniversityEntity.toUniversityDto();
     }
 
     @Override
-    public UniversityDto update(UUID id, UniversityDto newUniversity) {
+    public UniversityDto update(@NonNull UUID id, @NonNull String name, String apiUrl) {
         NewUniversityEntity target = findUniversityEntity(id);
-        if (doesIndexOfUniversityChange(target, newUniversity)) {
-            checkUniversityConflict(newUniversity.name());
+        if (doesIndexOfUniversityChange(target, name)) {
+            checkUniversityConflict(name);
         }
 
         NewUniversityEntity updatedUniversity = target
-                .withName(newUniversity.name())
-                .withApiUrl(newUniversity.apiUrl());
+                .withName(name)
+                .withApiUrl(apiUrl);
 
         return universityRepository.save(updatedUniversity).toUniversityDto();
     }
 
-    private boolean doesIndexOfUniversityChange(NewUniversityEntity oldUniversity, UniversityDto newUniversity) {
-        return !oldUniversity.getName().equals(newUniversity.name());
+    private boolean doesIndexOfUniversityChange(NewUniversityEntity oldUniversity, String universityName) {
+        return !oldUniversity.getName().equals(universityName);
+    }
+
+    private void checkUniversityIdConflict(UUID universityId) {
+        if (universityRepository.existsById(universityId)) {
+            throw new ConflictException();
+        }
     }
 
     private void checkUniversityConflict(String universityName) {

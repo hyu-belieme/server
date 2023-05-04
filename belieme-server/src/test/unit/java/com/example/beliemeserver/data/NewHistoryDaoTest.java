@@ -229,7 +229,14 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         }
 
         protected HistoryDto execMethod() {
-            return historyDao.create(history.toHistoryDto());
+            return historyDao.create(
+                    history.getId(), history.getItemId(), history.getNum(),
+                    history.getRequesterId(), history.getApproveManagerId(),
+                    history.getReturnManagerId(), history.getLostManagerId(),
+                    history.getCancelManagerId(), history.getRequestedAt(),
+                    history.getApprovedAt(), history.getReturnedAt(),
+                    history.getLostAt(), history.getCanceledAt()
+            );
         }
 
         @RepeatedTest(10)
@@ -238,6 +245,7 @@ public class NewHistoryDaoTest extends BaseDaoTest {
             setHistory(randomHistory());
 
             when(itemRepository.findById(history.getItemId())).thenReturn(Optional.of(history.getItem()));
+            when(historyRepository.existsById(history.getId())).thenReturn(false);
             when(historyRepository.existsByItemIdAndNum(history.getItemId(), history.getNum())).thenReturn(false);
             if(history.getRequester() != null) when(userRepository.findById(history.getRequesterId())).thenReturn(Optional.of(history.getRequester()));
             if(history.getApproveManager() != null) when(userRepository.findById(history.getApproveManagerId())).thenReturn(Optional.of(history.getApproveManager()));
@@ -263,11 +271,23 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[ERROR]_[동일한 `id`를 갖는 `history`가 존재할 시]_[ConflictException]")
+        public void ERROR_IdConflict_ConflictException() {
+            setHistory(randomHistory());
+
+            when(itemRepository.findById(history.getItemId())).thenReturn(Optional.of(history.getItem()));
+            when(historyRepository.existsById(history.getId())).thenReturn(true);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[동일한 `index`를 갖는 `history`가 존재할 시]_[ConflictException]")
         public void ERROR_IndexConflict_ConflictException() {
             setHistory(randomHistory());
 
             when(itemRepository.findById(history.getItemId())).thenReturn(Optional.of(history.getItem()));
+            when(historyRepository.existsById(history.getId())).thenReturn(false);
             when(historyRepository.existsByItemIdAndNum(history.getItemId(), history.getNum())).thenReturn(true);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -315,7 +335,14 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         }
 
         protected HistoryDto execMethod() {
-            return historyDao.update(targetId, newHistory.toHistoryDto());
+            return historyDao.update(
+                    targetId, newHistory.getItemId(), newHistory.getNum(),
+                    newHistory.getRequesterId(), newHistory.getApproveManagerId(),
+                    newHistory.getReturnManagerId(), newHistory.getLostManagerId(),
+                    newHistory.getCancelManagerId(), newHistory.getRequestedAt(),
+                    newHistory.getApprovedAt(), newHistory.getReturnedAt(),
+                    newHistory.getLostAt(), newHistory.getCanceledAt()
+            );
         }
 
         @RepeatedTest(10)

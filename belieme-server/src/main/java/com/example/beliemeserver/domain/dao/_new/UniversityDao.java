@@ -1,6 +1,7 @@
 package com.example.beliemeserver.domain.dao._new;
 
 import com.example.beliemeserver.domain.dto._new.UniversityDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,14 +12,14 @@ public interface UniversityDao {
     List<UniversityDto> getAllList();
 
     @Transactional
-    UniversityDto getById(UUID id);
+    UniversityDto getById(@NonNull UUID id);
 
     @Transactional
-    boolean checkExistById(UUID id);
+    boolean checkExistById(@NonNull UUID id);
 
     @Transactional
-    UniversityDto create(UniversityDto newUniversity);
+    UniversityDto create(@NonNull UUID id, @NonNull String name, String apiUrl);
 
     @Transactional
-    UniversityDto update(UUID id, UniversityDto newUniversityDto);
+    UniversityDto update(@NonNull UUID id, @NonNull String name, String apiUrl);
 }

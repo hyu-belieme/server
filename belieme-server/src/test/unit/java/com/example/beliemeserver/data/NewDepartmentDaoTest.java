@@ -156,7 +156,11 @@ public class NewDepartmentDaoTest  extends BaseDaoTest {
         }
 
         protected DepartmentDto execMethod() {
-            return departmentDao.create(dept.toDepartmentDto());
+            return departmentDao.create(
+                    dept.getId(),
+                    dept.getUniversityId(),
+                    dept.getName(),
+                    dept.getBaseMajorJoin().stream().map(NewMajorDepartmentJoinEntity::getMajorId).toList());
         }
 
         @RepeatedTest(10)
@@ -165,6 +169,7 @@ public class NewDepartmentDaoTest  extends BaseDaoTest {
             setDept(randomDept());
 
             when(univRepository.findById(dept.getUniversityId())).thenReturn(Optional.of(dept.getUniversity()));
+            when(deptRepository.existsById(dept.getId())).thenReturn(false);
             when(deptRepository.existsByUniversityIdAndName(dept.getUniversityId(), dept.getName())).thenReturn(false);
             for(NewMajorDepartmentJoinEntity majorJoin : dept.getBaseMajorJoin()) {
                 when(majorDeptJoinRepository.save(mockArg(majorJoin))).thenReturn(majorJoin);
@@ -180,11 +185,23 @@ public class NewDepartmentDaoTest  extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[ERROR]_[동일한 `id`를 갖는 `department`가 존재할 시]_[ConflictException]")
+        public void ERROR_idConflict_ConflictException() {
+            setDept(randomDept());
+
+            when(univRepository.findById(dept.getUniversityId())).thenReturn(Optional.of(dept.getUniversity()));
+            when(deptRepository.existsById(dept.getId())).thenReturn(true);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[동일한 `index`를 갖는 `department`가 존재할 시]_[ConflictException]")
         public void ERROR_indexConflict_ConflictException() {
             setDept(randomDept());
 
             when(univRepository.findById(dept.getUniversityId())).thenReturn(Optional.of(dept.getUniversity()));
+            when(deptRepository.existsById(dept.getId())).thenReturn(false);
             when(deptRepository.existsByUniversityIdAndName(dept.getUniversityId(), dept.getName())).thenReturn(true);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -221,7 +238,10 @@ public class NewDepartmentDaoTest  extends BaseDaoTest {
         }
 
         protected DepartmentDto execMethod() {
-            return departmentDao.update(targetId, newDept.toDepartmentDto());
+            return departmentDao.update(targetId,
+                    newDept.getUniversityId(),
+                    newDept.getName(),
+                    newDept.getBaseMajorJoin().stream().map(NewMajorDepartmentJoinEntity::getMajorId).toList());
         }
 
         @RepeatedTest(10)

@@ -1,6 +1,7 @@
 package com.example.beliemeserver.domain.dao._new;
 
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,24 +12,34 @@ public interface HistoryDao {
     List<HistoryDto> getAllList();
 
     @Transactional
-    List<HistoryDto> getListByDepartment(UUID departmentId);
+    List<HistoryDto> getListByDepartment(@NonNull UUID departmentId);
 
     @Transactional
-    List<HistoryDto> getListByStuff(UUID stuffId);
+    List<HistoryDto> getListByStuff(@NonNull UUID stuffId);
 
     @Transactional
-    List<HistoryDto> getListByItem(UUID itemId);
+    List<HistoryDto> getListByItem(@NonNull UUID itemId);
 
     @Transactional
     List<HistoryDto> getListByDepartmentAndRequester(
-            UUID departmentId, UUID requesterId);
+            @NonNull UUID departmentId, @NonNull UUID requesterId);
 
     @Transactional
-    HistoryDto getById(UUID historyId);
+    HistoryDto getById(@NonNull UUID historyId);
 
     @Transactional
-    HistoryDto create(HistoryDto newHistory);
+    HistoryDto create(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    );
 
     @Transactional
-    HistoryDto update(UUID historyId, HistoryDto newHistory);
+    HistoryDto update(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    );
 }

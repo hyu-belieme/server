@@ -1,6 +1,7 @@
 package com.example.beliemeserver.domain.service._new;
 
-import com.example.beliemeserver.config.initdata._new.InitialData;
+import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
+import com.example.beliemeserver.config.initdata._new.container.UniversityInfo;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.UniversityDto;
 import com.example.beliemeserver.domain.dto._new.UserDto;
@@ -12,17 +13,25 @@ import java.util.UUID;
 
 @Service
 public class NewUniversityService extends NewBaseService {
-    public NewUniversityService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public NewUniversityService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public void initializeUniversities() {
-        for (UniversityDto university : initialData.universities().values()) {
+        for (UniversityInfo university : initialData.universityInfos().values()) {
             if (universityDao.checkExistById(university.id())) {
-                universityDao.update(university.id(), university);
+                universityDao.update(
+                        university.id(),
+                        university.name(),
+                        university.externalApiInfo().getOrDefault("url", null)
+                );
                 continue;
             }
-            universityDao.create(university);
+            universityDao.create(
+                    university.id(),
+                    university.name(),
+                    university.externalApiInfo().getOrDefault("url", null)
+            );
         }
     }
 

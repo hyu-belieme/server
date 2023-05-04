@@ -111,7 +111,7 @@ public class NewUniversityDaoTest extends BaseDaoTest {
         }
 
         protected UniversityDto execMethod() {
-            return universityDao.create(univ.toUniversityDto());
+            return universityDao.create(univ.getId(), univ.getName(), univ.getApiUrl());
         }
 
         @RepeatedTest(10)
@@ -119,6 +119,7 @@ public class NewUniversityDaoTest extends BaseDaoTest {
         public void SUCCESS() {
             setUniv(randomUniv());
 
+            when(univRepository.existsById(univ.getId())).thenReturn(false);
             when(univRepository.existsByName(univ.getName())).thenReturn(false);
             when(univRepository.save(univ)).thenReturn(univ);
 
@@ -128,10 +129,21 @@ public class NewUniversityDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[ERROR]_[동일한 `id`를 갖는 `university`가 존재할 시]_[ConflictException]")
+        public void ERROR_idConflict_ConflictException() {
+            setUniv(randomUniv());
+
+            when(univRepository.existsById(univ.getId())).thenReturn(true);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[동일한 `name`을 갖는 `university`가 존재할 시]_[ConflictException]")
         public void ERROR_NameConflict_ConflictException() {
             setUniv(randomUniv());
 
+            when(univRepository.existsById(univ.getId())).thenReturn(false);
             when(univRepository.existsByName(univ.getName())).thenReturn(true);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -157,7 +169,7 @@ public class NewUniversityDaoTest extends BaseDaoTest {
         }
 
         protected UniversityDto execMethod() {
-            return universityDao.update(targetId, newUnivDto);
+            return universityDao.update(targetId, newUnivDto.name(), newUnivDto.apiUrl());
         }
 
         @RepeatedTest(10)

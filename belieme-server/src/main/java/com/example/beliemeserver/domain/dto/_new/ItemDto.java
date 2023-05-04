@@ -28,15 +28,11 @@ public record ItemDto(
         return new ItemDto(id, stuff, num, lastHistory);
     }
 
-    public boolean matchUniqueKey(String universityName, String departmentName, String stuffName, int num) {
-        return this.stuff().matchUniqueKey(universityName, departmentName, stuffName)
-                && this.num == num;
-    }
-
-    public boolean matchUniqueKey(ItemDto oth) {
-        if (oth == null) return false;
-        return this.stuff.matchUniqueKey(oth.stuff())
-                && this.num == oth.num();
+    public boolean matchId(ItemDto oth) {
+        if (oth == null) {
+            return false;
+        }
+        return this.id.equals(oth.id);
     }
 
     public int nextHistoryNum() {

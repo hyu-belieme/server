@@ -9,6 +9,7 @@ import com.example.beliemeserver.domain.dao._new.UserDao;
 import com.example.beliemeserver.domain.dto._new.AuthorityDto;
 import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +35,7 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     @Override
-    public List<UserDto> getListByUniversity(UUID universityId) {
+    public List<UserDto> getListByUniversity(@NonNull UUID universityId) {
         List<UserDto> output = new ArrayList<>();
 
         for (NewUserEntity userEntity : userRepository.findByUniversityId(universityId)) {
@@ -44,70 +45,71 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     }
 
     @Override
-    public UserDto getByToken(String token) {
+    public UserDto getByToken(@NonNull String token) {
         return findUserEntityByToken(token).toUserDto();
     }
 
     @Override
-    public UserDto getById(UUID userId) {
+    public UserDto getById(@NonNull UUID userId) {
         return findUserEntity(userId).toUserDto();
     }
 
     @Override
-    public UserDto getByIndex(UUID universityId, String studentId) {
+    public UserDto getByIndex(@NonNull UUID universityId, @NonNull String studentId) {
         return findUserEntity(universityId, studentId).toUserDto();
     }
 
     @Override
-    public UserDto create(UserDto user) {
-        NewUserEntity newUserEntity = saveUserOnly(user);
-        newUserEntity = saveAuthorityJoins(newUserEntity, user.authorities());
+    public UserDto create(@NonNull UUID userId, @NonNull UUID universityId, @NonNull String studentId, @NonNull String name, int entranceYear, @NonNull String token, long createdAt, long approvedAt, @NonNull List<AuthorityDto> authorities) {
+        NewUserEntity newUserEntity = saveUserOnly(userId, universityId, studentId, name, entranceYear, token, createdAt, approvedAt);
+        newUserEntity = saveAuthorityJoins(newUserEntity, authorities);
 
         return newUserEntity.toUserDto();
     }
 
     @Override
-    public UserDto update(UUID userId, UserDto newUser) {
+    public UserDto update(@NonNull UUID userId, @NonNull UUID universityId, @NonNull String studentId, @NonNull String name, int entranceYear, @NonNull String token, long createdAt, long approvedAt, @NonNull List<AuthorityDto> authorities) {
         NewUserEntity target = findUserEntity(userId);
-        target = updateUserOnly(target, newUser);
+        target = updateUserOnly(target, universityId, studentId, name, entranceYear, token, createdAt, approvedAt);
         target = removeAllAuthorityJoins(target);
-        target = saveAuthorityJoins(target, newUser.authorities());
+        target = saveAuthorityJoins(target, authorities);
         return userRepository.save(target).toUserDto();
     }
 
-    private NewUserEntity saveUserOnly(UserDto newUser) {
-        NewUniversityEntity universityEntity = findUniversityEntity(newUser.university().id());
+    private NewUserEntity saveUserOnly(UUID userId, UUID universityId, String studentId, String name, int entranceYear, String token, long createdAt, long approvedAt) {
+        NewUniversityEntity universityEntity = findUniversityEntity(universityId);
 
-        checkUserConflict(universityEntity.getId(), newUser.studentId());
+        checkUserIdConflict(userId);
+        checkUserConflict(universityEntity.getId(), studentId);
 
         NewUserEntity newUserEntity = new NewUserEntity(
-                newUser.id(),
+                userId,
                 universityEntity,
-                newUser.studentId(),
-                newUser.name(),
-                newUser.entranceYear(),
-                newUser.token(),
-                newUser.createdAt(),
-                newUser.approvedAt()
+                studentId,
+                name,
+                entranceYear,
+                token,
+                createdAt,
+                approvedAt
         );
         return userRepository.save(newUserEntity);
     }
 
-    private NewUserEntity updateUserOnly(NewUserEntity target, UserDto newUser) {
-        NewUniversityEntity newUniversity = findUniversityEntity(newUser.university().id());
+    private NewUserEntity updateUserOnly(NewUserEntity target, UUID universityId, String studentId, String name, int entranceYear, String token, long createdAt, long approvedAt) {
+        NewUniversityEntity newUniversity = findUniversityEntity(universityId);
 
-        if (doesIndexChange(target, newUser)) {
-            checkUserConflict(newUniversity.getId(), newUser.studentId());
+        if (doesIndexChange(target, universityId, studentId)) {
+            checkUserConflict(newUniversity.getId(), studentId);
         }
 
         return target
                 .withUniversity(newUniversity)
-                .withStudentId(newUser.studentId())
-                .withName(newUser.name())
-                .withEntranceYear(newUser.entranceYear())
-                .withToken(newUser.token())
-                .withCreatedAt(newUser.createdAt())
-                .withApprovedAt(newUser.approvedAt());
+                .withStudentId(studentId)
+                .withName(name)
+                .withEntranceYear(entranceYear)
+                .withToken(token)
+                .withCreatedAt(createdAt)
+                .withApprovedAt(approvedAt);
     }
 
     private NewUserEntity saveAuthorityJoins(NewUserEntity newUserEntity, List<AuthorityDto> authorities) {
@@ -129,12 +131,18 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
         return user.withAuthorityClear();
     }
 
-    private boolean doesIndexChange(NewUserEntity target, UserDto newUser) {
-        String oldUniversityName = target.getUniversity().getName();
+    private boolean doesIndexChange(NewUserEntity target, UUID newUnivId, String newStudentId) {
+        UUID oldUniversityId = target.getUniversity().getId();
         String oldStudentId = target.getStudentId();
 
-        return !(oldUniversityName.equals(newUser.university().name())
-                && oldStudentId.equals(newUser.studentId()));
+        return !(oldUniversityId.equals(newUnivId)
+                && oldStudentId.equals(newStudentId));
+    }
+
+    private void checkUserIdConflict(UUID userId) {
+        if (userRepository.existsById(userId)) {
+            throw new ConflictException();
+        }
     }
 
     private void checkUserConflict(UUID universityId, String studentId) {

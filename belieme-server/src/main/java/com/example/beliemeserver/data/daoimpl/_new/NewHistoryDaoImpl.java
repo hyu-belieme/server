@@ -7,8 +7,8 @@ import com.example.beliemeserver.data.entity._new.NewUserEntity;
 import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.HistoryDao;
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
-import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByDepartment(UUID departmentId) {
+    public List<HistoryDto> getListByDepartment(@NonNull UUID departmentId) {
         List<HistoryDto> output = new ArrayList<>();
         for (NewStuffEntity stuff : stuffRepository.findByDepartmentId(departmentId)) {
             for (NewItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
@@ -38,7 +38,7 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByStuff(UUID stuffId) {
+    public List<HistoryDto> getListByStuff(@NonNull UUID stuffId) {
         List<HistoryDto> output = new ArrayList<>();
         for (NewItemEntity item : itemRepository.findByStuffId(stuffId)) {
             output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
@@ -47,12 +47,12 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByItem(UUID itemId) {
+    public List<HistoryDto> getListByItem(@NonNull UUID itemId) {
         return toHistoryDtoList(historyRepository.findByItemId(itemId));
     }
 
     @Override
-    public List<HistoryDto> getListByDepartmentAndRequester(UUID departmentId, UUID requesterId) {
+    public List<HistoryDto> getListByDepartmentAndRequester(@NonNull UUID departmentId, @NonNull UUID requesterId) {
         List<HistoryDto> output = new ArrayList<>();
         for (NewHistoryEntity historyEntity : historyRepository.findByRequesterId(requesterId)) {
             if (historyEntity.getItem().getStuff().getDepartment().getId() == departmentId) {
@@ -64,55 +64,66 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public HistoryDto getById(UUID historyId) {
+    public HistoryDto getById(@NonNull UUID historyId) {
         return findHistoryEntity(historyId).toHistoryDto();
     }
 
     @Override
-    public HistoryDto create(HistoryDto newHistory) {
-        NewItemEntity itemOfNewHistory = findItemEntity(newHistory.item().id());
+    public HistoryDto create(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    ) {
+        NewItemEntity itemOfNewHistory = findItemEntity(itemId);
 
-        checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
+        checkHistoryIdConflict(historyId);
+        checkHistoryConflict(itemId, num);
 
         NewHistoryEntity newHistoryEntity = new NewHistoryEntity(
-                newHistory.id(),
+                historyId,
                 itemOfNewHistory,
-                newHistory.num(),
-                toUserEntityOrNull(newHistory.requester()),
-                toUserEntityOrNull(newHistory.approveManager()),
-                toUserEntityOrNull(newHistory.returnManager()),
-                toUserEntityOrNull(newHistory.lostManager()),
-                toUserEntityOrNull(newHistory.cancelManager()),
-                newHistory.requestedAt(),
-                newHistory.approvedAt(),
-                newHistory.returnedAt(),
-                newHistory.lostAt(),
-                newHistory.canceledAt()
+                num,
+                getUserEntityIfIdIsNotNull(requesterId),
+                getUserEntityIfIdIsNotNull(approveManagerId),
+                getUserEntityIfIdIsNotNull(returnManagerId),
+                getUserEntityIfIdIsNotNull(lostManagerId),
+                getUserEntityIfIdIsNotNull(cancelManagerId),
+                requestedAt,
+                approvedAt,
+                returnedAt,
+                lostAt,
+                canceledAt
         );
         return historyRepository.save(newHistoryEntity).toHistoryDto();
     }
 
     @Override
-    public HistoryDto update(UUID historyId, HistoryDto newHistory) {
+    public HistoryDto update(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    ) {
         NewHistoryEntity target = findHistoryEntity(historyId);
-        NewItemEntity itemOfNewHistory = findItemEntity(newHistory.item().id());
+        NewItemEntity itemOfNewHistory = findItemEntity(itemId);
 
-        if (doesIndexChange(target, newHistory)) {
-            checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
+        if (doesIndexChange(target, itemId, num)) {
+            checkHistoryConflict(itemOfNewHistory.getId(), num);
         }
 
         target = target.withItem(itemOfNewHistory)
-                .withNum(newHistory.num())
-                .withRequester(toUserEntityOrNull(newHistory.requester()))
-                .withApproveManager(toUserEntityOrNull(newHistory.approveManager()))
-                .withReturnManager(toUserEntityOrNull(newHistory.returnManager()))
-                .withLostManager(toUserEntityOrNull(newHistory.lostManager()))
-                .withCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
-                .withRequestedAt(newHistory.requestedAt())
-                .withApprovedAt(newHistory.approvedAt())
-                .withReturnedAt(newHistory.returnedAt())
-                .withLostAt(newHistory.lostAt())
-                .withCanceledAt(newHistory.canceledAt());
+                .withNum(num)
+                .withRequester(getUserEntityIfIdIsNotNull(requesterId))
+                .withApproveManager(getUserEntityIfIdIsNotNull(approveManagerId))
+                .withReturnManager(getUserEntityIfIdIsNotNull(returnManagerId))
+                .withLostManager(getUserEntityIfIdIsNotNull(lostManagerId))
+                .withCancelManager(getUserEntityIfIdIsNotNull(cancelManagerId))
+                .withRequestedAt(requestedAt)
+                .withApprovedAt(approvedAt)
+                .withReturnedAt(returnedAt)
+                .withLostAt(lostAt)
+                .withCanceledAt(canceledAt);
         return historyRepository.save(target).toHistoryDto();
     }
 
@@ -125,18 +136,14 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
         return output;
     }
 
-    private boolean doesIndexChange(NewHistoryEntity target, HistoryDto newHistory) {
-        String oldUniversityName = target.getItem().getStuff().getDepartment().getUniversity().getName();
-        String oldDepartmentName = target.getItem().getStuff().getDepartment().getName();
-        String oldStuffName = target.getItem().getStuff().getName();
-        int oldItemNum = target.getItem().getNum();
-        int oldHistoryNum = target.getNum();
+    private boolean doesIndexChange(NewHistoryEntity target, UUID newItemId, int newHistoryNum) {
+        return !(target.getItemId().equals(newItemId) && target.getNum() == newHistoryNum);
+    }
 
-        return !(oldUniversityName.equals(newHistory.item().stuff().department().university().name())
-                && oldDepartmentName.equals(newHistory.item().stuff().department().name())
-                && oldStuffName.equals(newHistory.item().stuff().name())
-                && oldItemNum == newHistory.item().num()
-                && oldHistoryNum == newHistory.num());
+    private void checkHistoryIdConflict(UUID historyId) {
+        if (historyRepository.existsById(historyId)) {
+            throw new ConflictException();
+        }
     }
 
     private void checkHistoryConflict(UUID itemId, int historyNum) {
@@ -145,10 +152,10 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
         }
     }
 
-    private NewUserEntity toUserEntityOrNull(UserDto userDto) {
-        if (userDto == null) {
+    private NewUserEntity getUserEntityIfIdIsNotNull(UUID userId) {
+        if (userId == null) {
             return null;
         }
-        return findUserEntity(userDto.id());
+        return findUserEntity(userId);
     }
 }

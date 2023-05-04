@@ -40,15 +40,16 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto create(MajorDto newMajor) {
-        NewUniversityEntity university = findUniversityEntity(newMajor.university().id());
+    public MajorDto create(UUID majorId, UUID universityId, String majorCode) {
+        NewUniversityEntity university = findUniversityEntity(universityId);
 
-        checkMajorConflict(university.getId(), newMajor.code());
+        checkMajorIdConflict(majorId);
+        checkMajorConflict(university.getId(), majorCode);
 
         NewMajorEntity newMajorEntity = new NewMajorEntity(
-                newMajor.id(),
+                majorId,
                 university,
-                newMajor.code()
+                majorCode
         );
 
         NewMajorEntity savedMajorEntity = majorRepository.save(newMajorEntity);
@@ -56,28 +57,32 @@ public class NewMajorDaoImpl extends NewBaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto update(UUID majorId, MajorDto newMajor) {
+    public MajorDto update(UUID majorId, UUID universityId, String majorCode) {
         NewMajorEntity target = findMajorEntity(majorId);
+        NewUniversityEntity newUniversity = findUniversityEntity(universityId);
 
-        NewUniversityEntity newUniversity = findUniversityEntity(newMajor.university().id());
-
-        if (doesIndexChange(target, newMajor)) {
-            checkMajorConflict(newUniversity.getId(), newMajor.code());
+        if (doesIndexChange(target, universityId, majorCode)) {
+            checkMajorConflict(newUniversity.getId(), majorCode);
         }
 
         NewMajorEntity updatedMajor = target
                 .withUniversity(newUniversity)
-                .withCode(newMajor.code());
+                .withCode(majorCode);
 
         return majorRepository.save(updatedMajor).toMajorDto();
     }
 
-    private boolean doesIndexChange(NewMajorEntity target, MajorDto newMajor) {
+    private boolean doesIndexChange(NewMajorEntity target, UUID newUniversityId, String newMajorCode) {
         UUID oldUniversityId = target.getUniversity().getId();
         String oldCode = target.getCode();
 
-        return !(oldUniversityId.equals(newMajor.university().id())
-                && oldCode.equals(newMajor.code()));
+        return !(oldUniversityId.equals(newUniversityId) && oldCode.equals(newMajorCode));
+    }
+
+    private void checkMajorIdConflict(UUID majorId) {
+        if (majorRepository.existsById(majorId)) {
+            throw new ConflictException();
+        }
     }
 
     private void checkMajorConflict(UUID universityId, String majorCode) {

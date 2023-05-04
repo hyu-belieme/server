@@ -7,6 +7,7 @@ import com.example.beliemeserver.domain.dao._new.AuthorityDao;
 import com.example.beliemeserver.domain.dto._new.AuthorityDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -30,21 +31,20 @@ public class NewAuthorityDaoImpl extends NewBaseDaoImpl implements AuthorityDao 
     }
 
     @Override
-    public boolean checkExistByIndex(UUID departmentId, Permission permission) {
+    public boolean checkExistByIndex(@NonNull UUID departmentId, @NonNull Permission permission) {
         return authorityRepository.existsByDepartmentIdAndPermission(departmentId, permission.toString());
     }
 
     @Override
-    public AuthorityDto create(AuthorityDto authority) {
-        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(authority.department().id());
+    public AuthorityDto create(@NonNull UUID departmentId, @NonNull Permission permission) {
+        NewDepartmentEntity departmentOfAuthority = findDepartmentEntity(departmentId);
 
-        checkAuthorityConflict(departmentOfAuthority.getId(), authority.permission().name());
+        checkAuthorityConflict(departmentOfAuthority.getId(), permission.name());
 
         NewAuthorityEntity newAuthority = new NewAuthorityEntity(
                 departmentOfAuthority,
-                authority.permission().name()
+                permission.name()
         );
-
         return authorityRepository.save(newAuthority).toAuthorityDto();
     }
 

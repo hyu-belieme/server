@@ -1,6 +1,9 @@
 package com.example.beliemeserver.domain.dao._new;
 
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
+import com.example.beliemeserver.domain.dto._new.MajorDto;
+import com.example.beliemeserver.domain.dto._new.UniversityDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,17 +14,17 @@ public interface DepartmentDao {
     List<DepartmentDto> getAllList();
 
     @Transactional
-    List<DepartmentDto> getListByUniversity(UUID universityId);
+    List<DepartmentDto> getListByUniversity(@NonNull UUID universityId);
 
     @Transactional
-    DepartmentDto getById(UUID departmentId);
+    DepartmentDto getById(@NonNull UUID departmentId);
 
     @Transactional
-    boolean checkExistById(UUID id);
+    boolean checkExistById(@NonNull UUID id);
 
     @Transactional
-    DepartmentDto create(DepartmentDto newDepartment);
+    DepartmentDto create(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name, @NonNull List<UUID> majorId);
 
     @Transactional
-    DepartmentDto update(UUID departmentId, DepartmentDto newDepartment);
+    DepartmentDto update(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name, @NonNull List<UUID> majorId);
 }

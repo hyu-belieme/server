@@ -121,7 +121,7 @@ public class NewMajorDaoTest  extends BaseDaoTest {
         }
 
         protected MajorDto execMethod() {
-            return majorDao.create(major.toMajorDto());
+            return majorDao.create(major.getId(), major.getUniversityId(), major.getCode());
         }
 
         @RepeatedTest(10)
@@ -130,6 +130,7 @@ public class NewMajorDaoTest  extends BaseDaoTest {
             setMajor(randomMajor());
 
             when(univRepository.findById(major.getUniversityId())).thenReturn(Optional.of(major.getUniversity()));
+            when(majorRepository.existsById(major.getId())).thenReturn(false);
             when(majorRepository.existsByUniversityIdAndCode(major.getUniversityId(), major.getCode())).thenReturn(false);
             when(majorRepository.save(mockArg(major))).thenReturn(major);
 
@@ -149,11 +150,23 @@ public class NewMajorDaoTest  extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[ERROR]_[동일한 `id`를 갖는 `major`가 존재할 시]_[ConflictException]")
+        public void ERROR_idConflict_ConflictException() {
+            setMajor(randomMajor());
+
+            when(univRepository.findById(major.getUniversityId())).thenReturn(Optional.of(major.getUniversity()));
+            when(majorRepository.existsById(major.getId())).thenReturn(true);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[동일한 `index`를 갖는 `major`가 존재할 시]_[ConflictException]")
         public void ERROR_IndexConflict_ConflictException() {
             setMajor(randomMajor());
 
             when(univRepository.findById(major.getUniversityId())).thenReturn(Optional.of(major.getUniversity()));
+            when(majorRepository.existsById(major.getId())).thenReturn(false);
             when(majorRepository.existsByUniversityIdAndCode(major.getUniversityId(), major.getCode())).thenReturn(true);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -179,7 +192,7 @@ public class NewMajorDaoTest  extends BaseDaoTest {
         }
 
         protected MajorDto execMethod() {
-            return majorDao.update(targetId, newMajor.toMajorDto());
+            return majorDao.update(targetId, newMajor.getUniversityId(), newMajor.getCode());
         }
 
         @RepeatedTest(10)

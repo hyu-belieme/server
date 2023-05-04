@@ -59,20 +59,16 @@ public record StuffDto(
 
     public StuffDto withItemRemove(ItemDto itemDto) {
         StuffDto output = new StuffDto(id, department, name, thumbnail, items);
-        output.items.removeIf(item -> item.matchUniqueKey(itemDto));
+        output.items.removeIf(item -> item.matchId(itemDto));
 
         return output;
     }
 
-    public boolean matchUniqueKey(String universityName, String departmentName, String name) {
-        return department().matchUniqueKey(universityName, departmentName)
-                && this.name.equals(name);
-    }
-
-    public boolean matchUniqueKey(StuffDto oth) {
-        if (oth == null) return false;
-        return this.department.matchUniqueKey(oth.department())
-                && this.name.equals(oth.name());
+    public boolean matchId(StuffDto oth) {
+        if (oth == null) {
+            return false;
+        }
+        return this.id.equals(oth.id);
     }
 
     public ItemDto firstUsableItem() {

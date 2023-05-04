@@ -83,7 +83,7 @@ public class NewAuthorityDaoTest  extends BaseDaoTest {
         }
 
         protected AuthorityDto execMethod() {
-            return authDao.create(auth.toAuthorityDto());
+            return authDao.create(auth.getDepartmentId(), Permission.valueOf(auth.getPermission()));
         }
 
         @RepeatedTest(10)

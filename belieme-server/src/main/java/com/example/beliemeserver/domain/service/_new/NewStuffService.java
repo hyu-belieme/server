@@ -1,6 +1,6 @@
 package com.example.beliemeserver.domain.service._new;
 
-import com.example.beliemeserver.config.initdata._new.InitialData;
+import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Service
 public class NewStuffService extends NewBaseService {
-    public NewStuffService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public NewStuffService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
@@ -48,18 +48,16 @@ public class NewStuffService extends NewBaseService {
         DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
         checkStaffPermission(requester, department);
 
-        StuffDto newStuff = StuffDto.init(department, name, thumbnail);
-        StuffDto output = newStuff;
-        newStuff = stuffDao.create(newStuff);
+        StuffDto newStuff = stuffDao.create(UUID.randomUUID(), departmentId, name, thumbnail);
 
-        if (amount == null) return output;
+        if (amount == null) return newStuff;
         if (amount > Constants.MAX_ITEM_NUM) throw new ItemAmountLimitExceededException();
 
         for (int i = 0; i < amount; i++) {
-            ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i + 1));
-            output = output.withItemAdd(newItem);
+            ItemDto newItem = itemDao.create(UUID.randomUUID(), newStuff.id(), i + 1);
+            newStuff = newStuff.withItemAdd(newItem);
         }
-        return output;
+        return newStuff;
     }
 
     public StuffDto update(
@@ -74,7 +72,6 @@ public class NewStuffService extends NewBaseService {
         if (newName == null) newName = oldStuff.name();
         if (newThumbnail == null) newThumbnail = oldStuff.thumbnail();
 
-        StuffDto newStuff = StuffDto.init(oldStuff.department(), newName, newThumbnail);
-        return stuffDao.update(stuffId, newStuff);
+        return stuffDao.update(stuffId, oldStuff.id(), newName, newThumbnail);
     }
 }

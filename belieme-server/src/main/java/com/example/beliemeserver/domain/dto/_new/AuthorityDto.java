@@ -3,8 +3,6 @@ package com.example.beliemeserver.domain.dto._new;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import lombok.NonNull;
 
-import java.util.UUID;
-
 public record AuthorityDto(
         @NonNull DepartmentDto department,
         @NonNull Permission permission
@@ -19,19 +17,11 @@ public record AuthorityDto(
         return new AuthorityDto(department, permission);
     }
 
-    public boolean matchUniqueKey(String universityName, String departmentName, Permission permission) {
-        if (universityName == null || departmentName == null || permission == null) {
-            return false;
-        }
-        return this.department.matchUniqueKey(universityName, departmentName)
-                && permission.equals(this.permission());
-    }
-
     public boolean matchUniqueKey(AuthorityDto oth) {
         if (oth == null) {
             return false;
         }
-        return matchUniqueKey(oth.department.university().name(), oth.department.name(), oth.permission);
+        return this.department.matchId(oth.department) && this.permission.equals(oth.permission);
     }
 
     @Override

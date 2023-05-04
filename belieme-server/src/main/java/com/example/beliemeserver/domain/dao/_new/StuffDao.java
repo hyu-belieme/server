@@ -1,6 +1,7 @@
 package com.example.beliemeserver.domain.dao._new;
 
 import com.example.beliemeserver.domain.dto._new.StuffDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,14 +12,14 @@ public interface StuffDao {
     List<StuffDto> getAllList();
 
     @Transactional
-    List<StuffDto> getListByDepartment(UUID departmentId);
+    List<StuffDto> getListByDepartment(@NonNull UUID departmentId);
 
     @Transactional
-    StuffDto getById(UUID stuffId);
+    StuffDto getById(@NonNull UUID stuffId);
 
     @Transactional
-    StuffDto create(StuffDto newStuff);
+    StuffDto create(@NonNull UUID stuffId, @NonNull UUID departmentId, @NonNull String name, String thumbnail);
 
     @Transactional
-    StuffDto update(UUID stuffId, StuffDto newStuff);
+    StuffDto update(@NonNull UUID stuffId, @NonNull UUID departmentId, @NonNull String name, String thumbnail);
 }

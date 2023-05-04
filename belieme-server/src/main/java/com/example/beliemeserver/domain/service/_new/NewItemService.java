@@ -1,6 +1,6 @@
 package com.example.beliemeserver.domain.service._new;
 
-import com.example.beliemeserver.config.initdata._new.InitialData;
+import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Service
 public class NewItemService extends NewBaseService {
-    public NewItemService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public NewItemService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
@@ -46,11 +46,10 @@ public class NewItemService extends NewBaseService {
         StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
         checkStaffPermission(requester, stuff.department());
 
-        ItemDto newItem = ItemDto.init(stuff, stuff.nextItemNum());
-        if (newItem.num() > Constants.MAX_ITEM_NUM) {
+        if (stuff.nextItemNum() > Constants.MAX_ITEM_NUM) {
             throw new ItemAmountLimitExceededException();
         }
-        return itemDao.create(newItem);
+        return itemDao.create(UUID.randomUUID(), stuffId, stuff.nextItemNum());
     }
 
     protected List<ItemDto> getItemListByStuffOrThrowInvalidIndexException(UUID stuffId) {

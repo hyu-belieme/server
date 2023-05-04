@@ -9,6 +9,7 @@ import com.example.beliemeserver.domain.dao._new.DepartmentDao;
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.domain.dto._new.MajorDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     @Override
-    public List<DepartmentDto> getListByUniversity(UUID universityId) {
+    public List<DepartmentDto> getListByUniversity(@NonNull UUID universityId) {
         List<DepartmentDto> output = new ArrayList<>();
 
         for (NewDepartmentEntity departmentEntity : departmentRepository.findByUniversityId(universityId)) {
@@ -43,63 +44,59 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     }
 
     @Override
-    public DepartmentDto getById(UUID departmentId) {
+    public DepartmentDto getById(@NonNull UUID departmentId) {
         return findDepartmentEntity(departmentId).toDepartmentDto();
     }
 
     @Override
-    public boolean checkExistById(UUID departmentId) {
+    public boolean checkExistById(@NonNull UUID departmentId) {
         return departmentRepository.existsById(departmentId);
     }
 
     @Override
-    public DepartmentDto create(DepartmentDto newDepartment) {
-        NewDepartmentEntity newDepartmentEntity = saveDepartmentOnly(newDepartment);
-        newDepartmentEntity = saveBaseMajorJoins(newDepartmentEntity, newDepartment.baseMajors());
+    public DepartmentDto create(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name, @NonNull List<UUID> majorId) {
+        NewDepartmentEntity newDepartmentEntity = saveDepartmentOnly(departmentId, universityId, name);
+        newDepartmentEntity = saveBaseMajorJoins(newDepartmentEntity, majorId);
 
         return departmentRepository.save(newDepartmentEntity).toDepartmentDto();
     }
 
     @Override
-    public DepartmentDto update(UUID departmentId, DepartmentDto newDepartment) {
+    public DepartmentDto update(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name, @NonNull List<UUID> majorId) {
         NewDepartmentEntity target = findDepartmentEntity(departmentId);
-        target = updateDepartmentOnly(target, newDepartment);
+        target = updateDepartmentOnly(target, universityId, name);
 
         target = removeAllBaseMajorJoins(target);
-        target = saveBaseMajorJoins(target, newDepartment.baseMajors());
+        target = saveBaseMajorJoins(target, majorId);
 
         return departmentRepository.save(target).toDepartmentDto();
     }
 
-    private NewDepartmentEntity saveDepartmentOnly(DepartmentDto newDepartment) {
-        NewUniversityEntity university = findUniversityEntity(newDepartment.university().id());
+    private NewDepartmentEntity saveDepartmentOnly(UUID departmentId, UUID universityId, String name) {
+        NewUniversityEntity university = findUniversityEntity(universityId);
 
-        checkDepartmentConflict(university.getId(), newDepartment.name());
+        checkDepartmentIdConflict(departmentId);
+        checkDepartmentConflict(university.getId(), name);
 
-        NewDepartmentEntity newDepartmentEntity = new NewDepartmentEntity(
-                newDepartment.id(),
-                university,
-                newDepartment.name()
-        );
-
+        NewDepartmentEntity newDepartmentEntity = new NewDepartmentEntity(departmentId, university, name);
         return departmentRepository.save(newDepartmentEntity);
     }
 
-    private NewDepartmentEntity updateDepartmentOnly(NewDepartmentEntity target, DepartmentDto newDepartment) {
-        NewUniversityEntity newUniversityEntity = findUniversityEntity(newDepartment.university().id());
+    private NewDepartmentEntity updateDepartmentOnly(NewDepartmentEntity target, UUID universityId, String name) {
+        NewUniversityEntity newUniversityEntity = findUniversityEntity(universityId);
 
-        if (doesIndexOfDepartmentChange(target, newDepartment)) {
-            checkDepartmentConflict(newUniversityEntity.getId(), newDepartment.name());
+        if (doesIndexOfDepartmentChange(target, universityId, name)) {
+            checkDepartmentConflict(universityId, name);
         }
 
         return target
-                .withName(newDepartment.name())
+                .withName(name)
                 .withUniversity(newUniversityEntity);
     }
 
-    private NewDepartmentEntity saveBaseMajorJoins(NewDepartmentEntity newDepartmentEntity, List<MajorDto> baseMajors) {
-        for (MajorDto baseMajor : baseMajors) {
-            NewMajorEntity baseMajorEntity = findMajorEntity(baseMajor.id());
+    private NewDepartmentEntity saveBaseMajorJoins(NewDepartmentEntity newDepartmentEntity, List<UUID> baseMajorIds) {
+        for (UUID baseMajorId : baseMajorIds) {
+            NewMajorEntity baseMajorEntity = findMajorEntity(baseMajorId);
             NewMajorDepartmentJoinEntity newJoin = new NewMajorDepartmentJoinEntity(
                     baseMajorEntity,
                     newDepartmentEntity
@@ -115,11 +112,17 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
         return department.withBaseMajorClear();
     }
 
-    private boolean doesIndexOfDepartmentChange(NewDepartmentEntity target, DepartmentDto newDepartment) {
+    private boolean doesIndexOfDepartmentChange(NewDepartmentEntity target, UUID universityId, String name) {
         UUID oldUniversityId = target.getUniversity().getId();
         String oldDepartmentName = target.getName();
-        return !(oldUniversityId.equals(newDepartment.university().id())
-                && oldDepartmentName.equals(newDepartment.name()));
+        return !(oldUniversityId.equals(universityId)
+                && oldDepartmentName.equals(name));
+    }
+
+    private void checkDepartmentIdConflict(UUID departmentId) {
+        if (departmentRepository.existsById(departmentId)) {
+            throw new ConflictException();
+        }
     }
 
     private void checkDepartmentConflict(UUID universityId, String departmentName) {

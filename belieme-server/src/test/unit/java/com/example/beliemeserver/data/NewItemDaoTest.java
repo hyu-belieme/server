@@ -108,7 +108,7 @@ public class NewItemDaoTest extends BaseDaoTest {
         }
 
         protected ItemDto execMethod() {
-            return itemDao.create(item.toItemDto());
+            return itemDao.create(item.getId(), item.getStuffId(), item.getNum());
         }
 
         @RepeatedTest(10)
@@ -117,6 +117,7 @@ public class NewItemDaoTest extends BaseDaoTest {
             setItem(randomItem());
 
             when(stuffRepository.findById(item.getStuffId())).thenReturn(Optional.of(item.getStuff()));
+            when(itemRepository.existsById(item.getId())).thenReturn(false);
             when(itemRepository.existsByStuffIdAndNum(item.getStuffId(), item.getNum())).thenReturn(false);
             when(itemRepository.save(mockArg(item))).thenReturn(item);
 
@@ -136,11 +137,23 @@ public class NewItemDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[ERROR]_[동일한 `id`를 갖는 `item`이 존재할 시]_[ConflictException]")
+        public void ERROR_idConflict_ConflictException() {
+            setItem(randomItem());
+
+            when(stuffRepository.findById(item.getStuffId())).thenReturn(Optional.of(item.getStuff()));
+            when(itemRepository.existsById(item.getId())).thenReturn(true);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[동일한 `index`를 갖는 `item`이 존재할 시]_[ConflictException]")
         public void ERROR_IndexConflict_ConflictException() {
             setItem(randomItem());
 
             when(stuffRepository.findById(item.getStuffId())).thenReturn(Optional.of(item.getStuff()));
+            when(itemRepository.existsById(item.getId())).thenReturn(false);
             when(itemRepository.existsByStuffIdAndNum(item.getStuffId(), item.getNum())).thenReturn(true);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -167,7 +180,7 @@ public class NewItemDaoTest extends BaseDaoTest {
         }
 
         protected ItemDto execMethod() {
-            return itemDao.update(targetId, newItem.toItemDto());
+            return itemDao.update(targetId, newItem.getStuffId(), newItem.getNum(), newItem.getLastHistoryId());
         }
 
         @RepeatedTest(10)

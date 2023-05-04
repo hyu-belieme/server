@@ -1,6 +1,8 @@
 package com.example.beliemeserver.domain.dao._new;
 
+import com.example.beliemeserver.domain.dto._new.AuthorityDto;
 import com.example.beliemeserver.domain.dto._new.UserDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,20 +13,38 @@ public interface UserDao {
     List<UserDto> getAllList();
 
     @Transactional
-    List<UserDto> getListByUniversity(UUID universityId);
+    List<UserDto> getListByUniversity(@NonNull UUID universityId);
 
     @Transactional
-    UserDto getByToken(String token);
+    UserDto getByToken(@NonNull String token);
 
     @Transactional
-    UserDto getById(UUID userId);
+    UserDto getById(@NonNull UUID userId);
 
     @Transactional
-    UserDto getByIndex(UUID universityId, String studentId);
+    UserDto getByIndex(@NonNull UUID universityId, @NonNull String studentId);
 
     @Transactional
-    UserDto create(UserDto user);
+    UserDto create(
+            @NonNull UUID userId,
+            @NonNull UUID universityId,
+            @NonNull String studentId,
+            @NonNull String name,
+            int entranceYear,
+            @NonNull String token,
+            long createdAt,
+            long approvedAt,
+            @NonNull List<AuthorityDto> authorities);
 
     @Transactional
-    UserDto update(UUID userId, UserDto newUser);
+    UserDto update(
+            @NonNull UUID userId,
+            @NonNull UUID universityId,
+            @NonNull String studentId,
+            @NonNull String name,
+            int entranceYear,
+            @NonNull String token,
+            long createdAt,
+            long approvedAt,
+            @NonNull List<AuthorityDto> authorities);
 }

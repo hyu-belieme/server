@@ -24,15 +24,11 @@ public record UniversityDto(
         return new UniversityDto(id, name, apiUrl);
     }
 
-    public boolean matchUniqueKey(String name) {
-        return this.name.equals(name);
-    }
-
-    public boolean matchUniqueKey(UniversityDto oth) {
+    public boolean matchId(UniversityDto oth) {
         if (oth == null) {
             return false;
         }
-        return matchUniqueKey(oth.name);
+        return this.id.equals(oth.id);
     }
 
     @Override

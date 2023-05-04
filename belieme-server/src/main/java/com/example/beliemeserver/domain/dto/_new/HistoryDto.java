@@ -110,18 +110,11 @@ public record HistoryDto(
                 returnedAt, lostAt, canceledAt);
     }
 
-    public boolean matchUniqueKey(
-            String universityName, String departmentName,
-            String stuffName, int itemNum, int num
-    ) {
-        return this.item().matchUniqueKey(universityName, departmentName, stuffName, itemNum)
-                && this.num() == num;
-    }
-
-    public boolean matchUniqueKey(HistoryDto oth) {
-        if (oth == null) return false;
-        return this.item().matchUniqueKey(oth.item())
-                && this.num == oth.num;
+    public boolean matchId(HistoryDto oth) {
+        if (oth == null) {
+            return false;
+        }
+        return this.id.equals(oth.id);
     }
 
     public HistoryStatus status() {

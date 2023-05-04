@@ -1,7 +1,6 @@
 package com.example.beliemeserver.domain.service._new;
 
-import com.example.beliemeserver.config.initdata._new.InitialData;
-import com.example.beliemeserver.config.initdata._new.InitialDataDtoAdapter;
+import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
@@ -18,7 +17,7 @@ import java.util.UUID;
 
 @Service
 public abstract class NewBaseService {
-    protected final InitialDataDtoAdapter initialData;
+    protected final InitialDataConfig initialData;
     protected final UniversityDao universityDao;
     protected final DepartmentDao departmentDao;
     protected final UserDao userDao;
@@ -30,8 +29,8 @@ public abstract class NewBaseService {
 
     public static final long TOKEN_EXPIRED_TIME = 3L * 30 * 24 * 60 * 60;
 
-    public NewBaseService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
-        this.initialData = new InitialDataDtoAdapter(initialData);
+    public NewBaseService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        this.initialData = initialData;
         this.universityDao = universityDao;
         this.departmentDao = departmentDao;
         this.userDao = userDao;
@@ -110,5 +109,9 @@ public abstract class NewBaseService {
         } catch (NotFoundException e) {
             throw new IndexInvalidException();
         }
+    }
+
+    protected long currentTime() {
+        return System.currentTimeMillis() / 1000;
     }
 }

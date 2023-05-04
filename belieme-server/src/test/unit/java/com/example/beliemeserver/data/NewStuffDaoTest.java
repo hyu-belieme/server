@@ -117,7 +117,7 @@ public class NewStuffDaoTest extends BaseDaoTest {
         }
 
         protected StuffDto execMethod() {
-            return stuffDao.create(stuff.toStuffDto());
+            return stuffDao.create(stuff.getId(), stuff.getDepartmentId(), stuff.getName(), stuff.getThumbnail());
         }
 
         @RepeatedTest(10)
@@ -126,6 +126,7 @@ public class NewStuffDaoTest extends BaseDaoTest {
             setStuff(randomStuff());
 
             when(deptRepository.findById(stuff.getDepartmentId())).thenReturn(Optional.of(stuff.getDepartment()));
+            when(stuffRepository.existsById(stuff.getId())).thenReturn(false);
             when(stuffRepository.existsByDepartmentIdAndName(stuff.getDepartmentId(), stuff.getName())).thenReturn(false);
             when(stuffRepository.save(mockArg(stuff))).thenReturn(stuff);
 
@@ -145,11 +146,23 @@ public class NewStuffDaoTest extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[ERROR]_[동일한 `id`를 갖는 `stuff`가 존재할 시]_[ConflictException]")
+        public void ERROR_idConflict_ConflictException() {
+            setStuff(randomStuff());
+
+            when(deptRepository.findById(stuff.getDepartmentId())).thenReturn(Optional.of(stuff.getDepartment()));
+            when(stuffRepository.existsById(stuff.getId())).thenReturn(true);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[동일한 `index`를 갖는 `stuff`가 존재할 시]_[ConflictException]")
         public void ERROR_IndexConflict_ConflictException() {
             setStuff(randomStuff());
 
             when(deptRepository.findById(stuff.getDepartmentId())).thenReturn(Optional.of(stuff.getDepartment()));
+            when(stuffRepository.existsById(stuff.getId())).thenReturn(false);
             when(stuffRepository.existsByDepartmentIdAndName(stuff.getDepartmentId(), stuff.getName())).thenReturn(true);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -176,7 +189,7 @@ public class NewStuffDaoTest extends BaseDaoTest {
         }
 
         protected StuffDto execMethod() {
-            return stuffDao.update(targetId, newStuff.toStuffDto());
+            return stuffDao.update(targetId, newStuff.getDepartmentId(), newStuff.getName(), newStuff.getThumbnail());
         }
 
         @RepeatedTest(10)

@@ -186,7 +186,17 @@ public class NewUserDaoTest  extends BaseDaoTest {
         }
 
         protected UserDto execMethod() {
-            return userDao.create(user.toUserDto());
+            return userDao.create(
+                    user.getId(),
+                    user.getUniversityId(),
+                    user.getStudentId(),
+                    user.getName(),
+                    user.getEntranceYear(),
+                    user.getToken(),
+                    user.getCreatedAt(),
+                    user.getApprovedAt(),
+                    user.getAuthorityJoin().stream().map(e -> e.getAuthority().toAuthorityDto()).toList()
+            );
         }
 
         @RepeatedTest(10)
@@ -195,6 +205,7 @@ public class NewUserDaoTest  extends BaseDaoTest {
             setUser(randomUser());
 
             when(univRepository.findById(user.getUniversityId())).thenReturn(Optional.of(user.getUniversity()));
+            when(userRepository.existsById(user.getId())).thenReturn(false);
             when(userRepository.existsByUniversityIdAndStudentId(user.getUniversityId(), user.getStudentId())).thenReturn(false);
             for(NewAuthorityUserJoinEntity authJoin : user.getAuthorityJoin()) {
                 when(authUserJoinRepository.save(mockArg(authJoin))).thenReturn(authJoin);
@@ -210,11 +221,23 @@ public class NewUserDaoTest  extends BaseDaoTest {
         }
 
         @RepeatedTest(10)
+        @DisplayName("[ERROR]_[동일한 `id`를 갖는 `user`가 존재할 시]_[ConflictException]")
+        public void ERROR_idConflict_ConflictException() {
+            setUser(randomUser());
+
+            when(univRepository.findById(user.getUniversityId())).thenReturn(Optional.of(user.getUniversity()));
+            when(userRepository.existsById(user.getId())).thenReturn(true);
+
+            TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @RepeatedTest(10)
         @DisplayName("[ERROR]_[동일한 `index`를 갖는 `user`가 존재할 시]_[ConflictException]")
         public void ERROR_indexConflict_ConflictException() {
             setUser(randomUser());
 
             when(univRepository.findById(user.getUniversityId())).thenReturn(Optional.of(user.getUniversity()));
+            when(userRepository.existsById(user.getId())).thenReturn(false);
             when(userRepository.existsByUniversityIdAndStudentId(user.getUniversityId(), user.getStudentId())).thenReturn(true);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -256,7 +279,17 @@ public class NewUserDaoTest  extends BaseDaoTest {
         }
 
         protected UserDto execMethod() {
-            return userDao.update(targetId, newUser.toUserDto());
+            return userDao.update(
+                    targetId,
+                    newUser.getUniversityId(),
+                    newUser.getStudentId(),
+                    newUser.getName(),
+                    newUser.getEntranceYear(),
+                    newUser.getToken(),
+                    newUser.getCreatedAt(),
+                    newUser.getApprovedAt(),
+                    newUser.getAuthorityJoin().stream().map(e -> e.getAuthority().toAuthorityDto()).toList()
+            );
         }
 
         @RepeatedTest(10)

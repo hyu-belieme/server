@@ -6,6 +6,7 @@ import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.StuffDao;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     }
 
     @Override
-    public List<StuffDto> getListByDepartment(UUID departmentId) {
+    public List<StuffDto> getListByDepartment(@NonNull UUID departmentId) {
         List<StuffDto> output = new ArrayList<>();
         for (NewStuffEntity stuffEntity : stuffRepository.findByDepartmentId(departmentId)) {
             output.add(stuffEntity.toStuffDto());
@@ -37,48 +38,50 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
     }
 
     @Override
-    public StuffDto getById(UUID stuffId) {
+    public StuffDto getById(@NonNull UUID stuffId) {
         return findStuffEntity(stuffId).toStuffDto();
     }
 
     @Override
-    public StuffDto create(StuffDto newStuff) {
-        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department().id());
+    public StuffDto create(@NonNull UUID stuffId, @NonNull UUID departmentId, @NonNull String name, String thumbnail) {
+        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(departmentId);
 
-        checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
+        checkStuffIdConflict(stuffId);
+        checkStuffConflict(departmentId, name);
 
         NewStuffEntity newStuffEntity = new NewStuffEntity(
-                newStuff.id(),
+                stuffId,
                 departmentOfNewStuff,
-                newStuff.name(),
-                newStuff.thumbnail()
+                name,
+                thumbnail
         );
         return stuffRepository.save(newStuffEntity).toStuffDto();
     }
 
     @Override
-    public StuffDto update(UUID stuffId, StuffDto newStuff) {
+    public StuffDto update(@NonNull UUID stuffId, @NonNull UUID newDepartmentId, @NonNull String newName, String newThumbnail) {
         NewStuffEntity target = findStuffEntity(stuffId);
-        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newStuff.department().id());
+        NewDepartmentEntity departmentOfNewStuff = findDepartmentEntity(newDepartmentId);
 
-        if (doesIndexChange(target, newStuff)) {
-            checkStuffConflict(departmentOfNewStuff.getId(), newStuff.name());
+        if (doesIndexChange(target, newDepartmentId, newName)) {
+            checkStuffConflict(departmentOfNewStuff.getId(), newName);
         }
 
         target = target.withDepartment(departmentOfNewStuff)
-                .withName(newStuff.name())
-                .withThumbnail(newStuff.thumbnail());
+                .withName(newName)
+                .withThumbnail(newThumbnail);
         return stuffRepository.save(target).toStuffDto();
     }
 
-    private boolean doesIndexChange(NewStuffEntity target, StuffDto newStuff) {
-        String oldUniversityName = target.getDepartment().getUniversity().getName();
-        String oldDepartmentName = target.getDepartment().getName();
-        String oldName = target.getName();
+    private boolean doesIndexChange(NewStuffEntity target, UUID newDepartmentId, String newName) {
+        return !(target.getDepartmentId().equals(newDepartmentId)
+                && target.getName().equals(newName));
+    }
 
-        return !(oldUniversityName.equals(newStuff.department().university().name())
-                && oldDepartmentName.equals(newStuff.department().name())
-                && oldName.equals(newStuff.name()));
+    private void checkStuffIdConflict(UUID stuffId) {
+        if (stuffRepository.existsById(stuffId)) {
+            throw new ConflictException();
+        }
     }
 
     private void checkStuffConflict(UUID departmentId, String name) {

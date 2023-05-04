@@ -1,6 +1,7 @@
 package com.example.beliemeserver.domain.dao._new;
 
 import com.example.beliemeserver.domain.dto._new.MajorDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,14 +12,14 @@ public interface MajorDao {
     List<MajorDto> getAllList();
 
     @Transactional
-    MajorDto getById(UUID majorId);
+    MajorDto getById(@NonNull UUID majorId);
 
     @Transactional
-    MajorDto getByIndex(UUID universityId, String majorCode);
+    MajorDto getByIndex(@NonNull UUID universityId, @NonNull String majorCode);
 
     @Transactional
-    MajorDto create(MajorDto newMajor);
+    MajorDto create(@NonNull UUID majorId, @NonNull UUID universityId, @NonNull String majorCode);
 
     @Transactional
-    MajorDto update(UUID majorId, MajorDto newMajor);
+    MajorDto update(@NonNull UUID majorId, @NonNull UUID universityId, @NonNull String majorCode);
 }

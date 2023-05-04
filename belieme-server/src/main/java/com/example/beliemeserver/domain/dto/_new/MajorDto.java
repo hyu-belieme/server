@@ -20,19 +20,11 @@ public record MajorDto(@NonNull UUID id, @NonNull UniversityDto university, @Non
         return new MajorDto(id, university, code);
     }
 
-    public boolean matchUniqueKey(String universityName, String majorCode) {
-        if (universityName == null || majorCode == null) {
-            return false;
-        }
-        return university.matchUniqueKey(universityName)
-                && majorCode.equals(this.code());
-    }
-
-    public boolean matchUniqueKey(MajorDto oth) {
+    public boolean matchId(MajorDto oth) {
         if (oth == null) {
             return false;
         }
-        return matchUniqueKey(oth.university.name(), oth.code);
+        return this.id.equals(oth.id);
     }
 
     @Override

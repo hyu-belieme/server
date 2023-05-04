@@ -13,7 +13,7 @@ import java.util.Map;
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "newinit")
-public class InitialDataConfig implements InitialData {
+public class InitialDataConfig {
     private final Map<String, UniversityInfo> universityInfos;
     private final Map<String, DepartmentInfo> departmentInfos;
     private final List<UserInfo> userInfos;

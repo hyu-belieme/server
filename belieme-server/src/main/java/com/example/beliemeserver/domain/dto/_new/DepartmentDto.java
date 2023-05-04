@@ -55,16 +55,11 @@ public record DepartmentDto(
         return output;
     }
 
-    public boolean matchUniqueKey(String universityName, String departmentName) {
-        return this.university.matchUniqueKey(universityName)
-                && this.name.equals(departmentName);
-    }
-
-    public boolean matchUniqueKey(DepartmentDto oth) {
+    public boolean matchId(DepartmentDto oth) {
         if (oth == null) {
             return false;
         }
-        return matchUniqueKey(oth.university.name(), oth.name);
+        return this.id.equals(oth.id);
     }
 
     @Override

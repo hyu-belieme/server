@@ -107,28 +107,7 @@ public record UserDto(
     public UserDto withAuthorityRemove(DepartmentDto department) {
         UserDto output = new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
         output.authorities.removeIf(
-                (authority) -> department.matchUniqueKey(authority.department()));
-        return output;
-    }
-
-    public UserDto withAuthorityUpdate(DepartmentDto department, Permission permission) {
-        UserDto output = new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
-
-        if (permission == null) {
-            output.authorities.removeIf(
-                    (authority) -> department.matchUniqueKey(authority.department()));
-            return output;
-        }
-
-        for (int i = 0; i < output.authorities.size(); i++) {
-            AuthorityDto authority = output.authorities.get(i);
-            if (authority.department().matchUniqueKey(department)) {
-                output.authorities.set(i, new AuthorityDto(department, permission));
-                return output;
-            }
-        }
-
-        output.authorities.add(new AuthorityDto(department, permission));
+                (authority) -> department.matchId(authority.department()));
         return output;
     }
 
@@ -150,16 +129,11 @@ public record UserDto(
                 '}';
     }
 
-    public boolean matchUniqueKey(String universityName, String studentId) {
-        return this.university.matchUniqueKey(universityName)
-                && this.studentId.equals(studentId);
-    }
-
-    public boolean matchUniqueKey(UserDto oth) {
+    public boolean matchId(UserDto oth) {
         if (oth == null) {
             return false;
         }
-        return matchUniqueKey(oth.university.name(), oth.studentId);
+        return this.id.equals(oth.id);
     }
 
     public boolean isDeveloper() {
@@ -203,7 +177,7 @@ public record UserDto(
         boolean notExist = true;
         for (int i = 0; i < list.size(); i++) {
             DepartmentDto department = list.get(i).department();
-            if (!department.matchUniqueKey(targetDepartment)) continue;
+            if (!department.matchId(targetDepartment)) continue;
             notExist = false;
 
             if (newAuthority.permission() != Permission.DEFAULT) {
