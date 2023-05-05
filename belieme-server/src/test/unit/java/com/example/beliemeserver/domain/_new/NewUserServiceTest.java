@@ -11,6 +11,7 @@ import com.example.beliemeserver.domain.service._new.NewUserService;
 import com.example.beliemeserver.domain.util.HttpRequest;
 import com.example.beliemeserver.error.exception.BadGatewayException;
 import com.example.beliemeserver.error.exception.ForbiddenException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
@@ -61,7 +62,8 @@ public class NewUserServiceTest extends NewBaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
             when(userDao.getAllList()).thenReturn(stub.ALL_USERS);
 
             List<UserDto> expected = new ArrayList<>();
@@ -71,6 +73,30 @@ public class NewUserServiceTest extends NewBaseServiceTest {
             }
 
             TestHelper.listCompareTest(this::execMethod, expected);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[해당 `index`의 `department`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_getInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 

@@ -4,15 +4,13 @@ import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
 import com.example.beliemeserver.domain.dao._new.*;
 import com.example.beliemeserver.domain.dto._new.*;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
-import com.example.beliemeserver.error.exception.InvalidIndexException;
-import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.exception.TokenExpiredException;
 import com.example.beliemeserver.domain.service._new.NewBaseService;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.util.RandomGetter;
-import com.example.beliemeserver.util._new.StubWithInitialData;
 import com.example.beliemeserver.util.TestHelper;
+import com.example.beliemeserver.util._new.StubWithInitialData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -102,22 +100,6 @@ public abstract class NewBaseServiceTest {
             requester = randomUserHaveLessPermissionOnDept(dept, Permission.USER);
         }
 
-        protected void mockDepartmentAndRequester() {
-            when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(departmentDao.getById(deptId)).thenReturn(dept);
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[해당 `index`의 `department`가 존재하지 않을 시]_[InvalidIndexException]")
-        public void ERROR_getInvalidIndex_InvalidIndexException() {
-            setUpDefault();
-
-            when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(departmentDao.getById(deptId)).thenThrow(NotFoundException.class);
-
-            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
-        }
-
         @RepeatedTest(10)
         @DisplayName("[ERROR]_[토큰이 검증되지 않을 시]_[UnauthorizedException]")
         public void ERROR_isUnauthorizedToken_UnauthorizedException() {
@@ -130,14 +112,7 @@ public abstract class NewBaseServiceTest {
 
         @RepeatedTest(10)
         @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
-        public void ERROR_accessDenied_PermissionDeniedException() {
-            setUpDefault();
-            setRequesterAccessDenied();
-
-            mockDepartmentAndRequester();
-
-            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
-        }
+        public abstract void ERROR_accessDenied_PermissionDeniedException();
     }
 
     protected RandomGetter<UniversityDto> allUnivs() {
