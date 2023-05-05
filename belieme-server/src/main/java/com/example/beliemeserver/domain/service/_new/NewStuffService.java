@@ -72,6 +72,6 @@ public class NewStuffService extends NewBaseService {
         if (newName == null) newName = oldStuff.name();
         if (newThumbnail == null) newThumbnail = oldStuff.thumbnail();
 
-        return stuffDao.update(stuffId, oldStuff.id(), newName, newThumbnail);
+        return stuffDao.update(stuffId, oldStuff.department().id(), newName, newThumbnail);
     }
 }
