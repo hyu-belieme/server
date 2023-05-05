@@ -38,6 +38,7 @@ public class NewUserDaoImpl extends NewBaseDaoImpl implements UserDao {
     public List<UserDto> getListByUniversity(@NonNull UUID universityId) {
         List<UserDto> output = new ArrayList<>();
 
+        validateUniversityId(universityId);
         for (NewUserEntity userEntity : userRepository.findByUniversityId(universityId)) {
             output.add(userEntity.toUserDto());
         }

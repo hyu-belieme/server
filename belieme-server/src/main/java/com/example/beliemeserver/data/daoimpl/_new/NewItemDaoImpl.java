@@ -31,6 +31,8 @@ public class NewItemDaoImpl extends NewBaseDaoImpl implements ItemDao {
 
     @Override
     public List<ItemDto> getListByStuff(@NonNull UUID stuffId) {
+        validateStuffId(stuffId);
+
         List<ItemDto> output = new ArrayList<>();
         for (NewItemEntity itemEntity : itemRepository.findByStuffId(stuffId)) {
             output.add(itemEntity.toItemDto());

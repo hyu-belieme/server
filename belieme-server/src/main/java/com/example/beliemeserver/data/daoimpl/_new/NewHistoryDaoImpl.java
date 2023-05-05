@@ -28,6 +28,8 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
 
     @Override
     public List<HistoryDto> getListByDepartment(@NonNull UUID departmentId) {
+        validateDepartmentId(departmentId);
+
         List<HistoryDto> output = new ArrayList<>();
         for (NewStuffEntity stuff : stuffRepository.findByDepartmentId(departmentId)) {
             for (NewItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
@@ -39,6 +41,8 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
 
     @Override
     public List<HistoryDto> getListByStuff(@NonNull UUID stuffId) {
+        validateStuffId(stuffId);
+
         List<HistoryDto> output = new ArrayList<>();
         for (NewItemEntity item : itemRepository.findByStuffId(stuffId)) {
             output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
@@ -48,11 +52,16 @@ public class NewHistoryDaoImpl extends NewBaseDaoImpl implements HistoryDao {
 
     @Override
     public List<HistoryDto> getListByItem(@NonNull UUID itemId) {
+        validateItemId(itemId);
+
         return toHistoryDtoList(historyRepository.findByItemId(itemId));
     }
 
     @Override
     public List<HistoryDto> getListByDepartmentAndRequester(@NonNull UUID departmentId, @NonNull UUID requesterId) {
+        validateDepartmentId(departmentId);
+        validateUserId(requesterId);
+
         List<HistoryDto> output = new ArrayList<>();
         for (NewHistoryEntity historyEntity : historyRepository.findByRequesterId(requesterId)) {
             if (historyEntity.getItem().getStuff().getDepartment().getId() == departmentId) {

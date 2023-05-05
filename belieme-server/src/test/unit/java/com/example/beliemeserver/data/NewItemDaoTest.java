@@ -60,8 +60,17 @@ public class NewItemDaoTest extends BaseDaoTest {
                 if(item.getStuffId().equals(stuffId)) targets.add(item);
             }
 
+            when(stuffRepository.existsById(stuffId)).thenReturn(true);
             when(itemRepository.findByStuffId(stuffId)).thenReturn(targets);
             TestHelper.listCompareTest(this::execMethod, toItemDtoList(targets));
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `stuffId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongStuffId_invalidIndexException() {
+            when(stuffRepository.existsById(stuffId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 

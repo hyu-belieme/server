@@ -8,6 +8,7 @@ import com.example.beliemeserver.data.repository._new.*;
 import com.example.beliemeserver.domain.dao._new.DepartmentDao;
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,7 @@ public class NewDepartmentDaoImpl extends NewBaseDaoImpl implements DepartmentDa
     public List<DepartmentDto> getListByUniversity(@NonNull UUID universityId) {
         List<DepartmentDto> output = new ArrayList<>();
 
+        validateUniversityId(universityId);
         for (NewDepartmentEntity departmentEntity : departmentRepository.findByUniversityId(universityId)) {
             output.add(departmentEntity.toDepartmentDto());
         }

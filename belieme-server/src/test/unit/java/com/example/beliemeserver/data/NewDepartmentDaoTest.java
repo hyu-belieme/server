@@ -72,8 +72,19 @@ public class NewDepartmentDaoTest  extends BaseDaoTest {
                 if(dept.getUniversity().getId().equals(univId)) targets.add(dept);
             }
 
+            when(univRepository.existsById(univId)).thenReturn(true);
             when(deptRepository.findByUniversityId(univId)).thenReturn(targets);
             TestHelper.listCompareTest(this::execMethod, toDepartmentDtoList(targets));
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `universityId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongUniversityId_invalidIndexException() {
+            setUniv(randomUniv());
+
+            when(univRepository.existsById(univId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 

@@ -64,6 +64,7 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         public void SUCCESS() {
             setItem(randomItem());
 
+            when(itemRepository.existsById(itemId)).thenReturn(true);
             when(historyRepository.findByItemId(itemId)).thenReturn(historiesOnItem(itemId));
 
             List<NewHistoryEntity> expect = new ArrayList<>();
@@ -71,6 +72,16 @@ public class NewHistoryDaoTest extends BaseDaoTest {
                 if(history.getItemId().equals(itemId)) expect.add(history);
             }
             TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `itemId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongItemId_invalidIndexException() {
+            setItem(randomItem());
+
+            when(itemRepository.existsById(itemId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -94,6 +105,7 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         public void SUCCESS() {
             setStuff(randomStuff());
 
+            when(stuffRepository.existsById(stuffId)).thenReturn(true);
             when(itemRepository.findByStuffId(stuffId)).thenReturn(itemsOnStuff(stuffId));
             for(NewItemEntity item : itemsOnStuff(stuffId)) {
                 when(historyRepository.findByItemId(item.getId())).thenReturn(historiesOnItem(item.getId()));
@@ -104,6 +116,16 @@ public class NewHistoryDaoTest extends BaseDaoTest {
                 if(history.getItem().getStuffId().equals(stuffId)) expect.add(history);
             }
             TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `stuffId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongStuffId_invalidIndexException() {
+            setStuff(randomStuff());
+
+            when(stuffRepository.existsById(stuffId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -127,6 +149,7 @@ public class NewHistoryDaoTest extends BaseDaoTest {
         public void SUCCESS() {
             setDept(randomDept());
 
+            when(deptRepository.existsById(deptId)).thenReturn(true);
             when(stuffRepository.findByDepartmentId(deptId)).thenReturn(stuffsOnDept(deptId));
             for(NewStuffEntity stuff : stuffsOnDept(deptId)) {
                 when(itemRepository.findByStuffId(stuff.getId())).thenReturn(itemsOnStuff(stuff.getId()));
@@ -140,6 +163,16 @@ public class NewHistoryDaoTest extends BaseDaoTest {
                 if(history.getItem().getStuff().getDepartmentId().equals(deptId)) expect.add(history);
             }
             TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `departmentId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongDepartmentId_invalidIndexException() {
+            setDept(randomDept());
+
+            when(deptRepository.existsById(deptId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 
@@ -172,6 +205,8 @@ public class NewHistoryDaoTest extends BaseDaoTest {
             setDept(randomDept());
             setUser(randomUser());
 
+            when(deptRepository.existsById(deptId)).thenReturn(true);
+            when(userRepository.existsById(requesterId)).thenReturn(true);
             when(historyRepository.findByRequesterId(requesterId))
                     .thenReturn(historiesByRequesters(requesterId));
 
@@ -183,6 +218,29 @@ public class NewHistoryDaoTest extends BaseDaoTest {
                 }
             }
             TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `departmentId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongDepartmentId_invalidIndexException() {
+            setDept(randomDept());
+            setUser(randomUser());
+
+            when(deptRepository.existsById(deptId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `userId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongUserId_invalidIndexException() {
+            setDept(randomDept());
+            setUser(randomUser());
+
+            when(deptRepository.existsById(deptId)).thenReturn(true);
+            when(userRepository.existsById(requesterId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 

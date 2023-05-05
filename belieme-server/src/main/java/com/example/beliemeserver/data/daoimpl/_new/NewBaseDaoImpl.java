@@ -37,6 +37,26 @@ public abstract class NewBaseDaoImpl {
         this.historyRepository = historyRepository;
     }
 
+    protected void validateUniversityId(UUID universityId) {
+        if(!universityRepository.existsById(universityId)) throw new InvalidIndexException();
+    }
+
+    protected void validateDepartmentId(UUID departmentId) {
+        if(!departmentRepository.existsById(departmentId)) throw new InvalidIndexException();
+    }
+
+    protected void validateUserId(UUID userId) {
+        if(!userRepository.existsById(userId)) throw new InvalidIndexException();
+    }
+
+    protected void validateStuffId(UUID stuffId) {
+        if(!stuffRepository.existsById(stuffId)) throw new InvalidIndexException();
+    }
+
+    protected void validateItemId(UUID itemId) {
+        if(!itemRepository.existsById(itemId)) throw new InvalidIndexException();
+    }
+
     protected NewUniversityEntity findUniversityEntity(UUID id) {
         return NewIndexAdapter.getUniversityEntity(universityRepository, id);
     }

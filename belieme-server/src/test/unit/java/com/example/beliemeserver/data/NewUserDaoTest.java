@@ -69,8 +69,19 @@ public class NewUserDaoTest  extends BaseDaoTest {
                 if(user.getUniversity().getId().equals(univId)) targets.add(user);
             }
 
+            when(univRepository.existsById(univId)).thenReturn(true);
             when(userRepository.findByUniversityId(univId)).thenReturn(targets);
             TestHelper.listCompareTest(this::execMethod, toUserDtoList(targets));
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[잘못된 `universityId`가 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongUniversityId_invalidIndexException() {
+            setUniv(randomUniv());
+
+            when(univRepository.existsById(univId)).thenReturn(false);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
     }
 

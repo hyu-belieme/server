@@ -8,6 +8,7 @@ import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededExcepti
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service._new.NewStuffService;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -65,6 +66,18 @@ public class StuffServiceTest extends NewBaseServiceTest {
                     this::execMethod,
                     stuffList
             );
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[`departmentId`가 잘못 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongDepartmentId_invalidIndexException() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(stuffDao.getListByDepartment(deptId)).thenThrow(InvalidIndexException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @Override

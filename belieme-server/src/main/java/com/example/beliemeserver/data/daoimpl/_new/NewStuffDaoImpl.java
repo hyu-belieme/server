@@ -30,6 +30,8 @@ public class NewStuffDaoImpl extends NewBaseDaoImpl implements StuffDao {
 
     @Override
     public List<StuffDto> getListByDepartment(@NonNull UUID departmentId) {
+        validateDepartmentId(departmentId);
+
         List<StuffDto> output = new ArrayList<>();
         for (NewStuffEntity stuffEntity : stuffRepository.findByDepartmentId(departmentId)) {
             output.add(stuffEntity.toStuffDto());
