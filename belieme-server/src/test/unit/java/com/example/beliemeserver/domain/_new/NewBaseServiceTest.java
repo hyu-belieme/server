@@ -214,6 +214,10 @@ public abstract class NewBaseServiceTest {
         return output;
     }
 
+    protected MajorDto randomMajor() {
+        return randomSelectAndLog(allMajors());
+    }
+
     protected DepartmentDto randomDept() {
         return randomSelectAndLog(allDepts());
     }

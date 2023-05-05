@@ -198,6 +198,10 @@ public class NewUserService extends NewBaseService {
 
     private UserDto updateOrCreateUser(UUID universityId, String studentId, String name, int entranceYear, List<String> majorCodes) {
         UserDto targetUser = getOrNull(universityId, studentId);
+
+        List<AuthorityDto> oldAuthorities = new ArrayList<>();
+        if(targetUser != null) oldAuthorities = targetUser.authorities();
+
         return updateOrCreateUser(
                 targetUser,
                 null,
@@ -205,7 +209,7 @@ public class NewUserService extends NewBaseService {
                 studentId,
                 name,
                 entranceYear,
-                makeNewAuthorities(new ArrayList<>(), universityId, majorCodes)
+                makeNewAuthorities(oldAuthorities, universityId, majorCodes)
         );
     }
 
