@@ -717,10 +717,6 @@ public class NewUserServiceTest extends NewBaseServiceTest {
         });
     }
 
-    private long currentTime() {
-        return System.currentTimeMillis() / 1000;
-    }
-
     private abstract class UserNestedTest extends BaseNestedTest {
     }
 }

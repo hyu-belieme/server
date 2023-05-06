@@ -267,17 +267,22 @@ public class NewHistoryService extends NewBaseService {
                 newHistory.id(),
                 newHistory.item().id(),
                 newHistory.num(),
-                newHistory.requester().id(),
-                newHistory.approveManager().id(),
-                newHistory.returnManager().id(),
-                newHistory.lostManager().id(),
-                newHistory.cancelManager().id(),
+                getUserIdOrNull(newHistory.requester()),
+                getUserIdOrNull(newHistory.approveManager()),
+                getUserIdOrNull(newHistory.returnManager()),
+                getUserIdOrNull(newHistory.lostManager()),
+                getUserIdOrNull(newHistory.cancelManager()),
                 newHistory.requestedAt(),
                 newHistory.approvedAt(),
                 newHistory.returnedAt(),
                 newHistory.lostAt(),
                 newHistory.canceledAt()
         );
+    }
+
+    private UUID getUserIdOrNull(UserDto user) {
+        if(user == null) return null;
+        return user.id();
     }
 
     private UserDto getUserOrThrowInvalidIndexException(UUID userId) {

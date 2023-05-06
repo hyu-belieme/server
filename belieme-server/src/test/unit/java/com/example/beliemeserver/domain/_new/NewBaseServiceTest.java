@@ -235,4 +235,8 @@ public abstract class NewBaseServiceTest {
     protected HistoryDto randomHistoryOnDept(DepartmentDto dept) {
         return randomSelectAndLog(historiesOnDept(allHistories(), dept));
     }
+
+    protected long currentTime() {
+        return System.currentTimeMillis() / 1000;
+    }
 }

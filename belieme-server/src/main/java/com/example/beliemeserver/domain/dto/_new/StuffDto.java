@@ -73,7 +73,7 @@ public record StuffDto(
 
     public ItemDto firstUsableItem() {
         for (ItemDto item : items) {
-            if (item.isUsable()) return item;
+            if (item.isUsable()) return item.withStuff(this);
         }
         return null;
     }
