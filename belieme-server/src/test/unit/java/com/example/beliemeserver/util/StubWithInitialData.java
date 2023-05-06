@@ -1,14 +1,10 @@
 package com.example.beliemeserver.util;
 
-import com.example.beliemeserver.config.initdata.InitialData;
-import com.example.beliemeserver.config.initdata.InitialDataConfig;
-import com.example.beliemeserver.config.initdata.container.AuthorityInfo;
-import com.example.beliemeserver.config.initdata.container.DepartmentInfo;
-import com.example.beliemeserver.config.initdata.container.UniversityInfo;
-import com.example.beliemeserver.config.initdata.container.UserInfo;
-import com.example.beliemeserver.domain.dto.AuthorityDto;
-import com.example.beliemeserver.domain.dto.MajorDto;
-import com.example.beliemeserver.domain.dto.UserDto;
+import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
+import com.example.beliemeserver.config.initdata._new.container.*;
+import com.example.beliemeserver.domain.dto._new.AuthorityDto;
+import com.example.beliemeserver.domain.dto._new.DepartmentDto;
+import com.example.beliemeserver.domain.dto._new.UserDto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class StubWithInitialData extends StubData {
-    public final InitialData INIT_DATA;
+    public final InitialDataConfig INIT_DATA;
 
     public final UniversityInfo DEV_UNIV_INIT_INFO;
     public final UniversityInfo HYU_UNIV_INIT_INFO;
@@ -34,30 +30,21 @@ public class StubWithInitialData extends StubData {
     public StubWithInitialData() {
         // Initial Universities
         Map<String, String> apiInfos = new HashMap<>();
-        DEV_UNIV_INIT_INFO = new UniversityInfo(DEV_UNIV.code(), DEV_UNIV.name(), apiInfos);
+        DEV_UNIV_INIT_INFO = new UniversityInfo(DEV_UNIV.id(), DEV_UNIV.name(), apiInfos);
 
         apiInfos = new HashMap<>();
         apiInfos.put("url", HYU_UNIV.apiUrl());
         apiInfos.put("client-token", "5448db157878445bb4392355b15a03fa");
-        HYU_UNIV_INIT_INFO = new UniversityInfo(HYU_UNIV.code(), HYU_UNIV.name(), apiInfos);
+        HYU_UNIV_INIT_INFO = new UniversityInfo(HYU_UNIV.id(), HYU_UNIV.name(), apiInfos);
 
         Map<String, UniversityInfo> universities = new HashMap<>();
         universities.put("DEV", DEV_UNIV_INIT_INFO);
         universities.put("HYU", HYU_UNIV_INIT_INFO);
 
         // Initial Departments
-        DEV_DEV_DEPT_INIT_INFO = new DepartmentInfo(
-                DEV_DEPT.university().code(), DEV_DEPT.code(), DEV_DEPT.name(),
-                DEV_DEPT.baseMajors().stream().map(MajorDto::code).toList()
-        );
-        HYU_CSE_DEPT_INIT_INFO = new DepartmentInfo(
-                HYU_CSE_DEPT.university().code(), HYU_CSE_DEPT.code(), HYU_CSE_DEPT.name(),
-                HYU_CSE_DEPT.baseMajors().stream().map(MajorDto::code).toList()
-        );
-        HYU_ME_DEPT_INIT_INFO = new DepartmentInfo(
-                HYU_ME_DEPT.university().code(), HYU_ME_DEPT.code(), HYU_ME_DEPT.name(),
-                HYU_ME_DEPT.baseMajors().stream().map(MajorDto::code).toList()
-        );
+        DEV_DEV_DEPT_INIT_INFO = makeDepartmentInfo(DEV_DEPT);
+        HYU_CSE_DEPT_INIT_INFO = makeDepartmentInfo(HYU_CSE_DEPT);
+        HYU_ME_DEPT_INIT_INFO = makeDepartmentInfo(HYU_ME_DEPT);
 
         Map<String, DepartmentInfo> departments = new HashMap<>();
         departments.put("DEV_DEV", DEV_DEV_DEPT_INIT_INFO);
@@ -76,16 +63,25 @@ public class StubWithInitialData extends StubData {
         INIT_DATA = new InitialDataConfig(universities, departments, users);
     }
 
+    private DepartmentInfo makeDepartmentInfo(DepartmentDto deptDto) {
+        return new DepartmentInfo(
+                deptDto.id(),
+                deptDto.university().id(),
+                deptDto.name(),
+                deptDto.baseMajors().stream()
+                        .map(e -> new MajorInfo(deptDto.university().id(), e.code())).toList()
+        );
+    }
+
     private UserInfo makeUserInfo(String apiToken, UserDto userDto) {
         List<AuthorityInfo> authorityInfos = new ArrayList<>();
         for (AuthorityDto authority : userDto.authorities()) {
             authorityInfos.add(new AuthorityInfo(
-                    authority.department().university().code(),
-                    authority.department().code(), authority.permission().toString()));
+                    authority.department().id(), authority.permission().toString()));
         }
 
         return new UserInfo(
-                apiToken, userDto.university().code(), userDto.studentId(),
+                userDto.id(), apiToken, userDto.university().id(), userDto.studentId(),
                 userDto.name(), userDto.entranceYear(), authorityInfos);
     }
 }

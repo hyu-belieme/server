@@ -1,13 +1,16 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.domain.dto.HistoryDto;
+import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
-@JsonPropertyOrder({"univ", "dept", "item", "num", "status", "requestedAt", "requester", "approvedAt", "approveManager", "lostAt", "lostManager", "returnedAt", "returnManager", "canceledAt", "cancelManager"})
+@JsonPropertyOrder({"id", "univ", "dept", "item", "num", "status", "requestedAt", "requester", "approvedAt", "approveManager", "lostAt", "lostManager", "returnedAt", "returnManager", "canceledAt", "cancelManager"})
 public class HistoryResponse extends JsonResponse {
+    private UUID id;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private UniversityResponse university;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
@@ -45,8 +48,9 @@ public class HistoryResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private HistoryResponse(UniversityResponse university, DepartmentResponse department, ItemResponse item, int num, UserResponse requester, UserResponse approveManager, UserResponse returnManager, UserResponse lostManager, UserResponse cancelManager, long requestedAt, long approvedAt, long returnedAt, long lostAt, long canceledAt, String status) {
+    private HistoryResponse(UUID id, UniversityResponse university, DepartmentResponse department, ItemResponse item, int num, UserResponse requester, UserResponse approveManager, UserResponse returnManager, UserResponse lostManager, UserResponse cancelManager, long requestedAt, long approvedAt, long returnedAt, long lostAt, long canceledAt, String status) {
         super(true);
+        this.id = id;
         this.university = university;
         this.department = department;
         this.item = item;
@@ -75,6 +79,7 @@ public class HistoryResponse extends JsonResponse {
         }
 
         return new HistoryResponse(
+                historyDto.id(),
                 UniversityResponse.from(historyDto.item().stuff().department().university()),
                 DepartmentResponse.from(historyDto.item().stuff().department()).withoutUniversity(),
                 ItemResponse.from(historyDto.item()).withoutUniversityAndDepartment(),
@@ -91,6 +96,7 @@ public class HistoryResponse extends JsonResponse {
 
     public HistoryResponse withoutUniversityAndDepartment() {
         return new HistoryResponse(
+                id,
                 UniversityResponse.responseWillBeIgnore(), DepartmentResponse.responseWillBeIgnore(),
                 item, num, requester, approveManager,
                 returnManager, lostManager, cancelManager, requestedAt,
@@ -99,7 +105,7 @@ public class HistoryResponse extends JsonResponse {
 
     public HistoryResponse withoutItem() {
         return new HistoryResponse(
-                university, department,
+                id, university, department,
                 ItemResponse.responseWillBeIgnore(), num, requester, approveManager,
                 returnManager, lostManager, cancelManager, requestedAt,
                 approvedAt, returnedAt, lostAt, canceledAt, status);

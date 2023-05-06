@@ -10,7 +10,7 @@ import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
-import com.example.beliemeserver.util._new.StubWithInitialData;
+import com.example.beliemeserver.util.StubWithInitialData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.domain.dto.UserDto;
+import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.util.RandomGetter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 
 import java.io.IOException;
-
 
 public class UserResponseTest extends BaseResponseTest {
     private final RandomGetter<UserDto> userGetter = new RandomGetter<>(stub.ALL_USERS);

@@ -1,4 +1,4 @@
-package com.example.beliemeserver.web.requestbody._new;
+package com.example.beliemeserver.web.requestbody;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

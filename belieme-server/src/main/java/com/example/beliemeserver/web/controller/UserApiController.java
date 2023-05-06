@@ -4,7 +4,7 @@ import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.domain.service.UserService;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
-import com.example.beliemeserver.web.responsebody._new.UserResponse;
+import com.example.beliemeserver.web.responsebody.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

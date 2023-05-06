@@ -1,6 +1,6 @@
 package com.example.beliemeserver.util;
 
-import com.example.beliemeserver.domain.dto.*;
+import com.example.beliemeserver.domain.dto._new.*;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public abstract class BaseStub {
             HistoryDto newLastHistory = history.withItem(ItemDto.nestedEndpoint);
             for (int i = 0; i < items.size(); i++) {
                 ItemDto item = items.get(i);
-                if (item.matchUniqueKey(history.item())) {
+                if (item.matchId(history.item())) {
                     items.set(i, item.withLastHistory(newLastHistory));
                 }
             }
@@ -38,7 +38,7 @@ public abstract class BaseStub {
         for (ItemDto item : items) {
             for (int i = 0; i < stuffs.size(); i++) {
                 StuffDto stuff = stuffs.get(i);
-                if (stuff.matchUniqueKey(item.stuff())) {
+                if (stuff.matchId(item.stuff())) {
                     stuffs.set(i, stuff.withItemAdd(item));
                 }
             }
@@ -49,7 +49,7 @@ public abstract class BaseStub {
         for (StuffDto stuff : stuffs) {
             for (int i = 0; i < items.size(); i++) {
                 ItemDto item = items.get(i);
-                if (stuff.matchUniqueKey(item.stuff())) {
+                if (stuff.matchId(item.stuff())) {
                     items.set(i, item.withStuff(stuff));
                 }
             }
@@ -60,7 +60,7 @@ public abstract class BaseStub {
         for (ItemDto item : items) {
             for (int i = 0; i < histories.size(); i++) {
                 HistoryDto history = histories.get(i);
-                if (item.matchUniqueKey(history.item())) {
+                if (item.matchId(history.item())) {
                     histories.set(i, history.withItem(item));
                 }
             }

@@ -2,10 +2,10 @@ package com.example.beliemeserver.web.controller;
 
 import com.example.beliemeserver.domain.dto._new.DepartmentDto;
 import com.example.beliemeserver.domain.service.DepartmentService;
-import com.example.beliemeserver.web.requestbody._new.DepartmentRequest;
+import com.example.beliemeserver.web.requestbody.DepartmentRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.DepartmentUpdateValidationGroup;
-import com.example.beliemeserver.web.responsebody._new.DepartmentResponse;
+import com.example.beliemeserver.web.responsebody.DepartmentResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

@@ -14,6 +14,11 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 public class StuffRequest {
+    @NotNull(message = "{message.error.badRequest.notNull}",
+            groups = StuffCreateValidationGroup.class)
+    @JsonProperty("department-id")
+    String departmentId;
+
     @Size(min = 1, max = 30, message = "{message.error.badRequest.outOfSize}",
             groups = {StuffCreateValidationGroup.class, StuffUpdateValidationGroup.class})
     @Pattern(regexp = "[\\p{L}\\d() ]+", message = "{message.error.badRequest.containsNonLetter}",
