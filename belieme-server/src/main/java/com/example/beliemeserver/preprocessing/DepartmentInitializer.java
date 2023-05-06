@@ -1,6 +1,6 @@
 package com.example.beliemeserver.preprocessing;
 
-import com.example.beliemeserver.domain.service._new.NewDepartmentService;
+import com.example.beliemeserver.domain.service.DepartmentService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 @Order(2)
 @Component
 public class DepartmentInitializer implements CommandLineRunner {
-    private final NewDepartmentService departmentService;
+    private final DepartmentService departmentService;
 
-    public DepartmentInitializer(NewDepartmentService departmentService) {
+    public DepartmentInitializer(DepartmentService departmentService) {
         this.departmentService = departmentService;
     }
 

@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
 import com.example.beliemeserver.domain.dto._new.UserDto;
-import com.example.beliemeserver.domain.service._new.NewUserService;
+import com.example.beliemeserver.domain.service.UserService;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import com.example.beliemeserver.web.responsebody._new.UserResponse;
@@ -16,9 +16,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "")
 public class UserApiController extends BaseApiController {
-    private final NewUserService userService;
+    private final UserService userService;
 
-    public UserApiController(NewUserService userService) {
+    public UserApiController(UserService userService) {
         this.userService = userService;
     }
 

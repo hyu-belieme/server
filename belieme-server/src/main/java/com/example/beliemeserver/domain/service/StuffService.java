@@ -1,80 +1,77 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata.InitialData;
-import com.example.beliemeserver.domain.dao.*;
-import com.example.beliemeserver.domain.dto.DepartmentDto;
-import com.example.beliemeserver.domain.dto.ItemDto;
-import com.example.beliemeserver.domain.dto.StuffDto;
+import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
+import com.example.beliemeserver.domain.dao._new.*;
+import com.example.beliemeserver.domain.dto._new.DepartmentDto;
+import com.example.beliemeserver.domain.dto._new.ItemDto;
+import com.example.beliemeserver.domain.dto._new.StuffDto;
+import com.example.beliemeserver.domain.dto._new.UserDto;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.util.Constants;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class StuffService extends BaseService {
-    public StuffService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public StuffService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public List<StuffDto> getListByDepartment(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode
+            @NonNull String userToken, @NonNull UUID departmentId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkUserPermission(userToken, department);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
+        checkUserPermission(requester, department);
 
-        return stuffDao.getListByDepartment(universityCode, departmentCode);
+        return stuffDao.getListByDepartment(departmentId);
     }
 
-    public StuffDto getByIndex(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String name
+    public StuffDto getById(
+            @NonNull String userToken, @NonNull UUID stuffId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkUserPermission(userToken, department);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        StuffDto stuff = stuffDao.getById(stuffId);
+        checkUserPermission(requester, stuff.department());
 
-        return stuffDao.getByIndex(universityCode, departmentCode, name);
+        return stuff;
     }
 
     public StuffDto create(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
+            @NonNull String userToken, @NonNull UUID departmentId,
             @NonNull String name, @NonNull String thumbnail, Integer amount
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkStaffPermission(userToken, department);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
+        checkStaffPermission(requester, department);
 
-        StuffDto newStuff = StuffDto.init(department, name, thumbnail);
-        StuffDto output = newStuff;
-        newStuff = stuffDao.create(newStuff);
+        StuffDto newStuff = stuffDao.create(UUID.randomUUID(), departmentId, name, thumbnail);
 
-        if (amount == null) return output;
+        if (amount == null) return newStuff;
         if (amount > Constants.MAX_ITEM_NUM) throw new ItemAmountLimitExceededException();
 
         for (int i = 0; i < amount; i++) {
-            ItemDto newItem = itemDao.create(ItemDto.init(newStuff, i + 1));
-            output = output.withItemAdd(newItem);
+            ItemDto newItem = itemDao.create(UUID.randomUUID(), newStuff.id(), i + 1);
+            newStuff = newStuff.withItemAdd(newItem);
         }
-        return output;
+        return newStuff;
     }
 
     public StuffDto update(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String name,
+            @NonNull String userToken, @NonNull UUID stuffId,
             String newName, String newThumbnail
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkStaffPermission(userToken, department);
-
-        StuffDto oldStuff = stuffDao.getByIndex(universityCode, departmentCode, name);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        StuffDto oldStuff = stuffDao.getById(stuffId);
+        checkStaffPermission(requester, oldStuff.department());
 
         if (newName == null && newThumbnail == null) return oldStuff;
         if (newName == null) newName = oldStuff.name();
         if (newThumbnail == null) newThumbnail = oldStuff.thumbnail();
 
-        StuffDto newStuff = StuffDto.init(department, newName, newThumbnail);
-        return stuffDao.update(universityCode, departmentCode, name, newStuff);
+        return stuffDao.update(stuffId, oldStuff.department().id(), newName, newThumbnail);
     }
 }

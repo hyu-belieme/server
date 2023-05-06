@@ -1,6 +1,6 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.domain.dto.UniversityDto;
+import com.example.beliemeserver.domain.dto._new.UniversityDto;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.UniversityService;
 import com.example.beliemeserver.error.exception.NotFoundException;
@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 
@@ -47,10 +48,10 @@ public class UniversityServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    @DisplayName("getByIndex()")
+    @DisplayName("getById()")
     public class TestGetByIndex extends UnivNestedTest {
         private UniversityDto univ;
-        private String univCode;
+        private UUID univId;
 
         @Override
         protected void setUpDefault() {
@@ -60,12 +61,12 @@ public class UniversityServiceTest extends BaseServiceTest {
 
         private void setUniv(UniversityDto univ) {
             this.univ = univ;
-            this.univCode = univ.name();
+            this.univId = univ.id();
         }
 
         @Override
         protected UniversityDto execMethod() {
-            return universityService.getByIndex(userToken, univCode);
+            return universityService.getById(userToken, univId);
         }
 
         @RepeatedTest(10)
@@ -74,7 +75,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getByIndex(univCode)).thenReturn(univ);
+            when(universityDao.getById(univId)).thenReturn(univ);
 
             TestHelper.objectCompareTest(this::execMethod, univ);
         }
@@ -85,7 +86,7 @@ public class UniversityServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(universityDao.getByIndex(univCode)).thenThrow(NotFoundException.class);
+            when(universityDao.getById(univId)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }

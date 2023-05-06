@@ -2,8 +2,8 @@ package com.example.beliemeserver.web.controller;
 
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.example.beliemeserver.domain.dto._new.ItemDto;
-import com.example.beliemeserver.domain.service._new.NewHistoryService;
-import com.example.beliemeserver.domain.service._new.NewItemService;
+import com.example.beliemeserver.domain.service.HistoryService;
+import com.example.beliemeserver.domain.service.ItemService;
 import com.example.beliemeserver.web.requestbody._new.ItemRequest;
 import com.example.beliemeserver.web.responsebody._new.HistoryResponse;
 import com.example.beliemeserver.web.responsebody._new.ItemResponse;
@@ -19,10 +19,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "")
 public class ItemApiController extends BaseApiController {
-    private final NewItemService itemService;
-    private final NewHistoryService historyService;
+    private final ItemService itemService;
+    private final HistoryService historyService;
 
-    public ItemApiController(NewItemService itemService, NewHistoryService historyService) {
+    public ItemApiController(ItemService itemService, HistoryService historyService) {
         this.itemService = itemService;
         this.historyService = historyService;
     }

@@ -1,14 +1,15 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.domain.dto.DepartmentDto;
-import com.example.beliemeserver.domain.dto.ItemDto;
-import com.example.beliemeserver.domain.dto.StuffDto;
+import com.example.beliemeserver.domain.dto._new.DepartmentDto;
+import com.example.beliemeserver.domain.dto._new.ItemDto;
+import com.example.beliemeserver.domain.dto._new.StuffDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
-import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
+import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.ItemService;
 import com.example.beliemeserver.domain.util.Constants;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -33,7 +35,7 @@ public class ItemServiceTest extends BaseServiceTest {
     @DisplayName("getListByStuff()")
     public final class TestGetListByStuff extends ItemNestedTest {
         private StuffDto stuff;
-        private String stuffName;
+        private UUID stuffId;
 
         private List<ItemDto> itemList;
 
@@ -48,12 +50,12 @@ public class ItemServiceTest extends BaseServiceTest {
 
         private void setStuff(StuffDto stuff) {
             this.stuff = stuff;
-            this.stuffName = stuff.name();
+            this.stuffId = stuff.id();
         }
 
         @Override
         protected List<ItemDto> execMethod() {
-            return itemService.getListByStuff(userToken, univCode, deptCode, stuffName);
+            return itemService.getListByStuff(userToken, stuffId);
         }
 
         @RepeatedTest(10)
@@ -61,9 +63,9 @@ public class ItemServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getListByStuff(univCode, deptCode, stuffName))
-                    .thenReturn(itemList);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
+            when(itemDao.getListByStuff(stuffId)).thenReturn(itemList);
 
             TestHelper.listCompareTest(this::execMethod, itemList);
         }
@@ -73,26 +75,38 @@ public class ItemServiceTest extends BaseServiceTest {
         public void ERROR_stuffInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getListByStuff(univCode, deptCode, stuffName))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
+            when(itemDao.getListByStuff(stuffId)).thenThrow(InvalidIndexException.class);
 
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
+
         private List<ItemDto> getItemListByStuff(StuffDto stuff) {
             return stub.ALL_ITEMS.stream()
-                    .filter((item) -> stuff.matchUniqueKey(item.stuff()))
+                    .filter((item) -> stuff.matchId(item.stuff()))
                     .toList();
         }
     }
 
     @Nested
-    @DisplayName("getByIndex()")
+    @DisplayName("getById()")
     public final class TestGetByIndex extends ItemNestedTest {
         private ItemDto item;
-        private String stuffName;
-        private int itemNum;
+        private UUID itemId;
 
         @Override
         protected void setUpDefault() {
@@ -103,13 +117,12 @@ public class ItemServiceTest extends BaseServiceTest {
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.stuffName = item.stuff().name();
-            this.itemNum = item.num();
+            this.itemId = item.id();
         }
 
         @Override
         protected ItemDto execMethod() {
-            return itemService.getByIndex(userToken, univCode, deptCode, stuffName, itemNum);
+            return itemService.getById(userToken, itemId);
         }
 
         @RepeatedTest(10)
@@ -117,9 +130,8 @@ public class ItemServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.objectCompareTest(
                     this::execMethod,
@@ -132,14 +144,26 @@ public class ItemServiceTest extends BaseServiceTest {
         public void ERROR_itemNotFound_NotFoundException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(
                     this::execMethod,
                     NotFoundException.class
             );
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 
@@ -147,8 +171,7 @@ public class ItemServiceTest extends BaseServiceTest {
     @DisplayName("create()")
     public final class TestCreate extends ItemNestedTest {
         private ItemDto item;
-        private StuffDto stuff;
-        private String stuffName;
+        private UUID stuffId;
 
         @Override
         protected void setUpDefault() {
@@ -156,13 +179,12 @@ public class ItemServiceTest extends BaseServiceTest {
             setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
 
             StuffDto targetStuff = randomStuffOnDept(dept);
-            setItem(ItemDto.init(targetStuff, targetStuff.nextItemNum()));
+            setItem(new ItemDto(UUID.randomUUID(), targetStuff, targetStuff.nextItemNum(), null));
         }
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.stuff = item.stuff();
-            this.stuffName = stuff.name();
+            this.stuffId = item.stuff().id();
         }
 
         @Override
@@ -172,7 +194,7 @@ public class ItemServiceTest extends BaseServiceTest {
 
         @Override
         protected Object execMethod() {
-            return itemService.create(userToken, univCode, deptCode, stuffName);
+            return itemService.create(userToken, stuffId);
         }
 
         @RepeatedTest(10)
@@ -180,14 +202,13 @@ public class ItemServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-            when(itemDao.create(item)).thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(item.stuff());
+            when(itemDao.create(any(), eq(stuffId), eq(item.stuff().nextItemNum()))).thenReturn(item);
 
             TestHelper.objectCompareTest(this::execMethod, item);
 
-            verify(itemDao, times(1)).create(item);
+            verify(itemDao, times(1)).create(any(), eq(stuffId), eq(item.stuff().nextItemNum()));
         }
 
         @RepeatedTest(10)
@@ -195,9 +216,8 @@ public class ItemServiceTest extends BaseServiceTest {
         public void ERROR_stuffInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
@@ -207,12 +227,11 @@ public class ItemServiceTest extends BaseServiceTest {
         public void ERROR_stuffIsFull_ExceedMaxItemNumException() {
             setUpDefault();
 
-            StuffDto newStuff = getFullStuff(stuff);
+            StuffDto newStuff = getFullStuff(item.stuff());
             setItem(ItemDto.init(newStuff, newStuff.nextItemNum()));
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(newStuff);
 
             TestHelper.exceptionTest(this::execMethod, ItemAmountLimitExceededException.class);
         }
@@ -222,12 +241,25 @@ public class ItemServiceTest extends BaseServiceTest {
         public void ERROR_stuffConflict_ConflictException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-            when(itemDao.create(item)).thenThrow(ConflictException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(item.stuff());
+            when(itemDao.create(any(), eq(stuffId), eq(item.stuff().nextItemNum())))
+                    .thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(item.stuff());
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         private StuffDto getFullStuff(StuffDto stuff) {

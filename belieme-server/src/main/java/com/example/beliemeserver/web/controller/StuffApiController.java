@@ -2,8 +2,8 @@ package com.example.beliemeserver.web.controller;
 
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
 import com.example.beliemeserver.domain.dto._new.StuffDto;
-import com.example.beliemeserver.domain.service._new.NewHistoryService;
-import com.example.beliemeserver.domain.service._new.NewStuffService;
+import com.example.beliemeserver.domain.service.HistoryService;
+import com.example.beliemeserver.domain.service.StuffService;
 import com.example.beliemeserver.web.requestbody._new.StuffRequest;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffCreateValidationGroup;
 import com.example.beliemeserver.web.requestbody.validatemarker.StuffUpdateValidationGroup;
@@ -21,10 +21,10 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "")
 public class StuffApiController extends BaseApiController {
-    private final NewStuffService stuffService;
-    private final NewHistoryService historyService;
+    private final StuffService stuffService;
+    private final HistoryService historyService;
 
-    public StuffApiController(NewStuffService stuffService, NewHistoryService historyService) {
+    public StuffApiController(StuffService stuffService, HistoryService historyService) {
         this.stuffService = stuffService;
         this.historyService = historyService;
     }

@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
 import com.example.beliemeserver.domain.dto._new.UniversityDto;
-import com.example.beliemeserver.domain.service._new.NewUniversityService;
+import com.example.beliemeserver.domain.service.UniversityService;
 import com.example.beliemeserver.web.responsebody._new.UniversityResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +13,9 @@ import java.util.Map;
 @RestController
 @RequestMapping(path = "/${api.keyword.university}")
 public class UniversityApiController extends BaseApiController {
-    private final NewUniversityService universityService;
+    private final UniversityService universityService;
 
-    public UniversityApiController(NewUniversityService universityService) {
+    public UniversityApiController(UniversityService universityService) {
         this.universityService = universityService;
     }
 

@@ -1,12 +1,14 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.domain.dto.DepartmentDto;
-import com.example.beliemeserver.domain.dto.ItemDto;
-import com.example.beliemeserver.domain.dto.StuffDto;
+import com.example.beliemeserver.domain.dto._new.DepartmentDto;
+import com.example.beliemeserver.domain.dto._new.ItemDto;
+import com.example.beliemeserver.domain.dto._new.StuffDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
+import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.StuffService;
 import com.example.beliemeserver.error.exception.ConflictException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.TestHelper;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.mockito.Mockito.*;
@@ -46,7 +49,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         @Override
         protected List<StuffDto> execMethod() {
-            return stuffService.getListByDepartment(userToken, univCode, deptCode);
+            return stuffService.getListByDepartment(userToken, deptId);
         }
 
         @Test
@@ -54,8 +57,9 @@ public class StuffServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getListByDepartment(univCode, deptCode))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(stuffDao.getListByDepartment(deptId))
                     .thenReturn(stuffList);
 
             TestHelper.listCompareTest(
@@ -64,18 +68,43 @@ public class StuffServiceTest extends BaseServiceTest {
             );
         }
 
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[`departmentId`가 잘못 주어졌을 시]_[InvalidIndexException]")
+        public void ERROR_wrongDepartmentId_invalidIndexException() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(stuffDao.getListByDepartment(deptId)).thenThrow(InvalidIndexException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
+
         private List<StuffDto> getStuffListByDept(DepartmentDto dept) {
             return stub.ALL_STUFFS.stream()
-                    .filter((stuff) -> dept.matchUniqueKey(stuff.department()))
+                    .filter((stuff) -> dept.matchId(stuff.department()))
                     .collect(Collectors.toList());
         }
     }
 
     @Nested
-    @DisplayName("getByIndex()")
-    public class TestGetByIndex extends StuffNestedTest {
+    @DisplayName("getById()")
+    public class TestGetById extends StuffNestedTest {
         private StuffDto stuff;
-        private String stuffName;
+        private UUID stuffId;
 
         @Override
         protected void setUpDefault() {
@@ -86,12 +115,12 @@ public class StuffServiceTest extends BaseServiceTest {
 
         private void setStuff(StuffDto stuff) {
             this.stuff = stuff;
-            this.stuffName = stuff.name();
+            this.stuffId = stuff.id();
         }
 
         @Override
         protected StuffDto execMethod() {
-            return stuffService.getByIndex(userToken, univCode, deptCode, stuffName);
+            return stuffService.getById(userToken, stuffId);
         }
 
         @Test
@@ -99,14 +128,10 @@ public class StuffServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
 
-            TestHelper.objectCompareTest(
-                    this::execMethod,
-                    stuff
-            );
+            TestHelper.objectCompareTest(this::execMethod, stuff);
         }
 
         @Test
@@ -114,8 +139,8 @@ public class StuffServiceTest extends BaseServiceTest {
         public void ERROR_stuffNotFound_NotFoundException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId))
                     .thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(
@@ -123,12 +148,26 @@ public class StuffServiceTest extends BaseServiceTest {
                     NotFoundException.class
             );
         }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
     }
 
     @Nested
     @DisplayName("create()")
     public final class TestCreate extends StuffNestedTest {
         private StuffDto stuff;
+        private UUID stuffId;
         private String stuffName;
         private String stuffThumbnail;
 
@@ -144,6 +183,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
         private void setStuff(StuffDto stuff) {
             this.stuff = stuff;
+            this.stuffId = stuff.id();
             this.stuffName = stuff.name();
             this.stuffThumbnail = stuff.thumbnail();
         }
@@ -151,8 +191,7 @@ public class StuffServiceTest extends BaseServiceTest {
         @Override
         protected StuffDto execMethod() {
             return stuffService.create(
-                    userToken, univCode, deptCode,
-                    stuffName, stuffThumbnail, amount
+                    userToken, deptId, stuffName, stuffThumbnail, amount
             );
         }
 
@@ -167,12 +206,13 @@ public class StuffServiceTest extends BaseServiceTest {
             setUpDefault();
             amount = null;
 
-            mockDepartmentAndRequester();
-            when(stuffDao.create(stuff)).thenReturn(stuff);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail))).thenReturn(stuff);
 
-            TestHelper.objectCompareTest(this::execMethod, stuff);
+            execMethod();
 
-            verify(stuffDao).create(stuff);
+            verify(stuffDao).create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail));
         }
 
         @RepeatedTest(10)
@@ -180,23 +220,24 @@ public class StuffServiceTest extends BaseServiceTest {
         public void SUCCESS_amountIsNotZero() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.create(stuff)).thenReturn(stuff);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail))).thenReturn(stuff);
             for (int i = 0; i < amount; i++) {
-                ItemDto newItem = ItemDto.init(stuff, i + 1);
-                when(itemDao.create(newItem)).thenReturn(newItem);
+                ItemDto newItem = new ItemDto(UUID.randomUUID(), stuff, i + 1, null);
+                when(itemDao.create(any(), eq(stuffId), eq(i + 1))).thenReturn(newItem);
             }
 
             StuffDto expected = stuff;
             for (int i = 0; i < amount; i++) {
-                ItemDto newItem = ItemDto.init(stuff, i + 1);
+                ItemDto newItem = new ItemDto(UUID.randomUUID(), stuff, i + 1, null);
                 expected = expected.withItemAdd(newItem);
             }
-            TestHelper.objectCompareTest(this::execMethod, expected);
+            execMethod();
 
-            verify(stuffDao).create(stuff);
+            verify(stuffDao).create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail));
             for (int i = 0; i < amount; i++) {
-                verify(itemDao).create(ItemDto.init(stuff, i + 1));
+                verify(itemDao).create(any(), eq(stuffId), eq(i + 1));
             }
         }
 
@@ -205,8 +246,9 @@ public class StuffServiceTest extends BaseServiceTest {
         public void ERROR_stuffConflict_ConflictException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.create(stuff)).thenThrow(ConflictException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail))).thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
         }
@@ -217,9 +259,23 @@ public class StuffServiceTest extends BaseServiceTest {
             setUpDefault();
             amount = 51;
 
-            mockDepartmentAndRequester();
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
 
             TestHelper.exceptionTest(this::execMethod, ItemAmountLimitExceededException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 
@@ -227,7 +283,7 @@ public class StuffServiceTest extends BaseServiceTest {
     @DisplayName("update()")
     public final class TestUpdate extends StuffNestedTest {
         private StuffDto targetStuff;
-        private String targetStuffName;
+        private UUID targetStuffId;
 
         private String newStuffName;
         private String newStuffThumbnail;
@@ -243,14 +299,13 @@ public class StuffServiceTest extends BaseServiceTest {
 
         private void setStuff(StuffDto stuff) {
             this.targetStuff = stuff;
-            this.targetStuffName = stuff.name();
+            this.targetStuffId = stuff.id();
         }
 
         @Override
         protected StuffDto execMethod() {
             return stuffService.update(
-                    userToken, univCode, deptCode,
-                    targetStuffName, newStuffName, newStuffThumbnail
+                    userToken, targetStuffId, newStuffName, newStuffThumbnail
             );
         }
 
@@ -263,20 +318,18 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffThumbnail`가 모두 `null`이 아닐 시]")
         public void SUCCESS_allMemberIsNotNull() {
             setUpDefault();
-            StuffDto newStuff = StuffDto.init(dept, newStuffName, newStuffThumbnail);
             StuffDto expected = targetStuff
                     .withName(newStuffName)
                     .withThumbnail(newStuffThumbnail);
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, targetStuffName))
-                    .thenReturn(targetStuff);
-            when(stuffDao.update(univCode, deptCode, targetStuffName, newStuff))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
+            when(stuffDao.update(targetStuffId, targetStuff.department().id(), newStuffName, newStuffThumbnail))
                     .thenReturn(expected);
 
             TestHelper.objectCompareTest(this::execMethod, expected);
 
-            verify(stuffDao).update(univCode, deptCode, targetStuffName, newStuff);
+            verify(stuffDao).update(targetStuffId, targetStuff.department().id(), newStuffName, newStuffThumbnail);
         }
 
         @RepeatedTest(10)
@@ -287,9 +340,8 @@ public class StuffServiceTest extends BaseServiceTest {
             newStuffThumbnail = null;
             StuffDto expected = targetStuff;
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, targetStuffName))
-                    .thenReturn(targetStuff);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
 
             TestHelper.objectCompareTest(this::execMethod, expected);
 
@@ -301,19 +353,17 @@ public class StuffServiceTest extends BaseServiceTest {
         public void SUCCESS_someMemberIsNull() {
             setUpDefault();
             newStuffName = null;
-            StuffDto newStuff = StuffDto.init(dept, targetStuffName, newStuffThumbnail);
             StuffDto expected = targetStuff
                     .withThumbnail(newStuffThumbnail);
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, targetStuffName))
-                    .thenReturn(targetStuff);
-            when(stuffDao.update(univCode, deptCode, targetStuffName, newStuff))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
+            when(stuffDao.update(targetStuffId, targetStuff.department().id(), targetStuff.name(), newStuffThumbnail))
                     .thenReturn(expected);
 
             TestHelper.objectCompareTest(this::execMethod, expected);
 
-            verify(stuffDao).update(univCode, deptCode, targetStuffName, newStuff);
+            verify(stuffDao).update(targetStuffId, targetStuff.department().id(), targetStuff.name(), newStuffThumbnail);
         }
 
         @RepeatedTest(10)
@@ -321,9 +371,8 @@ public class StuffServiceTest extends BaseServiceTest {
         public void ERROR_stuffNotFound_NotFoundException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, targetStuffName))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(targetStuffId)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
@@ -332,13 +381,26 @@ public class StuffServiceTest extends BaseServiceTest {
         @DisplayName("[ERROR]_[해당 `index`의 `stuff`가 이미 존재할 시]_[ConflictException]")
         public void ERROR_stuffConflict_ConflictException() {
             setUpDefault();
-            StuffDto newStuff = StuffDto.init(dept, newStuffName, newStuffThumbnail);
 
-            mockDepartmentAndRequester();
-            when(stuffDao.update(univCode, deptCode, targetStuffName, newStuff))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
+            when(stuffDao.update(targetStuffId, targetStuff.department().id(), newStuffName, newStuffThumbnail))
                     .thenThrow(ConflictException.class);
 
             TestHelper.exceptionTest(this::execMethod, ConflictException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 

@@ -1,6 +1,6 @@
 package com.example.beliemeserver.preprocessing;
 
-import com.example.beliemeserver.domain.service._new.NewUniversityService;
+import com.example.beliemeserver.domain.service.UniversityService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 @Order(1)
 @Component
 public class UniversityInitializer implements CommandLineRunner {
-    private final NewUniversityService universityService;
+    private final UniversityService universityService;
 
-    public UniversityInitializer(NewUniversityService universityService) {
+    public UniversityInitializer(UniversityService universityService) {
         this.universityService = universityService;
     }
 

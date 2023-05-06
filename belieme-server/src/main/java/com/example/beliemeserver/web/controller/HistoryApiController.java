@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
 import com.example.beliemeserver.domain.dto._new.HistoryDto;
-import com.example.beliemeserver.domain.service._new.NewHistoryService;
+import com.example.beliemeserver.domain.service.HistoryService;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.web.responsebody._new.HistoryResponse;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping(path = "")
 public class HistoryApiController extends BaseApiController {
-    private final NewHistoryService historyService;
+    private final HistoryService historyService;
 
-    public HistoryApiController(NewHistoryService historyService) {
+    public HistoryApiController(HistoryService historyService) {
         this.historyService = historyService;
     }
 
