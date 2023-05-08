@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto._new.UserDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import com.example.beliemeserver.domain.service.UserService;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;

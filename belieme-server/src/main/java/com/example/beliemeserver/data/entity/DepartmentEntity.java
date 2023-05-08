@@ -10,29 +10,25 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "department", uniqueConstraints = {
         @UniqueConstraint(
                 name = "department_index",
-                columnNames = {"university_id", "code"}
+                columnNames = {"university_id", "name"}
         )
 })
 @NoArgsConstructor
-@ToString
 @Getter
-public class DepartmentEntity extends DataEntity {
+public class DepartmentEntity extends DataEntity<UUID> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
-    @Column(name = "university_id")
-    private int universityId;
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     @NonNull
-    @Column(name = "code")
-    private String code;
+    @Column(name = "university_id", columnDefinition = "BINARY(16)")
+    private UUID universityId;
 
     @NonNull
     @Column(name = "name")
@@ -45,28 +41,54 @@ public class DepartmentEntity extends DataEntity {
     @OneToMany(mappedBy = "department")
     private List<MajorDepartmentJoinEntity> baseMajorJoin;
 
-    public DepartmentEntity(UniversityEntity university, String code, String name) {
-        this.code = code;
-        this.name = name;
+    public DepartmentEntity(UUID id, UniversityEntity university, String name) {
+        this.id = id;
         this.university = university;
         this.universityId = university.getId();
+        this.name = name;
         this.baseMajorJoin = new ArrayList<>();
     }
 
-    public DepartmentEntity setUniversity(UniversityEntity university) {
+    private DepartmentEntity(UUID id, UniversityEntity university, String name, List<MajorDepartmentJoinEntity> baseMajorJoin) {
+        this.id = id;
         this.university = university;
         this.universityId = university.getId();
-        return this;
-    }
-
-    public DepartmentEntity setCode(String code) {
-        this.code = code;
-        return this;
-    }
-
-    public DepartmentEntity setName(String name) {
         this.name = name;
-        return this;
+        this.baseMajorJoin = new ArrayList<>(baseMajorJoin);
+    }
+
+    public List<MajorDepartmentJoinEntity> getBaseMajorJoin() {
+        return new ArrayList<>(baseMajorJoin);
+    }
+
+    public DepartmentEntity withUniversity(UniversityEntity university) {
+        return new DepartmentEntity(id, university, name, baseMajorJoin);
+    }
+
+    public DepartmentEntity withName(String name) {
+        return new DepartmentEntity(id, university, name, baseMajorJoin);
+    }
+
+    public DepartmentEntity withBaseMajor(List<MajorDepartmentJoinEntity> baseMajors) {
+        return new DepartmentEntity(id, university, name, new ArrayList<>(baseMajorJoin));
+    }
+
+    public DepartmentEntity withBaseMajorAdd(MajorDepartmentJoinEntity baseMajor) {
+        List<MajorDepartmentJoinEntity> newBaseMajors = new ArrayList<>(baseMajorJoin);
+        newBaseMajors.add(baseMajor);
+        return new DepartmentEntity(id, university, name, newBaseMajors);
+    }
+
+    public DepartmentEntity withBaseMajorRemove(int index) {
+        List<MajorDepartmentJoinEntity> newBaseMajors = new ArrayList<>(baseMajorJoin);
+        newBaseMajors.remove(index);
+        return new DepartmentEntity(id, university, name, newBaseMajors);
+    }
+
+    public DepartmentEntity withBaseMajorClear() {
+        List<MajorDepartmentJoinEntity> newBaseMajors = new ArrayList<>(baseMajorJoin);
+        newBaseMajors.clear();
+        return new DepartmentEntity(id, university, name, newBaseMajors);
     }
 
     public DepartmentDto toDepartmentDto() {
@@ -76,8 +98,8 @@ public class DepartmentEntity extends DataEntity {
         }
 
         return new DepartmentDto(
+                id,
                 university.toUniversityDto(),
-                code,
                 name,
                 baseMajorDtoList
         );

@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto._new.HistoryDto;
-import com.example.beliemeserver.domain.dto._new.ItemDto;
+import com.example.beliemeserver.domain.dto.HistoryDto;
+import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.service.HistoryService;
 import com.example.beliemeserver.domain.service.ItemService;
 import com.example.beliemeserver.web.requestbody.ItemRequest;

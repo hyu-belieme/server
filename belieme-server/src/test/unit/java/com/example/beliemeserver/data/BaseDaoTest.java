@@ -1,8 +1,8 @@
 package com.example.beliemeserver.data;
 
-import com.example.beliemeserver.data.entity._new.*;
-import com.example.beliemeserver.data.repository._new.*;
-import com.example.beliemeserver.domain.dto._new.*;
+import com.example.beliemeserver.data.entity.*;
+import com.example.beliemeserver.data.repository.*;
+import com.example.beliemeserver.domain.dto.*;
 import com.example.beliemeserver.util.ArgumentMatchHelper;
 import com.example.beliemeserver.util.EntityStubData;
 import com.example.beliemeserver.util.RandomGetter;
@@ -16,55 +16,55 @@ public abstract class BaseDaoTest {
     protected EntityStubData stub = new EntityStubData();
 
     @Mock
-    protected NewUniversityRepository univRepository;
+    protected UniversityRepository univRepository;
     @Mock
-    protected NewMajorRepository majorRepository;
+    protected MajorRepository majorRepository;
     @Mock
-    protected NewDepartmentRepository deptRepository;
+    protected DepartmentRepository deptRepository;
     @Mock
-    protected NewMajorDepartmentJoinRepository majorDeptJoinRepository;
+    protected MajorDepartmentJoinRepository majorDeptJoinRepository;
     @Mock
-    protected NewUserRepository userRepository;
+    protected UserRepository userRepository;
     @Mock
-    protected NewAuthorityRepository authRepository;
+    protected AuthorityRepository authRepository;
     @Mock
-    protected NewAuthorityUserJoinRepository authUserJoinRepository;
+    protected AuthorityUserJoinRepository authUserJoinRepository;
     @Mock
-    protected NewStuffRepository stuffRepository;
+    protected StuffRepository stuffRepository;
     @Mock
-    protected NewItemRepository itemRepository;
+    protected ItemRepository itemRepository;
     @Mock
-    protected NewHistoryRepository historyRepository;
+    protected HistoryRepository historyRepository;
 
-    protected RandomGetter<NewUniversityEntity> allUnivs() {
+    protected RandomGetter<UniversityEntity> allUnivs() {
         return new RandomGetter<>(stub.ALL_UNIVS);
     }
 
-    protected RandomGetter<NewMajorEntity> allMajors() {
+    protected RandomGetter<MajorEntity> allMajors() {
         return new RandomGetter<>(stub.ALL_MAJORS);
     }
 
-    protected RandomGetter<NewDepartmentEntity> allDepts() {
+    protected RandomGetter<DepartmentEntity> allDepts() {
         return new RandomGetter<>(stub.ALL_DEPTS);
     }
 
-    protected RandomGetter<NewAuthorityEntity> allAuths() {
+    protected RandomGetter<AuthorityEntity> allAuths() {
         return new RandomGetter<>(stub.ALL_AUTHS);
     }
 
-    protected RandomGetter<NewUserEntity> allUsers() {
+    protected RandomGetter<UserEntity> allUsers() {
         return new RandomGetter<>(stub.ALL_USERS);
     }
 
-    protected RandomGetter<NewStuffEntity> allStuffs() {
+    protected RandomGetter<StuffEntity> allStuffs() {
         return new RandomGetter<>(stub.ALL_STUFFS);
     }
 
-    protected RandomGetter<NewItemEntity> allItems() {
+    protected RandomGetter<ItemEntity> allItems() {
         return new RandomGetter<>(stub.ALL_ITEMS);
     }
 
-    protected RandomGetter<NewHistoryEntity> allHistories() {
+    protected RandomGetter<HistoryEntity> allHistories() {
         return new RandomGetter<>(stub.ALL_HISTORIES);
     }
 
@@ -78,115 +78,115 @@ public abstract class BaseDaoTest {
         return output;
     }
 
-    protected RandomGetter<NewDepartmentEntity> deptsOnUniv(RandomGetter<NewDepartmentEntity> rs, NewUniversityEntity univ) {
+    protected RandomGetter<DepartmentEntity> deptsOnUniv(RandomGetter<DepartmentEntity> rs, UniversityEntity univ) {
         return rs.filter((dept) -> dept.getUniversity().getId().equals(univ.getId()));
     }
 
-    protected NewUniversityEntity randomUniv() {
+    protected UniversityEntity randomUniv() {
         return randomSelectAndLog(allUnivs());
     }
 
-    protected NewDepartmentEntity randomDept() {
+    protected DepartmentEntity randomDept() {
         return randomSelectAndLog(allDepts());
     }
 
-    protected NewDepartmentEntity randomDeptOnUniv(NewUniversityEntity univ) {
+    protected DepartmentEntity randomDeptOnUniv(UniversityEntity univ) {
         return randomSelectAndLog(deptsOnUniv(allDepts(), univ));
     }
 
-    protected NewMajorEntity randomMajor() {
+    protected MajorEntity randomMajor() {
         return randomSelectAndLog(allMajors());
     }
 
-    protected NewUserEntity randomUser() {
+    protected UserEntity randomUser() {
         return randomSelectAndLog(allUsers());
     }
 
-    protected NewAuthorityEntity randomAuth() {
+    protected AuthorityEntity randomAuth() {
         return randomSelectAndLog(allAuths());
     }
 
-    protected NewStuffEntity randomStuff() {
+    protected StuffEntity randomStuff() {
         return randomSelectAndLog(allStuffs());
     }
 
-    protected NewItemEntity randomItem() {
+    protected ItemEntity randomItem() {
         return randomSelectAndLog(allItems());
     }
 
-    protected NewHistoryEntity randomHistory() {
+    protected HistoryEntity randomHistory() {
         return randomSelectAndLog(allHistories());
     }
 
-    protected List<UniversityDto> toUniversityDtoList(List<NewUniversityEntity> universityEntityList) {
-        return universityEntityList.stream().map(NewUniversityEntity::toUniversityDto).toList();
+    protected List<UniversityDto> toUniversityDtoList(List<UniversityEntity> universityEntityList) {
+        return universityEntityList.stream().map(UniversityEntity::toUniversityDto).toList();
     }
 
-    protected List<MajorDto> toMajorDtoList(List<NewMajorEntity> majorEntityList) {
-        return majorEntityList.stream().map(NewMajorEntity::toMajorDto).toList();
+    protected List<MajorDto> toMajorDtoList(List<MajorEntity> majorEntityList) {
+        return majorEntityList.stream().map(MajorEntity::toMajorDto).toList();
     }
 
-    protected List<DepartmentDto> toDepartmentDtoList(List<NewDepartmentEntity> departmentEntityList) {
-        return departmentEntityList.stream().map(NewDepartmentEntity::toDepartmentDto).toList();
+    protected List<DepartmentDto> toDepartmentDtoList(List<DepartmentEntity> departmentEntityList) {
+        return departmentEntityList.stream().map(DepartmentEntity::toDepartmentDto).toList();
     }
 
-    protected List<AuthorityDto> toAuthorityDtoList(List<NewAuthorityEntity> authorityEntityList) {
-        return authorityEntityList.stream().map(NewAuthorityEntity::toAuthorityDto).toList();
+    protected List<AuthorityDto> toAuthorityDtoList(List<AuthorityEntity> authorityEntityList) {
+        return authorityEntityList.stream().map(AuthorityEntity::toAuthorityDto).toList();
     }
 
-    protected List<UserDto> toUserDtoList(List<NewUserEntity> userEntityList) {
-        return userEntityList.stream().map(NewUserEntity::toUserDto).toList();
+    protected List<UserDto> toUserDtoList(List<UserEntity> userEntityList) {
+        return userEntityList.stream().map(UserEntity::toUserDto).toList();
     }
 
-    protected List<StuffDto> toStuffDtoList(List<NewStuffEntity> stuffEntityList) {
-        return stuffEntityList.stream().map(NewStuffEntity::toStuffDto).toList();
+    protected List<StuffDto> toStuffDtoList(List<StuffEntity> stuffEntityList) {
+        return stuffEntityList.stream().map(StuffEntity::toStuffDto).toList();
     }
 
-    protected List<ItemDto> toItemDtoList(List<NewItemEntity> itemEntityList) {
-        return itemEntityList.stream().map(NewItemEntity::toItemDto).toList();
+    protected List<ItemDto> toItemDtoList(List<ItemEntity> itemEntityList) {
+        return itemEntityList.stream().map(ItemEntity::toItemDto).toList();
     }
 
-    protected List<HistoryDto> toHistoryDtoList(List<NewHistoryEntity> historyEntityList) {
-        return historyEntityList.stream().map(NewHistoryEntity::toHistoryDto).toList();
+    protected List<HistoryDto> toHistoryDtoList(List<HistoryEntity> historyEntityList) {
+        return historyEntityList.stream().map(HistoryEntity::toHistoryDto).toList();
     }
 
-    protected NewUniversityEntity mockArg(NewUniversityEntity target) {
+    protected UniversityEntity mockArg(UniversityEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewDepartmentEntity mockArg(NewDepartmentEntity target) {
+    protected DepartmentEntity mockArg(DepartmentEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewMajorEntity mockArg(NewMajorEntity target) {
+    protected MajorEntity mockArg(MajorEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewMajorDepartmentJoinEntity mockArg(NewMajorDepartmentJoinEntity target) {
+    protected MajorDepartmentJoinEntity mockArg(MajorDepartmentJoinEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewUserEntity mockArg(NewUserEntity target) {
+    protected UserEntity mockArg(UserEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewAuthorityEntity mockArg(NewAuthorityEntity target) {
+    protected AuthorityEntity mockArg(AuthorityEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewAuthorityUserJoinEntity mockArg(NewAuthorityUserJoinEntity target) {
+    protected AuthorityUserJoinEntity mockArg(AuthorityUserJoinEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewStuffEntity mockArg(NewStuffEntity target) {
+    protected StuffEntity mockArg(StuffEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewItemEntity mockArg(NewItemEntity target) {
+    protected ItemEntity mockArg(ItemEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 
-    protected NewHistoryEntity mockArg(NewHistoryEntity target) {
+    protected HistoryEntity mockArg(HistoryEntity target) {
         return argThat(e -> ArgumentMatchHelper.canMatch(target, e));
     }
 }

@@ -1,10 +1,12 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
-import com.example.beliemeserver.config.initdata._new.container.DepartmentInfo;
-import com.example.beliemeserver.config.initdata._new.container.MajorInfo;
-import com.example.beliemeserver.domain.dao._new.*;
-import com.example.beliemeserver.domain.dto._new.*;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
+import com.example.beliemeserver.config.initdata.container.DepartmentInfo;
+import com.example.beliemeserver.config.initdata.container.MajorInfo;
+import com.example.beliemeserver.domain.dao.*;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.MajorDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import lombok.NonNull;

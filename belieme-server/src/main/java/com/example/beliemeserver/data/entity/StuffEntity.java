@@ -3,11 +3,11 @@ package com.example.beliemeserver.data.entity;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.StuffDto;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "stuff", uniqueConstraints = {
@@ -17,25 +17,22 @@ import java.util.List;
         )
 })
 @NoArgsConstructor
-@ToString
 @Getter
-@Accessors(chain = true)
-public class StuffEntity extends DataEntity {
+public class StuffEntity extends DataEntity<UUID> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
-    @Column(name = "department_id")
-    private int departmentId;
+    @NonNull
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     @NonNull
-    @Setter
+    @Column(name = "department_id", columnDefinition = "BINARY(16)")
+    private UUID departmentId;
+
+    @NonNull
     @Column(name = "name")
     private String name;
 
     @NonNull
-    @Setter
     @Column(name = "thumbnail")
     private String thumbnail;
 
@@ -48,7 +45,8 @@ public class StuffEntity extends DataEntity {
     @OneToMany(mappedBy = "stuff")
     private List<ItemEntity> items;
 
-    public StuffEntity(@NonNull DepartmentEntity department, @NonNull String name, @NonNull String thumbnail) {
+    public StuffEntity(@NonNull UUID id, @NonNull DepartmentEntity department, @NonNull String name, @NonNull String thumbnail) {
+        this.id = id;
         this.department = department;
         this.departmentId = department.getId();
         this.name = name;
@@ -56,10 +54,25 @@ public class StuffEntity extends DataEntity {
         this.items = new ArrayList<>();
     }
 
-    public StuffEntity setDepartment(@NonNull DepartmentEntity department) {
+    private StuffEntity(@NonNull UUID id, @NonNull DepartmentEntity department, @NonNull String name, @NonNull String thumbnail, @NonNull List<ItemEntity> items) {
+        this.id = id;
         this.department = department;
         this.departmentId = department.getId();
-        return this;
+        this.name = name;
+        this.thumbnail = thumbnail;
+        this.items = new ArrayList<>(items);
+    }
+
+    public StuffEntity withDepartment(@NonNull DepartmentEntity department) {
+        return new StuffEntity(id, department, name, thumbnail, items);
+    }
+
+    public StuffEntity withName(@NonNull String name) {
+        return new StuffEntity(id, department, name, thumbnail, items);
+    }
+
+    public StuffEntity withThumbnail(@NonNull String thumbnail) {
+        return new StuffEntity(id, department, name, thumbnail, items);
     }
 
     public StuffDto toStuffDto() {
@@ -69,6 +82,7 @@ public class StuffEntity extends DataEntity {
         }
 
         return new StuffDto(
+                id,
                 department.toDepartmentDto(),
                 name,
                 thumbnail,

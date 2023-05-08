@@ -2,34 +2,33 @@ package com.example.beliemeserver.domain.dto;
 
 import lombok.NonNull;
 
-public record UniversityDto(@NonNull String code, @NonNull String name, String apiUrl) {
-    public static final UniversityDto nestedEndpoint = new UniversityDto("-", "-", "-");
+import java.util.UUID;
 
-    public UniversityDto withCode(@NonNull String code) {
-        return new UniversityDto(code, name, apiUrl);
+public record UniversityDto(
+        @NonNull UUID id,
+        @NonNull String name,
+        String apiUrl
+) {
+    private static final UUID NIL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final UniversityDto nestedEndpoint = new UniversityDto(NIL_UUID,"-", "-");
+
+    public static UniversityDto init(@NonNull String name, String apiUrl) {
+        return new UniversityDto(UUID.randomUUID(), name, apiUrl);
     }
 
     public UniversityDto withName(@NonNull String name) {
-        return new UniversityDto(code, name, apiUrl);
+        return new UniversityDto(id, name, apiUrl);
     }
 
     public UniversityDto withApiUrl(String apiUrl) {
-        return new UniversityDto(code, name, apiUrl);
+        return new UniversityDto(id, name, apiUrl);
     }
 
-    public boolean matchUniqueKey(String universityCode) {
-        if (universityCode == null) {
-            return false;
-        }
-        return universityCode.equals(this.code());
-    }
-
-    public boolean matchUniqueKey(UniversityDto oth) {
+    public boolean matchId(UniversityDto oth) {
         if (oth == null) {
             return false;
         }
-        String universityCode = oth.code();
-        return universityCode.equals(this.code());
+        return this.id.equals(oth.id);
     }
 
     @Override
@@ -38,7 +37,7 @@ public record UniversityDto(@NonNull String code, @NonNull String name, String a
             return "omitted";
         }
         return "UniversityDto{" +
-                "code='" + code + '\'' +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", apiUrl='" + apiUrl + '\'' +
                 '}';

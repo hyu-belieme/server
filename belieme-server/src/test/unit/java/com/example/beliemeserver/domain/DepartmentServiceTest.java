@@ -1,7 +1,7 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.domain.dto._new.DepartmentDto;
-import com.example.beliemeserver.domain.dto._new.MajorDto;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.MajorDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.DepartmentService;

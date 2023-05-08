@@ -1,23 +1,25 @@
 package com.example.beliemeserver.domain.dao;
 
 import com.example.beliemeserver.domain.dto.UniversityDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface UniversityDao {
     @Transactional
     List<UniversityDto> getAllList();
 
     @Transactional
-    UniversityDto getByIndex(String code);
+    UniversityDto getById(@NonNull UUID id);
 
     @Transactional
-    boolean checkExistByIndex(String universityCode);
+    boolean checkExistById(@NonNull UUID id);
 
     @Transactional
-    UniversityDto create(UniversityDto newUniversity);
+    UniversityDto create(@NonNull UUID id, @NonNull String name, String apiUrl);
 
     @Transactional
-    UniversityDto update(String code, UniversityDto newUniversityDto);
+    UniversityDto update(@NonNull UUID id, @NonNull String name, String apiUrl);
 }

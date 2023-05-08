@@ -8,19 +8,31 @@ import java.util.List;
 import java.util.UUID;
 
 public record UserDto(
-        @NonNull UniversityDto university, @NonNull String studentId,
-        @NonNull String name, int entranceYear, @NonNull String token,
-        long createdAt, long approvedAt,
+        @NonNull UUID id,
+        @NonNull UniversityDto university,
+        @NonNull String studentId,
+        @NonNull String name,
+        int entranceYear,
+        @NonNull String token,
+        long createdAt,
+        long approvedAt,
         @NonNull List<AuthorityDto> authorities
 ) {
-    public static final UserDto nestedEndpoint = new UserDto(UniversityDto.nestedEndpoint, "-", "-", 0,"", 0, 0, new ArrayList<>());
+    private static final UUID NIL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final UserDto nestedEndpoint = new UserDto(NIL_UUID, UniversityDto.nestedEndpoint, "-", "-", 0,"", 0, 0, new ArrayList<>());
 
     public UserDto(
-            @NonNull UniversityDto university, @NonNull String studentId,
-            @NonNull String name, int entranceYear, @NonNull String token,
-            long createdAt, long approvedAt,
+            @NonNull UUID id,
+            @NonNull UniversityDto university,
+            @NonNull String studentId,
+            @NonNull String name,
+            int entranceYear,
+            @NonNull String token,
+            long createdAt,
+            long approvedAt,
             @NonNull List<AuthorityDto> authorities
     ) {
+        this.id = id;
         this.university = university;
         this.studentId = studentId;
         this.name = name;
@@ -32,12 +44,12 @@ public record UserDto(
     }
 
     public static UserDto init(@NonNull UniversityDto university, @NonNull String studentId, @NonNull String name) {
-        return new UserDto(university, studentId, name, 0, newToken(),
+        return new UserDto(UUID.randomUUID(), university, studentId, name, 0, newToken(),
                 currentTime(), currentTime(), new ArrayList<>());
     }
 
     public static UserDto init(@NonNull UniversityDto university, @NonNull String studentId, @NonNull String name, int entranceYear) {
-        return new UserDto(university, studentId, name, entranceYear, newToken(),
+        return new UserDto(UUID.randomUUID(), university, studentId, name, entranceYear, newToken(),
                 currentTime(), currentTime(), new ArrayList<>());
     }
 
@@ -55,68 +67,47 @@ public record UserDto(
     }
 
     public UserDto withUniversity(@NonNull UniversityDto university) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withStudentId(@NonNull String studentId) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withName(@NonNull String name) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withEntranceYear(int entranceYear) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withToken(@NonNull String token) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withCreatedAt(long createdAt) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withApprovedAt(long approvedAt) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withAuthorities(@NonNull List<AuthorityDto> authorities) {
-        return new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        return new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
     }
 
     public UserDto withAuthorityAdd(AuthorityDto authorityDto) {
-        UserDto output = new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        UserDto output = new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
         output.authorities.add(authorityDto);
         return output;
     }
 
     public UserDto withAuthorityRemove(DepartmentDto department) {
-        UserDto output = new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
+        UserDto output = new UserDto(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
         output.authorities.removeIf(
-                (authority) -> department.matchUniqueKey(authority.department()));
-        return output;
-    }
-
-    public UserDto withAuthorityUpdate(DepartmentDto department, Permission permission) {
-        UserDto output = new UserDto(university, studentId, name, entranceYear, token, createdAt, approvedAt, authorities);
-
-        if (permission == null) {
-            output.authorities.removeIf(
-                    (authority) -> department.matchUniqueKey(authority.department()));
-            return output;
-        }
-
-        for (int i = 0; i < output.authorities.size(); i++) {
-            AuthorityDto authority = output.authorities.get(i);
-            if (authority.department().matchUniqueKey(department)) {
-                output.authorities.set(i, new AuthorityDto(department, permission));
-                return output;
-            }
-        }
-
-        output.authorities.add(new AuthorityDto(department, permission));
+                (authority) -> department.matchId(authority.department()));
         return output;
     }
 
@@ -125,35 +116,24 @@ public record UserDto(
         if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
-
         return "UserDto{" +
-                "university=" + university +
+                "id=" + id +
+                ", university=" + university +
                 ", studentId='" + studentId + '\'' +
                 ", name='" + name + '\'' +
-                ", token='" + token + '\'' +
                 ", entranceYear=" + entranceYear +
+                ", token='" + token + '\'' +
                 ", createdAt=" + createdAt +
                 ", approvedAt=" + approvedAt +
                 ", authorities=" + authorities +
                 '}';
     }
 
-    public boolean matchUniqueKey(String universityCode, String studentId) {
-        if (universityCode == null || studentId == null) {
-            return false;
-        }
-        return universityCode.equals(this.university().code())
-                && studentId.equals(this.studentId());
-    }
-
-    public boolean matchUniqueKey(UserDto oth) {
+    public boolean matchId(UserDto oth) {
         if (oth == null) {
             return false;
         }
-        String universityCode = oth.university().code();
-        String studentId = oth.studentId();
-        return universityCode.equals(this.university().code())
-                && studentId.equals(this.studentId());
+        return this.id.equals(oth.id);
     }
 
     public boolean isDeveloper() {
@@ -197,7 +177,7 @@ public record UserDto(
         boolean notExist = true;
         for (int i = 0; i < list.size(); i++) {
             DepartmentDto department = list.get(i).department();
-            if (!department.matchUniqueKey(targetDepartment)) continue;
+            if (!department.matchId(targetDepartment)) continue;
             notExist = false;
 
             if (newAuthority.permission() != Permission.DEFAULT) {

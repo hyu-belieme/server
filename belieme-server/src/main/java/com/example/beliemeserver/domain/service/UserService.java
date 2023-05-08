@@ -1,13 +1,13 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
-import com.example.beliemeserver.config.initdata._new.container.AuthorityInfo;
-import com.example.beliemeserver.config.initdata._new.container.UniversityInfo;
-import com.example.beliemeserver.config.initdata._new.container.UserInfo;
-import com.example.beliemeserver.domain.dao._new.*;
-import com.example.beliemeserver.domain.dto._new.AuthorityDto;
-import com.example.beliemeserver.domain.dto._new.DepartmentDto;
-import com.example.beliemeserver.domain.dto._new.UserDto;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
+import com.example.beliemeserver.config.initdata.container.AuthorityInfo;
+import com.example.beliemeserver.config.initdata.container.UniversityInfo;
+import com.example.beliemeserver.config.initdata.container.UserInfo;
+import com.example.beliemeserver.domain.dao.*;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.util.HttpRequest;

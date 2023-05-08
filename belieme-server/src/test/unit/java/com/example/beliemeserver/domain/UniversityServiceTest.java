@@ -1,6 +1,6 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.domain.dto._new.UniversityDto;
+import com.example.beliemeserver.domain.dto.UniversityDto;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.UniversityService;
 import com.example.beliemeserver.error.exception.NotFoundException;

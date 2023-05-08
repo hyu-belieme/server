@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.domain.dto._new.ItemDto;
+import com.example.beliemeserver.domain.dto.ItemDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 

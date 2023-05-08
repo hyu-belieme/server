@@ -6,112 +6,126 @@ import lombok.NonNull;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.UUID;
 
 public record HistoryDto(
-        @NonNull ItemDto item, int num, UserDto requester, UserDto approveManager,
-        UserDto returnManager, UserDto lostManager, UserDto cancelManager,
-        long requestedAt, long approvedAt, long returnedAt,
+        @NonNull UUID id, @NonNull ItemDto item, int num, UserDto requester,
+        UserDto approveManager, UserDto returnManager, UserDto lostManager,
+        UserDto cancelManager, long requestedAt, long approvedAt, long returnedAt,
         long lostAt, long canceledAt
 ) {
-    public static final HistoryDto nestedEndpoint = new HistoryDto(ItemDto.nestedEndpoint, 0, null, null, null, null, null, 0, 0, 0, 0, 0);
+    private static final UUID NIL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final HistoryDto nestedEndpoint = new HistoryDto(NIL_UUID, ItemDto.nestedEndpoint, 0, null, null, null, null, null, 0, 0, 0, 0, 0);
+
+    public static HistoryDto init(
+            @NonNull ItemDto item, int num, UserDto requester,
+            UserDto approveManager, UserDto returnManager, UserDto lostManager,
+            UserDto cancelManager, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    ) {
+        return new HistoryDto(UUID.randomUUID(), item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
 
     public HistoryDto withItem(@NonNull ItemDto item) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withNum(int num) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withRequester(UserDto requester) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withApproveManager(UserDto approveManager) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withReturnManager(UserDto returnManager) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withLostManager(UserDto lostManager) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withCancelManager(UserDto cancelManager) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withRequestedAt(long requestedAt) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withApprovedAt(long approvedAt) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withReturnedAt(long returnedAt) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withLostAt(long lostAt) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto withCanceledAt(long canceledAt) {
-        return new HistoryDto(item, num, requester, approveManager,
-                returnManager, lostManager, cancelManager,
-                requestedAt, approvedAt, returnedAt,
-                lostAt, canceledAt);
+        return new HistoryDto(id, item, num, requester,
+                approveManager, returnManager, lostManager,
+                cancelManager, requestedAt, approvedAt,
+                returnedAt, lostAt, canceledAt);
     }
 
-    public boolean matchUniqueKey(
-            String universityCode, String departmentCode,
-            String stuffName, int itemNum, int num
-    ) {
-        return this.item().matchUniqueKey(
-                universityCode, departmentCode, stuffName, itemNum)
-                && this.num() == num;
+    public boolean matchId(HistoryDto oth) {
+        if (oth == null) {
+            return false;
+        }
+        return this.id.equals(oth.id);
     }
 
-    public boolean matchUniqueKey(HistoryDto oth) {
-        if (oth == null) return false;
-        return this.item().matchUniqueKey(oth.item())
-                && this.num == oth.num;
+    public HistoryStatus status() {
+        if (isRequested()) return HistoryStatus.REQUESTED;
+        if (isUsing()) return HistoryStatus.USING;
+        if (isDelayed()) return HistoryStatus.DELAYED;
+        if (isLost()) return HistoryStatus.LOST;
+        if (isReturned()) return HistoryStatus.RETURNED;
+        if (isFound()) return HistoryStatus.FOUND;
+        if (isExpired()) return HistoryStatus.EXPIRED;
+        return HistoryStatus.ERROR;
     }
 
     @Override
@@ -119,9 +133,9 @@ public record HistoryDto(
         if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
-
         return "HistoryDto{" +
-                "item=" + item +
+                "id=" + id +
+                ", item=" + item +
                 ", num=" + num +
                 ", requester=" + requester +
                 ", approveManager=" + approveManager +
@@ -134,17 +148,6 @@ public record HistoryDto(
                 ", lostAt=" + lostAt +
                 ", canceledAt=" + canceledAt +
                 '}';
-    }
-
-    public HistoryStatus status() {
-        if (isRequested()) return HistoryStatus.REQUESTED;
-        if (isUsing()) return HistoryStatus.USING;
-        if (isDelayed()) return HistoryStatus.DELAYED;
-        if (isLost()) return HistoryStatus.LOST;
-        if (isReturned()) return HistoryStatus.RETURNED;
-        if (isFound()) return HistoryStatus.FOUND;
-        if (isExpired()) return HistoryStatus.EXPIRED;
-        return HistoryStatus.ERROR;
     }
 
     private boolean isRequested() {

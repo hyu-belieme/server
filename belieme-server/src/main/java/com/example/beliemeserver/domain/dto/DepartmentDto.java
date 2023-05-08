@@ -4,22 +4,24 @@ import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public record DepartmentDto(
-        @NonNull UniversityDto university, @NonNull String code,
+        @NonNull UUID id, @NonNull UniversityDto university,
         @NonNull String name, @NonNull List<MajorDto> baseMajors
 ) {
-    public static final DepartmentDto nestedEndpoint = new DepartmentDto(UniversityDto.nestedEndpoint, "-", "-", new ArrayList<>());
+    private static final UUID NIL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final DepartmentDto nestedEndpoint = new DepartmentDto(NIL_UUID, UniversityDto.nestedEndpoint, "-", new ArrayList<>());
 
-    public DepartmentDto(@NonNull UniversityDto university, @NonNull String code, @NonNull String name, @NonNull List<MajorDto> baseMajors) {
+    public DepartmentDto(@NonNull UUID id, @NonNull UniversityDto university, @NonNull String name, @NonNull List<MajorDto> baseMajors) {
+        this.id = id;
         this.university = university;
-        this.code = code;
         this.name = name;
         this.baseMajors = new ArrayList<>(baseMajors);
     }
 
-    public static DepartmentDto init(@NonNull UniversityDto university, @NonNull String code, @NonNull String name) {
-        return new DepartmentDto(university, code, name, new ArrayList<>());
+    public static DepartmentDto init(@NonNull UniversityDto university, @NonNull String name, @NonNull List<MajorDto> baseMajors) {
+        return new DepartmentDto(UUID.randomUUID(), university, name, baseMajors);
     }
 
     @Override
@@ -28,51 +30,36 @@ public record DepartmentDto(
     }
 
     public DepartmentDto withUniversity(@NonNull UniversityDto university) {
-        return new DepartmentDto(university, code, name, baseMajors);
-    }
-
-    public DepartmentDto withCode(@NonNull String code) {
-        return new DepartmentDto(university, code, name, baseMajors);
+        return new DepartmentDto(id, university, name, baseMajors);
     }
 
     public DepartmentDto withName(@NonNull String name) {
-        return new DepartmentDto(university, code, name, baseMajors);
+        return new DepartmentDto(id, university, name, baseMajors);
     }
 
     public DepartmentDto withBaseMajors(@NonNull List<MajorDto> baseMajors) {
-        return new DepartmentDto(university, code, name, baseMajors);
+        return new DepartmentDto(id, university, name, baseMajors);
     }
 
     public DepartmentDto withBaseMajorAdd(MajorDto newMajor) {
-        DepartmentDto output = new DepartmentDto(university, code, name, baseMajors);
+        DepartmentDto output = new DepartmentDto(id, university, name, baseMajors);
         output.baseMajors.add(newMajor);
 
         return output;
     }
 
     public DepartmentDto withBaseMajorRemove(MajorDto targetMajor) {
-        DepartmentDto output = new DepartmentDto(university, code, name, baseMajors);
+        DepartmentDto output = new DepartmentDto(id, university, name, baseMajors);
         output.baseMajors.remove(targetMajor);
 
         return output;
     }
 
-    public boolean matchUniqueKey(String universityCode, String departmentCode) {
-        if (universityCode == null || departmentCode == null) {
-            return false;
-        }
-        return universityCode.equals(this.university().code())
-                && departmentCode.equals(this.code());
-    }
-
-    public boolean matchUniqueKey(DepartmentDto oth) {
+    public boolean matchId(DepartmentDto oth) {
         if (oth == null) {
             return false;
         }
-        String universityCode = oth.university().code();
-        String departmentCode = oth.code();
-        return universityCode.equals(this.university().code())
-                && departmentCode.equals(this.code());
+        return this.id.equals(oth.id);
     }
 
     @Override
@@ -80,10 +67,9 @@ public record DepartmentDto(
         if (this.equals(nestedEndpoint)) {
             return "omitted";
         }
-
         return "DepartmentDto{" +
-                "university=" + university +
-                ", code='" + code + '\'' +
+                "id='" + id + '\'' +
+                ", university=" + university +
                 ", name='" + name + '\'' +
                 ", baseMajors=" + baseMajors +
                 '}';

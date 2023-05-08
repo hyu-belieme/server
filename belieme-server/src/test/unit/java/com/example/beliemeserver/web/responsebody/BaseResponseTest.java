@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.domain.dto._new.*;
+import com.example.beliemeserver.domain.dto.*;
 import com.example.beliemeserver.util.StubData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto._new.HistoryDto;
+import com.example.beliemeserver.domain.dto.HistoryDto;
 import com.example.beliemeserver.domain.service.HistoryService;
 import com.example.beliemeserver.error.exception.BadRequestException;
 import com.example.beliemeserver.web.responsebody.HistoryResponse;

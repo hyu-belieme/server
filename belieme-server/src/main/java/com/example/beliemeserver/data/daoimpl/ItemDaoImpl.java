@@ -5,13 +5,14 @@ import com.example.beliemeserver.data.entity.ItemEntity;
 import com.example.beliemeserver.data.entity.StuffEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.domain.dao.ItemDao;
-import com.example.beliemeserver.domain.dto.HistoryDto;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
@@ -29,70 +30,71 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
     }
 
     @Override
-    public List<ItemDto> getListByStuff(String universityCode, String departmentCode, String stuffName) {
-        StuffEntity targetStuff = findStuffEntity(universityCode, departmentCode, stuffName);
+    public List<ItemDto> getListByStuff(@NonNull UUID stuffId) {
+        validateStuffId(stuffId);
+
         List<ItemDto> output = new ArrayList<>();
-        for (ItemEntity itemEntity : itemRepository.findByStuffId(targetStuff.getId())) {
+        for (ItemEntity itemEntity : itemRepository.findByStuffId(stuffId)) {
             output.add(itemEntity.toItemDto());
         }
         return output;
     }
 
     @Override
-    public ItemDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum) {
-        return findItemEntity(universityCode, departmentCode, stuffName, itemNum).toItemDto();
+    public ItemDto getById(@NonNull UUID itemId) {
+        return findItemEntity(itemId).toItemDto();
     }
 
     @Override
-    public ItemDto create(ItemDto newItem) {
-        StuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff());
+    public ItemDto create(@NonNull UUID itemId, @NonNull UUID stuffId, int num) {
+        StuffEntity stuffOfNewItem = getStuffEntityOrThrowInvalidIndexException(stuffId);
 
-        checkItemConflict(stuffOfNewItem.getId(), newItem.num());
+        checkItemIdConflict(itemId);
+        checkItemConflict(stuffOfNewItem.getId(), num);
 
         ItemEntity newItemEntity = new ItemEntity(
+                itemId,
                 stuffOfNewItem,
-                newItem.num(),
+                num,
                 null
         );
         return itemRepository.save(newItemEntity).toItemDto();
     }
 
     @Override
-    public ItemDto update(String universityCode, String departmentCode, String stuffName, int itemNum, ItemDto newItem) {
-        ItemEntity target = findItemEntity(universityCode, departmentCode, stuffName, itemNum);
-        StuffEntity stuffOfNewItem = findStuffEntity(newItem.stuff());
-        HistoryEntity lastHistoryOfNewItem = toHistoryEntityOrNull(newItem.lastHistory());
+    public ItemDto update(@NonNull UUID itemId, @NonNull UUID stuffId, int num, UUID lastHistoryId) {
+        ItemEntity target = findItemEntity(itemId);
+        StuffEntity stuffOfNewItem = getStuffEntityOrThrowInvalidIndexException(stuffId);
+        HistoryEntity lastHistoryOfNewItem = getHistoryEntityIfIdIsNotNull(lastHistoryId);
 
-        if (doesIndexChange(target, newItem)) {
-            checkItemConflict(stuffOfNewItem.getId(), newItem.num());
+        if (doesIndexChange(target, stuffId, num)) {
+            checkItemConflict(stuffId, num);
         }
 
-        target.setStuff(stuffOfNewItem)
-                .setNum(newItem.num())
-                .setLastHistory(lastHistoryOfNewItem);
-        return target.toItemDto();
+        target = target.withStuff(stuffOfNewItem)
+                .withNum(num)
+                .withLastHistory(lastHistoryOfNewItem);
+        return itemRepository.save(target).toItemDto();
     }
 
-    private HistoryEntity toHistoryEntityOrNull(HistoryDto historyDto) {
-        if (historyDto == null) {
+    private HistoryEntity getHistoryEntityIfIdIsNotNull(UUID historyId) {
+        if (historyId == null) {
             return null;
         }
-        return findHistoryEntity(historyDto);
+        return getHistoryEntityOrThrowInvalidIndexException(historyId);
     }
 
-    private boolean doesIndexChange(ItemEntity target, ItemDto newItem) {
-        String oldUniversityCode = target.getStuff().getDepartment().getUniversity().getCode();
-        String oldDepartmentCode = target.getStuff().getDepartment().getCode();
-        String oldStuffName = target.getStuff().getName();
-        int oldItemNum = target.getNum();
-
-        return !(oldUniversityCode.equals(newItem.stuff().department().university().code())
-                && oldDepartmentCode.equals(newItem.stuff().department().code())
-                && oldStuffName.equals(newItem.stuff().name())
-                && oldItemNum == newItem.num());
+    private boolean doesIndexChange(ItemEntity target, UUID stuffId, int num) {
+        return !(target.getStuffId().equals(stuffId) && target.getNum() == num);
     }
 
-    private void checkItemConflict(int stuffId, int num) {
+    private void checkItemIdConflict(UUID itemId) {
+        if (itemRepository.existsById(itemId)) {
+            throw new ConflictException();
+        }
+    }
+
+    private void checkItemConflict(UUID stuffId, int num) {
         if (itemRepository.existsByStuffIdAndNum(stuffId, num)) {
             throw new ConflictException();
         }

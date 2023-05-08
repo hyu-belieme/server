@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.controller;
 
-import com.example.beliemeserver.domain.dto._new.HistoryDto;
-import com.example.beliemeserver.domain.dto._new.StuffDto;
+import com.example.beliemeserver.domain.dto.HistoryDto;
+import com.example.beliemeserver.domain.dto.StuffDto;
 import com.example.beliemeserver.domain.service.HistoryService;
 import com.example.beliemeserver.domain.service.StuffService;
 import com.example.beliemeserver.web.requestbody.StuffRequest;
@@ -57,6 +57,7 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @RequestBody @Validated(StuffCreateValidationGroup.class) StuffRequest newStuff
     ) {
+        System.out.println(toUUID(newStuff.getDepartmentId()));
         StuffDto stuffDto = stuffService.create(
                 userToken, toUUID(newStuff.getDepartmentId()),
                 newStuff.getName(), newStuff.getThumbnail(), newStuff.getAmount());

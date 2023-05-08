@@ -1,10 +1,10 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
-import com.example.beliemeserver.domain.dao._new.*;
-import com.example.beliemeserver.domain.dto._new.ItemDto;
-import com.example.beliemeserver.domain.dto._new.StuffDto;
-import com.example.beliemeserver.domain.dto._new.UserDto;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
+import com.example.beliemeserver.domain.dao.*;
+import com.example.beliemeserver.domain.dto.ItemDto;
+import com.example.beliemeserver.domain.dto.StuffDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.util.Constants;

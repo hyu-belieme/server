@@ -1,10 +1,10 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
-import com.example.beliemeserver.config.initdata._new.container.UniversityInfo;
-import com.example.beliemeserver.domain.dao._new.*;
-import com.example.beliemeserver.domain.dto._new.UniversityDto;
-import com.example.beliemeserver.domain.dto._new.UserDto;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
+import com.example.beliemeserver.config.initdata.container.UniversityInfo;
+import com.example.beliemeserver.domain.dao.*;
+import com.example.beliemeserver.domain.dto.UniversityDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 

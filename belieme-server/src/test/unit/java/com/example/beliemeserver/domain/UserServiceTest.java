@@ -1,10 +1,10 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.config.initdata._new.container.AuthorityInfo;
-import com.example.beliemeserver.config.initdata._new.container.MajorInfo;
-import com.example.beliemeserver.config.initdata._new.container.UniversityInfo;
-import com.example.beliemeserver.config.initdata._new.container.UserInfo;
-import com.example.beliemeserver.domain.dto._new.*;
+import com.example.beliemeserver.config.initdata.container.AuthorityInfo;
+import com.example.beliemeserver.config.initdata.container.MajorInfo;
+import com.example.beliemeserver.config.initdata.container.UniversityInfo;
+import com.example.beliemeserver.config.initdata.container.UserInfo;
+import com.example.beliemeserver.domain.dto.*;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.UserService;

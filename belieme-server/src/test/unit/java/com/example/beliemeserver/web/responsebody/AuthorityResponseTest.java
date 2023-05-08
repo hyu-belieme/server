@@ -1,7 +1,7 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.domain.dto._new.AuthorityDto;
-import com.example.beliemeserver.domain.dto._new.DepartmentDto;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.util.RandomGetter;
 import org.json.simple.JSONObject;

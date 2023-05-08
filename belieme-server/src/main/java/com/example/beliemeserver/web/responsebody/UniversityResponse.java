@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.domain.dto._new.UniversityDto;
+import com.example.beliemeserver.domain.dto.UniversityDto;
 import lombok.Getter;
 
 import java.util.UUID;

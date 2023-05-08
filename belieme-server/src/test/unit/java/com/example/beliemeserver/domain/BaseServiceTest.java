@@ -1,8 +1,8 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.config.initdata._new.InitialDataConfig;
-import com.example.beliemeserver.domain.dao._new.*;
-import com.example.beliemeserver.domain.dto._new.*;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
+import com.example.beliemeserver.domain.dao.*;
+import com.example.beliemeserver.domain.dto.*;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.TokenExpiredException;
 import com.example.beliemeserver.domain.service.BaseService;

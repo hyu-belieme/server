@@ -1,9 +1,10 @@
 package com.example.beliemeserver.config.initdata.container;
 
 import java.util.Map;
+import java.util.UUID;
 
 public record UniversityInfo(
-        String code,
+        UUID id,
         String name,
         Map<String, String> externalApiInfo) {
 

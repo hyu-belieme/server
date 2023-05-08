@@ -1,15 +1,19 @@
 package com.example.beliemeserver.data.daoimpl;
 
-import com.example.beliemeserver.data.entity.*;
+import com.example.beliemeserver.data.entity.HistoryEntity;
+import com.example.beliemeserver.data.entity.ItemEntity;
+import com.example.beliemeserver.data.entity.StuffEntity;
+import com.example.beliemeserver.data.entity.UserEntity;
 import com.example.beliemeserver.data.repository.*;
 import com.example.beliemeserver.domain.dao.HistoryDao;
 import com.example.beliemeserver.domain.dto.HistoryDto;
-import com.example.beliemeserver.domain.dto.UserDto;
 import com.example.beliemeserver.error.exception.ConflictException;
+import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
@@ -23,11 +27,11 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByDepartment(String universityCode, String departmentCode) {
-        List<HistoryDto> output = new ArrayList<>();
-        DepartmentEntity targetDepartment = findDepartmentEntity(universityCode, departmentCode);
+    public List<HistoryDto> getListByDepartment(@NonNull UUID departmentId) {
+        validateDepartmentId(departmentId);
 
-        for (StuffEntity stuff : stuffRepository.findByDepartmentId(targetDepartment.getId())) {
+        List<HistoryDto> output = new ArrayList<>();
+        for (StuffEntity stuff : stuffRepository.findByDepartmentId(departmentId)) {
             for (ItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
                 output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
             }
@@ -36,30 +40,31 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public List<HistoryDto> getListByStuff(String universityCode, String departmentCode, String stuffName) {
-        List<HistoryDto> output = new ArrayList<>();
-        StuffEntity targetStuff = findStuffEntity(universityCode, departmentCode, stuffName);
+    public List<HistoryDto> getListByStuff(@NonNull UUID stuffId) {
+        validateStuffId(stuffId);
 
-        for (ItemEntity item : itemRepository.findByStuffId(targetStuff.getId())) {
+        List<HistoryDto> output = new ArrayList<>();
+        for (ItemEntity item : itemRepository.findByStuffId(stuffId)) {
             output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
         }
         return output;
     }
 
     @Override
-    public List<HistoryDto> getListByItem(String universityCode, String departmentCode, String stuffName, int itemNum) {
-        ItemEntity targetItem = findItemEntity(universityCode, departmentCode, stuffName, itemNum);
-        return toHistoryDtoList(historyRepository.findByItemId(targetItem.getId()));
+    public List<HistoryDto> getListByItem(@NonNull UUID itemId) {
+        validateItemId(itemId);
+
+        return toHistoryDtoList(historyRepository.findByItemId(itemId));
     }
 
     @Override
-    public List<HistoryDto> getListByDepartmentAndRequester(String universityCodeForDepartment, String departmentCode, String universityCodeForUser, String requesterStudentId) {
-        List<HistoryDto> output = new ArrayList<>();
-        DepartmentEntity targetDepartment = findDepartmentEntity(universityCodeForDepartment, departmentCode);
-        UserEntity targetRequester = findUserEntity(universityCodeForUser, requesterStudentId);
+    public List<HistoryDto> getListByDepartmentAndRequester(@NonNull UUID departmentId, @NonNull UUID requesterId) {
+        validateDepartmentId(departmentId);
+        validateUserId(requesterId);
 
-        for (HistoryEntity historyEntity : historyRepository.findByRequesterId(targetRequester.getId())) {
-            if (historyEntity.getItem().getStuff().getDepartment().getId() == targetDepartment.getId()) {
+        List<HistoryDto> output = new ArrayList<>();
+        for (HistoryEntity historyEntity : historyRepository.findByRequesterId(requesterId)) {
+            if (historyEntity.getItem().getStuff().getDepartment().getId() == departmentId) {
                 output.add(historyEntity.toHistoryDto());
             }
         }
@@ -68,55 +73,67 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
     }
 
     @Override
-    public HistoryDto getByIndex(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum) {
-        return findHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum).toHistoryDto();
+    public HistoryDto getById(@NonNull UUID historyId) {
+        return findHistoryEntity(historyId).toHistoryDto();
     }
 
     @Override
-    public HistoryDto create(HistoryDto newHistory) {
-        ItemEntity itemOfNewHistory = findItemEntity(newHistory.item());
+    public HistoryDto create(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    ) {
+        ItemEntity itemOfNewHistory = getItemEntityOrThrowInvalidIndexException(itemId);
 
-        checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
+        checkHistoryIdConflict(historyId);
+        checkHistoryConflict(itemId, num);
 
         HistoryEntity newHistoryEntity = new HistoryEntity(
+                historyId,
                 itemOfNewHistory,
-                newHistory.num(),
-                toUserEntityOrNull(newHistory.requester()),
-                toUserEntityOrNull(newHistory.approveManager()),
-                toUserEntityOrNull(newHistory.returnManager()),
-                toUserEntityOrNull(newHistory.lostManager()),
-                toUserEntityOrNull(newHistory.cancelManager()),
-                newHistory.requestedAt(),
-                newHistory.approvedAt(),
-                newHistory.returnedAt(),
-                newHistory.lostAt(),
-                newHistory.canceledAt()
+                num,
+                getUserEntityIfIdIsNotNull(requesterId),
+                getUserEntityIfIdIsNotNull(approveManagerId),
+                getUserEntityIfIdIsNotNull(returnManagerId),
+                getUserEntityIfIdIsNotNull(lostManagerId),
+                getUserEntityIfIdIsNotNull(cancelManagerId),
+                requestedAt,
+                approvedAt,
+                returnedAt,
+                lostAt,
+                canceledAt
         );
         return historyRepository.save(newHistoryEntity).toHistoryDto();
     }
 
     @Override
-    public HistoryDto update(String universityCode, String departmentCode, String stuffName, int itemNum, int historyNum, HistoryDto newHistory) {
-        HistoryEntity target = findHistoryEntity(universityCode, departmentCode, stuffName, itemNum, historyNum);
-        ItemEntity itemOfNewHistory = findItemEntity(newHistory.item());
+    public HistoryDto update(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    ) {
+        HistoryEntity target = findHistoryEntity(historyId);
+        ItemEntity itemOfNewHistory = getItemEntityOrThrowInvalidIndexException(itemId);
 
-        if (doesIndexChange(target, newHistory)) {
-            checkHistoryConflict(itemOfNewHistory.getId(), newHistory.num());
+        if (doesIndexChange(target, itemId, num)) {
+            checkHistoryConflict(itemOfNewHistory.getId(), num);
         }
 
-        target.setItem(itemOfNewHistory)
-                .setNum(newHistory.num())
-                .setRequester(toUserEntityOrNull(newHistory.requester()))
-                .setApproveManager(toUserEntityOrNull(newHistory.approveManager()))
-                .setReturnManager(toUserEntityOrNull(newHistory.returnManager()))
-                .setLostManager(toUserEntityOrNull(newHistory.lostManager()))
-                .setCancelManager(toUserEntityOrNull(newHistory.cancelManager()))
-                .setRequestedAt(newHistory.requestedAt())
-                .setApprovedAt(newHistory.approvedAt())
-                .setReturnedAt(newHistory.returnedAt())
-                .setLostAt(newHistory.lostAt())
-                .setCanceledAt(newHistory.canceledAt());
-        return target.toHistoryDto();
+        target = target.withItem(itemOfNewHistory)
+                .withNum(num)
+                .withRequester(getUserEntityIfIdIsNotNull(requesterId))
+                .withApproveManager(getUserEntityIfIdIsNotNull(approveManagerId))
+                .withReturnManager(getUserEntityIfIdIsNotNull(returnManagerId))
+                .withLostManager(getUserEntityIfIdIsNotNull(lostManagerId))
+                .withCancelManager(getUserEntityIfIdIsNotNull(cancelManagerId))
+                .withRequestedAt(requestedAt)
+                .withApprovedAt(approvedAt)
+                .withReturnedAt(returnedAt)
+                .withLostAt(lostAt)
+                .withCanceledAt(canceledAt);
+        return historyRepository.save(target).toHistoryDto();
     }
 
     private List<HistoryDto> toHistoryDtoList(Iterable<HistoryEntity> historyEntities) {
@@ -128,30 +145,26 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         return output;
     }
 
-    private boolean doesIndexChange(HistoryEntity target, HistoryDto newHistory) {
-        String oldUniversityCode = target.getItem().getStuff().getDepartment().getUniversity().getCode();
-        String oldDepartmentCode = target.getItem().getStuff().getDepartment().getCode();
-        String oldStuffName = target.getItem().getStuff().getName();
-        int oldItemNum = target.getItem().getNum();
-        int oldHistoryNum = target.getNum();
-
-        return !(oldUniversityCode.equals(newHistory.item().stuff().department().university().code())
-                && oldDepartmentCode.equals(newHistory.item().stuff().department().code())
-                && oldStuffName.equals(newHistory.item().stuff().name())
-                && oldItemNum == newHistory.item().num()
-                && oldHistoryNum == newHistory.num());
+    private UserEntity getUserEntityIfIdIsNotNull(UUID userId) {
+        if (userId == null) {
+            return null;
+        }
+        return getUserEntityOrThrowInvalidIndexException(userId);
     }
 
-    private void checkHistoryConflict(int itemId, int historyNum) {
-        if (historyRepository.existsByItemIdAndNum(itemId, historyNum)) {
+    private boolean doesIndexChange(HistoryEntity target, UUID newItemId, int newHistoryNum) {
+        return !(target.getItemId().equals(newItemId) && target.getNum() == newHistoryNum);
+    }
+
+    private void checkHistoryIdConflict(UUID historyId) {
+        if (historyRepository.existsById(historyId)) {
             throw new ConflictException();
         }
     }
 
-    private UserEntity toUserEntityOrNull(UserDto userDto) {
-        if (userDto == null) {
-            return null;
+    private void checkHistoryConflict(UUID itemId, int historyNum) {
+        if (historyRepository.existsByItemIdAndNum(itemId, historyNum)) {
+            throw new ConflictException();
         }
-        return findUserEntity(userDto);
     }
 }

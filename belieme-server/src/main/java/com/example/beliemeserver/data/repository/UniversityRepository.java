@@ -4,9 +4,10 @@ import com.example.beliemeserver.data.entity.UniversityEntity;
 import com.example.beliemeserver.data.repository.custom.RefreshRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-public interface UniversityRepository extends RefreshRepository<UniversityEntity, Integer> {
-    boolean existsByCode(String code);
+public interface UniversityRepository extends RefreshRepository<UniversityEntity, UUID> {
+    boolean existsByName(String name);
 
-    Optional<UniversityEntity> findByCode(String code);
+    Optional<UniversityEntity> findByName(String name);
 }

@@ -1,8 +1,8 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.domain.dto._new.DepartmentDto;
-import com.example.beliemeserver.domain.dto._new.ItemDto;
-import com.example.beliemeserver.domain.dto._new.StuffDto;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.ItemDto;
+import com.example.beliemeserver.domain.dto.StuffDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;

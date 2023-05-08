@@ -1,6 +1,6 @@
 package com.example.beliemeserver.web.responsebody;
 
-import com.example.beliemeserver.domain.dto._new.AuthorityDto;
+import com.example.beliemeserver.domain.dto.AuthorityDto;
 import lombok.Getter;
 
 @Getter

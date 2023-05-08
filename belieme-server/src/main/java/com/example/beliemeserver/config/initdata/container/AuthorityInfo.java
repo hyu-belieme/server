@@ -1,8 +1,9 @@
 package com.example.beliemeserver.config.initdata.container;
 
+import java.util.UUID;
+
 public record AuthorityInfo(
-        String universityCode,
-        String departmentCode,
+        UUID departmentId,
         String permission) {
 
 }
