@@ -3,7 +3,7 @@ package com.example.beliemeserver.data.entity;
 import com.example.beliemeserver.domain.dto.UniversityDto;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity

@@ -4,7 +4,7 @@ import com.example.beliemeserver.domain.dto.AuthorityDto;
 import com.example.beliemeserver.domain.dto.UserDto;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

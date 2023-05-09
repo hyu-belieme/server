@@ -5,7 +5,7 @@ import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.StuffDto;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity

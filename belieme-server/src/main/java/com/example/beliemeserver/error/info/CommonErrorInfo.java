@@ -2,6 +2,7 @@ package com.example.beliemeserver.error.info;
 
 import com.example.beliemeserver.util.message.Message;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 
 public enum CommonErrorInfo implements ErrorInfo {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, new Message("message.error.badRequest")),
@@ -14,7 +15,7 @@ public enum CommonErrorInfo implements ErrorInfo {
     BAD_GATEWAY(HttpStatus.BAD_GATEWAY, new Message("message.error.badGateway")),
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, new Message("message.error.serviceUnavailable"));
 
-    private final HttpStatus httpStatus;
+    private final HttpStatusCode httpStatus;
     private final Message responseMessage;
 
     CommonErrorInfo(HttpStatus httpStatus, Message responseMessage) {
@@ -22,7 +23,7 @@ public enum CommonErrorInfo implements ErrorInfo {
         this.responseMessage = responseMessage;
     }
 
-    public static ErrorInfo getByHttpStatus(HttpStatus status) {
+    public static ErrorInfo getByHttpStatus(HttpStatusCode status) {
         for (ErrorInfo errorInfo : CommonErrorInfo.values()) {
             if (errorInfo.httpStatus().equals(status)) return errorInfo;
         }
@@ -30,7 +31,7 @@ public enum CommonErrorInfo implements ErrorInfo {
     }
 
     @Override
-    public HttpStatus httpStatus() {
+    public HttpStatusCode httpStatus() {
         return httpStatus;
     }
 
