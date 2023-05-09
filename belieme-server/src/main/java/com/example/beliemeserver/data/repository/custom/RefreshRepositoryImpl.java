@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.io.Serializable;
 
 public class RefreshRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements RefreshRepository<T, ID> {
