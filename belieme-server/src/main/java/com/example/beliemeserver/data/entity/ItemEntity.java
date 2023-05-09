@@ -6,7 +6,7 @@ import com.example.beliemeserver.domain.dto.StuffDto;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "item", uniqueConstraints = {

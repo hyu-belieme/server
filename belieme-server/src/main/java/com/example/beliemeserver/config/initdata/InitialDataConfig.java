@@ -4,14 +4,12 @@ import com.example.beliemeserver.config.initdata.container.DepartmentInfo;
 import com.example.beliemeserver.config.initdata.container.UniversityInfo;
 import com.example.beliemeserver.config.initdata.container.UserInfo;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ConstructorBinding
 @ConfigurationProperties(prefix = "init")
 public class InitialDataConfig implements InitialData {
     private final Map<String, UniversityInfo> universityInfos;
