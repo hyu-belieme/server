@@ -46,5 +46,5 @@ jobs:
         aws deploy push \
           --application-name belieme-server \
           --ignore-hidden-files \
-          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
+          --s3-location s3://belieme-server/$GITHUB_SHA.zip \
           --source .
