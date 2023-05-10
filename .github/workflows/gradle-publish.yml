@@ -39,6 +39,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_IAM_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_IAM_ACCESS_KEY_PW }}
+        aws-region: ap-northeast-2
 
     - name: Upload to AWS S3
       run: |
