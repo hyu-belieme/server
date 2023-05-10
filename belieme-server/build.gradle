@@ -41,14 +41,21 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web:3.0.6'
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.6'
     implementation 'org.springframework.boot:spring-boot-configuration-processor:3.0.6'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
 
     compileOnly 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
+    runtimeOnly 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
+    implementation 'com.oracle.database.security:osdt_cert:21.9.0.0'
+    implementation 'com.oracle.database.security:oraclepki:21.9.0.0'
+    implementation 'com.oracle.database.security:osdt_core:21.9.0.0'
+
     implementation 'mysql:mysql-connector-java:8.0.32'
-    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     runtimeOnly 'com.h2database:h2:2.1.214'
+
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.0.6'
     testImplementation 'org.mockito:mockito-inline:5.2.0'
 }

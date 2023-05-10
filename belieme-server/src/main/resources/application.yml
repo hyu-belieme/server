@@ -6,44 +6,28 @@ logging:
   level:
     org.hibernate.SQL: debug
 
-
 spring:
+  profiles:
+    include:
+      - connection
   config:
-    import: classpath:apis/api.yml, classpath:inits/init.yml, classpath:cors/cors.yml
+    import: classpath:apis/api.yml, classpath:secret/inits/init.yml, classpath:cors/cors.yml
   data:
     jdbc:
       repositories.enabled: false
   jpa:
-    database: mysql
     show-sql: true
-    database-platform: org.hibernate.dialect.MySQL57Dialect
-
     hibernate:
-      ddl-auto: update
-
+      ddl-auto: none
   sql:
     init:
       encoding: UTF-8
 
-  # local DB
-  datasource:
-    url: jdbc:mysql://localhost:3306/belieme
-    username: root
-    password: localTest123
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  # jaws DB(ITEM ID?? ??)
+  #  # local DB
 #  datasource:
-#    url: jdbc:mysql://zvk4t48t3gs82lqw:f0fxfigs5so9pt61@ble5mmo2o5v9oouq.cbetxkdyhwsb.us-east-1.rds.amazonaws.com:3306/ht59aoarqlfauy77/123123123
-#    username: zvk4t48t3gs82lqw
-#    password: f0fxfigs5so9pt61
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  # AWS s3 free tier
-#  datasource:
-#    url: jdbc:mysql://admin:qlfflal1234!@belieme-test-db.csariljxxswb.us-east-1.rds.amazonaws.com:3306/data
-#    username: admin
-#    password: qlfflal1234!
+#    url: jdbc:mysql://localhost:3306/belieme
+#    username: root
+#    password: localTest123
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 
   messages:
