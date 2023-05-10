@@ -9,7 +9,6 @@ import org.junit.jupiter.api.RepeatedTest;
 
 import java.io.IOException;
 
-
 public class UserResponseTest extends BaseResponseTest {
     private final RandomGetter<UserDto> userGetter = new RandomGetter<>(stub.ALL_USERS);
 

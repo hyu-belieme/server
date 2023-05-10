@@ -45,8 +45,10 @@ public record ApiConfig(
     }
 
     public record Query(
-            String requesterUniversityCode,
-            String requesterStudentId
+            String requesterId,
+            String departmentId,
+            String stuffId,
+            String itemId
     ) {
 
     }

@@ -1,18 +1,20 @@
 package com.example.beliemeserver.domain.dto;
 
-import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public record StuffDto(
-        @NonNull DepartmentDto department, @NonNull String name,
-        String thumbnail, @NonNull List<ItemDto> items
+        @NonNull UUID id, @NonNull DepartmentDto department,
+        @NonNull String name, String thumbnail, @NonNull List<ItemDto> items
 ) {
-    public static final StuffDto nestedEndpoint = new StuffDto(DepartmentDto.nestedEndpoint, "-", "-", new ArrayList<>());
+    private static final UUID NIL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final StuffDto nestedEndpoint = new StuffDto(NIL_UUID, DepartmentDto.nestedEndpoint, "-", "-", new ArrayList<>());
 
-    public StuffDto(@NonNull DepartmentDto department, @NonNull String name, String thumbnail, @NonNull List<ItemDto> items) {
+    public StuffDto(@NonNull UUID id, @NonNull DepartmentDto department, @NonNull String name, String thumbnail, @NonNull List<ItemDto> items) {
+        this.id = id;
         this.department = department;
         this.name = name;
         this.thumbnail = thumbnail;
@@ -20,7 +22,7 @@ public record StuffDto(
     }
 
     public static StuffDto init(@NonNull DepartmentDto department, @NonNull String name, String thumbnail) {
-        return new StuffDto(department, name, thumbnail, new ArrayList<>());
+        return new StuffDto(UUID.randomUUID(), department, name, thumbnail, new ArrayList<>());
     }
 
     @Override
@@ -33,70 +35,47 @@ public record StuffDto(
     }
 
     public StuffDto withDepartment(@NonNull DepartmentDto department) {
-        return new StuffDto(department, name, thumbnail, items);
+        return new StuffDto(id, department, name, thumbnail, items);
     }
 
     public StuffDto withName(@NonNull String name) {
-        return new StuffDto(department, name, thumbnail, items);
+        return new StuffDto(id, department, name, thumbnail, items);
     }
 
     public StuffDto withThumbnail(String thumbnail) {
-        return new StuffDto(department, name, thumbnail, items);
+        return new StuffDto(id, department, name, thumbnail, items);
     }
 
     public StuffDto withItems(@NonNull List<ItemDto> items) {
-        return new StuffDto(department, name, thumbnail, items);
+        return new StuffDto(id, department, name, thumbnail, items);
     }
 
     public StuffDto withItemAdd(ItemDto itemDto) {
-        StuffDto output = new StuffDto(department, name, thumbnail, items);
+        StuffDto output = new StuffDto(id, department, name, thumbnail, items);
         output.items.add(itemDto.withStuff(nestedEndpoint));
 
         return output;
     }
 
     public StuffDto withItemRemove(ItemDto itemDto) {
-        StuffDto output = new StuffDto(department, name, thumbnail, items);
-        output.items.removeIf(item -> item.matchUniqueKey(itemDto));
+        StuffDto output = new StuffDto(id, department, name, thumbnail, items);
+        output.items.removeIf(item -> item.matchId(itemDto));
 
         return output;
     }
 
-    public boolean matchUniqueKey(String universityCode, String departmentCode, String name) {
-        if (name == null) return false;
-        return department().matchUniqueKey(universityCode, departmentCode)
-                && name.equals(this.name());
-    }
-
-    public boolean matchUniqueKey(StuffDto oth) {
-        if (oth == null) return false;
-        return matchUniqueKey(
-                oth.department().university().code(),
-                oth.department().code(),
-                oth.name()
-        );
-    }
-
-    @Override
-    public String toString() {
-        if (this.equals(nestedEndpoint)) {
-            return "omitted";
+    public boolean matchId(StuffDto oth) {
+        if (oth == null) {
+            return false;
         }
-
-        return "StuffDto{" +
-                "department=" + department +
-                ", name='" + name + '\'' +
-                ", thumbnail='" + thumbnail + '\'' +
-                ", items=" + items +
-                '}';
+        return this.id.equals(oth.id);
     }
 
-    public int firstUsableItemNum() {
+    public ItemDto firstUsableItem() {
         for (ItemDto item : items) {
-            if (item.status() == ItemStatus.USABLE)
-                return item.num();
+            if (item.isUsable()) return item.withStuff(this);
         }
-        return 0;
+        return null;
     }
 
     public int nextItemNum() {
@@ -110,23 +89,24 @@ public record StuffDto(
     }
 
     public int amount() {
-        int amount = 0;
-        for (ItemDto item : items) {
-            if (item.status() == ItemStatus.USABLE
-                    || item.status() == ItemStatus.UNUSABLE) {
-                amount++;
-            }
-        }
-        return amount;
+        return items.size();
     }
 
     public int count() {
-        int count = 0;
-        for (ItemDto item : items) {
-            if (item.status() == ItemStatus.USABLE) {
-                count++;
-            }
+        return (int) items.stream().filter(ItemDto::isUsable).count();
+    }
+
+    @Override
+    public String toString() {
+        if (this.equals(nestedEndpoint)) {
+            return "omitted";
         }
-        return count;
+        return "StuffDto{" +
+                "id=" + id +
+                ", department=" + department +
+                ", name='" + name + '\'' +
+                ", thumbnail='" + thumbnail + '\'' +
+                ", items=" + items +
+                '}';
     }
 }

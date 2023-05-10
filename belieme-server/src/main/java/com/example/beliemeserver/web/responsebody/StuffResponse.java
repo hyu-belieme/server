@@ -7,9 +7,11 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class StuffResponse extends JsonResponse {
+    private UUID id;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private UniversityResponse university;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
@@ -26,8 +28,9 @@ public class StuffResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private StuffResponse(UniversityResponse university, DepartmentResponse department, String name, String thumbnail, int amount, int count, List<ItemResponse> items) {
+    private StuffResponse(UUID id, UniversityResponse university, DepartmentResponse department, String name, String thumbnail, int amount, int count, List<ItemResponse> items) {
         super(true);
+        this.id = id;
         this.university = university;
         this.department = department;
         this.name = name;
@@ -52,6 +55,7 @@ public class StuffResponse extends JsonResponse {
             itemResponseList.add(nestedItemResponse);
         }
         return new StuffResponse(
+                stuffDto.id(),
                 UniversityResponse.from(stuffDto.department().university()),
                 DepartmentResponse.from(stuffDto.department()).withoutUniversity(),
                 stuffDto.name(), stuffDto.thumbnail(), stuffDto.amount(),
@@ -61,6 +65,7 @@ public class StuffResponse extends JsonResponse {
 
     public StuffResponse withoutUniversityAndDepartment() {
         return new StuffResponse(
+                id,
                 UniversityResponse.responseWillBeIgnore(),
                 DepartmentResponse.responseWillBeIgnore(),
                 name, thumbnail, amount, count, items);
@@ -68,7 +73,7 @@ public class StuffResponse extends JsonResponse {
 
     public StuffResponse withoutItems() {
         return new StuffResponse(
-                university, department, name, thumbnail,
+                id, university, department, name, thumbnail,
                 amount, count, null);
     }
 }

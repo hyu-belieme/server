@@ -1,11 +1,12 @@
 package com.example.beliemeserver.config.initdata.container;
 
 import java.util.List;
+import java.util.UUID;
 
 public record DepartmentInfo(
-        String universityCode,
-        String code,
+        UUID id,
+        UUID universityId,
         String name,
-        List<String> baseMajors) {
+        List<MajorInfo> baseMajors) {
 
 }

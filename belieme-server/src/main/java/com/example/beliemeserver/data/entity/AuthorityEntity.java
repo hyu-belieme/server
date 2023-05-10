@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.ToString;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "authority", uniqueConstraints = {
@@ -19,38 +20,36 @@ import jakarta.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
-public class AuthorityEntity extends DataEntity {
+public class AuthorityEntity extends DataEntity<Integer> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
-    @Column(name = "department_id")
-    private int departmentId;
+    @NonNull
+    @Column(name = "department_id", columnDefinition = "BINARY(16)")
+    private UUID departmentId;
 
     @NonNull
     @Column(name = "permission", length = 20)
     private String permission;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
     private DepartmentEntity department;
 
-    public AuthorityEntity(DepartmentEntity department, String permission) {
+    public AuthorityEntity(@NonNull DepartmentEntity department, @NonNull String permission) {
         this.department = department;
         this.departmentId = department.getId();
         this.permission = permission; // TODO : validate Permission String
     }
 
-    public AuthorityEntity setDepartment(DepartmentEntity department) {
+    public AuthorityEntity(int id, @NonNull DepartmentEntity department, @NonNull String permission) {
+        this.id = id;
         this.department = department;
         this.departmentId = department.getId();
-        return this;
-    }
-
-    public AuthorityEntity setPermission(String permission) {
         this.permission = permission; // TODO : validate Permission String
-        return this;
     }
 
     public AuthorityDto toAuthorityDto() {

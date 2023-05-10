@@ -1,0 +1,33 @@
+server:
+  tomcat:
+    uri-encoding: UTF-8
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+spring:
+  config:
+    import: classpath:apis/api.yml, classpath:inits/init.yml, classpath:cors/cors.yml
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: create
+
+  h2:
+    console:
+      enabled: true
+
+  messages:
+    basename: messages/message
+    encoding: UTF-8
+    cache-duration: 30
+    always-use-message-format: true
+    use-code-as-default-message: true
+    fallback-to-system-locale: true

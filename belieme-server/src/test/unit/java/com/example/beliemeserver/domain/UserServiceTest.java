@@ -1,19 +1,17 @@
 package com.example.beliemeserver.domain;
 
-import com.example.beliemeserver.config.initdata.InitialDataDtoAdapter;
 import com.example.beliemeserver.config.initdata.container.AuthorityInfo;
+import com.example.beliemeserver.config.initdata.container.MajorInfo;
 import com.example.beliemeserver.config.initdata.container.UniversityInfo;
 import com.example.beliemeserver.config.initdata.container.UserInfo;
-import com.example.beliemeserver.domain.dto.AuthorityDto;
-import com.example.beliemeserver.domain.dto.DepartmentDto;
-import com.example.beliemeserver.domain.dto.UniversityDto;
-import com.example.beliemeserver.domain.dto.UserDto;
+import com.example.beliemeserver.domain.dto.*;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.service.UserService;
 import com.example.beliemeserver.domain.util.HttpRequest;
 import com.example.beliemeserver.error.exception.BadGatewayException;
 import com.example.beliemeserver.error.exception.ForbiddenException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
@@ -29,6 +27,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -50,7 +49,7 @@ public class UserServiceTest extends BaseServiceTest {
 
         @Override
         protected List<UserDto> execMethod() {
-            return userService.getListByDepartment(userToken, univCode, deptCode);
+            return userService.getListByDepartment(userToken, deptId);
         }
 
         @Override
@@ -63,7 +62,8 @@ public class UserServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
             when(userDao.getAllList()).thenReturn(stub.ALL_USERS);
 
             List<UserDto> expected = new ArrayList<>();
@@ -74,14 +74,37 @@ public class UserServiceTest extends BaseServiceTest {
 
             TestHelper.listCompareTest(this::execMethod, expected);
         }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[해당 `index`의 `department`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_getInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
     }
 
     @Nested
-    @DisplayName("getByIndex()")
-    public final class TestGetByIndex extends UserNestedTest {
+    @DisplayName("getById()")
+    public final class TestGetById extends UserNestedTest {
         private UserDto target;
-        private String targetUnivCode;
-        private String targetStudentId;
+        private UUID targetUserId;
 
         @Override
         protected void setUpDefault() {
@@ -91,13 +114,12 @@ public class UserServiceTest extends BaseServiceTest {
 
         private void setTarget(UserDto user) {
             this.target = user;
-            this.targetUnivCode = user.university().code();
-            this.targetStudentId = user.studentId();
+            this.targetUserId = user.id();
         }
 
         @Override
         protected UserDto execMethod() {
-            return userService.getByIndex(userToken, targetUnivCode, targetStudentId);
+            return userService.getById(userToken, targetUserId);
         }
 
         @RepeatedTest(10)
@@ -106,8 +128,7 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(userDao.getByIndex(targetUnivCode, targetStudentId))
-                    .thenReturn(target);
+            when(userDao.getById(targetUserId)).thenReturn(target);
 
             TestHelper.objectCompareTest(this::execMethod, target);
         }
@@ -118,8 +139,7 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(userDao.getByIndex(targetUnivCode, targetStudentId))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getById(targetUserId)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
@@ -161,15 +181,13 @@ public class UserServiceTest extends BaseServiceTest {
     }
 
     @Nested
-    @DisplayName("updateAuthority()")
-    public final class TestUpdateAuthority extends UserNestedTest {
+    @DisplayName("updateAuthorityOfUser()")
+    public final class TestUpdateAuthorityOfUser extends UserNestedTest {
         private UserDto targetUser;
-        private String targetUserUnivCode;
-        private String targetUserStudentId;
+        private UUID targetUserId;
 
         private DepartmentDto authDept;
-        private String authUnivCode;
-        private String authDeptCode;
+        private UUID authDeptId;
         private Permission authPermission;
 
         @Override
@@ -182,14 +200,12 @@ public class UserServiceTest extends BaseServiceTest {
 
         private void setTargetUser(UserDto user) {
             this.targetUser = user;
-            this.targetUserUnivCode = user.university().code();
-            this.targetUserStudentId = user.studentId();
+            this.targetUserId = user.id();
         }
 
         private void setAuthDept(DepartmentDto dept) {
             this.authDept = dept;
-            this.authUnivCode = dept.university().code();
-            this.authDeptCode = dept.code();
+            this.authDeptId = dept.id();
         }
 
         private void setAuthPermission(Permission permission) {
@@ -198,9 +214,8 @@ public class UserServiceTest extends BaseServiceTest {
 
         @Override
         protected UserDto execMethod() {
-            return userService.updateAuthority(
-                    userToken, targetUserUnivCode, targetUserStudentId,
-                    authUnivCode, authDeptCode, authPermission);
+            return userService.updateAuthorityOfUser(
+                    userToken, targetUserId, authDeptId, authPermission);
         }
 
         @RepeatedTest(10)
@@ -269,9 +284,8 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
             setRequester(randomUserHaveLessPermissionOnDept(authDept, Permission.MASTER));
 
-            when(departmentDao.getByIndex(authUnivCode, authDeptCode))
-                    .thenReturn(authDept);
             when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(authDeptId)).thenReturn(authDept);
 
             TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
@@ -282,11 +296,9 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
             setAuthPermission(Permission.DEVELOPER);
 
-            when(departmentDao.getByIndex(authUnivCode, authDeptCode))
-                    .thenReturn(authDept);
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
-                    .thenReturn(targetUser);
+            when(departmentDao.getById(authDeptId)).thenReturn(authDept);
+            when(userDao.getById(targetUserId)).thenReturn(targetUser);
 
             TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
@@ -298,10 +310,8 @@ public class UserServiceTest extends BaseServiceTest {
             setTargetUser(randomDevUser());
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
-                    .thenReturn(targetUser);
-            when(departmentDao.getByIndex(authUnivCode, authDeptCode))
-                    .thenReturn(authDept);
+            when(departmentDao.getById(authDeptId)).thenReturn(authDept);
+            when(userDao.getById(targetUserId)).thenReturn(targetUser);
 
             TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
         }
@@ -312,11 +322,9 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
             setAuthPermission(Permission.MASTER);
 
-            when(departmentDao.getByIndex(authUnivCode, authDeptCode))
-                    .thenReturn(authDept);
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
-                    .thenReturn(targetUser);
+            when(departmentDao.getById(authDeptId)).thenReturn(authDept);
+            when(userDao.getById(targetUserId)).thenReturn(targetUser);
 
             TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
@@ -328,25 +336,31 @@ public class UserServiceTest extends BaseServiceTest {
             setTargetUser(randomUserHaveExactPermissionOnDept(authDept, Permission.MASTER));
 
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
-                    .thenReturn(targetUser);
-            when(departmentDao.getByIndex(authUnivCode, authDeptCode))
-                    .thenReturn(authDept);
+            when(departmentDao.getById(authDeptId)).thenReturn(authDept);
+            when(userDao.getById(targetUserId)).thenReturn(targetUser);
 
             TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         private void mockAndTestHappyPath() {
-            when(departmentDao.getByIndex(authUnivCode, authDeptCode))
-                    .thenReturn(authDept);
             when(userDao.getByToken(userToken)).thenReturn(requester);
-            when(userDao.getByIndex(targetUserUnivCode, targetUserStudentId))
-                    .thenReturn(targetUser);
+            when(departmentDao.getById(authDeptId)).thenReturn(authDept);
+            when(userDao.getById(targetUserId)).thenReturn(targetUser);
 
             execMethod();
 
-            UserDto newUser = targetUser.withAuthorityUpdate(authDept, authPermission);
-            verify(userDao).update(targetUserUnivCode, targetUserStudentId, newUser);
+            List<AuthorityDto> newAuthorities = updateAuthorities(targetUser.authorities(), authDept, authPermission);
+            verify(userDao).update(
+                    eq(targetUserId),
+                    eq(targetUser.university().id()),
+                    eq(targetUser.studentId()),
+                    eq(targetUser.name()),
+                    eq(targetUser.entranceYear()),
+                    any(),
+                    eq(targetUser.createdAt()),
+                    anyLong(),
+                    eq(newAuthorities)
+            );
         }
 
         private Permission randomUnderDevPermission() {
@@ -369,19 +383,37 @@ public class UserServiceTest extends BaseServiceTest {
             users = usersHaveAdditionalAuthOnDept(users, dept);
             return users.randomSelect();
         }
+
+        private List<AuthorityDto> updateAuthorities(List<AuthorityDto> authorities, DepartmentDto department, Permission newPermission) {
+            List<AuthorityDto> output = new ArrayList<>(authorities);
+
+            if (newPermission == null) {
+                output.removeIf((e) -> e.department().matchId(department));
+                return output;
+            }
+
+            for (int i = 0; i < output.size(); i++) {
+                AuthorityDto authority = output.get(i);
+                if (authority.department().matchId(department)) {
+                    output.set(i, new AuthorityDto(department, newPermission));
+                    return output;
+                }
+            }
+
+            output.add(new AuthorityDto(department, newPermission));
+            return output;
+        }
     }
 
     @Nested
     @DisplayName("reloadInitialUser()")
     public final class TestReloadDeveloperUser {
         @Captor
-        private ArgumentCaptor<UserDto> userArgumentCaptor;
+        private ArgumentCaptor<List<AuthorityDto>> authListCaptor;
 
         private UserInfo userInfo;
-        private UniversityDto univ;
-        private String univCode;
+        private UUID univId;
         private String apiToken;
-        private String studentId;
 
         private UserDto targetUser;
         private List<DepartmentDto> deptList;
@@ -390,18 +422,39 @@ public class UserServiceTest extends BaseServiceTest {
             RandomGetter<UserInfo> userInfoGetter = new RandomGetter<>(stub.INIT_DATA.userInfos());
             this.userInfo = userInfoGetter.randomSelect();
             this.apiToken = userInfo.apiToken();
-            this.studentId = userInfo.studentId();
-            this.univCode = userInfo.universityCode();
+            this.univId = userInfo.universityId();
 
-            InitialDataDtoAdapter initialDataAdapter = new InitialDataDtoAdapter(stub.INIT_DATA);
-            this.univ = initialDataAdapter.universities().get(univCode);
-            this.deptList = new ArrayList<>(initialDataAdapter.departments().values());
-            this.targetUser = UserDto.init(univ, studentId, userInfo.name(), userInfo.entranceYear())
-                    .withApprovedAt(0);
+            UniversityDto univ = getUnivByUnivIdFromStub(userInfo.universityId());
+            this.targetUser = makeUser(univ, userInfo);
+            this.deptList = getDeptListByUnivIdFromStub(univ);
+        }
+
+        private UniversityDto getUnivByUnivIdFromStub(UUID univId) {
+            UniversityInfo univInfo = stub.INIT_DATA.universityInfos().values().stream()
+                    .filter(e -> e.id().equals(univId)).findFirst().get();
+            return new UniversityDto(univInfo.id(), univInfo.name(), univInfo.externalApiInfo().get("url"));
+        }
+
+        private List<DepartmentDto> getDeptListByUnivIdFromStub(UniversityDto univ) {
+            return stub.INIT_DATA.departmentInfos().values().stream().map(
+                    e -> new DepartmentDto(e.id(), univ, e.name(), makeMajorList(univ, e.baseMajors()))
+            ).toList();
+        }
+
+        private UserDto makeUser(UniversityDto univ, UserInfo info) {
+            return new UserDto(
+                    info.id(), univ, info.studentId(), info.name(),
+                    info.entranceYear(), UUID.randomUUID().toString(),
+                    currentTime(), currentTime(), new ArrayList<>()
+            );
+        }
+
+        private List<MajorDto> makeMajorList(UniversityDto univ, List<MajorInfo> infos) {
+            return infos.stream().map(info -> new MajorDto(info.id(), univ, info.code())).toList();
         }
 
         private UserDto execMethod() {
-            return userService.reloadInitialUser(univCode, apiToken);
+            return userService.reloadInitialUser(univId, apiToken);
         }
 
         @RepeatedTest(10)
@@ -410,15 +463,14 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(initialData.userInfos()).thenReturn(stub.INIT_DATA.userInfos());
-            when(universityDao.getByIndex(univCode)).thenReturn(univ);
-            when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+            when(userDao.getById(userInfo.id())).thenReturn(targetUser);
             mockDepartmentDao();
 
             execMethod();
 
-            verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
-            UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkUpdatedUser(newUser, userInfo)).isTrue();
+            verify(userDao).update(eq(userInfo.id()), eq(univId), eq(userInfo.studentId()), eq(userInfo.name()), eq(userInfo.entranceYear()), any(), eq(targetUser.createdAt()), anyLong(), authListCaptor.capture());
+            List<AuthorityDto> authDtoList = authListCaptor.getValue();
+            Assertions.assertThat(checkMatchAuthDtoAndInfoList(authDtoList, userInfo.authorities())).isTrue();
         }
 
         @RepeatedTest(10)
@@ -427,15 +479,14 @@ public class UserServiceTest extends BaseServiceTest {
             setUpDefault();
 
             when(initialData.userInfos()).thenReturn(stub.INIT_DATA.userInfos());
-            when(universityDao.getByIndex(univCode)).thenReturn(univ);
-            when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+            when(userDao.getById(userInfo.id())).thenThrow(NotFoundException.class);
             mockDepartmentDao();
 
             execMethod();
 
-            verify(userDao).create(userArgumentCaptor.capture());
-            UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkCreatedUser(newUser, userInfo)).isTrue();
+            verify(userDao).create(any(), eq(univId), eq(userInfo.studentId()), eq(userInfo.name()), eq(userInfo.entranceYear()), any(), anyLong(), anyLong(), authListCaptor.capture());
+            List<AuthorityDto> authDtoList = authListCaptor.getValue();
+            Assertions.assertThat(checkMatchAuthDtoAndInfoList(authDtoList, userInfo.authorities())).isTrue();
         }
 
         @RepeatedTest(10)
@@ -452,45 +503,23 @@ public class UserServiceTest extends BaseServiceTest {
         private void mockDepartmentDao() {
             for (AuthorityInfo authInfo : userInfo.authorities()) {
                 DepartmentDto targetDept = deptList.stream()
-                        .filter(dept -> dept.matchUniqueKey(authInfo.universityCode(), authInfo.departmentCode()))
+                        .filter(dept -> dept.id().equals(authInfo.departmentId()))
                         .findFirst().orElse(null);
-                when(departmentDao.getByIndex(authInfo.universityCode(), authInfo.departmentCode())).thenReturn(targetDept);
+                when(departmentDao.getById(authInfo.departmentId())).thenReturn(targetDept);
             }
         }
 
-        private boolean checkUpdatedUser(UserDto newUser, UserInfo userInfo) {
-            System.out.println(newUser);
-            if (newUser.studentId().equals(userInfo.studentId())
-                    && newUser.university().matchUniqueKey(userInfo.universityCode())
-                    && newUser.name().equals(userInfo.name())
-                    && newUser.entranceYear() == userInfo.entranceYear()
-                    && !newUser.token().equals(targetUser.token())
-                    && newUser.approvedAt() > targetUser.approvedAt()
-            ) {
-                return checkUserAuth(newUser, userInfo.authorities());
-            }
-            return false;
-        }
-
-        private boolean checkCreatedUser(UserDto newUser, UserInfo userInfo) {
-            System.out.println(newUser);
-            if (newUser.studentId().equals(userInfo.studentId())
-                    && newUser.university().matchUniqueKey(userInfo.universityCode())
-                    && newUser.name().equals(userInfo.name())
-                    && newUser.entranceYear() == userInfo.entranceYear()
-            ) {
-                return checkUserAuth(newUser, userInfo.authorities());
-            }
-            return false;
-        }
-
-        private boolean checkUserAuth(UserDto newUser, List<AuthorityInfo> authorityInfos) {
+        private boolean checkMatchAuthDtoAndInfoList(List<AuthorityDto> authorities, List<AuthorityInfo> authorityInfos) {
             return authorityInfos.stream().allMatch(authorityInfo ->
-                    newUser.authorities().stream().anyMatch(authorityDto ->
-                            authorityDto.department().matchUniqueKey(authorityInfo.universityCode(), authorityInfo.departmentCode())
-                                    && authorityDto.permission().toString().equals(authorityInfo.permission())
+                    authorities.stream().anyMatch(
+                            authorityDto ->checkMatchAuthDtoAndInfo(authorityDto, authorityInfo)
                     )
             );
+        }
+
+        private boolean checkMatchAuthDtoAndInfo(AuthorityDto dto, AuthorityInfo info) {
+            return  dto.department().id().equals(info.departmentId())
+                    && dto.permission().toString().equals(info.permission());
         }
     }
 
@@ -498,24 +527,25 @@ public class UserServiceTest extends BaseServiceTest {
     @DisplayName("updateUserFromHanyangUniversity()")
     public final class TestUpdateUserFromHanyangUniversity {
         private static MockedStatic<HttpRequest> httpRequest;
+
         @Captor
-        private ArgumentCaptor<UserDto> userArgumentCaptor;
+        private ArgumentCaptor<List<AuthorityDto>> authListCaptor;
 
         private final String apiToken = "";
 
         private UniversityDto univ;
-        private String univCode;
+        private UUID univId;
         private String apiUrl;
         private String clientKey;
 
         private UserDto targetUser;
-        private String studentId;
+        private String targetStudentId;
 
         private String newName;
         private String newMajorCode;
 
-        private List<DepartmentDto> deptByUniv;
-        private List<DepartmentDto> newDepartments;
+        private List<DepartmentDto> deptsByUniv;
+        private List<DepartmentDto> newDepts;
 
         @BeforeEach
         void setUp() {
@@ -530,33 +560,39 @@ public class UserServiceTest extends BaseServiceTest {
         private void setUpDefault() {
             setUniv();
             setTargetUser(randomUserOnUniv(univ));
+
             newName = "이석환";
-            newMajorCode = "FH04067";
-            deptByUniv = stub.ALL_DEPTS.stream()
-                    .filter((dept) -> dept.university().matchUniqueKey(univ))
+            setNewMajorCode(randomMajor().code());
+
+            deptsByUniv = stub.ALL_DEPTS.stream()
+                    .filter((dept) -> dept.university().matchId(univ))
                     .toList();
-            newDepartments = stub.ALL_DEPTS.stream().filter((dept) -> {
-                if (!dept.university().matchUniqueKey(univ)) return false;
-                return dept.baseMajors().stream().anyMatch(major -> newMajorCode.equals(major.code()));
-            }).toList();
         }
 
         private void setUniv() {
             UniversityInfo univInfo = stub.HYU_UNIV_INIT_INFO;
             univ = stub.HYU_UNIV;
-            univCode = univ.code();
+            univId = univ.id();
             apiUrl = univInfo.externalApiInfo().get("url");
             clientKey = univInfo.externalApiInfo().get("clientKey");
         }
 
         private void setTargetUser(UserDto user) {
-            this.targetUser = user.withApprovedAt(0);
-            this.studentId = user.studentId();
+            this.targetUser = user;
+            this.targetStudentId = user.studentId();
+        }
+
+        private void setNewMajorCode(String newMajorCode) {
+            this.newMajorCode = newMajorCode;
+            newDepts = stub.ALL_DEPTS.stream().filter((dept) -> {
+                if (!dept.university().matchId(univ)) return false;
+                return dept.baseMajors().stream().anyMatch(major -> newMajorCode.equals(major.code()));
+            }).toList();
         }
 
         private JSONObject makeJsonResponse() {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("gaeinNo", studentId);
+            jsonObject.put("gaeinNo", targetStudentId);
             jsonObject.put("userNm", newName);
             jsonObject.put("sosokId", newMajorCode);
 
@@ -574,33 +610,18 @@ public class UserServiceTest extends BaseServiceTest {
 
             when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
             when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
-            when(universityDao.getByIndex(univCode)).thenReturn(univ);
-            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
-            when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
+            when(userDao.getByIndex(univId, targetStudentId)).thenReturn(targetUser);
+            when(departmentDao.getListByUniversity(univId)).thenReturn(deptsByUniv);
 
             execMethod();
 
-            verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
-            UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[기존에 존재하는 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
-        public void SUCCESS_userIsAlreadyCreatedAndNewMajorCreate() {
-            setUpDefault();
-
-            when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
-            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
-            when(universityDao.getByIndex(univCode)).thenReturn(univ);
-            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
-            when(userDao.getByIndex(univCode, studentId)).thenReturn(targetUser);
-
-            execMethod();
-
-            verify(userDao).update(eq(univCode), eq(studentId), userArgumentCaptor.capture());
-            UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkUpdatedUser(newUser)).isTrue();
+            verify(userDao).update(
+                    eq(targetUser.id()), eq(univId), eq(targetStudentId), eq(newName),
+                    eq(extractEntranceYearFromStudentId(targetStudentId)), any(),
+                    eq(targetUser.createdAt()), anyLong(), authListCaptor.capture()
+            );
+            List<AuthorityDto> authList = authListCaptor.getValue();
+            Assertions.assertThat(checkAuthUpdate(authList)).isTrue();
         }
 
         @RepeatedTest(10)
@@ -610,33 +631,17 @@ public class UserServiceTest extends BaseServiceTest {
 
             when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
             when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
-            when(universityDao.getByIndex(univCode)).thenReturn(univ);
-            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
-            when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
+            when(departmentDao.getListByUniversity(univId)).thenReturn(deptsByUniv);
+            when(userDao.getByIndex(univId, targetStudentId)).thenThrow(NotFoundException.class);
 
             execMethod();
 
-            verify(userDao).create(userArgumentCaptor.capture());
-            UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[새로운 유저이고 새로운 `majorCode`가 기존에 존재 하지 않을 시]_[-]")
-        public void SUCCESS_userIsNewAndNewMajorCreate() {
-            setUpDefault();
-
-            when(initialData.universityInfos()).thenReturn(stub.INIT_DATA.universityInfos());
-            when(HttpRequest.getUserInfoFromHanyangApi(apiUrl, clientKey, apiToken)).thenReturn(makeJsonResponse());
-            when(universityDao.getByIndex(univCode)).thenReturn(univ);
-            when(departmentDao.getListByUniversity(univCode)).thenReturn(deptByUniv);
-            when(userDao.getByIndex(univCode, studentId)).thenThrow(NotFoundException.class);
-
-            execMethod();
-
-            verify(userDao).create(userArgumentCaptor.capture());
-            UserDto newUser = userArgumentCaptor.getValue();
-            Assertions.assertThat(checkCreatedUser(newUser)).isTrue();
+            verify(userDao).create(any(), eq(univId), eq(targetStudentId), eq(newName),
+                    eq(extractEntranceYearFromStudentId(targetStudentId)), any(),
+                    anyLong(), anyLong(), authListCaptor.capture()
+            );
+            List<AuthorityDto> authList = authListCaptor.getValue();
+            Assertions.assertThat(checkAuthUpdate(authList)).isTrue();
         }
 
         @RepeatedTest(10)
@@ -650,37 +655,20 @@ public class UserServiceTest extends BaseServiceTest {
             TestHelper.exceptionTest(this::execMethod, BadGatewayException.class);
         }
 
-        private boolean checkUpdatedUser(UserDto newUser) {
-            System.out.println(newUser.studentId());
-            System.out.println(studentId);
-            System.out.println();
+        private int extractEntranceYearFromStudentId(String studentId) {
+            int entranceYear = 0;
+            try {
+                entranceYear = Integer.parseInt(studentId.substring(0, 4));
+            } catch (Exception ignored) { }
 
-            System.out.println(newUser.university());
-            System.out.println(univ);
-            System.out.println();
-            if (newUser.studentId().equals(studentId)
-                    && newUser.university().equals(univ)
-                    && newUser.name().equals(newName)
-                    && !newUser.token().equals(targetUser.token())
-                    && newUser.approvedAt() > targetUser.approvedAt()
-            ) {
-                return checkAuthUpdate(newUser);
-            }
-            return false;
+            if(entranceYear >  UserService.HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND
+                    && entranceYear < UserService.HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND) return entranceYear;
+            return 0;
         }
 
-        private boolean checkCreatedUser(UserDto newUser) {
-            if (newUser.studentId().equals(studentId)
-                    && newUser.university().equals(univ)
-                    && newUser.name().equals(newName)) {
-                return checkAuthUpdate(newUser);
-            }
-            return false;
-        }
-
-        private boolean checkAuthUpdate(UserDto newUser) {
-            for (DepartmentDto dept : newDepartments) {
-                if (newUser.authorities().stream()
+        private boolean checkAuthUpdate(List<AuthorityDto> auths) {
+            for (DepartmentDto dept : newDepts) {
+                if (auths.stream()
                         .filter(authority -> authority.permission() == Permission.DEFAULT)
                         .noneMatch(authority -> authority.department().equals(dept))
                 ) {
@@ -704,13 +692,13 @@ public class UserServiceTest extends BaseServiceTest {
     }
 
     private RandomGetter<UserDto> usersOnUniv(RandomGetter<UserDto> rs, UniversityDto univ) {
-        return rs.filter((user) -> user.university().matchUniqueKey(univ));
+        return rs.filter((user) -> user.university().matchId(univ));
     }
 
     private RandomGetter<UserDto> usersHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
             for (AuthorityDto auth : user.authorities()) {
-                if (auth.department().matchUniqueKey(dept)
+                if (auth.department().matchId(dept)
                         && auth.permission() != Permission.DEFAULT) return true;
                 if (auth.permission() == Permission.DEVELOPER) return true;
             }
@@ -721,7 +709,7 @@ public class UserServiceTest extends BaseServiceTest {
     private RandomGetter<UserDto> usersNotHaveAdditionalAuthOnDept(RandomGetter<UserDto> rs, DepartmentDto dept) {
         return rs.filter((user) -> {
             for (AuthorityDto auth : user.authorities()) {
-                if (auth.department().matchUniqueKey(dept)
+                if (auth.department().matchId(dept)
                         && auth.permission() != Permission.DEFAULT) return false;
                 if (auth.permission() == Permission.DEVELOPER) return false;
             }

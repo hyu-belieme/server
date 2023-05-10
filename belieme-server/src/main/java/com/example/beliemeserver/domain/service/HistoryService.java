@@ -1,198 +1,154 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata.InitialData;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
 import com.example.beliemeserver.domain.dao.*;
 import com.example.beliemeserver.domain.dto.*;
 import com.example.beliemeserver.domain.dto.enumeration.HistoryStatus;
 import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import com.example.beliemeserver.domain.exception.*;
 import com.example.beliemeserver.domain.util.Constants;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class HistoryService extends BaseService {
-    public HistoryService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public HistoryService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public List<HistoryDto> getListByDepartment(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode
+            @NonNull String userToken, @NonNull UUID departmentId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkStaffPermission(userToken, department);
-        return historyDao.getListByDepartment(universityCode, departmentCode);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
+        checkStaffPermission(requester, department);
+        return historyDao.getListByDepartment(departmentId);
     }
 
     public List<HistoryDto> getListByStuff(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName
+            @NonNull String userToken, @NonNull UUID stuffId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkStaffPermission(userToken, department);
-        return getHistoryListByStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
+        checkStaffPermission(requester, stuff.department());
+        return historyDao.getListByStuff(stuffId);
     }
 
     public List<HistoryDto> getListByItem(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum
+            @NonNull String userToken, @NonNull UUID itemId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkStaffPermission(userToken, department);
-        return getHistoryListByItemOrThrowInvalidIndexException(universityCode, departmentCode, stuffName, itemNum);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        ItemDto item = getItemOrThrowInvalidIndexException(itemId);
+        checkStaffPermission(requester, item.stuff().department());
+        return historyDao.getListByItem(itemId);
     }
 
     public List<HistoryDto> getListByDepartmentAndRequester(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String userUniversityCode, @NonNull String userStudentId
+            @NonNull String userToken, @NonNull UUID departmentId, @NonNull UUID userId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         UserDto requester = validateTokenAndGetUser(userToken);
-        UserDto historyRequester = getUserOrThrowInvalidIndexException(userUniversityCode, userStudentId);
+        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
+        UserDto historyRequester = getUserOrThrowInvalidIndexException(userId);
 
-        if (!requester.matchUniqueKey(historyRequester)) {
-            checkStaffPermission(department, requester);
+        if (!requester.matchId(historyRequester)) {
+            checkStaffPermission(requester, department);
         }
-        checkUserPermission(department, requester);
+        checkUserPermission(requester, department);
 
-        return historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, userUniversityCode, userStudentId);
+        return historyDao.getListByDepartmentAndRequester(departmentId, userId);
     }
 
-    public HistoryDto getByIndex(@NonNull String userToken,
-                                 @NonNull String universityCode, @NonNull String departmentCode,
-                                 @NonNull String stuffName, int itemNum, int historyNum) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
+    public HistoryDto getById(@NonNull String userToken, @NonNull UUID historyId) {
         UserDto requester = validateTokenAndGetUser(userToken);
 
-        HistoryDto target = historyDao.getByIndex(universityCode, departmentCode, stuffName, itemNum, historyNum);
-        if (!requester.matchUniqueKey(target.requester())) {
-            checkStaffPermission(department, requester);
+        HistoryDto history = historyDao.getById(historyId);
+        if (!requester.matchId(history.requester())) {
+            checkStaffPermission(requester, history.item().stuff().department());
         }
-        checkUserPermission(department, requester);
-
-        return target;
+        checkUserPermission(requester, history.item().stuff().department());
+        return history;
     }
 
-    public HistoryDto createReservation(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, Integer itemNum
+    public HistoryDto createReservationOnStuff(
+            @NonNull String userToken, @NonNull UUID stuffId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         UserDto requester = validateTokenAndGetUser(userToken);
-        checkUserPermission(department, requester);
 
-        StuffDto stuff = getStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
-        List<HistoryDto> requesterHistory = historyDao.getListByDepartmentAndRequester(universityCode, departmentCode, requester.university().code(), requester.studentId());
+        StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
+        DepartmentDto department = stuff.department();
+        checkUserPermission(requester, department);
+        checkRequesterRentalList(stuff, requester);
 
-        int usingItemCount = 0;
-        int usingSameStuffCount = 0;
-        for (HistoryDto history : requesterHistory) {
-            if (history.status().isClosed()) continue;
-            if (history.item().stuff().matchUniqueKey(stuff)) usingSameStuffCount += 1;
-            usingItemCount += 1;
-            if (usingItemCount >= Constants.MAX_RENTAL_COUNT) throw new RentalCountLimitExceededException();
-            if (usingSameStuffCount >= Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF)
-                throw new RentalCountOnSameStuffLimitExceededException();
-        }
+        ItemDto item = stuff.firstUsableItem();
+        if (item == null) throw new UsableItemNotExistedException();
+        if (item.isUnusable()) throw new ReservationRequestedOnNonUsableItemException();
 
-        if (itemNum == null) {
-            itemNum = stuff.firstUsableItemNum();
-        }
-        if (itemNum == 0) throw new UsableItemNotExistedException();
+        HistoryDto newHistory = createRentalHistory(item.id(), item.nextHistoryNum(), requester.id());
+        ItemDto newItem = itemDao.update(item.id(), item.stuff().id(), item.num(), newHistory.id());
 
-        ItemDto item = getItemOrThrowInvalidIndexException(
-                universityCode, departmentCode, stuffName, itemNum);
+        return newHistory.withItem(newItem);
+    }
 
-        if (item.status() != ItemStatus.USABLE) throw new ReservationRequestedOnNonUsableItemException();
+    public HistoryDto createReservationOnItem(
+            @NonNull String userToken, @NonNull UUID itemId
+    ) {
+        UserDto requester = validateTokenAndGetUser(userToken);
 
-        HistoryDto newHistory = new HistoryDto(
-                item,
-                item.nextHistoryNum(),
-                requester,
-                null,
-                null,
-                null,
-                null,
-                System.currentTimeMillis() / 1000,
-                0,
-                0,
-                0,
-                0
-        );
-        historyDao.create(newHistory);
-        itemDao.update(universityCode, departmentCode,
-                stuffName, itemNum, item.withLastHistory(newHistory));
+        ItemDto item = getItemOrThrowInvalidIndexException(itemId);
+        DepartmentDto department = item.stuff().department();
+        checkUserPermission(requester, department);
+        checkRequesterRentalList(item.stuff(), requester);
 
-        return historyDao.getByIndex(universityCode, departmentCode,
-                stuffName, itemNum, newHistory.num());
+        if (item.isUnusable()) throw new ReservationRequestedOnNonUsableItemException();
+
+        HistoryDto newHistory = createRentalHistory(item.id(), item.nextHistoryNum(), requester.id());
+        ItemDto newItem = itemDao.update(item.id(), item.stuff().id(), item.num(), newHistory.id());
+
+        return newHistory.withItem(newItem);
     }
 
     public HistoryDto makeItemLost(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum
+            @NonNull String userToken, @NonNull UUID itemId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         UserDto requester = validateTokenAndGetUser(userToken);
-        checkStaffPermission(department, requester);
 
-        ItemDto item = getItemOrThrowInvalidIndexException(
-                universityCode, departmentCode, stuffName, itemNum);
+        ItemDto item = getItemOrThrowInvalidIndexException(itemId);
+        DepartmentDto department = item.stuff().department();
+        checkStaffPermission(requester, department);
 
-        if (item.status() == ItemStatus.INACTIVE) throw new LostRegistrationRequestedOnLostItemException();
+        if (item.status() == ItemStatus.LOST) throw new LostRegistrationRequestedOnLostItemException();
 
         HistoryDto newHistory;
-        if (item.status() == ItemStatus.USABLE) {
-            newHistory = new HistoryDto(
-                    item,
-                    item.nextHistoryNum(),
-                    null,
-                    null,
-                    null,
-                    requester,
-                    null,
-                    0,
-                    0,
-                    0,
-                    System.currentTimeMillis() / 1000,
-                    0
-            );
-            historyDao.create(newHistory);
-            itemDao.update(universityCode, departmentCode,
-                    stuffName, itemNum, item.withLastHistory(newHistory));
-            return historyDao.getByIndex(universityCode, departmentCode,
-                    stuffName, itemNum, newHistory.num());
+        if (item.isUsable() || item.status() == ItemStatus.REQUESTED) {
+            if (item.isUnusable() && item.lastHistory().status() == HistoryStatus.REQUESTED) {
+                makeItemCancel(userToken, itemId);
+            }
+            newHistory = createLostHistory(item.id(), item.nextHistoryNum(), requester.id());
+            ItemDto newItem = itemDao.update(item.id(), item.stuff().id(), item.num(), newHistory.id());
+
+            return newHistory.withItem(newItem);
         }
 
-        if (item.lastHistory().status() == HistoryStatus.REQUESTED)
-            throw new LostRegistrationRequestedOnReservedItemException();
         newHistory = item.lastHistory()
                 .withItem(item)
                 .withLostManager(requester)
-                .withLostAt(System.currentTimeMillis() / 1000);
-
-        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
+                .withLostAt(currentTime());
+        return updateHistory(newHistory);
     }
 
     public HistoryDto makeItemUsing(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum
+            @NonNull String userToken, @NonNull UUID itemId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         UserDto requester = validateTokenAndGetUser(userToken);
-        checkStaffPermission(department, requester);
 
-        ItemDto item = getItemOrThrowInvalidIndexException(
-                universityCode, departmentCode, stuffName, itemNum);
+        ItemDto item = getItemOrThrowInvalidIndexException(itemId);
+        DepartmentDto department = item.stuff().department();
+        checkStaffPermission(requester, department);
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
@@ -203,22 +159,18 @@ public class HistoryService extends BaseService {
         HistoryDto newHistory = lastHistory
                 .withItem(item)
                 .withApproveManager(requester)
-                .withApprovedAt(System.currentTimeMillis() / 1000);
-
-        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
+                .withApprovedAt(currentTime());
+        return updateHistory(newHistory);
     }
 
     public HistoryDto makeItemReturn(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum
+            @NonNull String userToken, @NonNull UUID itemId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         UserDto requester = validateTokenAndGetUser(userToken);
-        checkStaffPermission(department, requester);
 
-        ItemDto item = getItemOrThrowInvalidIndexException(
-                universityCode, departmentCode, stuffName, itemNum);
+        ItemDto item = getItemOrThrowInvalidIndexException(itemId);
+        DepartmentDto department = item.stuff().department();
+        checkStaffPermission(requester, department);
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
@@ -231,22 +183,18 @@ public class HistoryService extends BaseService {
         HistoryDto newHistory = lastHistory
                 .withItem(item)
                 .withReturnManager(requester)
-                .withReturnedAt(System.currentTimeMillis() / 1000);
-
-        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
+                .withReturnedAt(currentTime());
+        return updateHistory(newHistory);
     }
 
     public HistoryDto makeItemCancel(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum
+            @NonNull String userToken, @NonNull UUID itemId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
         UserDto requester = validateTokenAndGetUser(userToken);
-        checkStaffPermission(department, requester);
 
-        ItemDto item = getItemOrThrowInvalidIndexException(
-                universityCode, departmentCode, stuffName, itemNum);
+        ItemDto item = getItemOrThrowInvalidIndexException(itemId);
+        DepartmentDto department = item.stuff().department();
+        checkStaffPermission(requester, department);
 
         HistoryDto lastHistory = item.lastHistory();
         if (lastHistory == null
@@ -257,36 +205,91 @@ public class HistoryService extends BaseService {
         HistoryDto newHistory = lastHistory
                 .withItem(item)
                 .withCancelManager(requester)
-                .withCanceledAt(System.currentTimeMillis() / 1000);
-
-        return historyDao.update(universityCode, departmentCode, stuffName, itemNum, newHistory.num(), newHistory);
+                .withCanceledAt(currentTime());
+        return updateHistory(newHistory);
     }
 
-    private List<HistoryDto> getHistoryListByStuffOrThrowInvalidIndexException(
-            String universityCode, String departmentCode, String stuffName
-    ) {
-        try {
-            return historyDao.getListByStuff(universityCode, departmentCode, stuffName);
-        } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+    private void checkRequesterRentalList(StuffDto stuff, UserDto requester) {
+        List<HistoryDto> requesterHistory = historyDao.getListByDepartmentAndRequester(stuff.department().id(), requester.id());
+
+        int usingItemCount = 0;
+        int usingSameStuffCount = 0;
+        for (HistoryDto history : requesterHistory) {
+            if (history.status().isClosed()) continue;
+            if (history.item().stuff().matchId(stuff)) usingSameStuffCount += 1;
+            usingItemCount += 1;
+
+            if (usingItemCount >= Constants.MAX_RENTAL_COUNT) throw new RentalCountLimitExceededException();
+            if (usingSameStuffCount >= Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF) {
+                throw new RentalCountOnSameStuffLimitExceededException();
+            }
         }
     }
 
-    private List<HistoryDto> getHistoryListByItemOrThrowInvalidIndexException(
-            String universityCode, String departmentCode, String stuffName, int itemNum
-    ) {
-        try {
-            return historyDao.getListByItem(universityCode, departmentCode, stuffName, itemNum);
-        } catch (NotFoundException e) {
-            throw new IndexInvalidException();
-        }
+    private HistoryDto createRentalHistory(UUID itemId, int num, UUID requesterId) {
+        return historyDao.create(
+                UUID.randomUUID(),
+                itemId,
+                num,
+                requesterId,
+                null,
+                null,
+                null,
+                null,
+                currentTime(),
+                0,
+                0,
+                0,
+                0
+        );
     }
 
-    private UserDto getUserOrThrowInvalidIndexException(String universityCode, String studentId) {
+    private HistoryDto createLostHistory(UUID itemId, int num, UUID lostManagerId) {
+        return historyDao.create(
+                UUID.randomUUID(),
+                itemId,
+                num,
+                null,
+                null,
+                null,
+                lostManagerId,
+                null,
+                0,
+                0,
+                0,
+                currentTime(),
+                0
+        );
+    }
+
+    private HistoryDto updateHistory(HistoryDto newHistory) {
+        return historyDao.update(
+                newHistory.id(),
+                newHistory.item().id(),
+                newHistory.num(),
+                getUserIdOrNull(newHistory.requester()),
+                getUserIdOrNull(newHistory.approveManager()),
+                getUserIdOrNull(newHistory.returnManager()),
+                getUserIdOrNull(newHistory.lostManager()),
+                getUserIdOrNull(newHistory.cancelManager()),
+                newHistory.requestedAt(),
+                newHistory.approvedAt(),
+                newHistory.returnedAt(),
+                newHistory.lostAt(),
+                newHistory.canceledAt()
+        );
+    }
+
+    private UUID getUserIdOrNull(UserDto user) {
+        if(user == null) return null;
+        return user.id();
+    }
+
+    private UserDto getUserOrThrowInvalidIndexException(UUID userId) {
         try {
-            return userDao.getByIndex(universityCode, studentId);
+            return userDao.getById(userId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 }

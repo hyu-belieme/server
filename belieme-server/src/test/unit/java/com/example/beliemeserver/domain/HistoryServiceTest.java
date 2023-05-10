@@ -1,32 +1,28 @@
 package com.example.beliemeserver.domain;
 
 import com.example.beliemeserver.domain.dto.*;
-import com.example.beliemeserver.domain.dto.enumeration.HistoryStatus;
 import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
 import com.example.beliemeserver.domain.exception.*;
 import com.example.beliemeserver.domain.service.HistoryService;
 import com.example.beliemeserver.domain.util.Constants;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.util.RandomGetter;
 import com.example.beliemeserver.util.TestHelper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class HistoryServiceTest extends BaseServiceTest {
@@ -57,7 +53,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected List<HistoryDto> execMethod() {
-            return historyService.getListByDepartment(userToken, univCode, deptCode);
+            return historyService.getListByDepartment(userToken, deptId);
         }
 
         @RepeatedTest(10)
@@ -65,9 +61,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(historyDao.getListByDepartment(univCode, deptCode))
-                    .thenReturn(historyList);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(historyDao.getListByDepartment(deptId)).thenReturn(historyList);
 
             System.out.println("Expected : " + historyList);
             TestHelper.listCompareTest(
@@ -76,9 +72,22 @@ public class HistoryServiceTest extends BaseServiceTest {
             );
         }
 
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
+
         private List<HistoryDto> getHistoryListByDept(DepartmentDto dept) {
             return stub.ALL_HISTORIES.stream()
-                    .filter((history) -> dept.matchUniqueKey(history.item().stuff().department()))
+                    .filter((history) -> dept.matchId(history.item().stuff().department()))
                     .collect(Collectors.toList());
         }
     }
@@ -87,22 +96,21 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("getListByStuff()")
     public final class TestGetListByStuff extends HistoryNestedTest {
         private StuffDto stuff;
-        private String stuffName;
+        private UUID stuffId;
 
         private List<HistoryDto> historyList;
 
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setStuff(randomStuffOnDept(dept));
             historyList = getHistoryListByStuff(stuff);
         }
 
         private void setStuff(StuffDto stuff) {
             this.stuff = stuff;
-            stuffName = stuff.name();
+            this.stuffId = stuff.id();
         }
 
         @Override
@@ -113,8 +121,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected List<HistoryDto> execMethod() {
-            return historyService.getListByStuff(
-                    userToken, univCode, deptCode, stuffName);
+            return historyService.getListByStuff(userToken, stuffId);
         }
 
         @RepeatedTest(10)
@@ -122,9 +129,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(historyDao.getListByStuff(univCode, deptCode, stuffName))
-                    .thenReturn(historyList);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
+            when(historyDao.getListByStuff(stuffId)).thenReturn(historyList);
 
             System.out.println("Expected : " + historyList);
             TestHelper.listCompareTest(
@@ -138,16 +145,29 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_stuffInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(historyDao.getListByStuff(univCode, deptCode, stuffName))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
+            when(historyDao.getListByStuff(stuffId)).thenThrow(InvalidIndexException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuffId)).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         private List<HistoryDto> getHistoryListByStuff(StuffDto stuff) {
             return stub.ALL_HISTORIES.stream()
-                    .filter((history) -> stuff.matchUniqueKey(history.item().stuff()))
+                    .filter((history) -> stuff.matchId(history.item().stuff()))
                     .collect(Collectors.toList());
         }
     }
@@ -156,22 +176,19 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("getListByItem()")
     public final class TestGetListByItem extends HistoryNestedTest {
         private ItemDto item;
-        private String stuffName;
-        private int itemNum;
+        private UUID itemId;
 
         private List<HistoryDto> historyList;
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.stuffName = item.stuff().name();
-            this.itemNum = item.num();
+            this.itemId = item.id();
         }
 
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, Permission.STAFF));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
             setItem(randomItemOnDept(dept));
 
             historyList = getHistoryListByItem(item);
@@ -184,8 +201,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected List<HistoryDto> execMethod() {
-            return historyService.getListByItem(userToken,
-                    univCode, deptCode, stuffName, itemNum);
+            return historyService.getListByItem(userToken, itemId);
         }
 
         @RepeatedTest(10)
@@ -193,9 +209,9 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(historyDao.getListByItem(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(historyList);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.getListByItem(itemId)).thenReturn(historyList);
 
             System.out.println("Expected : " + historyList);
             TestHelper.listCompareTest(
@@ -209,16 +225,29 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_itemInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(historyDao.getListByItem(univCode, deptCode, stuffName, itemNum))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.getListByItem(itemId)).thenThrow(InvalidIndexException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @Override
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
 
         private List<HistoryDto> getHistoryListByItem(ItemDto item) {
             return stub.ALL_HISTORIES.stream()
-                    .filter((history) -> item.matchUniqueKey(history.item()))
+                    .filter((history) -> item.matchId(history.item()))
                     .collect(Collectors.toList());
         }
     }
@@ -227,16 +256,14 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("getListByDepartmentAndRequester()")
     public final class TestGetListByDepartmentAndRequester extends HistoryNestedTest {
         private UserDto historyRequester;
-        private String historyRequesterUnivCode;
-        private String historyRequesterStudentId;
+        private UUID historyRequesterId;
 
         private List<HistoryDto> historyList;
 
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveExactPermissionOnDept(
-                    dept, Permission.USER));
+            setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
 
             setHistoryRequester(requester);
             historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
@@ -244,16 +271,13 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private void setHistoryRequester(UserDto historyRequester) {
             this.historyRequester = historyRequester;
-            this.historyRequesterUnivCode = historyRequester.university().code();
-            this.historyRequesterStudentId = historyRequester.studentId();
+            this.historyRequesterId = historyRequester.id();
         }
 
         @Override
         protected List<HistoryDto> execMethod() {
             return historyService.getListByDepartmentAndRequester(
-                    userToken, univCode, deptCode,
-                    historyRequesterUnivCode,
-                    historyRequesterStudentId
+                    userToken, deptId, historyRequesterId
             );
         }
 
@@ -262,14 +286,11 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS_getHistoryListHerSelf() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(userDao.getByIndex(historyRequesterUnivCode, historyRequesterStudentId))
-                    .thenReturn(historyRequester);
-            when(historyDao.getListByDepartmentAndRequester(
-                    univCode, deptCode,
-                    historyRequesterUnivCode,
-                    historyRequesterStudentId)
-            ).thenReturn(historyList);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
+            when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId))
+                    .thenReturn(historyList);
 
             TestHelper.listCompareTest(this::execMethod, historyList);
         }
@@ -284,15 +305,11 @@ public class HistoryServiceTest extends BaseServiceTest {
                     dept, Permission.USER));
             historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
 
-            mockDepartmentAndRequester();
-            when(userDao.getByIndex(
-                    historyRequesterUnivCode, historyRequesterStudentId)
-            ).thenReturn(historyRequester);
-            when(historyDao.getListByDepartmentAndRequester(
-                    univCode, deptCode,
-                    historyRequesterUnivCode,
-                    historyRequesterStudentId)
-            ).thenReturn(historyList);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
+            when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId))
+                    .thenReturn(historyList);
 
             System.out.println("Expected : " + historyList);
             TestHelper.listCompareTest(this::execMethod, historyList);
@@ -308,11 +325,9 @@ public class HistoryServiceTest extends BaseServiceTest {
             setHistoryRequester(randomUserHaveMorePermissionOnDept(
                     dept, Permission.USER));
 
-            mockDepartmentAndRequester();
-            when(userDao.getByIndex(
-                    historyRequesterUnivCode,
-                    historyRequesterStudentId)
-            ).thenReturn(historyRequester);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
 
             TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
@@ -326,13 +341,26 @@ public class HistoryServiceTest extends BaseServiceTest {
             setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
                     dept, Permission.USER, List.of(historyRequester)));
 
-            mockDepartmentAndRequester();
-            when(userDao.getByIndex(
-                    historyRequesterUnivCode,
-                    historyRequesterStudentId)
-            ).thenReturn(historyRequester);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
 
             TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[`department`의 `index`가 유효하지 않을 시]_[InvalidException]")
+        public void ERROR_deptInvalidIndex_InvalidException() {
+            setDept(TEST_DEPT);
+            setRequester(randomUserHaveExactPermissionOnDept(
+                    dept, Permission.STAFF));
+            setHistoryRequester(randomUserHaveExactPermissionOnDept(
+                    dept, Permission.USER));
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         @RepeatedTest(10)
@@ -344,19 +372,17 @@ public class HistoryServiceTest extends BaseServiceTest {
             setHistoryRequester(randomUserHaveExactPermissionOnDept(
                     dept, Permission.USER));
 
-            mockDepartmentAndRequester();
-            when(userDao.getByIndex(
-                    historyRequesterUnivCode,
-                    historyRequesterStudentId)
-            ).thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(departmentDao.getById(deptId)).thenReturn(dept);
+            when(userDao.getById(historyRequesterId)).thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
         private List<HistoryDto> getHistoryListByDeptAndRequester(DepartmentDto dept, UserDto requester) {
             return stub.ALL_HISTORIES.stream()
-                    .filter((history) -> dept.matchUniqueKey(history.item().stuff().department())
-                            && requester.matchUniqueKey(history.requester()))
+                    .filter((history) -> dept.matchId(history.item().stuff().department())
+                            && requester.matchId(history.requester()))
                     .collect(Collectors.toList());
         }
     }
@@ -365,9 +391,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("getByIndex()")
     public final class TestGetByIndex extends HistoryNestedTest {
         private HistoryDto history;
-        private String stuffName;
-        private int itemNum;
-        private int historyNum;
+        private UUID historyId;
 
         @Override
         protected void setUpDefault() {
@@ -379,17 +403,12 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private void setHistory(HistoryDto history) {
             this.history = history;
-            this.stuffName = history.item().stuff().name();
-            this.itemNum = history.item().num();
-            this.historyNum = history.num();
+            this.historyId = history.id();
         }
 
         @Override
         protected HistoryDto execMethod() {
-            return historyService.getByIndex(
-                    userToken, univCode, deptCode,
-                    stuffName, itemNum, historyNum
-            );
+            return historyService.getById(userToken, historyId);
         }
 
         @RepeatedTest(10)
@@ -398,11 +417,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setUpDefault();
             setRequester(history.requester());
 
-            mockDepartmentAndRequester();
-            when(historyDao.getByIndex(
-                    univCode, deptCode,
-                    stuffName, itemNum, historyNum)
-            ).thenReturn(history);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getById(historyId)).thenReturn(history);
 
             System.out.println("Expected : " + history);
             TestHelper.objectCompareTest(this::execMethod, history);
@@ -415,11 +431,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setRequester(randomUserHaveExactPermissionOnDept(
                     dept, Permission.STAFF));
 
-            mockDepartmentAndRequester();
-            when(historyDao.getByIndex(
-                    univCode, deptCode,
-                    stuffName, itemNum, historyNum)
-            ).thenReturn(history);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getById(historyId)).thenReturn(history);
 
             System.out.println("Expected : " + history);
             TestHelper.objectCompareTest(this::execMethod, history);
@@ -433,11 +446,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setRequester(randomUserHaveLessPermissionOnDept(
                     dept, Permission.USER));
 
-            mockDepartmentAndRequester();
-            when(historyDao.getByIndex(
-                    univCode, deptCode,
-                    stuffName, itemNum, historyNum)
-            ).thenReturn(history);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getById(historyId)).thenReturn(history);
 
             TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
@@ -449,11 +459,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
                     dept, Permission.USER, List.of(history.requester())));
 
-            mockDepartmentAndRequester();
-            when(historyDao.getByIndex(
-                    univCode, deptCode,
-                    stuffName, itemNum, historyNum)
-            ).thenReturn(history);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getById(historyId)).thenReturn(history);
 
             TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
@@ -463,120 +470,73 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_userInvalidIndex_InvalidException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(historyDao.getByIndex(
-                    univCode, deptCode,
-                    stuffName, itemNum, historyNum)
-            ).thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getById(historyId)).thenThrow(NotFoundException.class);
 
             TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
         }
     }
 
     @Nested
-    @DisplayName("createReservation()")
-    public final class TestCreateReservation extends HistoryNestedTest {
-        @Captor
-        private ArgumentCaptor<HistoryDto> historyCaptor;
-
-        @Captor
-        private ArgumentCaptor<ItemDto> itemCaptor;
-
-        @Captor
-        private ArgumentCaptor<Integer> integerCaptor;
-
+    @DisplayName("createReservationOnItem()")
+    public final class TestCreateReservationOnItem extends HistoryNestedTest {
         private ItemDto item;
-        private StuffDto stuff;
-        private String stuffName;
-        private int itemNum;
+        private UUID itemId;
 
-        private Integer argItemNum;
+        private HistoryDto createdHistory;
 
         @Override
         protected void setUpDefault() {
             setDept(TEST_DEPT);
-            setRequester(randomUserHaveMorePermissionOnDept(
-                    dept, Permission.USER));
-            setItem(randomNonFirstUsableItemByDept(dept));
+            setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
+            setItem(randomUsableItemOnDept(dept));
+
+            createdHistory = new HistoryDto(
+                    UUID.randomUUID(), item, item.nextHistoryNum(), requester,
+                    null, null, null, null,
+                    currentTime(), 0, 0, 0, 0
+            );
         }
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.stuff = item.stuff();
-            this.stuffName = stuff.name();
-            this.itemNum = item.num();
-            this.argItemNum = itemNum;
+            this.itemId = item.id();
         }
 
         @Override
         protected Object execMethod() {
-            return historyService.createReservation(userToken,
-                    univCode, deptCode, stuffName, argItemNum);
+            return historyService.createReservationOnItem(userToken, itemId);
         }
 
         @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[`itemNum`이 `null`이 아닐 시]_[-]")
-        public void SUCCESS_itemNumIsNotNull() {
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS_() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(new ArrayList<>());
+
+            when(historyDao.create(
+                    any(), eq(itemId), eq(item.nextHistoryNum()), eq(requesterId),
+                    eq(null), eq(null), eq(null), eq(null),
+                    anyLong(), eq(0L), eq(0L), eq(0L), eq(0L))
+            ).thenReturn(createdHistory);
+            when(itemDao.update(itemId, item.stuff().id(), item.num(), createdHistory.id())).thenReturn(item);
 
             execMethod();
 
-            verify(historyDao).create(historyCaptor.capture());
-            verify(itemDao).update(eq(univCode), eq(deptCode),
-                    eq(stuffName), eq(itemNum), itemCaptor.capture());
-
-            ItemDto historyItem = historyCaptor.getValue().item();
-            UserDto historyRequester = historyCaptor.getValue().requester();
-
-            Assertions.assertThat(historyItem).isEqualTo(item);
-            Assertions.assertThat(historyRequester).isEqualTo(requester);
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[SUCCESS]_[`itemNum`이 `null`일 시]_[-]")
-        public void SUCCESS_itemNumIsNull() {
-            setUpDefault();
-            setItem(randomFirstUsableItemOnDept(dept));
-            argItemNum = null;
-
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
-
-            execMethod();
-
-            verify(historyDao).create(historyCaptor.capture());
-            verify(itemDao).update(eq(univCode), eq(deptCode), eq(stuffName),
-                    integerCaptor.capture(), itemCaptor.capture());
-
-            ItemDto historyItem = historyCaptor.getValue().item();
-            UserDto historyRequester = historyCaptor.getValue().requester();
-            Integer targetItemNum = integerCaptor.getValue();
-
-            Assertions.assertThat(historyItem).isEqualTo(item);
-            Assertions.assertThat(historyRequester).isEqualTo(requester);
-            Assertions.assertThat(targetItemNum).isEqualTo(stuff.firstUsableItemNum());
+            verify(itemDao).update(itemId, item.stuff().id(), item.num(), createdHistory.id());
         }
 
         @RepeatedTest(10)
         @DisplayName("[ERROR]_[`item`이 대여가 불가능 한 상태일 시 1]_[ReservationOnNonUsableItemException]")
         public void ERROR_itemIsUnusable_ReservationOnNonUsableItemException() {
             setUpDefault();
-            setItem(randomUnusableItemOnDept(dept));
+            setItem(randomUnusableItemByDept(dept));
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, ReservationRequestedOnNonUsableItemException.class);
         }
@@ -587,41 +547,23 @@ public class HistoryServiceTest extends BaseServiceTest {
             setUpDefault();
             setItem(randomInactiveItemByDept(dept));
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, ReservationRequestedOnNonUsableItemException.class);
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`itemNum`이 `null`이고 대여가능 한 `item`이 존재하지 않을 시]_[NoUsableItemExistException]")
-        public void ERROR_noUsableItem_NoUsableItemExistException() {
-            setUpDefault();
-            StuffDto targetStuff = randomUnusableStuffByDept(dept);
-            setItem(randomItemOnStuff(targetStuff));
-            argItemNum = null;
-
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-
-            TestHelper.exceptionTest(this::execMethod, UsableItemNotExistedException.class);
         }
 
         @RepeatedTest(10)
         @DisplayName("[ERROR]_[`requester`가 이미 해당 물품을 " + Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF + "개 사용 중일 시]_[ExceedMaxRentalCountOnSameStuffException]")
         public void ERROR_requesterAlreadyRequestStuff_ExceedMaxRentalCountOnSameStuffException() {
             setUpDefault();
-            StuffDto targetStuff = randomStuffHaveItemMoreOnDept(dept, Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF);
-            setItem(randomItemOnStuff(targetStuff));
+            StuffDto targetStuff = randomUsableStuffHaveItemMoreOnDept(dept, Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF);
+            setItem(randomUsableItemOnStuff(targetStuff));
 
-            mockDepartmentAndRequester();
-            when(historyDao.getListByDepartmentAndRequester(univCode, deptCode, requesterUnivCode, requesterStudentId))
-                    .thenReturn(makeHistoryListWithSameStuff());
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName)).thenReturn(stuff);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
+                    .thenReturn(makeHistoryListWithSameStuff(item, requester));
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, RentalCountOnSameStuffLimitExceededException.class);
         }
@@ -631,25 +573,12 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_requesterHasTooManyRequest_ExceedMaxRentalCountException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(historyDao.getListByDepartmentAndRequester(univCode, deptCode, requesterUnivCode, requesterStudentId))
-                    .thenReturn(makeHistoryListWithSameRequester());
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
+                    .thenReturn(makeHistoryListWithSameRequester(item, requester));
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, RentalCountLimitExceededException.class);
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`stuff`가 존재하지 않을 시]_[InvalidIndexException]")
-        public void ERROR_stuffInvalidIndex_InvalidIndexException() {
-            setUpDefault();
-
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenThrow(NotFoundException.class);
-
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
         }
 
         @RepeatedTest(10)
@@ -657,85 +586,160 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_itemInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(stuffDao.getByIndex(univCode, deptCode, stuffName))
-                    .thenReturn(stuff);
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId))
                     .thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
 
-        private List<HistoryDto> makeHistoryListWithSameStuff() {
-            List<HistoryDto> output = new ArrayList<>();
-            List<ItemDto> exclude = new ArrayList<>(List.of(item));
-            for (int i = 0; i < Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF; i++) {
-                ItemDto newItem = randomItemOnStuffWithExclude(stuff, exclude);
-                exclude.add(newItem);
-                output.add(
-                        new HistoryDto(
-                                newItem,
-                                newItem.nextHistoryNum(),
-                                requester,
-                                null,
-                                null,
-                                null,
-                                null,
-                                System.currentTimeMillis() / 1000,
-                                0,
-                                0,
-                                0,
-                                0
-                        )
-                );
-            }
-            return output;
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        @Override
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, Permission.USER));
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("createReservationOnStuff()")
+    public final class TestCreateReservationOnStuff extends HistoryNestedTest {
+        private StuffDto stuff;
+        private ItemDto item;
+
+        private HistoryDto createdHistory;
+
+        @Override
+        protected void setUpDefault() {
+            setDept(TEST_DEPT);
+            setRequester(randomUserHaveMorePermissionOnDept(
+                    dept, Permission.USER));
+            setStuff(randomUsableStuffOnDept(dept));
         }
 
-        private List<HistoryDto> makeHistoryListWithSameRequester() {
-            List<HistoryDto> output = new ArrayList<>();
-            List<StuffDto> exclude = new ArrayList<>(List.of(stuff));
-            for (int i = 0; i < Constants.MAX_RENTAL_COUNT; i++) {
-                StuffDto newStuff = randomStuffOnDeptWithExclude(dept, exclude);
-                exclude.add(newStuff);
+        private void setStuff(StuffDto stuff) {
+            this.stuff = stuff;
+            this.item = stuff.firstUsableItem();
 
-                ItemDto newItem = randomItemOnStuff(newStuff);
-                output.add(
-                        new HistoryDto(
-                                newItem,
-                                newItem.nextHistoryNum(),
-                                requester,
-                                null,
-                                null,
-                                null,
-                                null,
-                                System.currentTimeMillis() / 1000,
-                                0,
-                                0,
-                                0,
-                                0
-                        )
+            if(this.item != null) {
+                this.createdHistory = new HistoryDto(
+                        UUID.randomUUID(), item, item.nextHistoryNum(), requester,
+                        null, null, null, null,
+                        currentTime(), 0, 0, 0, 0
                 );
             }
-            return output;
+        }
+
+        @Override
+        protected Object execMethod() {
+            return historyService.createReservationOnStuff(userToken, stuff.id());
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[-]_[-]")
+        public void SUCCESS() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuff.id())).thenReturn(stuff);
+            when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(new ArrayList<>());
+
+            when(historyDao.create(
+                    any(), eq(item.id()), eq(item.nextHistoryNum()), eq(requesterId),
+                    eq(null), eq(null), eq(null), eq(null),
+                    anyLong(), eq(0L), eq(0L), eq(0L), eq(0L))
+            ).thenReturn(createdHistory);
+            when(itemDao.update(item.id(), item.stuff().id(), item.num(), createdHistory.id())).thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).create(
+                    any(), eq(item.id()), eq(item.nextHistoryNum()), eq(requesterId),
+                    eq(null), eq(null), eq(null), eq(null),
+                    anyLong(), eq(0L), eq(0L), eq(0L), eq(0L)
+            );
+            verify(itemDao).update(item.id(), item.stuff().id(), item.num(), createdHistory.id());
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[`stuff`가 존재하지 않을 시]_[InvalidIndexException]")
+        public void ERROR_stuffInvalidIndex_InvalidIndexException() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuff.id())).thenThrow(NotFoundException.class);
+
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[사용가능한`item`이 없는 상태일 시]_[NoUsableItemExistException]")
+        public void ERROR_noUsableItem_NoUsableItemExistException() {
+            setUpDefault();
+
+            setStuff(randomUnusableStuffByDept(dept));
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuff.id())).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, UsableItemNotExistedException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[`requester`가 이미 해당 물품을 " + Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF + "개 사용 중일 시]_[ExceedMaxRentalCountOnSameStuffException]")
+        public void ERROR_requesterAlreadyRequestStuff_ExceedMaxRentalCountOnSameStuffException() {
+            setUpDefault();
+
+            setStuff(randomUsableStuffHaveItemMoreOnDept(dept, Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF));
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuff.id())).thenReturn(stuff);
+            when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
+                    .thenReturn(makeHistoryListWithSameStuff(item, requester));
+
+            TestHelper.exceptionTest(this::execMethod, RentalCountOnSameStuffLimitExceededException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[`requester`가 이미 " + Constants.MAX_RENTAL_COUNT + "개 이상에 대한 대여가 진행 중일 시]_[ExceedMaxRentalCountException]")
+        public void ERROR_requesterHasTooManyRequest_ExceedMaxRentalCountException() {
+            setUpDefault();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
+                    .thenReturn(makeHistoryListWithSameRequester(item, requester));
+            when(stuffDao.getById(stuff.id())).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, RentalCountLimitExceededException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        @Override
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequester(randomUserHaveLessPermissionOnDept(
+                    dept, Permission.USER));
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(stuffDao.getById(stuff.id())).thenReturn(stuff);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 
     @Nested
     @DisplayName("makeItemLost()")
     public final class TestMakeItemLost extends HistoryNestedTest {
-        @Captor
-        private ArgumentCaptor<HistoryDto> historyCaptor;
-
-        @Captor
-        private ArgumentCaptor<ItemDto> itemCaptor;
-
-        @Captor
-        private ArgumentCaptor<Integer> integerCaptor;
-
         private ItemDto item;
-        private String stuffName;
-        private int itemNum;
+        private UUID itemId;
 
         @Override
         protected void setUpDefault() {
@@ -746,8 +750,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.stuffName = item.stuff().name();
-            this.itemNum = item.num();
+            this.itemId = item.id();
         }
 
         @Override
@@ -757,7 +760,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected Object execMethod() {
-            return historyService.makeItemLost(userToken, univCode, deptCode, stuffName, itemNum);
+            return historyService.makeItemLost(userToken, itemId);
         }
 
         @RepeatedTest(10)
@@ -765,26 +768,79 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS_itemIsUsable() {
             setUpDefault();
             setItem(randomUsableItemOnDept(dept));
+            HistoryDto createdHistory = new HistoryDto(
+                    UUID.randomUUID(), item, item.nextHistoryNum(), null,
+                    null, null, requester, null,
+                    0L, 0L, 0L, currentTime(), 0L
+            );
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.create(
+                    any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
+                    eq(null), eq(null), eq(requesterId), eq(null),
+                    eq(0L), eq(0L), eq(0L), anyLong(), eq(0L))
+            ).thenReturn(createdHistory);
+            when(itemDao.update(item.id(), item.stuff().id(), item.num(), createdHistory.id())).thenReturn(item);
 
             execMethod();
 
-            verify(historyDao).create(historyCaptor.capture());
-            verify(itemDao).update(eq(univCode), eq(deptCode),
-                    eq(stuffName), eq(itemNum), itemCaptor.capture());
+            verify(historyDao).create(
+                    any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
+                    eq(null), eq(null), eq(requesterId), eq(null),
+                    eq(0L), eq(0L), eq(0L), anyLong(), eq(0L)
+            );
+            verify(itemDao).update(item.id(), item.stuff().id(), item.num(), createdHistory.id());
+        }
 
-            ItemDto historyItem = historyCaptor.getValue().item();
-            UserDto historyRequester = historyCaptor.getValue().requester();
-            UserDto historyLostManager = historyCaptor.getValue().lostManager();
-            long historyLostAt = historyCaptor.getValue().lostAt();
+        @RepeatedTest(10)
+        @DisplayName("[SUCCESS]_[`item`이 대여 요청이 들어 온 상태일 시]_[]")
+        public void SUCCESS_itemIsReserved() {
+            setUpDefault();
+            setItem(randomReservedItemByDept(dept));
 
-            Assertions.assertThat(historyItem).isEqualTo(item);
-            Assertions.assertThat(historyRequester).isEqualTo(null);
-            Assertions.assertThat(historyLostManager).isEqualTo(requester);
-            Assertions.assertThat(historyLostAt).isNotZero();
+            HistoryDto canceledHistory = item.lastHistory()
+                    .withCancelManager(requester)
+                    .withCanceledAt(currentTime());
+
+            HistoryDto createdHistory = new HistoryDto(
+                    UUID.randomUUID(), item, item.nextHistoryNum(), null,
+                    null, null, requester, null,
+                    0L, 0L, 0L, currentTime(), 0L
+            );
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.update(
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
+                    eq(null), eq(null), eq(null), eq(requesterId),
+                    eq(item.lastHistory().requestedAt()), eq(0L),
+                    eq(0L), eq(0L), anyLong())
+            ).thenReturn(canceledHistory);
+            when(historyDao.create(
+                    any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
+                    eq(null), eq(null), eq(requesterId), eq(null),
+                    eq(0L), eq(0L), eq(0L), anyLong(), eq(0L))
+            ).thenReturn(createdHistory);
+            when(itemDao.update(item.id(), item.stuff().id(), item.num(), createdHistory.id())).thenReturn(item);
+
+            execMethod();
+
+            verify(historyDao).update(
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
+                    eq(null), eq(null),
+                    eq(null), eq(requesterId), eq(item.lastHistory().requestedAt()),
+                    eq(0L), eq(0L),eq(0L), anyLong()
+            );
+
+            verify(historyDao).create(
+                    any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
+                    eq(null), eq(null), eq(requesterId), eq(null),
+                    eq(0L), eq(0L), eq(0L), anyLong(), eq(0L)
+            );
+            verify(itemDao).update(item.id(), item.stuff().id(), item.num(), createdHistory.id());
         }
 
         @RepeatedTest(10)
@@ -792,37 +848,29 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS_itemIsUnusable() {
             setUpDefault();
             setItem(randomUsingOrDelayedItemByDept(dept));
+            HistoryDto newHistory = item.lastHistory()
+                    .withLostManager(requester)
+                    .withLostAt(currentTime());
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.update(
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
+                    eq(item.lastHistory().approveManager().id()), eq(null),
+                    eq(requesterId), eq(null), eq(item.lastHistory().requestedAt()),
+                    eq(item.lastHistory().approvedAt()), eq(0L), anyLong(), eq(0L))
+            ).thenReturn(newHistory);
 
             execMethod();
 
             verify(historyDao).update(
-                    eq(univCode), eq(deptCode), eq(stuffName), eq(itemNum),
-                    integerCaptor.capture(), historyCaptor.capture());
-
-            int historyNum = integerCaptor.getValue();
-            UserDto historyLostManager = historyCaptor.getValue().lostManager();
-            long historyLostAt = historyCaptor.getValue().lostAt();
-
-            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
-            Assertions.assertThat(historyLostManager).isEqualTo(requester);
-            Assertions.assertThat(historyLostAt).isNotZero();
-        }
-
-        @RepeatedTest(10)
-        @DisplayName("[ERROR]_[`item`이 대여 요청이 들어 온 상태일 시]_[LostRegistrationOnReservedItemException]")
-        public void ERROR_itemIsReserved_LostRegistrationOnReservedItemException() {
-            setUpDefault();
-            setItem(randomReservedItemByDept(dept));
-
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
-
-            TestHelper.exceptionTest(this::execMethod, LostRegistrationRequestedOnReservedItemException.class);
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
+                    eq(item.lastHistory().approveManager().id()), eq(null),
+                    eq(requesterId), eq(null), eq(item.lastHistory().requestedAt()),
+                    eq(item.lastHistory().approvedAt()), eq(0L), anyLong(), eq(0L)
+            );
         }
 
         @RepeatedTest(10)
@@ -831,9 +879,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setUpDefault();
             setItem(randomInactiveItemByDept(dept));
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, LostRegistrationRequestedOnLostItemException.class);
         }
@@ -843,26 +890,34 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_itemInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        @Override
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(item.id())).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
+
 
     @Nested
     @DisplayName("makeItemUsing()")
     public final class TestMakeItemUsing extends HistoryNestedTest {
-        @Captor
-        private ArgumentCaptor<Integer> integerCaptor;
-
-        @Captor
-        private ArgumentCaptor<HistoryDto> historyCaptor;
-
         private ItemDto item;
-        private String stuffName;
-        private int itemNum;
+        private UUID itemId;
+
+        private HistoryDto newHistory;
 
         @Override
         protected void setUpDefault() {
@@ -873,8 +928,13 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.stuffName = item.stuff().name();
-            this.itemNum = item.num();
+            this.itemId = item.id();
+
+            if(item.lastHistory() != null) {
+                this.newHistory = item.lastHistory()
+                        .withApproveManager(requester)
+                        .withApprovedAt(currentTime());
+            }
         }
 
         @Override
@@ -884,7 +944,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected HistoryDto execMethod() {
-            return historyService.makeItemUsing(userToken, univCode, deptCode, stuffName, itemNum);
+            return historyService.makeItemUsing(userToken, itemId);
         }
 
         @RepeatedTest(10)
@@ -892,23 +952,25 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.update(
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
+                    eq(requesterId), eq(null), eq(null), eq(null),
+                    eq(item.lastHistory().requestedAt()), anyLong(),
+                    eq(0L), eq(0L), eq(0L))
+            ).thenReturn(newHistory);
 
             execMethod();
 
             verify(historyDao).update(
-                    eq(univCode), eq(deptCode), eq(stuffName), eq(itemNum),
-                    integerCaptor.capture(), historyCaptor.capture());
-
-            int historyNum = integerCaptor.getValue();
-            UserDto historyApprovalManage = historyCaptor.getValue().approveManager();
-            long historyApprovedAt = historyCaptor.getValue().approvedAt();
-
-            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
-            Assertions.assertThat(historyApprovalManage).isEqualTo(requester);
-            Assertions.assertThat(historyApprovedAt).isNotZero();
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
+                    eq(requesterId), eq(null), eq(null), eq(null),
+                    eq(item.lastHistory().requestedAt()), anyLong(),
+                    eq(0L), eq(0L), eq(0L)
+            );
         }
 
         @RepeatedTest(10)
@@ -917,9 +979,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setUpDefault();
             setItem(randomUsableItemOnDept(dept));
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, RespondedOnUnrequestedItemException.class);
         }
@@ -929,26 +990,33 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_itemInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        @Override
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(item.id())).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 
     @Nested
     @DisplayName("makeItemReturn()")
     public final class TestMakeItemReturn extends HistoryNestedTest {
-        @Captor
-        private ArgumentCaptor<Integer> integerCaptor;
-
-        @Captor
-        private ArgumentCaptor<HistoryDto> historyCaptor;
-
         private ItemDto item;
-        private String stuffName;
-        private int itemNum;
+        private UUID itemId;
+
+        private HistoryDto newHistory;
 
         @Override
         protected void setUpDefault() {
@@ -959,8 +1027,13 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.stuffName = item.stuff().name();
-            this.itemNum = item.num();
+            this.itemId = item.id();
+
+            if(item.lastHistory() != null) {
+                this.newHistory = item.lastHistory()
+                        .withLostManager(requester)
+                        .withLostAt(currentTime());
+            }
         }
 
         @Override
@@ -970,7 +1043,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected HistoryDto execMethod() {
-            return historyService.makeItemReturn(userToken, univCode, deptCode, stuffName, itemNum);
+            return historyService.makeItemReturn(userToken, itemId);
         }
 
         @RepeatedTest(10)
@@ -978,23 +1051,39 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.update(
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()),
+                    eq(getUserIdOrNull(item.lastHistory().requester())),
+                    eq(getUserIdOrNull(item.lastHistory().approveManager())),
+                    eq(requesterId),
+                    eq(getUserIdOrNull(item.lastHistory().lostManager())),
+                    eq(null),
+                    eq(item.lastHistory().requestedAt()),
+                    eq(item.lastHistory().approvedAt()),
+                    anyLong(),
+                    eq(item.lastHistory().lostAt()),
+                    eq(0L))
+            ).thenReturn(newHistory);
 
             execMethod();
 
             verify(historyDao).update(
-                    eq(univCode), eq(deptCode), eq(stuffName), eq(itemNum),
-                    integerCaptor.capture(), historyCaptor.capture());
-
-            int historyNum = integerCaptor.getValue();
-            UserDto historyReturnManger = historyCaptor.getValue().returnManager();
-            long returnedAt = historyCaptor.getValue().returnedAt();
-
-            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
-            Assertions.assertThat(historyReturnManger).isEqualTo(requester);
-            Assertions.assertThat(returnedAt).isNotZero();
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()),
+                    eq(getUserIdOrNull(item.lastHistory().requester())),
+                    eq(getUserIdOrNull(item.lastHistory().approveManager())),
+                    eq(requesterId),
+                    eq(getUserIdOrNull(item.lastHistory().lostManager())),
+                    eq(null),
+                    eq(item.lastHistory().requestedAt()),
+                    eq(item.lastHistory().approvedAt()),
+                    anyLong(),
+                    eq(item.lastHistory().lostAt()),
+                    eq(0L)
+            );
         }
 
         @RepeatedTest(10)
@@ -1003,9 +1092,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setUpDefault();
             setItem(randomUsableItemOnDept(dept));
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, ReturnRegistrationRequestedOnReturnedItemException.class);
         }
@@ -1016,9 +1104,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setUpDefault();
             setItem(randomReservedItemByDept(dept));
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, ReturnRegistrationRequestedOnReturnedItemException.class);
         }
@@ -1028,26 +1115,33 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_itemInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
+        }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        @Override
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(item.id())).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
         }
     }
 
     @Nested
     @DisplayName("makeItemCancel()")
     public final class TestMakeItemCancel extends HistoryNestedTest {
-        @Captor
-        private ArgumentCaptor<Integer> integerCaptor;
-
-        @Captor
-        private ArgumentCaptor<HistoryDto> historyCaptor;
-
         private ItemDto item;
-        private String stuffName;
-        private int itemNum;
+        private UUID itemId;
+
+        private HistoryDto newHistory;
 
         @Override
         protected void setUpDefault() {
@@ -1058,8 +1152,13 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         private void setItem(ItemDto item) {
             this.item = item;
-            this.itemNum = item.num();
-            this.stuffName = item.stuff().name();
+            this.itemId = item.id();
+
+            if(item.lastHistory() != null) {
+                this.newHistory = item.lastHistory()
+                        .withCancelManager(requester)
+                        .withCanceledAt(currentTime());
+            }
         }
 
         @Override
@@ -1069,7 +1168,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
         @Override
         protected HistoryDto execMethod() {
-            return historyService.makeItemCancel(userToken, univCode, deptCode, stuffName, itemNum);
+            return historyService.makeItemCancel(userToken, itemId);
         }
 
         @RepeatedTest(10)
@@ -1077,23 +1176,27 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void SUCCESS() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
+            when(historyDao.update(
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()),
+                    eq(item.lastHistory().requester().id()), eq(null),
+                    eq(null), eq(null), eq(requesterId),
+                    eq(item.lastHistory().requestedAt()),
+                    eq(0L), eq(0L), eq(0L), anyLong())
+            ).thenReturn(newHistory);
 
             execMethod();
 
             verify(historyDao).update(
-                    eq(univCode), eq(deptCode), eq(stuffName),
-                    eq(itemNum), integerCaptor.capture(), historyCaptor.capture());
-
-            int historyNum = integerCaptor.getValue();
-            UserDto historyCancelManager = historyCaptor.getValue().cancelManager();
-            long canceledAt = historyCaptor.getValue().canceledAt();
-
-            Assertions.assertThat(historyNum).isEqualTo(item.lastHistory().num());
-            Assertions.assertThat(historyCancelManager).isEqualTo(requester);
-            Assertions.assertThat(canceledAt).isNotZero();
+                    eq(item.lastHistory().id()), eq(item.id()),
+                    eq(item.lastHistory().num()),
+                    eq(item.lastHistory().requester().id()), eq(null),
+                    eq(null), eq(null), eq(requesterId),
+                    eq(item.lastHistory().requestedAt()),
+                    eq(0L), eq(0L), eq(0L), anyLong()
+            );
         }
 
         @RepeatedTest(10)
@@ -1102,9 +1205,8 @@ public class HistoryServiceTest extends BaseServiceTest {
             setUpDefault();
             setItem(randomUsableItemOnDept(dept));
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenReturn(item);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenReturn(item);
 
             TestHelper.exceptionTest(this::execMethod, RespondedOnUnrequestedItemException.class);
         }
@@ -1114,12 +1216,85 @@ public class HistoryServiceTest extends BaseServiceTest {
         public void ERROR_itemInvalidIndex_InvalidIndexException() {
             setUpDefault();
 
-            mockDepartmentAndRequester();
-            when(itemDao.getByIndex(univCode, deptCode, stuffName, itemNum))
-                    .thenThrow(NotFoundException.class);
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(itemId)).thenThrow(NotFoundException.class);
 
-            TestHelper.exceptionTest(this::execMethod, IndexInvalidException.class);
+            TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
         }
+
+        @RepeatedTest(10)
+        @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
+        @Override
+        public void ERROR_accessDenied_PermissionDeniedException() {
+            setUpDefault();
+            setRequesterAccessDenied();
+
+            when(userDao.getByToken(userToken)).thenReturn(requester);
+            when(itemDao.getById(item.id())).thenReturn(item);
+
+            TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+        }
+    }
+
+    private List<HistoryDto> makeHistoryListWithSameStuff(ItemDto item, UserDto requester) {
+        List<HistoryDto> output = new ArrayList<>();
+        List<ItemDto> exclude = new ArrayList<>(List.of(item));
+        for (int i = 0; i < Constants.MAX_RENTAL_COUNT_ON_SAME_STUFF; i++) {
+            ItemDto newItem = randomItemOnStuffWithExclude(item.stuff(), exclude);
+            exclude.add(newItem);
+            output.add(
+                    new HistoryDto(
+                            UUID.randomUUID(),
+                            newItem,
+                            newItem.nextHistoryNum(),
+                            requester,
+                            null,
+                            null,
+                            null,
+                            null,
+                            System.currentTimeMillis() / 1000,
+                            0,
+                            0,
+                            0,
+                            0
+                    )
+            );
+        }
+        return output;
+    }
+
+    private List<HistoryDto> makeHistoryListWithSameRequester(ItemDto item, UserDto requester) {
+        List<HistoryDto> output = new ArrayList<>();
+        List<StuffDto> exclude = new ArrayList<>(List.of(item.stuff()));
+        for (int i = 0; i < Constants.MAX_RENTAL_COUNT; i++) {
+            StuffDto newStuff = randomStuffOnDeptWithExclude(item.stuff().department(), exclude);
+            exclude.add(newStuff);
+
+            ItemDto newItem = randomItemOnStuff(newStuff);
+            output.add(
+                    new HistoryDto(
+                            UUID.randomUUID(),
+                            newItem,
+                            newItem.nextHistoryNum(),
+                            requester,
+                            null,
+                            null,
+                            null,
+                            null,
+                            System.currentTimeMillis() / 1000,
+                            0,
+                            0,
+                            0,
+                            0
+                    )
+            );
+        }
+        return output;
+    }
+
+    private UUID getUserIdOrNull(UserDto user) {
+        if(user == null) return null;
+        return user.id();
     }
 
     private UserDto randomUserHaveExactPermissionOnDeptWithExclude(DepartmentDto dept, Permission permission, List<UserDto> exclude) {
@@ -1128,9 +1303,16 @@ public class HistoryServiceTest extends BaseServiceTest {
         return randomSelectAndLog(users);
     }
 
-    private StuffDto randomStuffHaveItemMoreOnDept(DepartmentDto dept, int n) {
+    private StuffDto randomUsableStuffHaveItemMoreOnDept(DepartmentDto dept, int n) {
         RandomGetter<StuffDto> stuffs = stuffsOnDept(allStuffs(), dept);
+        stuffs = usableStuffs(stuffs);
         stuffs = stuffsHaveItemMore(stuffs, n);
+        return randomSelectAndLog(stuffs);
+    }
+
+    private StuffDto randomUsableStuffOnDept(DepartmentDto dept) {
+        RandomGetter<StuffDto> stuffs = stuffsOnDept(allStuffs(), dept);
+        stuffs = usableStuffs(stuffs);
         return randomSelectAndLog(stuffs);
     }
 
@@ -1156,13 +1338,18 @@ public class HistoryServiceTest extends BaseServiceTest {
         return randomSelectAndLog(itemsOnStuff(allItems(), stuff));
     }
 
+    private ItemDto randomUsableItemOnStuff(StuffDto stuff) {
+        RandomGetter<ItemDto> items = usableItems(itemsOnStuff(allItems(), stuff));
+        return randomSelectAndLog(items);
+    }
+
     private ItemDto randomItemOnStuffWithExclude(StuffDto stuff, List<ItemDto> exclude) {
         RandomGetter<ItemDto> items = itemsOnStuff(allItems(), stuff);
         items = withExclude(items, exclude);
         return randomSelectAndLog(items);
     }
 
-    private ItemDto randomUnusableItemOnDept(DepartmentDto dept) {
+    private ItemDto randomUnusableItemByDept(DepartmentDto dept) {
         RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
         items = unusableItems(items);
         return randomSelectAndLog(items);
@@ -1170,7 +1357,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     private ItemDto randomInactiveItemByDept(DepartmentDto dept) {
         RandomGetter<ItemDto> items = itemsOnDept(allItems(), dept);
-        items = inactiveItems(items);
+        items = lostItems(items);
         return randomSelectAndLog(items);
     }
 
@@ -1220,50 +1407,49 @@ public class HistoryServiceTest extends BaseServiceTest {
         return stuffs.filter((stuff) -> stuff.items().size() > n);
     }
 
+    private RandomGetter<StuffDto> usableStuffs(RandomGetter<StuffDto> stuffs) {
+        return stuffs.filter((stuff) -> stuff.firstUsableItem() != null);
+    }
+
     private RandomGetter<StuffDto> unusableStuffs(RandomGetter<StuffDto> stuffs) {
-        return stuffs.filter((stuff) -> stuff.firstUsableItemNum() == 0);
+        return stuffs.filter((stuff) -> stuff.firstUsableItem() == null);
     }
 
     private RandomGetter<ItemDto> usableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemStatus.USABLE);
+        return items.filter(ItemDto::isUsable);
     }
 
     private RandomGetter<ItemDto> unusableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemStatus.UNUSABLE);
+        return items.filter(ItemDto::isUnusable);
     }
 
-    private RandomGetter<ItemDto> inactiveItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.status() == ItemStatus.INACTIVE);
+    private RandomGetter<ItemDto> lostItems(RandomGetter<ItemDto> items) {
+        return items.filter((item) -> item.status() == ItemStatus.LOST);
     }
 
     private RandomGetter<ItemDto> reservedItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.lastHistory() != null
-                && item.lastHistory().status() == HistoryStatus.REQUESTED);
+        return items.filter((item) -> item.status() == ItemStatus.REQUESTED);
     }
 
     private RandomGetter<ItemDto> usingOrDelayedItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.lastHistory() != null
-                && (item.lastHistory().status() == HistoryStatus.USING
-                || item.lastHistory().status() == HistoryStatus.DELAYED));
+        return items.filter((item) -> item.status() == ItemStatus.USING);
     }
 
     private RandomGetter<ItemDto> returnableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.lastHistory() != null
-                && (item.lastHistory().status() == HistoryStatus.USING
-                || item.lastHistory().status() == HistoryStatus.DELAYED
-                || item.lastHistory().status() == HistoryStatus.LOST));
+        return items.filter((item) -> item.status() == ItemStatus.USING
+                || item.status() == ItemStatus.LOST);
     }
 
     private RandomGetter<ItemDto> itemsOnStuff(RandomGetter<ItemDto> items, StuffDto stuff) {
-        return items.filter((item) -> item.stuff().matchUniqueKey(stuff));
+        return items.filter((item) -> item.stuff().matchId(stuff));
     }
 
     private RandomGetter<ItemDto> firstUsableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.num() == item.stuff().firstUsableItemNum());
+        return items.filter((item) -> item.matchId(item.stuff().firstUsableItem()));
     }
 
     private RandomGetter<ItemDto> nonFirstUsableItems(RandomGetter<ItemDto> items) {
-        return items.filter((item) -> item.num() != item.stuff().firstUsableItemNum());
+        return items.filter((item) -> !item.matchId(item.stuff().firstUsableItem()));
     }
 
     private abstract class HistoryNestedTest extends BaseNestedTestWithDept {

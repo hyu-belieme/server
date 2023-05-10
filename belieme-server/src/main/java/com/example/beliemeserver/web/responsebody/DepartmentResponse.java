@@ -7,12 +7,13 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class DepartmentResponse extends JsonResponse {
+    private UUID id;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private UniversityResponse university;
-    private String code;
     private String name;
     private List<String> baseMajors;
 
@@ -20,10 +21,10 @@ public class DepartmentResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private DepartmentResponse(UniversityResponse university, String code, String name, List<String> baseMajors) {
+    private DepartmentResponse(UUID id, UniversityResponse university, String name, List<String> baseMajors) {
         super(true);
+        this.id = id;
         this.university = university;
-        this.code = code;
         this.name = name;
         this.baseMajors = baseMajors;
     }
@@ -44,8 +45,8 @@ public class DepartmentResponse extends JsonResponse {
         }
 
         return new DepartmentResponse(
+                departmentDto.id(),
                 UniversityResponse.from(departmentDto.university()),
-                departmentDto.code(),
                 departmentDto.name(),
                 baseMajorCodes
         );
@@ -53,8 +54,8 @@ public class DepartmentResponse extends JsonResponse {
 
     public DepartmentResponse withoutUniversity() {
         return new DepartmentResponse(
+                id,
                 UniversityResponse.responseWillBeIgnore(),
-                code,
                 name,
                 baseMajors
         );

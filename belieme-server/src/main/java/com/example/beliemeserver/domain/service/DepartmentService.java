@@ -1,32 +1,46 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata.InitialData;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
+import com.example.beliemeserver.config.initdata.container.DepartmentInfo;
+import com.example.beliemeserver.config.initdata.container.MajorInfo;
 import com.example.beliemeserver.domain.dao.*;
-import com.example.beliemeserver.domain.dto.*;
+import com.example.beliemeserver.domain.dto.DepartmentDto;
+import com.example.beliemeserver.domain.dto.MajorDto;
+import com.example.beliemeserver.domain.dto.UserDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class DepartmentService extends BaseService {
-    public DepartmentService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public DepartmentService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public void initializeDepartments() {
-        for (DepartmentDto department : initialData.departments().values()) {
-            if (departmentDao.checkExistByIndex(department.university().code(), department.code())) {
-                departmentDao.update(department.university().code(), department.code(), department);
-                createOrUpdateAuthorities(department);
+        for (DepartmentInfo department : initialData.departmentInfos().values()) {
+            if (departmentDao.checkExistById(department.id())) {
+                departmentDao.update(
+                        department.id(),
+                        department.universityId(),
+                        department.name(),
+                        department.baseMajors().stream().map(MajorInfo::id).toList()
+                );
+                createOrUpdateAuthorities(department.id());
                 continue;
             }
-            departmentDao.create(department);
-            createOrUpdateAuthorities(department);
+            departmentDao.create(
+                    department.id(),
+                    department.universityId(),
+                    department.name(),
+                    department.baseMajors().stream().map(MajorInfo::id).toList()
+            );
+            createOrUpdateAuthorities(department.id());
         }
     }
 
@@ -44,82 +58,78 @@ public class DepartmentService extends BaseService {
         return output;
     }
 
-    public DepartmentDto getByIndex(
-            @NonNull String userToken, @NonNull String universityCode,
-            @NonNull String departmentCode
+    public DepartmentDto getById(
+            @NonNull String userToken, @NonNull UUID departmentId
     ) {
-        checkDeveloperPermission(userToken);
-        return departmentDao.getByIndex(universityCode, departmentCode);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
+
+        return departmentDao.getById(departmentId);
     }
 
     public DepartmentDto create(
-            @NonNull String userToken, @NonNull String universityCode,
-            @NonNull String departmentCode, @NonNull String name,
-            @NonNull List<String> majorCodes
+            @NonNull String userToken, @NonNull UUID universityId,
+            @NonNull String departmentName, @NonNull List<String> majorCodes
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
 
-        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
-        List<MajorDto> baseMajors = new ArrayList<>();
+        List<UUID> baseMajorIds = new ArrayList<>();
         for (String majorCode : majorCodes) {
-            baseMajors.add(getMajorOrCreate(university, majorCode));
+            baseMajorIds.add(getMajorOrCreate(universityId, majorCode).id());
         }
 
-        DepartmentDto newDepartment = new DepartmentDto(university, departmentCode, name, baseMajors);
-        newDepartment = departmentDao.create(newDepartment);
-        createOrUpdateAuthorities(newDepartment);
+        DepartmentDto newDepartment = departmentDao.create(
+                UUID.randomUUID(),
+                universityId,
+                departmentName,
+                baseMajorIds
+        );
+        createOrUpdateAuthorities(newDepartment.id());
         return newDepartment;
     }
 
     public DepartmentDto update(
-            @NonNull String userToken, @NonNull String universityCode, @NonNull String departmentCode,
-            String newDepartmentCode, String newName, List<String> newMajorCodes
+            @NonNull String userToken, @NonNull UUID departmentId,
+            String newDepartmentName, List<String> newMajorCodes
     ) {
-        checkDeveloperPermission(userToken);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        checkDeveloperPermission(requester);
 
-        UniversityDto university = getUniversityOrThrowInvalidIndexException(universityCode);
-        DepartmentDto oldDepartment = departmentDao.getByIndex(universityCode, departmentCode);
+        DepartmentDto oldDepartment = departmentDao.getById(departmentId);
 
-        if (newDepartmentCode == null && newName == null && newMajorCodes == null) return oldDepartment;
+        if (newDepartmentName == null && newMajorCodes == null) return oldDepartment;
+        if (newDepartmentName == null) newDepartmentName = oldDepartment.name();
 
-        if (newDepartmentCode == null) newDepartmentCode = oldDepartment.code();
-        if (newName == null) newName = oldDepartment.name();
         List<MajorDto> newBaseMajors = oldDepartment.baseMajors();
-
         if (newMajorCodes != null) {
             newBaseMajors = new ArrayList<>();
             for (String majorCode : newMajorCodes) {
-                newBaseMajors.add(getMajorOrCreate(university, majorCode));
+                newBaseMajors.add(getMajorOrCreate(oldDepartment.university().id(), majorCode));
             }
         }
 
-        DepartmentDto newDepartment = new DepartmentDto(university, newDepartmentCode, newName, newBaseMajors);
-        return departmentDao.update(universityCode, departmentCode, newDepartment);
+        DepartmentDto newDepartment = new DepartmentDto(departmentId, oldDepartment.university(), newDepartmentName, newBaseMajors);
+        return departmentDao.update(
+                departmentId,
+                oldDepartment.university().id(),
+                newDepartmentName,
+                newBaseMajors.stream().map(MajorDto::id).toList()
+        );
     }
 
-    private UniversityDto getUniversityOrThrowInvalidIndexException(String universityCode) {
+    private MajorDto getMajorOrCreate(UUID universityId, String majorCode) {
         try {
-            return universityDao.getByIndex(universityCode);
+            return majorDao.getByIndex(universityId, majorCode);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            return majorDao.create(UUID.randomUUID(), universityId, majorCode);
         }
     }
 
-    private MajorDto getMajorOrCreate(UniversityDto university, String majorCode) {
-        try {
-            return majorDao.getByIndex(university.code(), majorCode);
-        } catch (NotFoundException e) {
-            return majorDao.create(new MajorDto(university, majorCode));
-        }
-    }
-
-    private void createOrUpdateAuthorities(DepartmentDto department) {
+    private void createOrUpdateAuthorities(UUID departmentId) {
         for (Permission permission : Permission.values()) {
-            if (!authorityDao.checkExistByIndex(department.university().code(), department.code(), permission)) {
-                authorityDao.create(new AuthorityDto(department, permission));
-                continue;
-            }
-            authorityDao.update(department.university().code(), department.code(), permission, new AuthorityDto(department, permission));
+            if (authorityDao.checkExistByIndex(departmentId, permission)) continue;
+            authorityDao.create(departmentId, permission);
         }
     }
 }

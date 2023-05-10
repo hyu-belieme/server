@@ -1,12 +1,14 @@
 package com.example.beliemeserver.web.responsebody;
 
 import com.example.beliemeserver.domain.dto.ItemDto;
-import com.example.beliemeserver.domain.dto.StuffDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class ItemResponse extends JsonResponse {
+    private UUID id;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
     private UniversityResponse university;
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
@@ -23,8 +25,9 @@ public class ItemResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private ItemResponse(UniversityResponse university, DepartmentResponse department, StuffResponse stuff, int num, String status, HistoryResponse lastHistory) {
+    private ItemResponse(UUID id, UniversityResponse university, DepartmentResponse department, StuffResponse stuff, int num, String status, HistoryResponse lastHistory) {
         super(true);
+        this.id = id;
         this.university = university;
         this.department = department;
         this.stuff = stuff;
@@ -44,6 +47,7 @@ public class ItemResponse extends JsonResponse {
         }
 
         return new ItemResponse(
+                itemDto.id(),
                 UniversityResponse.from(itemDto.stuff().department().university()),
                 DepartmentResponse.from(itemDto.stuff().department()).withoutUniversity(),
                 StuffResponse.from(itemDto.stuff()).withoutUniversityAndDepartment().withoutItems(),
@@ -55,6 +59,7 @@ public class ItemResponse extends JsonResponse {
 
     public ItemResponse withoutUniversityAndDepartment() {
         return new ItemResponse(
+                id,
                 UniversityResponse.responseWillBeIgnore(),
                 DepartmentResponse.responseWillBeIgnore(),
                 stuff, num, status, lastHistory);
@@ -62,14 +67,15 @@ public class ItemResponse extends JsonResponse {
 
     public ItemResponse withoutStuffInfo() {
         return new ItemResponse(
-                university, department, StuffResponse.responseWillBeIgnore(),
+                id, university, department,
+                StuffResponse.responseWillBeIgnore(),
                 num, status, lastHistory);
     }
 
     public ItemResponse withoutLastHistory() {
         return new ItemResponse(
-                university, department, stuff,
-                num, status, HistoryResponse.responseWillBeIgnore());
+                id, university, department, stuff, num, status,
+                HistoryResponse.responseWillBeIgnore());
     }
 
     private static HistoryResponse toNestedResponse(HistoryResponse history) {

@@ -1,22 +1,23 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata.InitialData;
-import com.example.beliemeserver.config.initdata.InitialDataDtoAdapter;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
 import com.example.beliemeserver.domain.dao.*;
 import com.example.beliemeserver.domain.dto.DepartmentDto;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.StuffDto;
 import com.example.beliemeserver.domain.dto.UserDto;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.PermissionDeniedException;
 import com.example.beliemeserver.domain.exception.TokenExpiredException;
 import com.example.beliemeserver.error.exception.NotFoundException;
 import com.example.beliemeserver.error.exception.UnauthorizedException;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public abstract class BaseService {
-    protected final InitialDataDtoAdapter initialData;
+    protected final InitialDataConfig initialData;
     protected final UniversityDao universityDao;
     protected final DepartmentDao departmentDao;
     protected final UserDao userDao;
@@ -28,8 +29,8 @@ public abstract class BaseService {
 
     public static final long TOKEN_EXPIRED_TIME = 3L * 30 * 24 * 60 * 60;
 
-    public BaseService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
-        this.initialData = new InitialDataDtoAdapter(initialData);
+    public BaseService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+        this.initialData = initialData;
         this.universityDao = universityDao;
         this.departmentDao = departmentDao;
         this.userDao = userDao;
@@ -62,73 +63,55 @@ public abstract class BaseService {
         }
     }
 
-    protected void checkUserPermission(String token, DepartmentDto department) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkUserPermission(UserDto requester, DepartmentDto department) {
         if (!requester.getMaxPermission(department).hasUserPermission()) {
             throw new PermissionDeniedException();
         }
     }
 
-    protected void checkStaffPermission(String token, DepartmentDto department) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkStaffPermission(UserDto requester, DepartmentDto department) {
         if (!requester.getMaxPermission(department).hasStaffPermission()) {
             throw new PermissionDeniedException();
         }
     }
 
-    protected void checkMasterPermission(String token, DepartmentDto department) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkMasterPermission(UserDto requester, DepartmentDto department) {
         if (!requester.getMaxPermission(department).hasMasterPermission()) {
             throw new PermissionDeniedException();
         }
     }
 
-    protected void checkDeveloperPermission(String token) {
-        UserDto requester = validateTokenAndGetUser(token);
+    protected void checkDeveloperPermission(UserDto requester) {
         if (!requester.isDeveloper()) {
             throw new PermissionDeniedException();
         }
     }
 
-    protected void checkUserPermission(DepartmentDto department, UserDto requester) {
-        if (!requester.getMaxPermission(department).hasUserPermission()) {
-            throw new PermissionDeniedException();
-        }
-    }
-
-    protected void checkStaffPermission(DepartmentDto department, UserDto requester) {
-        if (!requester.getMaxPermission(department).hasStaffPermission()) {
-            throw new PermissionDeniedException();
-        }
-    }
-
-    protected void checkMasterPermission(DepartmentDto department, UserDto requester) {
-        if (!requester.getMaxPermission(department).hasMasterPermission()) {
-            throw new PermissionDeniedException();
-        }
-    }
-
-    protected DepartmentDto getDepartmentOrThrowInvalidIndexException(String universityCode, String departmentCode) {
+    protected DepartmentDto getDepartmentOrThrowInvalidIndexException(UUID departmentId) {
         try {
-            return departmentDao.getByIndex(universityCode, departmentCode);
+            return departmentDao.getById(departmentId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 
-    protected StuffDto getStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
+    protected StuffDto getStuffOrThrowInvalidIndexException(UUID stuffId) {
         try {
-            return stuffDao.getByIndex(universityCode, departmentCode, stuffName);
+            return stuffDao.getById(stuffId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 
-    protected ItemDto getItemOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName, int itemNum) {
+    protected ItemDto getItemOrThrowInvalidIndexException(UUID itemId) {
         try {
-            return itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum);
+            return itemDao.getById(itemId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
+    }
+
+    protected long currentTime() {
+        return System.currentTimeMillis() / 1000;
     }
 }

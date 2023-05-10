@@ -1,11 +1,11 @@
 package com.example.beliemeserver.domain.service;
 
-import com.example.beliemeserver.config.initdata.InitialData;
+import com.example.beliemeserver.config.initdata.InitialDataConfig;
 import com.example.beliemeserver.domain.dao.*;
-import com.example.beliemeserver.domain.dto.DepartmentDto;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.StuffDto;
-import com.example.beliemeserver.domain.exception.IndexInvalidException;
+import com.example.beliemeserver.domain.dto.UserDto;
+import com.example.beliemeserver.error.exception.InvalidIndexException;
 import com.example.beliemeserver.domain.exception.ItemAmountLimitExceededException;
 import com.example.beliemeserver.domain.util.Constants;
 import com.example.beliemeserver.error.exception.NotFoundException;
@@ -13,54 +13,50 @@ import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ItemService extends BaseService {
-    public ItemService(InitialData initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
+    public ItemService(InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
         super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao, itemDao, historyDao);
     }
 
     public List<ItemDto> getListByStuff(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String stuffName
+            @NonNull String userToken, @NonNull UUID stuffId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkUserPermission(userToken, department);
-
-        return getItemListByStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        StuffDto targetStuff = getStuffOrThrowInvalidIndexException(stuffId);
+        checkUserPermission(requester, targetStuff.department());
+        return getItemListByStuffOrThrowInvalidIndexException(stuffId);
     }
 
-    public ItemDto getByIndex(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode,
-            @NonNull String stuffName, int itemNum
+    public ItemDto getById(
+            @NonNull String userToken, @NonNull UUID itemId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkUserPermission(userToken, department);
-        return itemDao.getByIndex(universityCode, departmentCode, stuffName, itemNum);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        ItemDto item = itemDao.getById(itemId);
+        checkUserPermission(requester, item.stuff().department());
+        return item;
     }
 
     public ItemDto create(
-            @NonNull String userToken,
-            @NonNull String universityCode, @NonNull String departmentCode, @NonNull String stuffName
+            @NonNull String userToken, @NonNull UUID stuffId
     ) {
-        DepartmentDto department = getDepartmentOrThrowInvalidIndexException(universityCode, departmentCode);
-        checkStaffPermission(userToken, department);
+        UserDto requester = validateTokenAndGetUser(userToken);
+        StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
+        checkStaffPermission(requester, stuff.department());
 
-        StuffDto stuff = getStuffOrThrowInvalidIndexException(universityCode, departmentCode, stuffName);
-        ItemDto newItem = ItemDto.init(stuff, stuff.nextItemNum());
-
-        if (newItem.num() > Constants.MAX_ITEM_NUM) {
+        if (stuff.nextItemNum() > Constants.MAX_ITEM_NUM) {
             throw new ItemAmountLimitExceededException();
         }
-        return itemDao.create(newItem);
+        return itemDao.create(UUID.randomUUID(), stuffId, stuff.nextItemNum());
     }
 
-    protected List<ItemDto> getItemListByStuffOrThrowInvalidIndexException(String universityCode, String departmentCode, String stuffName) {
+    protected List<ItemDto> getItemListByStuffOrThrowInvalidIndexException(UUID stuffId) {
         try {
-            return itemDao.getListByStuff(universityCode, departmentCode, stuffName);
+            return itemDao.getListByStuff(stuffId);
         } catch (NotFoundException e) {
-            throw new IndexInvalidException();
+            throw new InvalidIndexException();
         }
     }
 }

@@ -1,51 +1,38 @@
 package com.example.beliemeserver.domain.dto;
 
+import com.example.beliemeserver.domain.dto.enumeration.HistoryStatus;
 import com.example.beliemeserver.domain.dto.enumeration.ItemStatus;
 import lombok.NonNull;
 
+import java.util.UUID;
+
 public record ItemDto(
-        @NonNull StuffDto stuff, int num, HistoryDto lastHistory
+        @NonNull UUID id, @NonNull StuffDto stuff, int num, HistoryDto lastHistory
 ) {
-    public static final ItemDto nestedEndpoint = new ItemDto(StuffDto.nestedEndpoint, 0, null);
+    private static final UUID NIL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final ItemDto nestedEndpoint = new ItemDto(NIL_UUID, StuffDto.nestedEndpoint, 0, null);
 
     public static ItemDto init(@NonNull StuffDto stuff, int itemNum) {
-        return new ItemDto(stuff, itemNum, null);
+        return new ItemDto(UUID.randomUUID(), stuff, itemNum, null);
     }
 
     public ItemDto withStuff(@NonNull StuffDto stuff) {
-        return new ItemDto(stuff, num, lastHistory);
+        return new ItemDto(id, stuff, num, lastHistory);
     }
 
     public ItemDto withNum(int num) {
-        return new ItemDto(stuff, num, lastHistory);
+        return new ItemDto(id, stuff, num, lastHistory);
     }
 
     public ItemDto withLastHistory(HistoryDto lastHistory) {
-        return new ItemDto(stuff, num, lastHistory);
+        return new ItemDto(id, stuff, num, lastHistory);
     }
 
-    public boolean matchUniqueKey(String universityCode, String departmentCode, String stuffName, int num) {
-        return this.stuff().matchUniqueKey(universityCode, departmentCode, stuffName)
-                && num == this.num();
-    }
-
-    public boolean matchUniqueKey(ItemDto oth) {
-        if (oth == null) return false;
-        return this.stuff().matchUniqueKey(oth.stuff())
-                && this.num() == oth.num();
-    }
-
-    @Override
-    public String toString() {
-        if (this.equals(nestedEndpoint)) {
-            return "omitted";
+    public boolean matchId(ItemDto oth) {
+        if (oth == null) {
+            return false;
         }
-
-        return "ItemDto{" +
-                "stuff=" + stuff +
-                ", num=" + num +
-                ", lastHistory=" + lastHistory +
-                '}';
+        return this.id.equals(oth.id);
     }
 
     public int nextHistoryNum() {
@@ -53,17 +40,39 @@ public record ItemDto(
         return lastHistory.num() + 1;
     }
 
+    public boolean isUsable() {
+        return status() == ItemStatus.USABLE;
+    }
+
+    public boolean isUnusable() {
+        return !isUsable();
+    }
+
     public ItemStatus status() {
-        if (lastHistory == null) {
+        if (lastHistory == null
+                || lastHistory.status() == HistoryStatus.RETURNED
+                || lastHistory.status() == HistoryStatus.FOUND
+                || lastHistory.status() == HistoryStatus.EXPIRED
+        ) {
             return ItemStatus.USABLE;
         }
 
-        return switch (lastHistory.status()) {
-            case REQUESTED, USING, DELAYED -> ItemStatus.UNUSABLE;
-            case RETURNED, EXPIRED, FOUND -> ItemStatus.USABLE;
-            case LOST -> ItemStatus.INACTIVE;
-            default -> ItemStatus.ERROR;
-        };
+        if(lastHistory.status() == HistoryStatus.REQUESTED) return ItemStatus.REQUESTED;
+        if(lastHistory.status() == HistoryStatus.USING || lastHistory.status() == HistoryStatus.DELAYED) return ItemStatus.USING;
+        if(lastHistory.status() == HistoryStatus.LOST) return ItemStatus.LOST;
+        return ItemStatus.ERROR;
     }
 
+    @Override
+    public String toString() {
+        if (this.equals(nestedEndpoint)) {
+            return "omitted";
+        }
+        return "ItemDto{" +
+                "id=" + id +
+                ", stuff=" + stuff +
+                ", num=" + num +
+                ", lastHistory=" + lastHistory +
+                '}';
+    }
 }

@@ -2,21 +2,19 @@ package com.example.beliemeserver.domain.dao;
 
 import com.example.beliemeserver.domain.dto.AuthorityDto;
 import com.example.beliemeserver.domain.dto.enumeration.Permission;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AuthorityDao {
     @Transactional
     List<AuthorityDto> getAllList();
 
     @Transactional
-    boolean checkExistByIndex(String universityCode, String departmentCode, Permission permission);
+    boolean checkExistByIndex(@NonNull UUID departmentId, @NonNull Permission permission);
 
     @Transactional
-    AuthorityDto create(AuthorityDto authority);
-
-    @Transactional
-    AuthorityDto update(String universityCode, String departmentCode,
-                        Permission permission, AuthorityDto authority);
+    AuthorityDto create(@NonNull UUID departmentId, @NonNull Permission permission);
 }

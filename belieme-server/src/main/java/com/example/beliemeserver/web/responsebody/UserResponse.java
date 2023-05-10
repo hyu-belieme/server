@@ -7,9 +7,11 @@ import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class UserResponse extends JsonResponse {
+    private UUID id;
     private UniversityResponse university;
     private String studentId;
     private String name;
@@ -29,8 +31,9 @@ public class UserResponse extends JsonResponse {
         super(doesJsonInclude);
     }
 
-    private UserResponse(UniversityResponse university, String studentId, String name, int entranceYear, List<AuthorityResponse> authorities, String token, long createdAt, long approvedAt) {
+    private UserResponse(UUID id, UniversityResponse university, String studentId, String name, int entranceYear, List<AuthorityResponse> authorities, String token, long createdAt, long approvedAt) {
         super(true);
+        this.id = id;
         this.university = university;
         this.studentId = studentId;
         this.name = name;
@@ -57,6 +60,7 @@ public class UserResponse extends JsonResponse {
         }
 
         return new UserResponse(
+                userDto.id(),
                 UniversityResponse.from(userDto.university()),
                 userDto.studentId(),
                 userDto.name(),
@@ -69,6 +73,6 @@ public class UserResponse extends JsonResponse {
     }
 
     public UserResponse withoutSecureInfo() {
-        return new UserResponse(university, studentId, name, entranceYear, null, null, 0, 0);
+        return new UserResponse(id, university, studentId, name, entranceYear, null, null, 0, 0);
     }
 }

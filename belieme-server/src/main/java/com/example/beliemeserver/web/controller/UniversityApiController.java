@@ -34,9 +34,9 @@ public class UniversityApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        String universityCode = params.get(api.variable().universityIndex());
+        String universityId = params.get(api.variable().universityIndex());
 
-        UniversityDto universityDto = universityService.getByIndex(userToken, universityCode);
+        UniversityDto universityDto = universityService.getById(userToken, toUUID(universityId));
         UniversityResponse response = UniversityResponse.from(universityDto);
         return ResponseEntity.ok(response);
     }

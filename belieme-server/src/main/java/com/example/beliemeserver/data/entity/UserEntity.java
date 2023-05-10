@@ -3,11 +3,11 @@ package com.example.beliemeserver.data.entity;
 import com.example.beliemeserver.domain.dto.AuthorityDto;
 import com.example.beliemeserver.domain.dto.UserDto;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user", uniqueConstraints = {
@@ -17,46 +17,39 @@ import java.util.List;
         )
 })
 @NoArgsConstructor
-@ToString
 @Getter
-@Accessors(chain = true)
-public class UserEntity extends DataEntity {
+public class UserEntity extends DataEntity<UUID> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
-    @Column(name = "university_id")
-    private int universityId;
+    @NonNull
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     @NonNull
-    @Setter
+    @Column(name = "university_id", columnDefinition = "BINARY(16)")
+    private UUID universityId;
+
+    @NonNull
     @Column(name = "student_id")
     private String studentId;
 
     @NonNull
-    @Setter
     @Column(name = "name")
     private String name;
 
-    @NonNull
-    @Setter
     @Column(name = "entrance_year")
     private int entranceYear;
 
     @NonNull
-    @Setter
     @Column(name = "token")
     private String token;
 
-    @Setter
     @Column(name = "created_at")
     private long createdAt;
 
-    @Setter
     @Column(name = "approved_at")
     private long approvedAt;
 
+    @NonNull
     @ManyToOne
     @JoinColumn(name = "university_id", referencedColumnName = "id", insertable = false, updatable = false)
     private UniversityEntity university;
@@ -65,7 +58,12 @@ public class UserEntity extends DataEntity {
     @OneToMany(mappedBy = "userId")
     private List<AuthorityUserJoinEntity> authorityJoin;
 
-    public UserEntity(UniversityEntity university, String studentId, String name, int entranceYear, String token, long createdAt, long approvedAt) {
+    public UserEntity(
+            @NonNull UUID id, @NonNull UniversityEntity university,
+            @NonNull String studentId, @NonNull String name, int entranceYear,
+            @NonNull String token, long createdAt, long approvedAt
+    ) {
+        this.id = id;
         this.university = university;
         this.universityId = university.getId();
         this.studentId = studentId;
@@ -77,18 +75,70 @@ public class UserEntity extends DataEntity {
         this.authorityJoin = new ArrayList<>();
     }
 
-    public UserEntity setUniversity(UniversityEntity university) {
+    private UserEntity(
+            @NonNull UUID id, @NonNull UniversityEntity university,
+            @NonNull String studentId, @NonNull String name, int entranceYear,
+            @NonNull String token, long createdAt, long approvedAt,
+            @NonNull List<AuthorityUserJoinEntity> authorityJoin
+    ) {
+        this.id = id;
         this.university = university;
         this.universityId = university.getId();
-        return this;
+        this.studentId = studentId;
+        this.name = name;
+        this.entranceYear = entranceYear;
+        this.token = token;
+        this.createdAt = createdAt;
+        this.approvedAt = approvedAt;
+        this.authorityJoin = new ArrayList<>(authorityJoin);
     }
 
-    public void addAuthority(AuthorityUserJoinEntity authority) {
-        this.authorityJoin.add(authority);
+    public List<AuthorityUserJoinEntity> getAuthorityJoin() {
+        return new ArrayList<>(authorityJoin);
     }
 
-    public void removeAuthority(AuthorityUserJoinEntity authority) {
-        this.authorityJoin.remove(authority);
+    public UserEntity withUniversity(@NonNull UniversityEntity university) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorityJoin);
+    }
+
+    public UserEntity withStudentId(@NonNull String studentId) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorityJoin);
+    }
+
+    public UserEntity withName(@NonNull String name) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorityJoin);
+    }
+
+    public UserEntity withEntranceYear(int entranceYear) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorityJoin);
+    }
+
+    public UserEntity withToken(@NonNull String token) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorityJoin);
+    }
+
+    public UserEntity withCreatedAt(long createdAt) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorityJoin);
+    }
+
+    public UserEntity withApprovedAt(long approvedAt) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, authorityJoin);
+    }
+
+    public UserEntity withAuthorityJoin(List<AuthorityUserJoinEntity> authorityJoin) {
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, new ArrayList<>(authorityJoin));
+    }
+
+    public UserEntity withAuthorityAdd(@NonNull AuthorityUserJoinEntity authority) {
+        List<AuthorityUserJoinEntity> newJoins = new ArrayList<>(authorityJoin);
+        newJoins.add(authority);
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, newJoins);
+    }
+
+    public UserEntity withAuthorityClear() {
+        List<AuthorityUserJoinEntity> newJoins = new ArrayList<>(authorityJoin);
+        newJoins.clear();
+        return new UserEntity(id, university, studentId, name, entranceYear, token, createdAt, approvedAt, newJoins);
     }
 
     public UserDto toUserDto() {
@@ -98,6 +148,7 @@ public class UserEntity extends DataEntity {
         }
 
         return new UserDto(
+                id,
                 university.toUniversityDto(),
                 studentId,
                 name,

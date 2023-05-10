@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatusCode;
 
 public enum CommonErrorInfo implements ErrorInfo {
     BAD_REQUEST(HttpStatus.BAD_REQUEST, new Message("message.error.badRequest")),
+    INVALID_INDEX(HttpStatus.BAD_REQUEST, new Message("message.error.invalidIndex")),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, new Message("message.error.unauthorized")),
     FORBIDDEN(HttpStatus.FORBIDDEN, new Message("message.error.forbidden")),
     NOT_FOUND(HttpStatus.NOT_FOUND, new Message("message.error.notFound")),

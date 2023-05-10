@@ -22,16 +22,18 @@ api :
     history-index: "{${api.variable.history-index}}"
 
   variable :
-    university-index : "university-code"
-    department-index : "department-code"
-    user-index : "student-id"
-    stuff-index : "stuff-name"
-    item-index : "item-num"
-    history-index : "history-num"
+    university-index : "university-id"
+    department-index : "department-id"
+    user-index : "user-id"
+    stuff-index : "stuff-id"
+    item-index : "item-id"
+    history-index : "history-id"
 
   query :
-    requester-university-code : "requester-university-code"
-    requester-student-id : "requester-student-id"
+    requester-id : "requester-id"
+    department-id : "department-id"
+    stuff-id : "stuff-id"
+    item-id : "item-id"
 
   header :
     user-token : "user-token"

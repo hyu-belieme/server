@@ -14,14 +14,10 @@ import java.util.List;
 @Getter
 @Setter
 public class DepartmentRequest {
-    @Size(min = 1, max = 10, message = "{message.error.badRequest.outOfSize}",
-            groups = {DepartmentCreateValidationGroup.class, DepartmentUpdateValidationGroup.class})
-    @Pattern(regexp = "[A-Z]+", message = "{message.error.badRequest.containsNonLargeCapital}",
-            groups = {DepartmentCreateValidationGroup.class, DepartmentUpdateValidationGroup.class})
     @NotNull(message = "{message.error.badRequest.notNull}",
             groups = DepartmentCreateValidationGroup.class)
-    @JsonProperty("code")
-    String code;
+    @JsonProperty("university-id")
+    String universityId;
 
     @Size(min = 1, max = 30, message = "{message.error.badRequest.outOfSize}",
             groups = {DepartmentCreateValidationGroup.class, DepartmentUpdateValidationGroup.class})

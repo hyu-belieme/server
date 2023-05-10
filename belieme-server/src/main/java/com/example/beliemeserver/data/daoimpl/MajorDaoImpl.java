@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
@@ -28,20 +29,28 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto getByIndex(String universityCode, String majorCode) {
-        MajorEntity targetEntity = findMajorEntity(universityCode, majorCode);
+    public MajorDto getById(UUID majorId) {
+        return findMajorEntity(majorId).toMajorDto();
+    }
+
+    @Override
+    public MajorDto getByIndex(UUID universityId, String majorCode) {
+        MajorEntity targetEntity = findMajorEntity(universityId, majorCode);
         return targetEntity.toMajorDto();
     }
 
     @Override
-    public MajorDto create(MajorDto newMajor) {
-        UniversityEntity university = findUniversityEntity(newMajor.university());
+    public MajorDto create(UUID majorId, UUID universityId, String majorCode) {
+        UniversityEntity university;
+        university = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
-        checkMajorConflict(university.getId(), newMajor.code());
+        checkMajorIdConflict(majorId);
+        checkMajorConflict(university.getId(), majorCode);
 
         MajorEntity newMajorEntity = new MajorEntity(
+                majorId,
                 university,
-                newMajor.code()
+                majorCode
         );
 
         MajorEntity savedMajorEntity = majorRepository.save(newMajorEntity);
@@ -49,20 +58,35 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     }
 
     @Override
-    public MajorDto update(String universityCode, String majorCode, MajorDto newMajor) {
-        MajorEntity target = findMajorEntity(universityCode, majorCode);
+    public MajorDto update(UUID majorId, UUID universityId, String majorCode) {
+        MajorEntity target = findMajorEntity(majorId);
+        UniversityEntity newUniversity = getUniversityEntityOrThrowInvalidIndexException(universityId);
 
-        UniversityEntity newUniversity = findUniversityEntity(newMajor.university());
+        if (doesIndexChange(target, universityId, majorCode)) {
+            checkMajorConflict(newUniversity.getId(), majorCode);
+        }
 
-        checkMajorConflict(newUniversity.getId(), newMajor.code());
+        MajorEntity updatedMajor = target
+                .withUniversity(newUniversity)
+                .withCode(majorCode);
 
-        target.setUniversity(newUniversity)
-                .setCode(newMajor.code());
-
-        return target.toMajorDto();
+        return majorRepository.save(updatedMajor).toMajorDto();
     }
 
-    private void checkMajorConflict(int universityId, String majorCode) {
+    private boolean doesIndexChange(MajorEntity target, UUID newUniversityId, String newMajorCode) {
+        UUID oldUniversityId = target.getUniversity().getId();
+        String oldCode = target.getCode();
+
+        return !(oldUniversityId.equals(newUniversityId) && oldCode.equals(newMajorCode));
+    }
+
+    private void checkMajorIdConflict(UUID majorId) {
+        if (majorRepository.existsById(majorId)) {
+            throw new ConflictException();
+        }
+    }
+
+    private void checkMajorConflict(UUID universityId, String majorCode) {
         if (majorRepository.existsByUniversityIdAndCode(universityId, majorCode)) {
             throw new ConflictException();
         }

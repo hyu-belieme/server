@@ -3,18 +3,20 @@ package com.example.beliemeserver.web.responsebody;
 import com.example.beliemeserver.domain.dto.UniversityDto;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class UniversityResponse extends JsonResponse {
-    private String code;
+    private UUID id;
     private String name;
 
     private UniversityResponse(boolean doesJsonInclude) {
         super(doesJsonInclude);
     }
 
-    private UniversityResponse(String code, String name) {
+    private UniversityResponse(UUID id, String name) {
         super(true);
-        this.code = code;
+        this.id = id;
         this.name = name;
     }
 
@@ -27,6 +29,6 @@ public class UniversityResponse extends JsonResponse {
         if (universityDto.equals(UniversityDto.nestedEndpoint)) {
             return responseWillBeIgnore();
         }
-        return new UniversityResponse(universityDto.code(), universityDto.name());
+        return new UniversityResponse(universityDto.id(), universityDto.name());
     }
 }

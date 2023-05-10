@@ -5,11 +5,12 @@ import com.example.beliemeserver.data.repository.custom.RefreshRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface StuffRepository extends RefreshRepository<StuffEntity, Integer> {
-    List<StuffEntity> findByDepartmentId(int departmentId);
+public interface StuffRepository extends RefreshRepository<StuffEntity, UUID> {
+    List<StuffEntity> findByDepartmentId(UUID departmentId);
 
-    Optional<StuffEntity> findByDepartmentIdAndName(int departmentId, String name);
+    Optional<StuffEntity> findByDepartmentIdAndName(UUID departmentId, String name);
 
-    boolean existsByDepartmentIdAndName(int departmentId, String name);
+    boolean existsByDepartmentIdAndName(UUID departmentId, String name);
 }

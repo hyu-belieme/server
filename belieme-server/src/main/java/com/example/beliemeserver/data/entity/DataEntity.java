@@ -2,10 +2,10 @@ package com.example.beliemeserver.data.entity;
 
 import java.io.Serializable;
 
-public abstract class DataEntity implements Serializable {
-    public abstract int getId();
+public abstract class DataEntity<T> implements Serializable {
+    public abstract T getId();
 
-    public static Integer getIdOrElse(DataEntity dataEntity, Integer otherValue) {
+    public static <T> T getIdOrElse(DataEntity<T> dataEntity, T otherValue) {
         if (dataEntity == null) {
             return otherValue;
         }

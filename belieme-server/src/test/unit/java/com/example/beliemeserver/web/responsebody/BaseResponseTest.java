@@ -25,8 +25,8 @@ public class BaseResponseTest {
         System.out.println("JSON : " + json.toString());
         System.out.println();
 
-        Assertions.assertThat(json.containsKey("code")).isTrue();
-        Assertions.assertThat(json.get("code")).isEqualTo(university.code());
+        Assertions.assertThat(json.containsKey("id")).isTrue();
+        Assertions.assertThat(json.get("id")).isEqualTo(university.id().toString());
 
         Assertions.assertThat(json.containsKey("name")).isTrue();
         Assertions.assertThat(json.get("name")).isEqualTo(university.name());
@@ -73,6 +73,10 @@ public class BaseResponseTest {
 
         userInfoJsonCmpAssertions(json, user);
 
+        Assertions.assertThat(json.containsKey("university")).isTrue();
+        JSONObject univJson = (JSONObject) json.get("university");
+        basicUnivJsonCmpAssertions(univJson, user.university());
+
         Assertions.assertThat(json.containsKey("authorities")).isTrue();
         JSONArray jsonArray = (JSONArray) json.get("authorities");
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -96,6 +100,10 @@ public class BaseResponseTest {
         System.out.println();
 
         userInfoJsonCmpAssertions(json, user);
+
+        Assertions.assertThat(json.containsKey("university")).isTrue();
+        JSONObject univJson = (JSONObject) json.get("university");
+        basicUnivJsonCmpAssertions(univJson, user.university());
 
         Assertions.assertThat(json.containsKey("authorities")).isFalse();
         Assertions.assertThat(json.containsKey("token")).isFalse();
@@ -302,8 +310,8 @@ public class BaseResponseTest {
     }
 
     private void deptInfoJsonCmpAssertions(JSONObject json, DepartmentDto department) {
-        Assertions.assertThat(json.containsKey("code")).isTrue();
-        Assertions.assertThat(json.get("code")).isEqualTo(department.code());
+        Assertions.assertThat(json.containsKey("id")).isTrue();
+        Assertions.assertThat(json.get("id")).isEqualTo(department.id().toString());
 
         Assertions.assertThat(json.containsKey("name")).isTrue();
         Assertions.assertThat(json.get("name")).isEqualTo(department.name());
@@ -316,9 +324,8 @@ public class BaseResponseTest {
     }
 
     private void userInfoJsonCmpAssertions(JSONObject json, UserDto user) {
-        Assertions.assertThat(json.containsKey("university")).isTrue();
-        JSONObject univJson = (JSONObject) json.get("university");
-        basicUnivJsonCmpAssertions(univJson, user.university());
+        Assertions.assertThat(json.containsKey("id")).isTrue();
+        Assertions.assertThat(json.get("id")).isEqualTo(user.id().toString());
 
         Assertions.assertThat(json.containsKey("studentId")).isTrue();
         Assertions.assertThat(json.get("studentId")).isEqualTo(user.studentId());
@@ -335,6 +342,9 @@ public class BaseResponseTest {
     }
 
     private void stuffInfoJsonCmpAssertions(JSONObject json, StuffDto stuff) {
+        Assertions.assertThat(json.containsKey("id")).isTrue();
+        Assertions.assertThat(json.get("id")).isEqualTo(stuff.id().toString());
+
         Assertions.assertThat(json.containsKey("name")).isTrue();
         Assertions.assertThat(json.get("name")).isEqualTo(stuff.name());
 
@@ -349,6 +359,9 @@ public class BaseResponseTest {
     }
 
     private void itemInfoJsonCmpAssertions(JSONObject json, ItemDto item) {
+        Assertions.assertThat(json.containsKey("id")).isTrue();
+        Assertions.assertThat(json.get("id")).isEqualTo(item.id().toString());
+
         Assertions.assertThat(json.containsKey("num")).isTrue();
         Assertions.assertThat(json.get("num")).isEqualTo((long) item.num());
 
@@ -357,6 +370,9 @@ public class BaseResponseTest {
     }
 
     private void historyInfoJsonCmpAssertions(JSONObject json, HistoryDto history) {
+        Assertions.assertThat(json.containsKey("id")).isTrue();
+        Assertions.assertThat(json.get("id")).isEqualTo(history.id().toString());
+
         Assertions.assertThat(json.containsKey("num")).isTrue();
         Assertions.assertThat(json.get("num")).isEqualTo((long) history.num());
 

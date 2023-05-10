@@ -3,10 +3,13 @@ package com.example.beliemeserver.data.entity;
 import com.example.beliemeserver.domain.dto.HistoryDto;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.UserDto;
-import lombok.*;
-import lombok.experimental.Accessors;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.ToString;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "history", uniqueConstraints = {
@@ -18,52 +21,46 @@ import jakarta.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
-@Accessors(chain = true)
-public class HistoryEntity extends DataEntity {
+public class HistoryEntity extends DataEntity<UUID> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+    @NonNull
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
-    @Column(name = "item_id")
-    private int itemId;
+    @NonNull
+    @Column(name = "item_id", columnDefinition = "BINARY(16)")
+    private UUID itemId;
 
-    @Setter
     @Column(name = "num")
     private int num;
 
-    @Column(name = "requester_id")
-    private Integer requesterId;
+    @Column(name = "requester_id", columnDefinition = "BINARY(16)")
+    private UUID requesterId;
 
-    @Column(name = "approve_manager_id")
-    private Integer approveManagerId;
+    @Column(name = "approve_manager_id", columnDefinition = "BINARY(16)")
+    private UUID approveManagerId;
 
-    @Column(name = "return_manager_id")
-    private Integer returnManagerId;
+    @Column(name = "return_manager_id", columnDefinition = "BINARY(16)")
+    private UUID returnManagerId;
 
-    @Column(name = "lost_manager_id")
-    private Integer lostManagerId;
+    @Column(name = "lost_manager_id", columnDefinition = "BINARY(16)")
+    private UUID lostManagerId;
 
-    @Column(name = "cancel_manager_id")
-    private Integer cancelManagerId;
+    @Column(name = "cancel_manager_id", columnDefinition = "BINARY(16)")
+    private UUID cancelManagerId;
 
-    @Setter
     @Column(name = "requested_at")
     private long requestedAt;
 
-    @Setter
     @Column(name = "approved_at")
     private long approvedAt;
 
-    @Setter
     @Column(name = "returned_at")
     private long returnedAt;
 
-    @Setter
     @Column(name = "lost_at")
     private long lostAt;
 
-    @Setter
     @Column(name = "canceled_at")
     private long canceledAt;
 
@@ -93,65 +90,90 @@ public class HistoryEntity extends DataEntity {
     private UserEntity cancelManager;
 
     public HistoryEntity(
-            @NonNull ItemEntity item, int num, UserEntity requester, UserEntity approveManager,
+            @NonNull UUID id, @NonNull ItemEntity item, int num, UserEntity requester, UserEntity approveManager,
             UserEntity returnManager, UserEntity lostManager, UserEntity cancelManager,
             long requestedAt, long approvedAt, long returnedAt,
             long lostAt, long canceledAt
     ) {
-        setItem(item);
-        setNum(num);
+        this.id = id;
 
-        setRequester(requester);
-        setApproveManager(approveManager);
-        setReturnManager(returnManager);
-        setLostManager(lostManager);
-        setCancelManager(cancelManager);
-
-        setRequestedAt(requestedAt);
-        setApprovedAt(approvedAt);
-        setReturnedAt(returnedAt);
-        setLostAt(lostAt);
-        setCanceledAt(canceledAt);
-    }
-
-    public HistoryEntity setItem(@NonNull ItemEntity item) {
         this.item = item;
         this.itemId = item.getId();
-        return this;
-    }
 
-    public HistoryEntity setRequester(UserEntity requester) {
+        this.num = num;
+
         this.requester = requester;
         this.requesterId = getIdOrElse(requester, null);
-        return this;
-    }
 
-    public HistoryEntity setApproveManager(UserEntity approveManager) {
         this.approveManager = approveManager;
         this.approveManagerId = getIdOrElse(approveManager, null);
-        return this;
-    }
 
-    public HistoryEntity setReturnManager(UserEntity returnManager) {
         this.returnManager = returnManager;
         this.returnManagerId = getIdOrElse(returnManager, null);
-        return this;
-    }
 
-    public HistoryEntity setLostManager(UserEntity lostManager) {
         this.lostManager = lostManager;
         this.lostManagerId = getIdOrElse(lostManager, null);
-        return this;
-    }
 
-    public HistoryEntity setCancelManager(UserEntity cancelManager) {
         this.cancelManager = cancelManager;
         this.cancelManagerId = getIdOrElse(cancelManager, null);
-        return this;
+
+        this.requestedAt = requestedAt;
+        this.approvedAt = approvedAt;
+        this.returnedAt = returnedAt;
+        this.lostAt = lostAt;
+        this.canceledAt = canceledAt;
+    }
+
+    public HistoryEntity withItem(@NonNull ItemEntity item) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withNum(int num) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withRequester(UserEntity requester) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withApproveManager(UserEntity approveManager) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withReturnManager(UserEntity returnManager) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withLostManager(UserEntity lostManager) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withCancelManager(UserEntity cancelManager) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withRequestedAt(long requestedAt) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withApprovedAt(long approvedAt) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+    public HistoryEntity withReturnedAt(long returnedAt) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withLostAt(long lostAt) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
+    }
+
+    public HistoryEntity withCanceledAt(long canceledAt) {
+        return new HistoryEntity(id, item, num, requester, approveManager, returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt);
     }
 
     public HistoryDto toHistoryDto() {
         return new HistoryDto(
+                id,
                 item.toItemDto(),
                 num,
                 getUserDtoOrNull(requester),
@@ -169,6 +191,7 @@ public class HistoryEntity extends DataEntity {
 
     public HistoryDto toHistoryDtoNestedToItem() {
         return new HistoryDto(
+                id,
                 ItemDto.nestedEndpoint,
                 num,
                 getUserDtoOrNull(requester),

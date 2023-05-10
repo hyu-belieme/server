@@ -4,9 +4,9 @@ import com.example.beliemeserver.domain.dto.HistoryDto;
 import com.example.beliemeserver.domain.dto.ItemDto;
 import com.example.beliemeserver.domain.dto.StuffDto;
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name = "item", uniqueConstraints = {
@@ -18,22 +18,22 @@ import jakarta.persistence.*;
 @NoArgsConstructor
 @ToString
 @Getter
-@Accessors(chain = true)
-public class ItemEntity extends DataEntity {
+public class ItemEntity extends DataEntity<UUID> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
+    @NonNull
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
-    @Column(name = "stuff_id")
-    private int stuffId;
+    @NonNull
+    @Column(name = "stuff_id", columnDefinition = "BINARY(16)")
+    private UUID stuffId;
 
     @Setter
     @Column(name = "num")
     private int num;
 
-    @Column(name = "last_history_id")
-    private Integer lastHistoryId;
+    @Column(name = "last_history_id", columnDefinition = "BINARY(16)")
+    private UUID lastHistoryId;
 
     @NonNull
     @ManyToOne
@@ -44,7 +44,8 @@ public class ItemEntity extends DataEntity {
     @JoinColumn(name = "last_history_id", referencedColumnName = "id", insertable = false, updatable = false)
     private HistoryEntity lastHistory;
 
-    public ItemEntity(@NonNull StuffEntity stuff, int num, HistoryEntity lastHistory) {
+    public ItemEntity(UUID id, @NonNull StuffEntity stuff, int num, HistoryEntity lastHistory) {
+        this.id = id;
         this.stuff = stuff;
         this.stuffId = stuff.getId();
         this.num = num;
@@ -52,21 +53,22 @@ public class ItemEntity extends DataEntity {
         this.lastHistoryId = getIdOrElse(lastHistory, null);
     }
 
-    public ItemEntity setStuff(@NonNull StuffEntity stuff) {
-        this.stuff = stuff;
-        this.stuffId = stuff.getId();
-        return this;
+    public ItemEntity withStuff(@NonNull StuffEntity stuff) {
+        return new ItemEntity(id, stuff, num, lastHistory);
     }
 
-    public ItemEntity setLastHistory(HistoryEntity lastHistory) {
-        this.lastHistory = lastHistory;
-        this.lastHistoryId = getIdOrElse(lastHistory, null);
-        return this;
+    public ItemEntity withNum(int num) {
+        return new ItemEntity(id, stuff, num, lastHistory);
+    }
+
+    public ItemEntity withLastHistory(HistoryEntity lastHistory) {
+        return new ItemEntity(id, stuff, num, lastHistory);
     }
 
     public ItemDto toItemDto() {
         HistoryDto lastHistoryDto = getLastHistoryDto();
         return new ItemDto(
+                id,
                 stuff.toStuffDto(),
                 num,
                 lastHistoryDto
@@ -76,6 +78,7 @@ public class ItemEntity extends DataEntity {
     public ItemDto toItemDtoNestedToStuff() {
         HistoryDto lastHistoryDto = getLastHistoryDto();
         return new ItemDto(
+                id,
                 StuffDto.nestedEndpoint,
                 num,
                 lastHistoryDto

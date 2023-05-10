@@ -1,39 +1,45 @@
 package com.example.beliemeserver.domain.dao;
 
 import com.example.beliemeserver.domain.dto.HistoryDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface HistoryDao {
     @Transactional
     List<HistoryDto> getAllList();
 
     @Transactional
-    List<HistoryDto> getListByDepartment(String universityCode, String departmentCode);
+    List<HistoryDto> getListByDepartment(@NonNull UUID departmentId);
 
     @Transactional
-    List<HistoryDto> getListByStuff(String universityCode,
-                                    String departmentCode, String stuffName);
+    List<HistoryDto> getListByStuff(@NonNull UUID stuffId);
 
     @Transactional
-    List<HistoryDto> getListByItem(String universityCode, String departmentCode,
-                                   String stuffName, int itemNum);
+    List<HistoryDto> getListByItem(@NonNull UUID itemId);
 
     @Transactional
     List<HistoryDto> getListByDepartmentAndRequester(
-            String universityCodeForDepartment, String departmentCode,
-            String universityCodeForUser, String requesterStudentId);
+            @NonNull UUID departmentId, @NonNull UUID requesterId);
 
     @Transactional
-    HistoryDto getByIndex(String universityCode, String departmentCode,
-                          String stuffName, int itemNum, int historyNum);
+    HistoryDto getById(@NonNull UUID historyId);
 
     @Transactional
-    HistoryDto create(HistoryDto newHistory);
+    HistoryDto create(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    );
 
     @Transactional
-    HistoryDto update(String universityCode, String departmentCode,
-                      String stuffName, int itemNum,
-                      int historyNum, HistoryDto newHistory);
+    HistoryDto update(
+            @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+            UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
+            UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
+            long lostAt, long canceledAt
+    );
 }

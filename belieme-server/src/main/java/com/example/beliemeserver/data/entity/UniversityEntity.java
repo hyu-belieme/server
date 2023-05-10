@@ -1,25 +1,26 @@
 package com.example.beliemeserver.data.entity;
 
 import com.example.beliemeserver.domain.dto.UniversityDto;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
-@Table(name = "university")
+@Table(name = "university", uniqueConstraints= {
+        @UniqueConstraint(
+                name = "university_index",
+                columnNames = {"name"}
+        )
+})
 @NoArgsConstructor
+@ToString
 @Getter
-public class UniversityEntity extends DataEntity {
+public class UniversityEntity extends DataEntity<UUID> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private int id;
-
     @NonNull
-    @Column(name = "code")
-    private String code;
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     @NonNull
     @Column(name = "name")
@@ -28,32 +29,21 @@ public class UniversityEntity extends DataEntity {
     @Column(name = "api_url")
     private String apiUrl;
 
-    public UniversityEntity(String code, String name, String apiUrl) {
-        this.code = code;
+    public UniversityEntity(@NonNull UUID id, @NonNull String name, String apiUrl) {
+        this.id = id;
         this.name = name;
         this.apiUrl = apiUrl;
     }
 
-    public UniversityEntity setCode(String code) {
-        this.code = code;
-        return this;
+    public UniversityEntity withName(@NonNull String name) {
+        return new UniversityEntity(id, name, apiUrl);
     }
 
-    public UniversityEntity setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    public UniversityEntity setApiUrl(String apiUrl) {
-        this.apiUrl = apiUrl;
-        return this;
+    public UniversityEntity withApiUrl(String apiUrl) {
+        return new UniversityEntity(id, name, apiUrl);
     }
 
     public UniversityDto toUniversityDto() {
-        return new UniversityDto(
-                code,
-                name,
-                apiUrl
-        );
+        return new UniversityDto(id, name, apiUrl);
     }
 }

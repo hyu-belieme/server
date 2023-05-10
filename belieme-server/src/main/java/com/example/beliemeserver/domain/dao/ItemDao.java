@@ -1,26 +1,25 @@
 package com.example.beliemeserver.domain.dao;
 
 import com.example.beliemeserver.domain.dto.ItemDto;
+import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ItemDao {
     @Transactional
     List<ItemDto> getAllList();
 
     @Transactional
-    List<ItemDto> getListByStuff(String universityCode,
-                                 String departmentCode, String stuffName);
+    List<ItemDto> getListByStuff(@NonNull UUID stuffId);
 
     @Transactional
-    ItemDto getByIndex(String universityCode, String departmentCode,
-                       String stuffName, int itemNum);
+    ItemDto getById(@NonNull UUID itemId);
 
     @Transactional
-    ItemDto create(ItemDto newItem);
+    ItemDto create(@NonNull UUID itemId, @NonNull UUID stuffId, int num);
 
     @Transactional
-    ItemDto update(String universityCode, String departmentCode,
-                   String stuffName, int itemNum, ItemDto newItem);
+    ItemDto update(@NonNull UUID itemId, @NonNull UUID stuffId, int num, UUID lastHistoryId);
 }
