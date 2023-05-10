@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "authority", uniqueConstraints = {
+@Table(name = "AUTHORITY_", uniqueConstraints = {
         @UniqueConstraint(
                 name = "authority_index",
                 columnNames = {"department_id", "permission"}
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Getter
 public class AuthorityEntity extends DataEntity<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id")
     private Integer id;
 

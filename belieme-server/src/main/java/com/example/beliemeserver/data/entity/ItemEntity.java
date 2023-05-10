@@ -9,7 +9,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "item", uniqueConstraints = {
+@Table(name = "ITEM_", uniqueConstraints = {
         @UniqueConstraint(
                 name = "item_index",
                 columnNames = {"stuff_id", "num"}

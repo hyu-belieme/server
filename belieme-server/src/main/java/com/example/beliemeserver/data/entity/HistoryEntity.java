@@ -12,7 +12,7 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "history", uniqueConstraints = {
+@Table(name = "HISTORY_", uniqueConstraints = {
         @UniqueConstraint(
                 name = "history_index",
                 columnNames = {"item_id", "num"}

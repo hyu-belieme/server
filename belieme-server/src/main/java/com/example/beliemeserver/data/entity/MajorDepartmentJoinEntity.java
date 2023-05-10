@@ -9,13 +9,13 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "major_department_join")
+@Table(name = "MAJOR_DEPARTMENT_JOIN_")
 @NoArgsConstructor
 @Getter
 @ToString
 public class MajorDepartmentJoinEntity extends DataEntity<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column
     private Integer id;
 
