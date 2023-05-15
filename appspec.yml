@@ -1,17 +1,24 @@
-version: 1.0
+version: 0.0
 os: linux
+
 files:
-  - source: /
+  - source:  /
     destination: /home/app
     overwrite: yes
+
 permissions:
   - object: /
     pattern: "**"
     owner: root
     group: root
+
 hooks:
-  AfterInstall:
+  ApplicationStop:
     - location: scripts/stop_server.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: scripts/build_server.sh
       timeout: 300
       runas: root
   ApplicationStart:
