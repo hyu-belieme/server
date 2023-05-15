@@ -30,6 +30,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+
+    - run: gradle init
   
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
