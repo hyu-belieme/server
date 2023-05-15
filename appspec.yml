@@ -15,13 +15,13 @@ permissions:
 hooks:
   ApplicationStop:
     - location: scripts/stop_server.sh
-      timeout: 300
+      timeout: 60
       runas: root
   AfterInstall:
     - location: scripts/build_server.sh
-      timeout: 300
+      timeout: 60
       runas: root
   ApplicationStart:
     - location: scripts/start_server.sh
-      timeout: 300
+      timeout: 60
       runas: root
