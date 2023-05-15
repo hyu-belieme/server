@@ -6,7 +6,7 @@ TIME_NOW=$(date +%c)
 # build
 cd $PROJECT_ROOT
 echo "$TIME_NOW > 빌드 시작" > $BUILD_LOG
-./gradlew build -x test >> $BUILD_LOG
+sudo ./gradlew build -x test >> $BUILD_LOG
 
 # build 후 잔여 process 강제 종료
 REMAIN_PID=$(pgrep -f "gradle")
