@@ -1,5 +1,0 @@
-cors:
-  registration-infos:
-    - mapping : "/**"
-      allowed-origins : ["*"]
-      allowed-methods : ["*"]
