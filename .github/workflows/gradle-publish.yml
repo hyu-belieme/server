@@ -17,18 +17,22 @@ permissions:
   contents: read
 
 jobs:
-  build:
-
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
+
     - run: gradle init
+
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
@@ -37,14 +41,22 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.AWS_IAM_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_IAM_ACCESS_KEY_PW }}
-        aws-region: ap-northeast-2
+        aws-access-key-id: ${{ secrets.SERVER_AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SERVER_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ vars.AWS_REGION }}
 
     - name: Upload to AWS S3
       run: |
         aws deploy push \
-          --application-name belieme-server \
+          --application-name ${{ vars.CODE_DEPLOY_APPLICATION_NAME }} \
           --ignore-hidden-files \
-          --s3-location s3://belieme-server/$GITHUB_SHA.zip \
-          --source .
+          --s3-location s3://${{ vars.S3_BUCKET_NAME }}/$GITHUB_SHA.zip \
+          --source . 
+
+    - name: Deploy to AWS EC2 from S3
+      run: |
+        aws deploy create-deployment \
+          --application-name ${{ vars.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name ${{ vars.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --s3-location bucket=${{ vars.S3_BUCKET_NAME }},key=$GITHUB_SHA.zip,bundleType=zip
