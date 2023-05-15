@@ -7,11 +7,8 @@ assignees: ESeokhwan
 
 ---
 
-## Description
+## Overview
 
-> Describe what to do.
+## Describe the solution you'd like
 
-## Progress
-- [ ] TODO 1
-- [ ] TODO 2
-- [ ] TODO 3
+## Additional context
