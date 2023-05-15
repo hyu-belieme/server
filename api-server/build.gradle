@@ -60,9 +60,9 @@ dependencies {
     testImplementation 'org.mockito:mockito-inline:5.2.0'
 }
 
-group = 'com.example'
+group = 'com.belieme'
 version = '0.0.1-SNAPSHOT'
-description = 'belieme-server'
+description = 'api-server'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 publishing {
