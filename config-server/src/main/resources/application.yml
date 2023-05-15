@@ -11,4 +11,4 @@ spring:
           default-label: main
           uri: git@github.com:hyu-belieme/server-cloud-config.git
           search-paths: /**
-          basedir: ./repo
+          basedir: ./config_cache
