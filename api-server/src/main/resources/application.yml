@@ -1,4 +1,5 @@
 server:
+  port: 8080
   tomcat:
     uri-encoding: UTF-8
 
@@ -13,6 +14,7 @@ spring:
     active: api, cors
     include:
       - connection
+      - actuator
   config:
     import: optional:configserver:http://localhost:8888, classpath:secret/inits/init.yml
   data:
@@ -34,9 +36,9 @@ spring:
     use-code-as-default-message: true
     fallback-to-system-locale: true
 
-
 management:
   endpoints:
-    web:
+    enabled-by-default: false
+    jmx:
       exposure:
-        include: health,info,refresh
+        exclude: "*"

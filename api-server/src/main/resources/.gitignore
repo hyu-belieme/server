@@ -1,2 +1,3 @@
 application-connection.yml
+application-actuator.yml
 secret/
