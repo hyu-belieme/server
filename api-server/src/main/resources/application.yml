@@ -15,6 +15,7 @@ spring:
     include:
       - datasource
       - actuator
+      - jasypt
   config:
     import: optional:configserver:http://localhost:8888
   data:

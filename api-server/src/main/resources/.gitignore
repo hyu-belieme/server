@@ -1,3 +1,4 @@
 application-datasource.yml
 application-actuator.yml
+application-jasypt.yml
 secret/
