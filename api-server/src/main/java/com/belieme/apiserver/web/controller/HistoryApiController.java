@@ -47,7 +47,7 @@ public class HistoryApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID historyId = toUUID(params.get(api.variable().historyIndex()));
+        UUID historyId = toUUID(params.get(api.getVariable().historyIndex()));
 
         HistoryDto historyDto = historyService.getById(userToken, historyId);
         HistoryResponse response = HistoryResponse.from(historyDto);

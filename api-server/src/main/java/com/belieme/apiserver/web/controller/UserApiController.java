@@ -43,7 +43,7 @@ public class UserApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID userId = toUUID(params.get(api.variable().userIndex()));
+        UUID userId = toUUID(params.get(api.getVariable().userIndex()));
 
         UserDto userDto = userService.getById(userToken, userId);
         UserResponse response = UserResponse.from(userDto).withoutSecureInfo();
@@ -64,7 +64,7 @@ public class UserApiController extends BaseApiController {
             @RequestHeader("${api.header.external-api-token}") String apiToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID universityId = toUUID(params.get(api.variable().universityIndex()));
+        UUID universityId = toUUID(params.get(api.getVariable().universityIndex()));
 
         UserDto userDto = userService.reloadInitialUser(universityId, apiToken);
         if (userDto != null) {

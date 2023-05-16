@@ -38,7 +38,7 @@ public class DepartmentApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID departmentId = toUUID(params.get(api.variable().departmentIndex()));
+        UUID departmentId = toUUID(params.get(api.getVariable().departmentIndex()));
 
         DepartmentDto departmentDto = departmentService.getById(userToken, departmentId);
         DepartmentResponse response = DepartmentResponse.from(departmentDto);
@@ -64,7 +64,7 @@ public class DepartmentApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(DepartmentUpdateValidationGroup.class) DepartmentRequest newDepartment
     ) {
-        UUID departmentId = toUUID(params.get(api.variable().departmentIndex()));
+        UUID departmentId = toUUID(params.get(api.getVariable().departmentIndex()));
 
         DepartmentDto newDepartmentDto = departmentService.update(
                 userToken, departmentId, newDepartment.getName(), newDepartment.getBaseMajors()

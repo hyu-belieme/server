@@ -39,4 +39,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,refresh,beans
+        include: health,info,refresh

@@ -1,14 +1,20 @@
 package com.belieme.apiserver.config.api;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
+@Getter
+@Setter
+@Component
 @ConfigurationProperties(prefix = "api")
-public record ApiConfig(
-        Keyword keyword,
-        Variable variable,
-        Query query,
-        Header header
-) {
+public class ApiConfig{
+    private Keyword keyword;
+    private Variable variable;
+    private Query query;
+    private Header header;
+
     public record Keyword(
             String university,
             String department,

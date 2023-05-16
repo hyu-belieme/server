@@ -43,7 +43,7 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID itemId = toUUID(params.get(api.variable().itemIndex()));
+        UUID itemId = toUUID(params.get(api.getVariable().itemIndex()));
 
         ItemDto itemDto = itemService.getById(userToken, itemId);
         ItemResponse response = ItemResponse.from(itemDto);
@@ -66,7 +66,7 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID itemId = toUUID(params.get(api.variable().itemIndex()));
+        UUID itemId = toUUID(params.get(api.getVariable().itemIndex()));
 
         HistoryDto historyDto = historyService.createReservationOnItem(userToken, itemId);
         HistoryResponse response = HistoryResponse.from(historyDto);
@@ -78,7 +78,7 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID itemId = toUUID(params.get(api.variable().itemIndex()));
+        UUID itemId = toUUID(params.get(api.getVariable().itemIndex()));
         HistoryDto historyDto = historyService.makeItemLost(userToken, itemId);
         HistoryResponse response = HistoryResponse.from(historyDto);
         return ResponseEntity.ok(response);
@@ -89,7 +89,7 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID itemId = toUUID(params.get(api.variable().itemIndex()));
+        UUID itemId = toUUID(params.get(api.getVariable().itemIndex()));
         HistoryDto historyDto = historyService.makeItemUsing(userToken, itemId);
         HistoryResponse response = HistoryResponse.from(historyDto);
         return ResponseEntity.ok(response);
@@ -100,7 +100,7 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID itemId = toUUID(params.get(api.variable().itemIndex()));
+        UUID itemId = toUUID(params.get(api.getVariable().itemIndex()));
         HistoryDto historyDto = historyService.makeItemReturn(userToken, itemId);
         HistoryResponse response = HistoryResponse.from(historyDto);
         return ResponseEntity.ok(response);
@@ -111,7 +111,7 @@ public class ItemApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID itemId = toUUID(params.get(api.variable().itemIndex()));
+        UUID itemId = toUUID(params.get(api.getVariable().itemIndex()));
         HistoryDto historyDto = historyService.makeItemCancel(userToken, itemId);
         HistoryResponse response = HistoryResponse.from(historyDto);
         return ResponseEntity.ok(response);

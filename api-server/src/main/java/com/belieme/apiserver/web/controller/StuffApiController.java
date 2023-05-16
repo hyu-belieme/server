@@ -45,7 +45,7 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID stuffId = toUUID(params.get(api.variable().stuffIndex()));
+        UUID stuffId = toUUID(params.get(api.getVariable().stuffIndex()));
 
         StuffDto stuffDto = stuffService.getById(userToken, stuffId);
         StuffResponse response = StuffResponse.from(stuffDto);
@@ -71,7 +71,7 @@ public class StuffApiController extends BaseApiController {
             @PathVariable Map<String, String> params,
             @RequestBody @Validated(StuffUpdateValidationGroup.class) StuffRequest newStuff
     ) {
-        UUID stuffId = toUUID(params.get(api.variable().stuffIndex()));
+        UUID stuffId = toUUID(params.get(api.getVariable().stuffIndex()));
 
         StuffDto stuffDto = stuffService.update(userToken, stuffId,
                 newStuff.getName(), newStuff.getThumbnail());
@@ -92,7 +92,7 @@ public class StuffApiController extends BaseApiController {
             @RequestHeader("${api.header.user-token}") String userToken,
             @PathVariable Map<String, String> params
     ) {
-        UUID stuffId = toUUID(params.get(api.variable().stuffIndex()));
+        UUID stuffId = toUUID(params.get(api.getVariable().stuffIndex()));
 
         HistoryDto historyDto = historyService.createReservationOnStuff(userToken, stuffId);
         HistoryResponse response = HistoryResponse.from(historyDto);
