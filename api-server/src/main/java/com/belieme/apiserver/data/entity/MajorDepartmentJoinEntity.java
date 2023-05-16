@@ -15,8 +15,13 @@ import java.util.UUID;
 @ToString
 public class MajorDepartmentJoinEntity extends DataEntity<Integer> {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "auto_increase_sequece_generator")
+    @SequenceGenerator(
+        name = "auto_increase_sequece_generator",
+        sequenceName = "GLOBAL_AUTO_INCREASE",
+        allocationSize = 1
+    )
+    @Column(name = "id")
     private Integer id;
 
     @NonNull
