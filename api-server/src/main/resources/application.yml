@@ -11,12 +11,12 @@ spring:
   application:
     name: belieme
   profiles:
-    active: api, cors
+    active: api, cors, init
     include:
       - datasource
       - actuator
   config:
-    import: optional:configserver:http://localhost:8888, classpath:secret/inits/init.yml
+    import: optional:configserver:http://localhost:8888
   data:
     jdbc:
       repositories.enabled: false
