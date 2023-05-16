@@ -7,11 +7,12 @@ logging:
     org.hibernate.SQL: debug
 
 spring:
+  application:
+    name: belieme
   profiles:
+    active: api, cors
     include:
       - connection
-  application:
-    name: cors, api
   config:
     import: optional:configserver:http://localhost:8888, classpath:secret/inits/init.yml
   data:
@@ -25,13 +26,6 @@ spring:
     init:
       encoding: UTF-8
 
-  #  # local DB
-#  datasource:
-#    url: jdbc:mysql://localhost:3306/belieme
-#    username: root
-#    password: localTest123
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-
   messages:
     basename: messages/message
     encoding: UTF-8
@@ -39,3 +33,10 @@ spring:
     always-use-message-format: true
     use-code-as-default-message: true
     fallback-to-system-locale: true
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,beans
