@@ -32,5 +32,5 @@ hooks:
       timeout: 60
       runas: root
     - location: scripts/start_api_server.sh
-      timeout: 60
+      timeout: 120
       runas: root
