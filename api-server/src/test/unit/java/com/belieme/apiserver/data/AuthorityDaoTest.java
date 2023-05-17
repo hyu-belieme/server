@@ -37,7 +37,7 @@ public class AuthorityDaoTest extends BaseDaoTest {
         @Test()
         @DisplayName("[SUCCESS]_[-]_[-]")
         public void SUCCESS() {
-            when(authRepository.findAll()).thenReturn(new ArrayList<>());
+            when(authRepository.findAll()).thenReturn(stub.ALL_AUTHS);
             TestHelper.listCompareTest(this::execMethod, toAuthorityDtoList(stub.ALL_AUTHS));
         }
     }
