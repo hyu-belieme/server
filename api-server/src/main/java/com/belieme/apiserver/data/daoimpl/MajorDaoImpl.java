@@ -23,10 +23,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
 
-  public MajorDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public MajorDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -63,11 +62,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
     checkMajorIdConflict(majorId);
     checkMajorConflict(university.getId(), majorCode);
 
-    MajorEntity newMajorEntity = new MajorEntity(
-        majorId,
-        university,
-        majorCode
-    );
+    MajorEntity newMajorEntity = new MajorEntity(majorId, university, majorCode);
 
     MajorEntity savedMajorEntity = majorRepository.save(newMajorEntity);
     return savedMajorEntity.toMajorDto();
@@ -82,9 +77,7 @@ public class MajorDaoImpl extends BaseDaoImpl implements MajorDao {
       checkMajorConflict(newUniversity.getId(), majorCode);
     }
 
-    MajorEntity updatedMajor = target
-        .withUniversity(newUniversity)
-        .withCode(majorCode);
+    MajorEntity updatedMajor = target.withUniversity(newUniversity).withCode(majorCode);
 
     return majorRepository.save(updatedMajor).toMajorDto();
   }

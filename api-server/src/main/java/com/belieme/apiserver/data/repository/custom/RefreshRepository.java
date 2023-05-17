@@ -1,11 +1,11 @@
 package com.belieme.apiserver.data.repository.custom;
 
+import java.io.Serializable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import java.io.Serializable;
-
 @NoRepositoryBean
 public interface RefreshRepository<T, ID extends Serializable> extends CrudRepository<T, ID> {
-    void refresh(T t);
+
+  void refresh(T t);
 }

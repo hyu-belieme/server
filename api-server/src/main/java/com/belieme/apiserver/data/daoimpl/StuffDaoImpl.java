@@ -24,10 +24,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
 
-  public StuffDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public StuffDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -70,12 +69,7 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
     checkStuffIdConflict(stuffId);
     checkStuffConflict(departmentId, name);
 
-    StuffEntity newStuffEntity = new StuffEntity(
-        stuffId,
-        departmentOfNewStuff,
-        name,
-        thumbnail
-    );
+    StuffEntity newStuffEntity = new StuffEntity(stuffId, departmentOfNewStuff, name, thumbnail);
     return stuffRepository.save(newStuffEntity).toStuffDto();
   }
 
@@ -90,15 +84,13 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
       checkStuffConflict(departmentOfNewStuff.getId(), newName);
     }
 
-    target = target.withDepartment(departmentOfNewStuff)
-        .withName(newName)
+    target = target.withDepartment(departmentOfNewStuff).withName(newName)
         .withThumbnail(newThumbnail);
     return stuffRepository.save(target).toStuffDto();
   }
 
   private boolean doesIndexChange(StuffEntity target, UUID newDepartmentId, String newName) {
-    return !(target.getDepartmentId().equals(newDepartmentId)
-        && target.getName().equals(newName));
+    return !(target.getDepartmentId().equals(newDepartmentId) && target.getName().equals(newName));
   }
 
   private void checkStuffIdConflict(UUID stuffId) {

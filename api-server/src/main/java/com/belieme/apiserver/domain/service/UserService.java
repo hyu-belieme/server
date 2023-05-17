@@ -37,25 +37,20 @@ public class UserService extends BaseService {
   public static final int HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND = 1900;
   public static final int HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND = 2500;
 
-  public UserService(
-      InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao,
-      UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao,
-      ItemDao itemDao, HistoryDao historyDao) {
+  public UserService(InitialDataConfig initialData, UniversityDao universityDao,
+      DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao,
+      StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
     super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao,
         itemDao, historyDao);
   }
 
-  public List<UserDto> getAllList(
-      @NonNull String userToken
-  ) {
+  public List<UserDto> getAllList(@NonNull String userToken) {
     UserDto requester = validateTokenAndGetUser(userToken);
     checkDeveloperPermission(requester);
     return userDao.getAllList();
   }
 
-  public List<UserDto> getListByDepartment(
-      @NonNull String userToken, @NonNull UUID departmentId
-  ) {
+  public List<UserDto> getListByDepartment(@NonNull String userToken, @NonNull UUID departmentId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
     checkMasterPermission(requester, department);
@@ -70,26 +65,18 @@ public class UserService extends BaseService {
     return output;
   }
 
-  public UserDto getById(
-      @NonNull String userToken, @NonNull UUID userId
-  ) {
+  public UserDto getById(@NonNull String userToken, @NonNull UUID userId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     checkDeveloperPermission(requester);
     return userDao.getById(userId);
   }
 
-  public UserDto getByToken(
-      @NonNull String userToken
-  ) {
+  public UserDto getByToken(@NonNull String userToken) {
     return validateTokenAndGetUser(userToken);
   }
 
-  public UserDto updateAuthorityOfUser(
-      @NonNull String userToken,
-      @NonNull UUID userId,
-      @NonNull UUID departmentId,
-      Permission newPermission
-  ) {
+  public UserDto updateAuthorityOfUser(@NonNull String userToken, @NonNull UUID userId,
+      @NonNull UUID departmentId, Permission newPermission) {
     UserDto requester = validateTokenAndGetUser(userToken);
 
     DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
@@ -112,17 +99,10 @@ public class UserService extends BaseService {
       }
     }
 
-    return userDao.update(
-        userId,
-        targetUser.university().id(),
-        targetUser.studentId(),
-        targetUser.name(),
-        targetUser.entranceYear(),
-        UUID.randomUUID().toString(),
-        targetUser.createdAt(),
-        currentTime(),
-        updateAuthorities(targetUser.authorities(), department, newPermission)
-    );
+    return userDao.update(userId, targetUser.university().id(), targetUser.studentId(),
+        targetUser.name(), targetUser.entranceYear(), UUID.randomUUID().toString(),
+        targetUser.createdAt(), currentTime(),
+        updateAuthorities(targetUser.authorities(), department, newPermission));
   }
 
   private List<AuthorityDto> updateAuthorities(List<AuthorityDto> authorities,
@@ -158,23 +138,21 @@ public class UserService extends BaseService {
   UserDto reloadInitialUser(@NonNull UUID universityId, @NonNull String apiToken) {
     UserInfo targetUserInfo = null;
     for (UserInfo userInfo : initialData.userInfos()) {
-      if (universityId.equals(userInfo.universityId())
-          && userInfo.apiToken().equals(apiToken)) {
+      if (universityId.equals(userInfo.universityId()) && userInfo.apiToken().equals(apiToken)) {
         targetUserInfo = userInfo;
         break;
       }
     }
-      if (targetUserInfo == null) {
-          return null;
-      }
+    if (targetUserInfo == null) {
+      return null;
+    }
     return updateOrCreateUser(targetUserInfo);
   }
 
   public UserDto reloadHanyangUniversityUser(@NonNull String apiToken) {
     UniversityInfo hyuInfo = initialData.universityInfos().get(HANYANG_UNIVERSITY_KEY);
     JSONObject jsonResponse = HttpRequest.getUserInfoFromHanyangApi(
-        hyuInfo.externalApiInfo().get("url"),
-        hyuInfo.externalApiInfo().get("client-key"),
+        hyuInfo.externalApiInfo().get("url"), hyuInfo.externalApiInfo().get("client-key"),
         apiToken);
     String studentId = (String) (jsonResponse.get("gaeinNo"));
     String name = (String) (jsonResponse.get("userNm"));
@@ -193,24 +171,18 @@ public class UserService extends BaseService {
     } catch (Exception ignored) {
     }
 
-      if (entranceYear > HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND
-          && entranceYear < HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND) {
-          return entranceYear;
-      }
+    if (entranceYear > HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND
+        && entranceYear < HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND) {
+      return entranceYear;
+    }
     return 0;
   }
 
   private UserDto updateOrCreateUser(UserInfo userInfo) {
     UserDto targetUser = getOrNull(userInfo.id());
-    return updateOrCreateUser(
-        targetUser,
-        userInfo.id(),
-        userInfo.universityId(),
-        userInfo.studentId(),
-        userInfo.name(),
-        userInfo.entranceYear(),
-        toAuthorityDtoList(userInfo.authorities())
-    );
+    return updateOrCreateUser(targetUser, userInfo.id(), userInfo.universityId(),
+        userInfo.studentId(), userInfo.name(), userInfo.entranceYear(),
+        toAuthorityDtoList(userInfo.authorities()));
   }
 
   private UserDto updateOrCreateUser(UUID universityId, String studentId, String name,
@@ -218,50 +190,25 @@ public class UserService extends BaseService {
     UserDto targetUser = getOrNull(universityId, studentId);
 
     List<AuthorityDto> oldAuthorities = new ArrayList<>();
-      if (targetUser != null) {
-          oldAuthorities = targetUser.authorities();
-      }
+    if (targetUser != null) {
+      oldAuthorities = targetUser.authorities();
+    }
 
-    return updateOrCreateUser(
-        targetUser,
-        null,
-        universityId,
-        studentId,
-        name,
-        entranceYear,
-        makeNewAuthorities(oldAuthorities, universityId, majorCodes)
-    );
+    return updateOrCreateUser(targetUser, null, universityId, studentId, name, entranceYear,
+        makeNewAuthorities(oldAuthorities, universityId, majorCodes));
   }
 
   private UserDto updateOrCreateUser(UserDto targetUser, UUID userId, UUID universityId,
       String studentId, String name, int entranceYear, List<AuthorityDto> authorities) {
-      if (userId == null) {
-          userId = UUID.randomUUID();
-      }
-    if (targetUser == null) {
-      return userDao.create(
-          userId,
-          universityId,
-          studentId,
-          name,
-          entranceYear,
-          UUID.randomUUID().toString(),
-          currentTime(),
-          currentTime(),
-          authorities
-      );
+    if (userId == null) {
+      userId = UUID.randomUUID();
     }
-    return userDao.update(
-        targetUser.id(),
-        universityId,
-        studentId,
-        name,
-        entranceYear,
-        UUID.randomUUID().toString(),
-        targetUser.createdAt(),
-        currentTime(),
-        authorities
-    );
+    if (targetUser == null) {
+      return userDao.create(userId, universityId, studentId, name, entranceYear,
+          UUID.randomUUID().toString(), currentTime(), currentTime(), authorities);
+    }
+    return userDao.update(targetUser.id(), universityId, studentId, name, entranceYear,
+        UUID.randomUUID().toString(), targetUser.createdAt(), currentTime(), authorities);
   }
 
   private UserDto getOrNull(UUID userId) {
@@ -298,9 +245,9 @@ public class UserService extends BaseService {
 
     List<DepartmentDto> candidateDepartments = departmentDao.getListByUniversity(universityId);
     for (DepartmentDto department : candidateDepartments) {
-        if (notContainAnyMajorCodesInBaseMajors(department, newMajorCodes)) {
-            continue;
-        }
+      if (notContainAnyMajorCodesInBaseMajors(department, newMajorCodes)) {
+        continue;
+      }
 
       AuthorityDto newAuthority = new AuthorityDto(department, Permission.DEFAULT);
       if (!newAuthorities.contains(newAuthority)) {
@@ -312,7 +259,6 @@ public class UserService extends BaseService {
 
   private boolean notContainAnyMajorCodesInBaseMajors(DepartmentDto department,
       List<String> majorCodes) {
-    return department.baseMajors().stream()
-        .noneMatch((major) -> majorCodes.contains(major.code()));
+    return department.baseMajors().stream().noneMatch((major) -> majorCodes.contains(major.code()));
   }
 }

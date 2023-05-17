@@ -1,28 +1,30 @@
 package com.belieme.apiserver.domain.dao;
 
 import com.belieme.apiserver.domain.dto.DepartmentDto;
+import java.util.List;
+import java.util.UUID;
 import lombok.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
-
 public interface DepartmentDao {
-    @Transactional
-    List<DepartmentDto> getAllList();
 
-    @Transactional
-    List<DepartmentDto> getListByUniversity(@NonNull UUID universityId);
+  @Transactional
+  List<DepartmentDto> getAllList();
 
-    @Transactional
-    DepartmentDto getById(@NonNull UUID departmentId);
+  @Transactional
+  List<DepartmentDto> getListByUniversity(@NonNull UUID universityId);
 
-    @Transactional
-    boolean checkExistById(@NonNull UUID id);
+  @Transactional
+  DepartmentDto getById(@NonNull UUID departmentId);
 
-    @Transactional
-    DepartmentDto create(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name, @NonNull List<UUID> majorId);
+  @Transactional
+  boolean checkExistById(@NonNull UUID id);
 
-    @Transactional
-    DepartmentDto update(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name, @NonNull List<UUID> majorId);
+  @Transactional
+  DepartmentDto create(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name,
+      @NonNull List<UUID> majorId);
+
+  @Transactional
+  DepartmentDto update(@NonNull UUID departmentId, @NonNull UUID universityId, @NonNull String name,
+      @NonNull List<UUID> majorId);
 }

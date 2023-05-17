@@ -59,33 +59,33 @@ public abstract class BaseDaoImpl {
   }
 
   protected void validateUniversityId(UUID universityId) {
-      if (!universityRepository.existsById(universityId)) {
-          throw new InvalidIndexException();
-      }
+    if (!universityRepository.existsById(universityId)) {
+      throw new InvalidIndexException();
+    }
   }
 
   protected void validateDepartmentId(UUID departmentId) {
-      if (!departmentRepository.existsById(departmentId)) {
-          throw new InvalidIndexException();
-      }
+    if (!departmentRepository.existsById(departmentId)) {
+      throw new InvalidIndexException();
+    }
   }
 
   protected void validateUserId(UUID userId) {
-      if (!userRepository.existsById(userId)) {
-          throw new InvalidIndexException();
-      }
+    if (!userRepository.existsById(userId)) {
+      throw new InvalidIndexException();
+    }
   }
 
   protected void validateStuffId(UUID stuffId) {
-      if (!stuffRepository.existsById(stuffId)) {
-          throw new InvalidIndexException();
-      }
+    if (!stuffRepository.existsById(stuffId)) {
+      throw new InvalidIndexException();
+    }
   }
 
   protected void validateItemId(UUID itemId) {
-      if (!itemRepository.existsById(itemId)) {
-          throw new InvalidIndexException();
-      }
+    if (!itemRepository.existsById(itemId)) {
+      throw new InvalidIndexException();
+    }
   }
 
   protected UniversityEntity findUniversityEntity(UUID id) {

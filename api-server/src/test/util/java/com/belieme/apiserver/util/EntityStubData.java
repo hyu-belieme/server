@@ -87,9 +87,7 @@ public class EntityStubData extends BaseEntityStub {
     SNU_UNIV = new UniversityEntity(UUID.fromString("507e25c4-9246-4863-bff8-059589989563"),
         "서울대학교", null);
 
-    tmpAllUnivs = List.of(
-        DEV_UNIV, HYU_UNIV, CKU_UNIV, SNU_UNIV
-    );
+    tmpAllUnivs = List.of(DEV_UNIV, HYU_UNIV, CKU_UNIV, SNU_UNIV);
 
     // Majors
     HYU_FH04067_MAJOR = new MajorEntity(UUID.fromString("edbbfebc-63b4-46e1-9753-67451d3614f8"),
@@ -105,10 +103,8 @@ public class EntityStubData extends BaseEntityStub {
     CKU_A70_MAJOR = new MajorEntity(UUID.fromString("40044cd4-f5e5-4a78-855c-4f4f52c92799"),
         CKU_UNIV, "A70");
 
-    tmpAllMajors = List.of(
-        HYU_FH04067_MAJOR, HYU_FH04068_MAJOR, HYU_FH04069_MAJOR, CKU_A68_MAJOR,
-        CKU_A69_MAJOR, CKU_A70_MAJOR
-    );
+    tmpAllMajors = List.of(HYU_FH04067_MAJOR, HYU_FH04068_MAJOR, HYU_FH04069_MAJOR, CKU_A68_MAJOR,
+        CKU_A69_MAJOR, CKU_A70_MAJOR);
 
     // Departments
     DEV_DEPT = new DepartmentEntity(UUID.fromString("8bdef44b-4849-4983-b2f7-5790e437c763"),
@@ -124,10 +120,8 @@ public class EntityStubData extends BaseEntityStub {
     CKU_STU_DEPT = new DepartmentEntity(UUID.fromString("65fd9185-48b6-407b-8bca-8177b4d64713"),
         CKU_UNIV, "총학생회");
 
-    tmpAllDepts = List.of(
-        DEV_DEPT, HYU_CSE_DEPT, HYU_ME_DEPT, HYU_ENG_DEPT,
-        CKU_MED_DEPT, CKU_STU_DEPT
-    );
+    tmpAllDepts = List.of(DEV_DEPT, HYU_CSE_DEPT, HYU_ME_DEPT, HYU_ENG_DEPT, CKU_MED_DEPT,
+        CKU_STU_DEPT);
 
     // Permissions
     List<Permission> permissions = Arrays.stream(Permission.values()).toList();
@@ -195,12 +189,10 @@ public class EntityStubData extends BaseEntityStub {
         CKU_UNIV, "C202201238", "전승용", 2022, "715a52ac-f312-4091-800c-475d9b727dbb", 1673155358,
         1673155358);
 
-    tmpAllUsers = List.of(
-        DEV_1_USER, DEV_2_USER, HYU_CSE_TESTER_1_USER, HYU_ME_TESTER_1_USER, HYU_CSE_MASTER_USER,
-        HYU_CSE_STAFF_USER, HYU_CSE_NORMAL_1_USER, HYU_CSE_NORMAL_2_USER, HYU_CSE_BANNED_USER,
-        HYU_DUMMY_USER_1, HYU_DUMMY_USER_2, HYU_DUMMY_USER_3, HYU_DUMMY_USER_4, CKU_DUMMY_USER_1,
-        CKU_DUMMY_USER_2, CKU_DUMMY_USER_3, CKU_DUMMY_USER_4, CKU_DUMMY_USER_5
-    );
+    tmpAllUsers = List.of(DEV_1_USER, DEV_2_USER, HYU_CSE_TESTER_1_USER, HYU_ME_TESTER_1_USER,
+        HYU_CSE_MASTER_USER, HYU_CSE_STAFF_USER, HYU_CSE_NORMAL_1_USER, HYU_CSE_NORMAL_2_USER,
+        HYU_CSE_BANNED_USER, HYU_DUMMY_USER_1, HYU_DUMMY_USER_2, HYU_DUMMY_USER_3, HYU_DUMMY_USER_4,
+        CKU_DUMMY_USER_1, CKU_DUMMY_USER_2, CKU_DUMMY_USER_3, CKU_DUMMY_USER_4, CKU_DUMMY_USER_5);
 
     // --------------------------------------------------------------------------------------
     // Stuffs init
@@ -238,13 +230,11 @@ public class EntityStubData extends BaseEntityStub {
     StuffEntity SOCCER_BALL_CKU_MED = new StuffEntity(
         UUID.fromString("eebb3378-3d04-4ba9-a1cc-297d2d0ab156"), CKU_MED_DEPT, "축구공", "⚽️️");
 
-    tmpAllStuffs = new ArrayList<>(List.of(
-        SPEAKER_HYU_CSE, UMBRELLA_HYU_CSE, PEN_HYU_CSE,
-        SCISSORS_HYU_CSE, SKATEBOARD_HYU_CSE, UMBRELLA_HYU_ME,
-        SCISSORS_HYU_ME, HAMMER_HYU_ME, UMBRELLA_HYU_ENG,
-        PEN_HYU_ENG, SCISSORS_HYU_ENG, CALCULATOR_HYU_ENG,
-        PEN_CKU_MED, SCISSORS_CKU_MED, SOCCER_BALL_CKU_MED
-    ));
+    tmpAllStuffs = new ArrayList<>(
+        List.of(SPEAKER_HYU_CSE, UMBRELLA_HYU_CSE, PEN_HYU_CSE, SCISSORS_HYU_CSE,
+            SKATEBOARD_HYU_CSE, UMBRELLA_HYU_ME, SCISSORS_HYU_ME, HAMMER_HYU_ME, UMBRELLA_HYU_ENG,
+            PEN_HYU_ENG, SCISSORS_HYU_ENG, CALCULATOR_HYU_ENG, PEN_CKU_MED, SCISSORS_CKU_MED,
+            SOCCER_BALL_CKU_MED));
 
     // --------------------------------------------------------------------------------------
     // Items Init
@@ -285,61 +275,41 @@ public class EntityStubData extends BaseEntityStub {
     ItemEntity SKATEBOARD_1_HYU_CSE = new ItemEntity(
         UUID.fromString("fde3b0bf-f1b4-4529-86df-844af597244a"), SKATEBOARD_HYU_CSE, 1, null);
 
-    tmpAllItems = new ArrayList<>(List.of(
-        SPEAKER_1_HYU_CSE, SPEAKER_2_HYU_CSE, UMBRELLA_1_HYU_CSE,
-        UMBRELLA_2_HYU_CSE, UMBRELLA_3_HYU_CSE, UMBRELLA_4_HYU_CSE,
-        PEN_1_HYU_CSE, PEN_2_HYU_CSE, PEN_3_HYU_CSE, PEN_4_HYU_CSE,
-        PEN_5_HYU_CSE, PEN_6_HYU_CSE, SCISSORS_1_HYU_CSE,
-        SCISSORS_2_HYU_CSE, SCISSORS_3_HYU_CSE, SKATEBOARD_1_HYU_CSE
-    ));
+    tmpAllItems = new ArrayList<>(
+        List.of(SPEAKER_1_HYU_CSE, SPEAKER_2_HYU_CSE, UMBRELLA_1_HYU_CSE, UMBRELLA_2_HYU_CSE,
+            UMBRELLA_3_HYU_CSE, UMBRELLA_4_HYU_CSE, PEN_1_HYU_CSE, PEN_2_HYU_CSE, PEN_3_HYU_CSE,
+            PEN_4_HYU_CSE, PEN_5_HYU_CSE, PEN_6_HYU_CSE, SCISSORS_1_HYU_CSE, SCISSORS_2_HYU_CSE,
+            SCISSORS_3_HYU_CSE, SKATEBOARD_1_HYU_CSE));
 
     // --------------------------------------------------------------------------------------
     // Histories Init
     HistoryEntity SPEAKER_1_1_EXPIRED_HYU_CSE = new HistoryEntity(
-        UUID.fromString("f820abeb-eaa3-4116-9850-d2d6867da7d8"),
-        SPEAKER_1_HYU_CSE, 1, HYU_CSE_NORMAL_1_USER,
-        null, null, null,
-        null, 1673155356, 0,
-        0, 0, 0
-    );
+        UUID.fromString("f820abeb-eaa3-4116-9850-d2d6867da7d8"), SPEAKER_1_HYU_CSE, 1,
+        HYU_CSE_NORMAL_1_USER, null, null, null, null, 1673155356, 0, 0, 0, 0);
 
     HistoryEntity SPEAKER_1_2_USING_HYU_CSE = new HistoryEntity(
-        UUID.fromString("d55195de-aa60-4dac-8bee-f04ddb713fa6"),
-        SPEAKER_1_HYU_CSE, 2, HYU_CSE_NORMAL_1_USER,
-        HYU_CSE_MASTER_USER, null, null,
-        null, 1673155193, 1673155275,
-        0, 0, 0
-    );
+        UUID.fromString("d55195de-aa60-4dac-8bee-f04ddb713fa6"), SPEAKER_1_HYU_CSE, 2,
+        HYU_CSE_NORMAL_1_USER, HYU_CSE_MASTER_USER, null, null, null, 1673155193, 1673155275, 0, 0,
+        0);
 
     HistoryEntity SPEAKER_2_1_LOST_HYU_CSE = new HistoryEntity(
-        UUID.fromString("dcf372d1-1df1-4e04-b2c5-68cdcf314bd8"),
-        SPEAKER_2_HYU_CSE, 1, HYU_CSE_NORMAL_2_USER,
-        HYU_CSE_STAFF_USER, null, HYU_CSE_MASTER_USER,
-        null, 1673195193, 1673195275,
-        0, 1673209275, 0
-    );
+        UUID.fromString("dcf372d1-1df1-4e04-b2c5-68cdcf314bd8"), SPEAKER_2_HYU_CSE, 1,
+        HYU_CSE_NORMAL_2_USER, HYU_CSE_STAFF_USER, null, HYU_CSE_MASTER_USER, null, 1673195193,
+        1673195275, 0, 1673209275, 0);
 
     HistoryEntity UMBRELLA_1_1_REQUESTED_HYU_CSE = new HistoryEntity(
-        UUID.fromString("a9b617f9-9a78-4691-b024-b79fd0b0d884"),
-        UMBRELLA_1_HYU_CSE, 1, HYU_CSE_NORMAL_2_USER,
-        null, null, null,
-        null, System.currentTimeMillis() / 1000, 0,
-        0, 0, 0
-    );
+        UUID.fromString("a9b617f9-9a78-4691-b024-b79fd0b0d884"), UMBRELLA_1_HYU_CSE, 1,
+        HYU_CSE_NORMAL_2_USER, null, null, null, null, System.currentTimeMillis() / 1000, 0, 0, 0,
+        0);
 
     HistoryEntity PEN_3_1_USING_HYU_CSE = new HistoryEntity(
-        UUID.fromString("e2e47347-8fed-4d62-b18b-dc8765add9ce"),
-        PEN_3_HYU_CSE, 1, HYU_CSE_NORMAL_2_USER,
-        HYU_CSE_STAFF_USER, null, null,
-        null, 1673195193, 1673195275,
-        0, 0, 0
-    );
+        UUID.fromString("e2e47347-8fed-4d62-b18b-dc8765add9ce"), PEN_3_HYU_CSE, 1,
+        HYU_CSE_NORMAL_2_USER, HYU_CSE_STAFF_USER, null, null, null, 1673195193, 1673195275, 0, 0,
+        0);
 
-    tmpAllHistories = new ArrayList<>(List.of(
-        SPEAKER_1_1_EXPIRED_HYU_CSE, SPEAKER_1_2_USING_HYU_CSE,
-        SPEAKER_2_1_LOST_HYU_CSE, UMBRELLA_1_1_REQUESTED_HYU_CSE,
-        PEN_3_1_USING_HYU_CSE
-    ));
+    tmpAllHistories = new ArrayList<>(
+        List.of(SPEAKER_1_1_EXPIRED_HYU_CSE, SPEAKER_1_2_USING_HYU_CSE, SPEAKER_2_1_LOST_HYU_CSE,
+            UMBRELLA_1_1_REQUESTED_HYU_CSE, PEN_3_1_USING_HYU_CSE));
     setUpRelations(tmpAllItems, tmpAllHistories);
 
     ALL_UNIVS = List.copyOf(tmpAllUnivs);

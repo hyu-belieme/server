@@ -25,10 +25,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
 
-  public AuthorityDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public AuthorityDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -60,10 +59,7 @@ public class AuthorityDaoImpl extends BaseDaoImpl implements AuthorityDao {
 
     checkAuthorityConflict(departmentOfAuthority.getId(), permission.name());
 
-    AuthorityEntity newAuthority = new AuthorityEntity(
-        departmentOfAuthority,
-        permission.name()
-    );
+    AuthorityEntity newAuthority = new AuthorityEntity(departmentOfAuthority, permission.name());
     return authorityRepository.save(newAuthority).toAuthorityDto();
   }
 

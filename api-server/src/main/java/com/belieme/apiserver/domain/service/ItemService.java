@@ -24,35 +24,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class ItemService extends BaseService {
 
-  public ItemService(
-      InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao,
-      UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao,
-      ItemDao itemDao, HistoryDao historyDao) {
+  public ItemService(InitialDataConfig initialData, UniversityDao universityDao,
+      DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao,
+      StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
     super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao,
         itemDao, historyDao);
   }
 
-  public List<ItemDto> getListByStuff(
-      @NonNull String userToken, @NonNull UUID stuffId
-  ) {
+  public List<ItemDto> getListByStuff(@NonNull String userToken, @NonNull UUID stuffId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     StuffDto targetStuff = getStuffOrThrowInvalidIndexException(stuffId);
     checkUserPermission(requester, targetStuff.department());
     return getItemListByStuffOrThrowInvalidIndexException(stuffId);
   }
 
-  public ItemDto getById(
-      @NonNull String userToken, @NonNull UUID itemId
-  ) {
+  public ItemDto getById(@NonNull String userToken, @NonNull UUID itemId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     ItemDto item = itemDao.getById(itemId);
     checkUserPermission(requester, item.stuff().department());
     return item;
   }
 
-  public ItemDto create(
-      @NonNull String userToken, @NonNull UUID stuffId
-  ) {
+  public ItemDto create(@NonNull String userToken, @NonNull UUID stuffId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
     checkStaffPermission(requester, stuff.department());

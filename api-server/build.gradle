@@ -13,7 +13,7 @@ ext {
     set('springCloudVersion', "2022.0.2")
 }
 
-sourceSets{
+sourceSets {
     test {
         java {
             srcDirs("src/test/integration/java")

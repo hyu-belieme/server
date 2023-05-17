@@ -23,17 +23,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class StuffService extends BaseService {
 
-  public StuffService(
-      InitialDataConfig initialData, UniversityDao universityDao, DepartmentDao departmentDao,
-      UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao, StuffDao stuffDao,
-      ItemDao itemDao, HistoryDao historyDao) {
+  public StuffService(InitialDataConfig initialData, UniversityDao universityDao,
+      DepartmentDao departmentDao, UserDao userDao, MajorDao majorDao, AuthorityDao authorityDao,
+      StuffDao stuffDao, ItemDao itemDao, HistoryDao historyDao) {
     super(initialData, universityDao, departmentDao, userDao, majorDao, authorityDao, stuffDao,
         itemDao, historyDao);
   }
 
-  public List<StuffDto> getListByDepartment(
-      @NonNull String userToken, @NonNull UUID departmentId
-  ) {
+  public List<StuffDto> getListByDepartment(@NonNull String userToken, @NonNull UUID departmentId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
     checkUserPermission(requester, department);
@@ -41,9 +38,7 @@ public class StuffService extends BaseService {
     return stuffDao.getListByDepartment(departmentId);
   }
 
-  public StuffDto getById(
-      @NonNull String userToken, @NonNull UUID stuffId
-  ) {
+  public StuffDto getById(@NonNull String userToken, @NonNull UUID stuffId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     StuffDto stuff = stuffDao.getById(stuffId);
     checkUserPermission(requester, stuff.department());
@@ -51,10 +46,8 @@ public class StuffService extends BaseService {
     return stuff;
   }
 
-  public StuffDto create(
-      @NonNull String userToken, @NonNull UUID departmentId,
-      @NonNull String name, @NonNull String thumbnail, Integer amount
-  ) {
+  public StuffDto create(@NonNull String userToken, @NonNull UUID departmentId,
+      @NonNull String name, @NonNull String thumbnail, Integer amount) {
     UserDto requester = validateTokenAndGetUser(userToken);
     System.out.println(departmentId);
     DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
@@ -76,10 +69,8 @@ public class StuffService extends BaseService {
     return newStuff;
   }
 
-  public StuffDto update(
-      @NonNull String userToken, @NonNull UUID stuffId,
-      String newName, String newThumbnail
-  ) {
+  public StuffDto update(@NonNull String userToken, @NonNull UUID stuffId, String newName,
+      String newThumbnail) {
     UserDto requester = validateTokenAndGetUser(userToken);
     StuffDto oldStuff = stuffDao.getById(stuffId);
     checkStaffPermission(requester, oldStuff.department());

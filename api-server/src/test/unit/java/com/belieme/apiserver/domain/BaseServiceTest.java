@@ -229,18 +229,15 @@ public abstract class BaseServiceTest {
   }
 
   protected UserDto randomUserHaveMorePermissionOnDept(DepartmentDto dept, Permission permission) {
-    return randomSelectAndLog(
-        usersHaveMorePermissionOnDept(allUsers(), dept, permission));
+    return randomSelectAndLog(usersHaveMorePermissionOnDept(allUsers(), dept, permission));
   }
 
   protected UserDto randomUserHaveLessPermissionOnDept(DepartmentDto dept, Permission permission) {
-    return randomSelectAndLog(
-        usersHaveLessPermissionOnDept(allUsers(), dept, permission));
+    return randomSelectAndLog(usersHaveLessPermissionOnDept(allUsers(), dept, permission));
   }
 
   protected UserDto randomUserHaveExactPermissionOnDept(DepartmentDto dept, Permission permission) {
-    return randomSelectAndLog(
-        usersHaveExactPermissionOnDept(allUsers(), dept, permission));
+    return randomSelectAndLog(usersHaveExactPermissionOnDept(allUsers(), dept, permission));
   }
 
   protected StuffDto randomStuffOnDept(DepartmentDto dept) {

@@ -70,24 +70,19 @@ public class StubWithInitialData extends StubData {
   }
 
   private DepartmentInfo makeDepartmentInfo(DepartmentDto deptDto) {
-    return new DepartmentInfo(
-        deptDto.id(),
-        deptDto.university().id(),
-        deptDto.name(),
-        deptDto.baseMajors().stream()
-            .map(e -> new MajorInfo(deptDto.university().id(), e.code())).toList()
-    );
+    return new DepartmentInfo(deptDto.id(), deptDto.university().id(), deptDto.name(),
+        deptDto.baseMajors().stream().map(e -> new MajorInfo(deptDto.university().id(), e.code()))
+            .toList());
   }
 
   private UserInfo makeUserInfo(String apiToken, UserDto userDto) {
     List<AuthorityInfo> authorityInfos = new ArrayList<>();
     for (AuthorityDto authority : userDto.authorities()) {
-      authorityInfos.add(new AuthorityInfo(
-          authority.department().id(), authority.permission().toString()));
+      authorityInfos.add(
+          new AuthorityInfo(authority.department().id(), authority.permission().toString()));
     }
 
-    return new UserInfo(
-        userDto.id(), apiToken, userDto.university().id(), userDto.studentId(),
+    return new UserInfo(userDto.id(), apiToken, userDto.university().id(), userDto.studentId(),
         userDto.name(), userDto.entranceYear(), authorityInfos);
   }
 }
