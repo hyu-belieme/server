@@ -19,6 +19,9 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: production
+    env:
+      api-server-working-directory: ./api-server
+      config-server-working-directory: ./config-server
 
     steps:
     - uses: actions/checkout@v3
@@ -29,7 +32,11 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - run: ls ~ && pwd && gradle init
+    - run: gradle init
+      working-directory: ${{ env.api-server-working-directory }}
+
+    - run: gradle init
+        working-directory: ${{ env.config-server-working-directory }}
   
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
