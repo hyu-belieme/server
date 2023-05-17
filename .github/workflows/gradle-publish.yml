@@ -9,7 +9,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "feat/74-cloud_config" ]
 
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - run: gradle init
+    - run: ls ~ && pwd && gradle init
   
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
