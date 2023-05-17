@@ -1,0 +1,14 @@
+server:
+  port: 8888
+spring:
+  profiles:
+    include:
+      - access-github
+  cloud:
+    config:
+      server:
+        git:
+          default-label: main
+          uri: git@github.com:hyu-belieme/server-cloud-config.git
+          search-paths: /**
+          basedir: ./config_cache

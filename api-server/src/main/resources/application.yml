@@ -1,0 +1,45 @@
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: UTF-8
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+spring:
+  application:
+    name: belieme
+  profiles:
+    active: api, cors, init
+    include:
+      - datasource
+      - actuator
+      - jasypt
+  config:
+    import: optional:configserver:http://localhost:8888
+  data:
+    jdbc:
+      repositories.enabled: false
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  sql:
+    init:
+      encoding: UTF-8
+
+  messages:
+    basename: messages/message
+    encoding: UTF-8
+    cache-duration: 30
+    always-use-message-format: true
+    use-code-as-default-message: true
+    fallback-to-system-locale: true
+
+management:
+  endpoints:
+    enabled-by-default: false
+    jmx:
+      exposure:
+        exclude: "*"
