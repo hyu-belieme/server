@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 PROJECT_ROOT="/home/app/config-server"
 BUILD_LOG="$PROJECT_ROOT/build.log"
 
