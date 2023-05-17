@@ -8,8 +8,6 @@
 name: Java CI with Gradle On Api Server
 
 on:
-  push:
-    branches: [ "feat/77-ci" ]
   pull_request:
     branches: [ "develop" ]
 
