@@ -5,11 +5,11 @@
 # This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
-name: Java CI with Gradle
+name: Java CI with Gradle On Api Server
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "feat/77-ci" ]
   pull_request:
     branches: [ "develop" ]
 
@@ -18,8 +18,9 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    env:
+      api-server-working-directory: ./api-server
 
     steps:
     - uses: actions/checkout@v3
@@ -29,8 +30,8 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     - run: gradle init
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: build
+      working-directory: ${{ env.api-server-working-directory }}
+    - name: Build with Gradle and Test
+      run: ./gradlew clean build
+      working-directory: ${{ env.api-server-working-directory }}
 
