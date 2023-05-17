@@ -7,6 +7,7 @@ import com.belieme.apiserver.domain.dto.enumeration.Permission;
 import com.belieme.apiserver.error.exception.ConflictException;
 import com.belieme.apiserver.error.exception.InvalidIndexException;
 import com.belieme.apiserver.util.TestHelper;
+import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.RepeatedTest;

@@ -93,6 +93,13 @@ tasks.withType(JavaCompile) {
 
 tasks.named('test') {
     useJUnitPlatform()
+    testLogging {
+        afterSuite { testDescriptor, testResult ->
+            if (testDescriptor.parent == null) {
+                println "Results: ${testResult.resultType} (${testResult.testCount} tests, ${testResult.successfulTestCount} successes, ${testResult.failedTestCount} failures, ${testResult.skippedTestCount} skipped)"
+            }
+        }
+    }
 }
 
 jar {
