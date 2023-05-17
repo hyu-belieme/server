@@ -36,7 +36,7 @@ jobs:
       working-directory: ${{ env.api-server-working-directory }}
 
     - run: gradle init
-        working-directory: ${{ env.config-server-working-directory }}
+      working-directory: ${{ env.config-server-working-directory }}
   
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
