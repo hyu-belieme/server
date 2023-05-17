@@ -82,9 +82,9 @@ public class UserServiceTest extends BaseServiceTest {
 
       List<UserDto> expected = new ArrayList<>();
       for (UserDto user : stub.ALL_USERS) {
-          if (user.getMaxPermission(dept).hasMorePermission(Permission.USER)) {
-              expected.add(user);
-          }
+        if (user.getMaxPermission(dept).hasMorePermission(Permission.USER)) {
+          expected.add(user);
+        }
       }
 
       TestHelper.listCompareTest(this::execMethod, expected);
@@ -232,8 +232,7 @@ public class UserServiceTest extends BaseServiceTest {
 
     @Override
     protected UserDto execMethod() {
-      return userService.updateAuthorityOfUser(
-          userToken, targetUserId, authDeptId, authPermission);
+      return userService.updateAuthorityOfUser(userToken, targetUserId, authDeptId, authPermission);
     }
 
     @RepeatedTest(10)
@@ -373,17 +372,9 @@ public class UserServiceTest extends BaseServiceTest {
 
       List<AuthorityDto> newAuthorities = updateAuthorities(targetUser.authorities(), authDept,
           authPermission);
-      verify(userDao).update(
-          eq(targetUserId),
-          eq(targetUser.university().id()),
-          eq(targetUser.studentId()),
-          eq(targetUser.name()),
-          eq(targetUser.entranceYear()),
-          any(),
-          eq(targetUser.createdAt()),
-          anyLong(),
-          eq(newAuthorities)
-      );
+      verify(userDao).update(eq(targetUserId), eq(targetUser.university().id()),
+          eq(targetUser.studentId()), eq(targetUser.name()), eq(targetUser.entranceYear()), any(),
+          eq(targetUser.createdAt()), anyLong(), eq(newAuthorities));
     }
 
     private Permission randomUnderDevPermission() {
@@ -463,17 +454,14 @@ public class UserServiceTest extends BaseServiceTest {
     }
 
     private List<DepartmentDto> getDeptListByUnivIdFromStub(UniversityDto univ) {
-      return stub.INIT_DATA.departmentInfos().values().stream().map(
-          e -> new DepartmentDto(e.id(), univ, e.name(), makeMajorList(univ, e.baseMajors()))
-      ).toList();
+      return stub.INIT_DATA.departmentInfos().values().stream()
+          .map(e -> new DepartmentDto(e.id(), univ, e.name(), makeMajorList(univ, e.baseMajors())))
+          .toList();
     }
 
     private UserDto makeUser(UniversityDto univ, UserInfo info) {
-      return new UserDto(
-          info.id(), univ, info.studentId(), info.name(),
-          info.entranceYear(), UUID.randomUUID().toString(),
-          currentTime(), currentTime(), new ArrayList<>()
-      );
+      return new UserDto(info.id(), univ, info.studentId(), info.name(), info.entranceYear(),
+          UUID.randomUUID().toString(), currentTime(), currentTime(), new ArrayList<>());
     }
 
     private List<MajorDto> makeMajorList(UniversityDto univ, List<MajorInfo> infos) {
@@ -535,24 +523,20 @@ public class UserServiceTest extends BaseServiceTest {
     private void mockDepartmentDao() {
       for (AuthorityInfo authInfo : userInfo.authorities()) {
         DepartmentDto targetDept = deptList.stream()
-            .filter(dept -> dept.id().equals(authInfo.departmentId()))
-            .findFirst().orElse(null);
+            .filter(dept -> dept.id().equals(authInfo.departmentId())).findFirst().orElse(null);
         when(departmentDao.getById(authInfo.departmentId())).thenReturn(targetDept);
       }
     }
 
     private boolean checkMatchAuthDtoAndInfoList(List<AuthorityDto> authorities,
         List<AuthorityInfo> authorityInfos) {
-      return authorityInfos.stream().allMatch(authorityInfo ->
-          authorities.stream().anyMatch(
-              authorityDto -> checkMatchAuthDtoAndInfo(authorityDto, authorityInfo)
-          )
-      );
+      return authorityInfos.stream().allMatch(authorityInfo -> authorities.stream()
+          .anyMatch(authorityDto -> checkMatchAuthDtoAndInfo(authorityDto, authorityInfo)));
     }
 
     private boolean checkMatchAuthDtoAndInfo(AuthorityDto dto, AuthorityInfo info) {
-      return dto.department().id().equals(info.departmentId())
-          && dto.permission().toString().equals(info.permission());
+      return dto.department().id().equals(info.departmentId()) && dto.permission().toString()
+          .equals(info.permission());
     }
   }
 
@@ -598,8 +582,7 @@ public class UserServiceTest extends BaseServiceTest {
       newName = "이석환";
       setNewMajorCode(randomMajor().code());
 
-      deptsByUniv = stub.ALL_DEPTS.stream()
-          .filter((dept) -> dept.university().matchId(univ))
+      deptsByUniv = stub.ALL_DEPTS.stream().filter((dept) -> dept.university().matchId(univ))
           .toList();
     }
 
@@ -619,9 +602,9 @@ public class UserServiceTest extends BaseServiceTest {
     private void setNewMajorCode(String newMajorCode) {
       this.newMajorCode = newMajorCode;
       newDepts = stub.ALL_DEPTS.stream().filter((dept) -> {
-          if (!dept.university().matchId(univ)) {
-              return false;
-          }
+        if (!dept.university().matchId(univ)) {
+          return false;
+        }
         return dept.baseMajors().stream().anyMatch(major -> newMajorCode.equals(major.code()));
       }).toList();
     }
@@ -652,11 +635,9 @@ public class UserServiceTest extends BaseServiceTest {
 
       execMethod();
 
-      verify(userDao).update(
-          eq(targetUser.id()), eq(univId), eq(targetStudentId), eq(newName),
-          eq(extractEntranceYearFromStudentId(targetStudentId)), any(),
-          eq(targetUser.createdAt()), anyLong(), authListCaptor.capture()
-      );
+      verify(userDao).update(eq(targetUser.id()), eq(univId), eq(targetStudentId), eq(newName),
+          eq(extractEntranceYearFromStudentId(targetStudentId)), any(), eq(targetUser.createdAt()),
+          anyLong(), authListCaptor.capture());
       List<AuthorityDto> authList = authListCaptor.getValue();
       Assertions.assertThat(checkAuthUpdate(authList)).isTrue();
     }
@@ -675,9 +656,8 @@ public class UserServiceTest extends BaseServiceTest {
       execMethod();
 
       verify(userDao).create(any(), eq(univId), eq(targetStudentId), eq(newName),
-          eq(extractEntranceYearFromStudentId(targetStudentId)), any(),
-          anyLong(), anyLong(), authListCaptor.capture()
-      );
+          eq(extractEntranceYearFromStudentId(targetStudentId)), any(), anyLong(), anyLong(),
+          authListCaptor.capture());
       List<AuthorityDto> authList = authListCaptor.getValue();
       Assertions.assertThat(checkAuthUpdate(authList)).isTrue();
     }
@@ -701,19 +681,17 @@ public class UserServiceTest extends BaseServiceTest {
       } catch (Exception ignored) {
       }
 
-        if (entranceYear > UserService.HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND
-            && entranceYear < UserService.HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND) {
-            return entranceYear;
-        }
+      if (entranceYear > UserService.HANYANG_UNIVERSITY_ENTRANCE_YEAR_LOWER_BOUND
+          && entranceYear < UserService.HANYANG_UNIVERSITY_ENTRANCE_YEAR_UPPER_BOUND) {
+        return entranceYear;
+      }
       return 0;
     }
 
     private boolean checkAuthUpdate(List<AuthorityDto> auths) {
       for (DepartmentDto dept : newDepts) {
-        if (auths.stream()
-            .filter(authority -> authority.permission() == Permission.DEFAULT)
-            .noneMatch(authority -> authority.department().equals(dept))
-        ) {
+        if (auths.stream().filter(authority -> authority.permission() == Permission.DEFAULT)
+            .noneMatch(authority -> authority.department().equals(dept))) {
           return false;
         }
       }
@@ -741,13 +719,12 @@ public class UserServiceTest extends BaseServiceTest {
       DepartmentDto dept) {
     return rs.filter((user) -> {
       for (AuthorityDto auth : user.authorities()) {
-          if (auth.department().matchId(dept)
-              && auth.permission() != Permission.DEFAULT) {
-              return true;
-          }
-          if (auth.permission() == Permission.DEVELOPER) {
-              return true;
-          }
+        if (auth.department().matchId(dept) && auth.permission() != Permission.DEFAULT) {
+          return true;
+        }
+        if (auth.permission() == Permission.DEVELOPER) {
+          return true;
+        }
       }
       return false;
     });
@@ -757,13 +734,12 @@ public class UserServiceTest extends BaseServiceTest {
       DepartmentDto dept) {
     return rs.filter((user) -> {
       for (AuthorityDto auth : user.authorities()) {
-          if (auth.department().matchId(dept)
-              && auth.permission() != Permission.DEFAULT) {
-              return false;
-          }
-          if (auth.permission() == Permission.DEVELOPER) {
-              return false;
-          }
+        if (auth.department().matchId(dept) && auth.permission() != Permission.DEFAULT) {
+          return false;
+        }
+        if (auth.permission() == Permission.DEVELOPER) {
+          return false;
+        }
       }
       return true;
     });

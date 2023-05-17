@@ -8,14 +8,15 @@ import org.springframework.stereotype.Component;
 @Order(1)
 @Component
 public class UniversityInitializer implements CommandLineRunner {
-    private final UniversityService universityService;
 
-    public UniversityInitializer(UniversityService universityService) {
-        this.universityService = universityService;
-    }
+  private final UniversityService universityService;
 
-    @Override
-    public void run(String... args) {
-        universityService.initializeUniversities();
-    }
+  public UniversityInitializer(UniversityService universityService) {
+    this.universityService = universityService;
+  }
+
+  @Override
+  public void run(String... args) {
+    universityService.initializeUniversities();
+  }
 }

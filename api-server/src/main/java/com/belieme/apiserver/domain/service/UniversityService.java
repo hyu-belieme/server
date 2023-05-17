@@ -30,18 +30,12 @@ public class UniversityService extends BaseService {
   public void initializeUniversities() {
     for (UniversityInfo university : initialData.universityInfos().values()) {
       if (universityDao.checkExistById(university.id())) {
-        universityDao.update(
-            university.id(),
-            university.name(),
-            university.externalApiInfo().getOrDefault("url", null)
-        );
+        universityDao.update(university.id(), university.name(),
+            university.externalApiInfo().getOrDefault("url", null));
         continue;
       }
-      universityDao.create(
-          university.id(),
-          university.name(),
-          university.externalApiInfo().getOrDefault("url", null)
-      );
+      universityDao.create(university.id(), university.name(),
+          university.externalApiInfo().getOrDefault("url", null));
     }
   }
 
@@ -52,9 +46,7 @@ public class UniversityService extends BaseService {
     return universityDao.getAllList();
   }
 
-  public UniversityDto getById(
-      @NonNull String userToken, @NonNull UUID universityId
-  ) {
+  public UniversityDto getById(@NonNull String userToken, @NonNull UUID universityId) {
     UserDto requester = validateTokenAndGetUser(userToken);
     checkDeveloperPermission(requester);
     return universityDao.getById(universityId);

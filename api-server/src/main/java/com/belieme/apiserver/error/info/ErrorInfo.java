@@ -4,9 +4,10 @@ import com.belieme.apiserver.util.message.Message;
 import org.springframework.http.HttpStatusCode;
 
 public interface ErrorInfo {
-    String name();
 
-    HttpStatusCode httpStatus();
+  String name();
 
-    Message responseMessage();
+  HttpStatusCode httpStatus();
+
+  Message responseMessage();
 }

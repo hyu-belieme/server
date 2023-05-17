@@ -25,10 +25,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
 
-  public ItemDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public ItemDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -69,12 +68,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
     checkItemIdConflict(itemId);
     checkItemConflict(stuffOfNewItem.getId(), num);
 
-    ItemEntity newItemEntity = new ItemEntity(
-        itemId,
-        stuffOfNewItem,
-        num,
-        null
-    );
+    ItemEntity newItemEntity = new ItemEntity(itemId, stuffOfNewItem, num, null);
     return itemRepository.save(newItemEntity).toItemDto();
   }
 
@@ -88,9 +82,7 @@ public class ItemDaoImpl extends BaseDaoImpl implements ItemDao {
       checkItemConflict(stuffId, num);
     }
 
-    target = target.withStuff(stuffOfNewItem)
-        .withNum(num)
-        .withLastHistory(lastHistoryOfNewItem);
+    target = target.withStuff(stuffOfNewItem).withNum(num).withLastHistory(lastHistoryOfNewItem);
     return itemRepository.save(target).toItemDto();
   }
 

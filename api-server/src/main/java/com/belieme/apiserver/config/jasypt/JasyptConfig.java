@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "jasypt.encryptor")
 public class JasyptConfig {
+
   private String password;
   private String algorithm = "PBEWithMD5AndDES";
   private String keyObtentionIterations = "1000";

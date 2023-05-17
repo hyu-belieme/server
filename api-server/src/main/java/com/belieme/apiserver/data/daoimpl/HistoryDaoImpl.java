@@ -26,10 +26,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
 
-  public HistoryDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public HistoryDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -96,42 +95,26 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
   }
 
   @Override
-  public HistoryDto create(
-      @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
-      UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
-      UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
-      long lostAt, long canceledAt
-  ) {
+  public HistoryDto create(@NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+      UUID approveManagerId, UUID returnManagerId, UUID lostManagerId, UUID cancelManagerId,
+      long requestedAt, long approvedAt, long returnedAt, long lostAt, long canceledAt) {
     ItemEntity itemOfNewHistory = getItemEntityOrThrowInvalidIndexException(itemId);
 
     checkHistoryIdConflict(historyId);
     checkHistoryConflict(itemId, num);
 
-    HistoryEntity newHistoryEntity = new HistoryEntity(
-        historyId,
-        itemOfNewHistory,
-        num,
-        getUserEntityIfIdIsNotNull(requesterId),
-        getUserEntityIfIdIsNotNull(approveManagerId),
-        getUserEntityIfIdIsNotNull(returnManagerId),
-        getUserEntityIfIdIsNotNull(lostManagerId),
-        getUserEntityIfIdIsNotNull(cancelManagerId),
-        requestedAt,
-        approvedAt,
-        returnedAt,
-        lostAt,
-        canceledAt
-    );
+    HistoryEntity newHistoryEntity = new HistoryEntity(historyId, itemOfNewHistory, num,
+        getUserEntityIfIdIsNotNull(requesterId), getUserEntityIfIdIsNotNull(approveManagerId),
+        getUserEntityIfIdIsNotNull(returnManagerId), getUserEntityIfIdIsNotNull(lostManagerId),
+        getUserEntityIfIdIsNotNull(cancelManagerId), requestedAt, approvedAt, returnedAt, lostAt,
+        canceledAt);
     return historyRepository.save(newHistoryEntity).toHistoryDto();
   }
 
   @Override
-  public HistoryDto update(
-      @NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
-      UUID approveManagerId, UUID returnManagerId, UUID lostManagerId,
-      UUID cancelManagerId, long requestedAt, long approvedAt, long returnedAt,
-      long lostAt, long canceledAt
-  ) {
+  public HistoryDto update(@NonNull UUID historyId, @NonNull UUID itemId, int num, UUID requesterId,
+      UUID approveManagerId, UUID returnManagerId, UUID lostManagerId, UUID cancelManagerId,
+      long requestedAt, long approvedAt, long returnedAt, long lostAt, long canceledAt) {
     HistoryEntity target = findHistoryEntity(historyId);
     ItemEntity itemOfNewHistory = getItemEntityOrThrowInvalidIndexException(itemId);
 
@@ -139,17 +122,13 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
       checkHistoryConflict(itemOfNewHistory.getId(), num);
     }
 
-    target = target.withItem(itemOfNewHistory)
-        .withNum(num)
+    target = target.withItem(itemOfNewHistory).withNum(num)
         .withRequester(getUserEntityIfIdIsNotNull(requesterId))
         .withApproveManager(getUserEntityIfIdIsNotNull(approveManagerId))
         .withReturnManager(getUserEntityIfIdIsNotNull(returnManagerId))
         .withLostManager(getUserEntityIfIdIsNotNull(lostManagerId))
-        .withCancelManager(getUserEntityIfIdIsNotNull(cancelManagerId))
-        .withRequestedAt(requestedAt)
-        .withApprovedAt(approvedAt)
-        .withReturnedAt(returnedAt)
-        .withLostAt(lostAt)
+        .withCancelManager(getUserEntityIfIdIsNotNull(cancelManagerId)).withRequestedAt(requestedAt)
+        .withApprovedAt(approvedAt).withReturnedAt(returnedAt).withLostAt(lostAt)
         .withCanceledAt(canceledAt);
     return historyRepository.save(target).toHistoryDto();
   }

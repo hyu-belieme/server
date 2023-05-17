@@ -10,7 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ConfigurationPropertiesScan
 @EnableJpaRepositories(repositoryBaseClass = RefreshRepositoryImpl.class)
 public class BeliemeApiServerApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(BeliemeApiServerApplication.class, args);
-    }
+
+  public static void main(String[] args) {
+    SpringApplication.run(BeliemeApiServerApplication.class, args);
+  }
 }

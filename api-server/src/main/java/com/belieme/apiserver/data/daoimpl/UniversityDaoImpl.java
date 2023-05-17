@@ -25,10 +25,9 @@ import org.springframework.stereotype.Component;
 public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
 
   @Autowired
-  public UniversityDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public UniversityDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -76,9 +75,7 @@ public class UniversityDaoImpl extends BaseDaoImpl implements UniversityDao {
       checkUniversityConflict(name);
     }
 
-    UniversityEntity updatedUniversity = target
-        .withName(name)
-        .withApiUrl(apiUrl);
+    UniversityEntity updatedUniversity = target.withName(name).withApiUrl(apiUrl);
 
     return universityRepository.save(updatedUniversity).toUniversityDto();
   }

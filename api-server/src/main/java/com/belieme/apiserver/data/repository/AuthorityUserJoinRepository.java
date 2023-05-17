@@ -5,4 +5,5 @@ import com.belieme.apiserver.data.repository.custom.RefreshRepository;
 
 public interface AuthorityUserJoinRepository extends
     RefreshRepository<AuthorityUserJoinEntity, Integer> {
+
 }

@@ -26,10 +26,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
 
-  public DepartmentDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public DepartmentDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -110,19 +109,15 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
       checkDepartmentConflict(universityId, name);
     }
 
-    return target
-        .withName(name)
-        .withUniversity(newUniversityEntity);
+    return target.withName(name).withUniversity(newUniversityEntity);
   }
 
   private DepartmentEntity saveBaseMajorJoins(DepartmentEntity newDepartmentEntity,
       List<UUID> baseMajorIds) {
     for (UUID baseMajorId : baseMajorIds) {
       MajorEntity baseMajorEntity = findMajorEntity(baseMajorId);
-      MajorDepartmentJoinEntity newJoin = new MajorDepartmentJoinEntity(
-          baseMajorEntity,
-          newDepartmentEntity
-      );
+      MajorDepartmentJoinEntity newJoin = new MajorDepartmentJoinEntity(baseMajorEntity,
+          newDepartmentEntity);
       MajorDepartmentJoinEntity newMajorJoin = majorDepartmentJoinRepository.save(newJoin);
       newDepartmentEntity = newDepartmentEntity.withBaseMajorAdd(newMajorJoin);
     }
@@ -138,8 +133,7 @@ public class DepartmentDaoImpl extends BaseDaoImpl implements DepartmentDao {
       String name) {
     UUID oldUniversityId = target.getUniversity().getId();
     String oldDepartmentName = target.getName();
-    return !(oldUniversityId.equals(universityId)
-        && oldDepartmentName.equals(name));
+    return !(oldUniversityId.equals(universityId) && oldDepartmentName.equals(name));
   }
 
   private void checkDepartmentIdConflict(UUID departmentId) {

@@ -55,16 +55,14 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Override
     protected void setUpDefault() {
       setDept(TEST_DEPT);
-      setRequester(randomUserHaveMorePermissionOnDept(
-          dept, Permission.STAFF));
+      setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
 
       historyList = getHistoryListByDept(dept);
     }
 
     @Override
     protected void setRequesterAccessDenied() {
-      setRequester(randomUserHaveLessPermissionOnDept(
-          dept, Permission.STAFF));
+      setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.STAFF));
     }
 
     @Override
@@ -82,10 +80,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       when(historyDao.getListByDepartment(deptId)).thenReturn(historyList);
 
       System.out.println("Expected : " + historyList);
-      TestHelper.listCompareTest(
-          this::execMethod,
-          historyList
-      );
+      TestHelper.listCompareTest(this::execMethod, historyList);
     }
 
     @Override
@@ -132,8 +127,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Override
     protected void setRequesterAccessDenied() {
-      setRequester(randomUserHaveLessPermissionOnDept(
-          dept, Permission.STAFF));
+      setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.STAFF));
     }
 
     @Override
@@ -151,10 +145,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       when(historyDao.getListByStuff(stuffId)).thenReturn(historyList);
 
       System.out.println("Expected : " + historyList);
-      TestHelper.listCompareTest(
-          this::execMethod,
-          historyList
-      );
+      TestHelper.listCompareTest(this::execMethod, historyList);
     }
 
     @RepeatedTest(10)
@@ -183,8 +174,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     }
 
     private List<HistoryDto> getHistoryListByStuff(StuffDto stuff) {
-      return stub.ALL_HISTORIES.stream()
-          .filter((history) -> stuff.matchId(history.item().stuff()))
+      return stub.ALL_HISTORIES.stream().filter((history) -> stuff.matchId(history.item().stuff()))
           .collect(Collectors.toList());
     }
   }
@@ -232,10 +222,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       when(historyDao.getListByItem(itemId)).thenReturn(historyList);
 
       System.out.println("Expected : " + historyList);
-      TestHelper.listCompareTest(
-          this::execMethod,
-          historyList
-      );
+      TestHelper.listCompareTest(this::execMethod, historyList);
     }
 
     @RepeatedTest(10)
@@ -264,8 +251,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     }
 
     private List<HistoryDto> getHistoryListByItem(ItemDto item) {
-      return stub.ALL_HISTORIES.stream()
-          .filter((history) -> item.matchId(history.item()))
+      return stub.ALL_HISTORIES.stream().filter((history) -> item.matchId(history.item()))
           .collect(Collectors.toList());
     }
   }
@@ -295,9 +281,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Override
     protected List<HistoryDto> execMethod() {
-      return historyService.getListByDepartmentAndRequester(
-          userToken, deptId, historyRequesterId
-      );
+      return historyService.getListByDepartmentAndRequester(userToken, deptId, historyRequesterId);
     }
 
     @RepeatedTest(10)
@@ -308,8 +292,8 @@ public class HistoryServiceTest extends BaseServiceTest {
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
       when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId))
-          .thenReturn(historyList);
+      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId)).thenReturn(
+          historyList);
 
       TestHelper.listCompareTest(this::execMethod, historyList);
     }
@@ -318,17 +302,15 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("[SUCCESS]_[타인의 `History List`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
     public void SUCCESS_getHistoryListOfOthers() {
       setDept(TEST_DEPT);
-      setRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.STAFF));
-      setHistoryRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.STAFF));
+      setHistoryRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
       historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
       when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId))
-          .thenReturn(historyList);
+      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId)).thenReturn(
+          historyList);
 
       System.out.println("Expected : " + historyList);
       TestHelper.listCompareTest(this::execMethod, historyList);
@@ -339,10 +321,8 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Override
     public void ERROR_accessDenied_PermissionDeniedException() {
       setDept(TEST_DEPT);
-      setRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.BANNED));
-      setHistoryRequester(randomUserHaveMorePermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.BANNED));
+      setHistoryRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
@@ -355,10 +335,9 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[PermissionDeniedException]")
     public void ERROR_getHistoryListOfOthers_PermissionDeniedException() {
       setDept(TEST_DEPT);
-      setHistoryRequester(randomUserHaveMorePermissionOnDept(
-          dept, Permission.USER));
-      setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
-          dept, Permission.USER, List.of(historyRequester)));
+      setHistoryRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
+      setRequester(randomUserHaveExactPermissionOnDeptWithExclude(dept, Permission.USER,
+          List.of(historyRequester)));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
@@ -371,10 +350,8 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("[ERROR]_[`department`의 `index`가 유효하지 않을 시]_[InvalidException]")
     public void ERROR_deptInvalidIndex_InvalidException() {
       setDept(TEST_DEPT);
-      setRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.STAFF));
-      setHistoryRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.STAFF));
+      setHistoryRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenThrow(NotFoundException.class);
@@ -386,10 +363,8 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("[ERROR]_[`History Requester`의 `index`가 유효하지 않을 시]_[InvalidException]")
     public void ERROR_userInvalidIndex_InvalidException() {
       setDept(TEST_DEPT);
-      setRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.STAFF));
-      setHistoryRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.STAFF));
+      setHistoryRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
@@ -400,10 +375,9 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     private List<HistoryDto> getHistoryListByDeptAndRequester(DepartmentDto dept,
         UserDto requester) {
-      return stub.ALL_HISTORIES.stream()
-          .filter((history) -> dept.matchId(history.item().stuff().department())
-              && requester.matchId(history.requester()))
-          .collect(Collectors.toList());
+      return stub.ALL_HISTORIES.stream().filter(
+          (history) -> dept.matchId(history.item().stuff().department()) && requester.matchId(
+              history.requester())).collect(Collectors.toList());
     }
   }
 
@@ -417,8 +391,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Override
     protected void setUpDefault() {
       setDept(TEST_DEPT);
-      setRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
       setHistory(randomHistoryOnDept(dept));
     }
 
@@ -449,8 +422,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("[SUCCESS]_[타인의 `History`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
     public void SUCCESS_getHistoryListOfOthers() {
       setUpDefault();
-      setRequester(randomUserHaveExactPermissionOnDept(
-          dept, Permission.STAFF));
+      setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.STAFF));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(historyDao.getById(historyId)).thenReturn(history);
@@ -464,8 +436,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Override
     public void ERROR_accessDenied_PermissionDeniedException() {
       setUpDefault();
-      setRequester(randomUserHaveLessPermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.USER));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(historyDao.getById(historyId)).thenReturn(history);
@@ -477,8 +448,8 @@ public class HistoryServiceTest extends BaseServiceTest {
     @DisplayName("[ERROR]_[본인의 `History List`에 대한 `request`가 아닐 시]_[PermissionDeniedException]")
     public void ERROR_getHistoryListOfOthers_PermissionDeniedException() {
       setUpDefault();
-      setRequester(randomUserHaveExactPermissionOnDeptWithExclude(
-          dept, Permission.USER, List.of(history.requester())));
+      setRequester(randomUserHaveExactPermissionOnDeptWithExclude(dept, Permission.USER,
+          List.of(history.requester())));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(historyDao.getById(historyId)).thenReturn(history);
@@ -513,11 +484,8 @@ public class HistoryServiceTest extends BaseServiceTest {
       setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
       setItem(randomUsableItemOnDept(dept));
 
-      createdHistory = new HistoryDto(
-          UUID.randomUUID(), item, item.nextHistoryNum(), requester,
-          null, null, null, null,
-          currentTime(), 0, 0, 0, 0
-      );
+      createdHistory = new HistoryDto(UUID.randomUUID(), item, item.nextHistoryNum(), requester,
+          null, null, null, null, currentTime(), 0, 0, 0, 0);
     }
 
     private void setItem(ItemDto item) {
@@ -540,11 +508,10 @@ public class HistoryServiceTest extends BaseServiceTest {
       when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
           new ArrayList<>());
 
-      when(historyDao.create(
-          any(), eq(itemId), eq(item.nextHistoryNum()), eq(requesterId),
-          eq(null), eq(null), eq(null), eq(null),
-          anyLong(), eq(0L), eq(0L), eq(0L), eq(0L))
-      ).thenReturn(createdHistory);
+      when(
+          historyDao.create(any(), eq(itemId), eq(item.nextHistoryNum()), eq(requesterId), eq(null),
+              eq(null), eq(null), eq(null), anyLong(), eq(0L), eq(0L), eq(0L), eq(0L))).thenReturn(
+          createdHistory);
       when(itemDao.update(itemId, item.stuff().id(), item.num(), createdHistory.id())).thenReturn(
           item);
 
@@ -589,8 +556,8 @@ public class HistoryServiceTest extends BaseServiceTest {
       setItem(randomUsableItemOnStuff(targetStuff));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
-          .thenReturn(makeHistoryListWithSameStuff(item, requester));
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+          makeHistoryListWithSameStuff(item, requester));
       when(itemDao.getById(itemId)).thenReturn(item);
 
       TestHelper.exceptionTest(this::execMethod,
@@ -604,8 +571,8 @@ public class HistoryServiceTest extends BaseServiceTest {
       setUpDefault();
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
-          .thenReturn(makeHistoryListWithSameRequester(item, requester));
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+          makeHistoryListWithSameRequester(item, requester));
       when(itemDao.getById(itemId)).thenReturn(item);
 
       TestHelper.exceptionTest(this::execMethod, RentalCountLimitExceededException.class);
@@ -617,8 +584,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       setUpDefault();
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(itemDao.getById(itemId))
-          .thenThrow(NotFoundException.class);
+      when(itemDao.getById(itemId)).thenThrow(NotFoundException.class);
 
       TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
     }
@@ -628,8 +594,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Override
     public void ERROR_accessDenied_PermissionDeniedException() {
       setUpDefault();
-      setRequester(randomUserHaveLessPermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.USER));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
@@ -650,8 +615,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Override
     protected void setUpDefault() {
       setDept(TEST_DEPT);
-      setRequester(randomUserHaveMorePermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.USER));
       setStuff(randomUsableStuffOnDept(dept));
     }
 
@@ -660,11 +624,8 @@ public class HistoryServiceTest extends BaseServiceTest {
       this.item = stuff.firstUsableItem();
 
       if (this.item != null) {
-        this.createdHistory = new HistoryDto(
-            UUID.randomUUID(), item, item.nextHistoryNum(), requester,
-            null, null, null, null,
-            currentTime(), 0, 0, 0, 0
-        );
+        this.createdHistory = new HistoryDto(UUID.randomUUID(), item, item.nextHistoryNum(),
+            requester, null, null, null, null, currentTime(), 0, 0, 0, 0);
       }
     }
 
@@ -683,22 +644,17 @@ public class HistoryServiceTest extends BaseServiceTest {
       when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
           new ArrayList<>());
 
-      when(historyDao.create(
-          any(), eq(item.id()), eq(item.nextHistoryNum()), eq(requesterId),
-          eq(null), eq(null), eq(null), eq(null),
-          anyLong(), eq(0L), eq(0L), eq(0L), eq(0L))
-      ).thenReturn(createdHistory);
+      when(historyDao.create(any(), eq(item.id()), eq(item.nextHistoryNum()), eq(requesterId),
+          eq(null), eq(null), eq(null), eq(null), anyLong(), eq(0L), eq(0L), eq(0L),
+          eq(0L))).thenReturn(createdHistory);
       when(
           itemDao.update(item.id(), item.stuff().id(), item.num(), createdHistory.id())).thenReturn(
           item);
 
       execMethod();
 
-      verify(historyDao).create(
-          any(), eq(item.id()), eq(item.nextHistoryNum()), eq(requesterId),
-          eq(null), eq(null), eq(null), eq(null),
-          anyLong(), eq(0L), eq(0L), eq(0L), eq(0L)
-      );
+      verify(historyDao).create(any(), eq(item.id()), eq(item.nextHistoryNum()), eq(requesterId),
+          eq(null), eq(null), eq(null), eq(null), anyLong(), eq(0L), eq(0L), eq(0L), eq(0L));
       verify(itemDao).update(item.id(), item.stuff().id(), item.num(), createdHistory.id());
     }
 
@@ -736,8 +692,8 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(stuffDao.getById(stuff.id())).thenReturn(stuff);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
-          .thenReturn(makeHistoryListWithSameStuff(item, requester));
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+          makeHistoryListWithSameStuff(item, requester));
 
       TestHelper.exceptionTest(this::execMethod,
           RentalCountOnSameStuffLimitExceededException.class);
@@ -750,8 +706,8 @@ public class HistoryServiceTest extends BaseServiceTest {
       setUpDefault();
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId))
-          .thenReturn(makeHistoryListWithSameRequester(item, requester));
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+          makeHistoryListWithSameRequester(item, requester));
       when(stuffDao.getById(stuff.id())).thenReturn(stuff);
 
       TestHelper.exceptionTest(this::execMethod, RentalCountLimitExceededException.class);
@@ -762,8 +718,7 @@ public class HistoryServiceTest extends BaseServiceTest {
     @Override
     public void ERROR_accessDenied_PermissionDeniedException() {
       setUpDefault();
-      setRequester(randomUserHaveLessPermissionOnDept(
-          dept, Permission.USER));
+      setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.USER));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(stuffDao.getById(stuff.id())).thenReturn(stuff);
@@ -806,30 +761,22 @@ public class HistoryServiceTest extends BaseServiceTest {
     public void SUCCESS_itemIsUsable() {
       setUpDefault();
       setItem(randomUsableItemOnDept(dept));
-      HistoryDto createdHistory = new HistoryDto(
-          UUID.randomUUID(), item, item.nextHistoryNum(), null,
-          null, null, requester, null,
-          0L, 0L, 0L, currentTime(), 0L
-      );
+      HistoryDto createdHistory = new HistoryDto(UUID.randomUUID(), item, item.nextHistoryNum(),
+          null, null, null, requester, null, 0L, 0L, 0L, currentTime(), 0L);
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.create(
-          any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
-          eq(null), eq(null), eq(requesterId), eq(null),
-          eq(0L), eq(0L), eq(0L), anyLong(), eq(0L))
-      ).thenReturn(createdHistory);
+      when(historyDao.create(any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(null), eq(0L), eq(0L), eq(0L), anyLong(),
+          eq(0L))).thenReturn(createdHistory);
       when(
           itemDao.update(item.id(), item.stuff().id(), item.num(), createdHistory.id())).thenReturn(
           item);
 
       execMethod();
 
-      verify(historyDao).create(
-          any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
-          eq(null), eq(null), eq(requesterId), eq(null),
-          eq(0L), eq(0L), eq(0L), anyLong(), eq(0L)
-      );
+      verify(historyDao).create(any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(null), eq(0L), eq(0L), eq(0L), anyLong(), eq(0L));
       verify(itemDao).update(item.id(), item.stuff().id(), item.num(), createdHistory.id());
     }
 
@@ -839,49 +786,34 @@ public class HistoryServiceTest extends BaseServiceTest {
       setUpDefault();
       setItem(randomReservedItemByDept(dept));
 
-      HistoryDto canceledHistory = item.lastHistory()
-          .withCancelManager(requester)
+      HistoryDto canceledHistory = item.lastHistory().withCancelManager(requester)
           .withCanceledAt(currentTime());
 
-      HistoryDto createdHistory = new HistoryDto(
-          UUID.randomUUID(), item, item.nextHistoryNum(), null,
-          null, null, requester, null,
-          0L, 0L, 0L, currentTime(), 0L
-      );
+      HistoryDto createdHistory = new HistoryDto(UUID.randomUUID(), item, item.nextHistoryNum(),
+          null, null, null, requester, null, 0L, 0L, 0L, currentTime(), 0L);
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
-          eq(null), eq(null), eq(null), eq(requesterId),
-          eq(item.lastHistory().requestedAt()), eq(0L),
-          eq(0L), eq(0L), anyLong())
-      ).thenReturn(canceledHistory);
-      when(historyDao.create(
-          any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
-          eq(null), eq(null), eq(requesterId), eq(null),
-          eq(0L), eq(0L), eq(0L), anyLong(), eq(0L))
-      ).thenReturn(createdHistory);
+      when(historyDao.update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(item.lastHistory().requestedAt()), eq(0L), eq(0L), eq(0L),
+          anyLong())).thenReturn(canceledHistory);
+      when(historyDao.create(any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(null), eq(0L), eq(0L), eq(0L), anyLong(),
+          eq(0L))).thenReturn(createdHistory);
       when(
           itemDao.update(item.id(), item.stuff().id(), item.num(), createdHistory.id())).thenReturn(
           item);
 
       execMethod();
 
-      verify(historyDao).update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
-          eq(null), eq(null),
-          eq(null), eq(requesterId), eq(item.lastHistory().requestedAt()),
-          eq(0L), eq(0L), eq(0L), anyLong()
-      );
+      verify(historyDao).update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(item.lastHistory().requestedAt()), eq(0L), eq(0L), eq(0L),
+          anyLong());
 
-      verify(historyDao).create(
-          any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null),
-          eq(null), eq(null), eq(requesterId), eq(null),
-          eq(0L), eq(0L), eq(0L), anyLong(), eq(0L)
-      );
+      verify(historyDao).create(any(), eq(item.id()), eq(item.nextHistoryNum()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(null), eq(0L), eq(0L), eq(0L), anyLong(), eq(0L));
       verify(itemDao).update(item.id(), item.stuff().id(), item.num(), createdHistory.id());
     }
 
@@ -890,29 +822,24 @@ public class HistoryServiceTest extends BaseServiceTest {
     public void SUCCESS_itemIsUnusable() {
       setUpDefault();
       setItem(randomUsingOrDelayedItemByDept(dept));
-      HistoryDto newHistory = item.lastHistory()
-          .withLostManager(requester)
+      HistoryDto newHistory = item.lastHistory().withLostManager(requester)
           .withLostAt(currentTime());
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.update(
-          eq(item.lastHistory().id()), eq(item.id()),
+      when(historyDao.update(eq(item.lastHistory().id()), eq(item.id()),
           eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
-          eq(item.lastHistory().approveManager().id()), eq(null),
-          eq(requesterId), eq(null), eq(item.lastHistory().requestedAt()),
-          eq(item.lastHistory().approvedAt()), eq(0L), anyLong(), eq(0L))
-      ).thenReturn(newHistory);
+          eq(item.lastHistory().approveManager().id()), eq(null), eq(requesterId), eq(null),
+          eq(item.lastHistory().requestedAt()), eq(item.lastHistory().approvedAt()), eq(0L),
+          anyLong(), eq(0L))).thenReturn(newHistory);
 
       execMethod();
 
-      verify(historyDao).update(
-          eq(item.lastHistory().id()), eq(item.id()),
+      verify(historyDao).update(eq(item.lastHistory().id()), eq(item.id()),
           eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
-          eq(item.lastHistory().approveManager().id()), eq(null),
-          eq(requesterId), eq(null), eq(item.lastHistory().requestedAt()),
-          eq(item.lastHistory().approvedAt()), eq(0L), anyLong(), eq(0L)
-      );
+          eq(item.lastHistory().approveManager().id()), eq(null), eq(requesterId), eq(null),
+          eq(item.lastHistory().requestedAt()), eq(item.lastHistory().approvedAt()), eq(0L),
+          anyLong(), eq(0L));
     }
 
     @RepeatedTest(10)
@@ -975,8 +902,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       this.itemId = item.id();
 
       if (item.lastHistory() != null) {
-        this.newHistory = item.lastHistory()
-            .withApproveManager(requester)
+        this.newHistory = item.lastHistory().withApproveManager(requester)
             .withApprovedAt(currentTime());
       }
     }
@@ -998,23 +924,17 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
-          eq(requesterId), eq(null), eq(null), eq(null),
-          eq(item.lastHistory().requestedAt()), anyLong(),
-          eq(0L), eq(0L), eq(0L))
-      ).thenReturn(newHistory);
+      when(historyDao.update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()), eq(requesterId),
+          eq(null), eq(null), eq(null), eq(item.lastHistory().requestedAt()), anyLong(), eq(0L),
+          eq(0L), eq(0L))).thenReturn(newHistory);
 
       execMethod();
 
-      verify(historyDao).update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()),
-          eq(requesterId), eq(null), eq(null), eq(null),
-          eq(item.lastHistory().requestedAt()), anyLong(),
-          eq(0L), eq(0L), eq(0L)
-      );
+      verify(historyDao).update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()), eq(requesterId),
+          eq(null), eq(null), eq(null), eq(item.lastHistory().requestedAt()), anyLong(), eq(0L),
+          eq(0L), eq(0L));
     }
 
     @RepeatedTest(10)
@@ -1075,9 +995,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       this.itemId = item.id();
 
       if (item.lastHistory() != null) {
-        this.newHistory = item.lastHistory()
-            .withLostManager(requester)
-            .withLostAt(currentTime());
+        this.newHistory = item.lastHistory().withLostManager(requester).withLostAt(currentTime());
       }
     }
 
@@ -1098,37 +1016,21 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()),
-          eq(getUserIdOrNull(item.lastHistory().requester())),
-          eq(getUserIdOrNull(item.lastHistory().approveManager())),
-          eq(requesterId),
-          eq(getUserIdOrNull(item.lastHistory().lostManager())),
-          eq(null),
-          eq(item.lastHistory().requestedAt()),
-          eq(item.lastHistory().approvedAt()),
-          anyLong(),
-          eq(item.lastHistory().lostAt()),
-          eq(0L))
-      ).thenReturn(newHistory);
+      when(historyDao.update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(getUserIdOrNull(item.lastHistory().requester())),
+          eq(getUserIdOrNull(item.lastHistory().approveManager())), eq(requesterId),
+          eq(getUserIdOrNull(item.lastHistory().lostManager())), eq(null),
+          eq(item.lastHistory().requestedAt()), eq(item.lastHistory().approvedAt()), anyLong(),
+          eq(item.lastHistory().lostAt()), eq(0L))).thenReturn(newHistory);
 
       execMethod();
 
-      verify(historyDao).update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()),
-          eq(getUserIdOrNull(item.lastHistory().requester())),
-          eq(getUserIdOrNull(item.lastHistory().approveManager())),
-          eq(requesterId),
-          eq(getUserIdOrNull(item.lastHistory().lostManager())),
-          eq(null),
-          eq(item.lastHistory().requestedAt()),
-          eq(item.lastHistory().approvedAt()),
-          anyLong(),
-          eq(item.lastHistory().lostAt()),
-          eq(0L)
-      );
+      verify(historyDao).update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(getUserIdOrNull(item.lastHistory().requester())),
+          eq(getUserIdOrNull(item.lastHistory().approveManager())), eq(requesterId),
+          eq(getUserIdOrNull(item.lastHistory().lostManager())), eq(null),
+          eq(item.lastHistory().requestedAt()), eq(item.lastHistory().approvedAt()), anyLong(),
+          eq(item.lastHistory().lostAt()), eq(0L));
     }
 
     @RepeatedTest(10)
@@ -1203,8 +1105,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       this.itemId = item.id();
 
       if (item.lastHistory() != null) {
-        this.newHistory = item.lastHistory()
-            .withCancelManager(requester)
+        this.newHistory = item.lastHistory().withCancelManager(requester)
             .withCanceledAt(currentTime());
       }
     }
@@ -1226,25 +1127,17 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()),
-          eq(item.lastHistory().requester().id()), eq(null),
-          eq(null), eq(null), eq(requesterId),
-          eq(item.lastHistory().requestedAt()),
-          eq(0L), eq(0L), eq(0L), anyLong())
-      ).thenReturn(newHistory);
+      when(historyDao.update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(item.lastHistory().requestedAt()), eq(0L), eq(0L), eq(0L),
+          anyLong())).thenReturn(newHistory);
 
       execMethod();
 
-      verify(historyDao).update(
-          eq(item.lastHistory().id()), eq(item.id()),
-          eq(item.lastHistory().num()),
-          eq(item.lastHistory().requester().id()), eq(null),
-          eq(null), eq(null), eq(requesterId),
-          eq(item.lastHistory().requestedAt()),
-          eq(0L), eq(0L), eq(0L), anyLong()
-      );
+      verify(historyDao).update(eq(item.lastHistory().id()), eq(item.id()),
+          eq(item.lastHistory().num()), eq(item.lastHistory().requester().id()), eq(null), eq(null),
+          eq(null), eq(requesterId), eq(item.lastHistory().requestedAt()), eq(0L), eq(0L), eq(0L),
+          anyLong());
     }
 
     @RepeatedTest(10)
@@ -1291,22 +1184,8 @@ public class HistoryServiceTest extends BaseServiceTest {
       ItemDto newItem = randomItemOnStuffWithExclude(item.stuff(), exclude);
       exclude.add(newItem);
       output.add(
-          new HistoryDto(
-              UUID.randomUUID(),
-              newItem,
-              newItem.nextHistoryNum(),
-              requester,
-              null,
-              null,
-              null,
-              null,
-              System.currentTimeMillis() / 1000,
-              0,
-              0,
-              0,
-              0
-          )
-      );
+          new HistoryDto(UUID.randomUUID(), newItem, newItem.nextHistoryNum(), requester, null,
+              null, null, null, System.currentTimeMillis() / 1000, 0, 0, 0, 0));
     }
     return output;
   }
@@ -1320,30 +1199,16 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       ItemDto newItem = randomItemOnStuff(newStuff);
       output.add(
-          new HistoryDto(
-              UUID.randomUUID(),
-              newItem,
-              newItem.nextHistoryNum(),
-              requester,
-              null,
-              null,
-              null,
-              null,
-              System.currentTimeMillis() / 1000,
-              0,
-              0,
-              0,
-              0
-          )
-      );
+          new HistoryDto(UUID.randomUUID(), newItem, newItem.nextHistoryNum(), requester, null,
+              null, null, null, System.currentTimeMillis() / 1000, 0, 0, 0, 0));
     }
     return output;
   }
 
   private UUID getUserIdOrNull(UserDto user) {
-      if (user == null) {
-          return null;
-      }
+    if (user == null) {
+      return null;
+    }
     return user.id();
   }
 
@@ -1487,8 +1352,8 @@ public class HistoryServiceTest extends BaseServiceTest {
   }
 
   private RandomGetter<ItemDto> returnableItems(RandomGetter<ItemDto> items) {
-    return items.filter((item) -> item.status() == ItemStatus.USING
-        || item.status() == ItemStatus.LOST);
+    return items.filter(
+        (item) -> item.status() == ItemStatus.USING || item.status() == ItemStatus.LOST);
   }
 
   private RandomGetter<ItemDto> itemsOnStuff(RandomGetter<ItemDto> items, StuffDto stuff) {

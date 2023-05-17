@@ -75,9 +75,9 @@ public class HistoryDaoTest extends BaseDaoTest {
 
       List<HistoryEntity> expect = new ArrayList<>();
       for (HistoryEntity history : stub.ALL_HISTORIES) {
-          if (history.getItemId().equals(itemId)) {
-              expect.add(history);
-          }
+        if (history.getItemId().equals(itemId)) {
+          expect.add(history);
+        }
       }
       TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
     }
@@ -123,9 +123,9 @@ public class HistoryDaoTest extends BaseDaoTest {
 
       List<HistoryEntity> expect = new ArrayList<>();
       for (HistoryEntity history : stub.ALL_HISTORIES) {
-          if (history.getItem().getStuffId().equals(stuffId)) {
-              expect.add(history);
-          }
+        if (history.getItem().getStuffId().equals(stuffId)) {
+          expect.add(history);
+        }
       }
       TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
     }
@@ -174,9 +174,9 @@ public class HistoryDaoTest extends BaseDaoTest {
 
       List<HistoryEntity> expect = new ArrayList<>();
       for (HistoryEntity history : stub.ALL_HISTORIES) {
-          if (history.getItem().getStuff().getDepartmentId().equals(deptId)) {
-              expect.add(history);
-          }
+        if (history.getItem().getStuff().getDepartmentId().equals(deptId)) {
+          expect.add(history);
+        }
       }
       TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
     }
@@ -224,8 +224,8 @@ public class HistoryDaoTest extends BaseDaoTest {
 
       when(deptRepository.existsById(deptId)).thenReturn(true);
       when(userRepository.existsById(requesterId)).thenReturn(true);
-      when(historyRepository.findByRequesterId(requesterId))
-          .thenReturn(historiesByRequesters(requesterId));
+      when(historyRepository.findByRequesterId(requesterId)).thenReturn(
+          historiesByRequesters(requesterId));
 
       List<HistoryEntity> expect = new ArrayList<>();
       for (HistoryEntity history : stub.ALL_HISTORIES) {
@@ -307,14 +307,11 @@ public class HistoryDaoTest extends BaseDaoTest {
     }
 
     protected HistoryDto execMethod() {
-      return historyDao.create(
-          history.getId(), history.getItemId(), history.getNum(),
-          history.getRequesterId(), history.getApproveManagerId(),
-          history.getReturnManagerId(), history.getLostManagerId(),
-          history.getCancelManagerId(), history.getRequestedAt(),
-          history.getApprovedAt(), history.getReturnedAt(),
-          history.getLostAt(), history.getCanceledAt()
-      );
+      return historyDao.create(history.getId(), history.getItemId(), history.getNum(),
+          history.getRequesterId(), history.getApproveManagerId(), history.getReturnManagerId(),
+          history.getLostManagerId(), history.getCancelManagerId(), history.getRequestedAt(),
+          history.getApprovedAt(), history.getReturnedAt(), history.getLostAt(),
+          history.getCanceledAt());
     }
 
     @RepeatedTest(10)
@@ -327,26 +324,26 @@ public class HistoryDaoTest extends BaseDaoTest {
       when(
           historyRepository.existsByItemIdAndNum(history.getItemId(), history.getNum())).thenReturn(
           false);
-        if (history.getRequester() != null) {
-            when(userRepository.findById(history.getRequesterId())).thenReturn(
-                Optional.of(history.getRequester()));
-        }
-        if (history.getApproveManager() != null) {
-            when(userRepository.findById(history.getApproveManagerId())).thenReturn(
-                Optional.of(history.getApproveManager()));
-        }
-        if (history.getReturnManager() != null) {
-            when(userRepository.findById(history.getReturnManagerId())).thenReturn(
-                Optional.of(history.getReturnManager()));
-        }
-        if (history.getLostManager() != null) {
-            when(userRepository.findById(history.getLostManagerId())).thenReturn(
-                Optional.of(history.getLostManager()));
-        }
-        if (history.getCancelManager() != null) {
-            when(userRepository.findById(history.getCancelManagerId())).thenReturn(
-                Optional.of(history.getCancelManager()));
-        }
+      if (history.getRequester() != null) {
+        when(userRepository.findById(history.getRequesterId())).thenReturn(
+            Optional.of(history.getRequester()));
+      }
+      if (history.getApproveManager() != null) {
+        when(userRepository.findById(history.getApproveManagerId())).thenReturn(
+            Optional.of(history.getApproveManager()));
+      }
+      if (history.getReturnManager() != null) {
+        when(userRepository.findById(history.getReturnManagerId())).thenReturn(
+            Optional.of(history.getReturnManager()));
+      }
+      if (history.getLostManager() != null) {
+        when(userRepository.findById(history.getLostManagerId())).thenReturn(
+            Optional.of(history.getLostManager()));
+      }
+      if (history.getCancelManager() != null) {
+        when(userRepository.findById(history.getCancelManagerId())).thenReturn(
+            Optional.of(history.getCancelManager()));
+      }
 
       when(historyRepository.save(mockArg(history))).thenReturn(history);
 
@@ -419,64 +416,55 @@ public class HistoryDaoTest extends BaseDaoTest {
     }
 
     private HistoryEntity updatedHistory() {
-      return target
-          .withItem(newHistory.getItem())
-          .withNum(newHistory.getNum())
+      return target.withItem(newHistory.getItem()).withNum(newHistory.getNum())
           .withRequester(newHistory.getRequester())
           .withApproveManager(newHistory.getApproveManager())
           .withReturnManager(newHistory.getReturnManager())
           .withLostManager(newHistory.getLostManager())
           .withCancelManager(newHistory.getCancelManager())
-          .withRequestedAt(newHistory.getRequestedAt())
-          .withApprovedAt(newHistory.getApprovedAt())
-          .withReturnedAt(newHistory.getReturnedAt())
-          .withLostAt(newHistory.getLostAt())
+          .withRequestedAt(newHistory.getRequestedAt()).withApprovedAt(newHistory.getApprovedAt())
+          .withReturnedAt(newHistory.getReturnedAt()).withLostAt(newHistory.getLostAt())
           .withCanceledAt(newHistory.getCanceledAt());
     }
 
     protected HistoryDto execMethod() {
-      return historyDao.update(
-          targetId, newHistory.getItemId(), newHistory.getNum(),
+      return historyDao.update(targetId, newHistory.getItemId(), newHistory.getNum(),
           newHistory.getRequesterId(), newHistory.getApproveManagerId(),
           newHistory.getReturnManagerId(), newHistory.getLostManagerId(),
-          newHistory.getCancelManagerId(), newHistory.getRequestedAt(),
-          newHistory.getApprovedAt(), newHistory.getReturnedAt(),
-          newHistory.getLostAt(), newHistory.getCanceledAt()
-      );
+          newHistory.getCancelManagerId(), newHistory.getRequestedAt(), newHistory.getApprovedAt(),
+          newHistory.getReturnedAt(), newHistory.getLostAt(), newHistory.getCanceledAt());
     }
 
     @RepeatedTest(10)
     @DisplayName("[SUCCESS]_[`index`를 변경하지 않을 시]_[-]")
     public void SUCCESS_notChangeIndex() {
       setTarget(randomHistory());
-      newHistory = target
-          .withApproveManager(randomUser())
-          .withApprovedAt(1683076516);
+      newHistory = target.withApproveManager(randomUser()).withApprovedAt(1683076516);
 
       when(historyRepository.findById(targetId)).thenReturn(Optional.of(target));
       when(itemRepository.findById(newHistory.getItemId())).thenReturn(
           Optional.of(newHistory.getItem()));
 
-        if (newHistory.getRequester() != null) {
-            when(userRepository.findById(newHistory.getRequesterId())).thenReturn(
-                Optional.of(newHistory.getRequester()));
-        }
-        if (newHistory.getApproveManager() != null) {
-            when(userRepository.findById(newHistory.getApproveManagerId())).thenReturn(
-                Optional.of(newHistory.getApproveManager()));
-        }
-        if (newHistory.getReturnManager() != null) {
-            when(userRepository.findById(newHistory.getReturnManagerId())).thenReturn(
-                Optional.of(newHistory.getReturnManager()));
-        }
-        if (newHistory.getLostManager() != null) {
-            when(userRepository.findById(newHistory.getLostManagerId())).thenReturn(
-                Optional.of(newHistory.getLostManager()));
-        }
-        if (newHistory.getCancelManager() != null) {
-            when(userRepository.findById(newHistory.getCancelManagerId())).thenReturn(
-                Optional.of(newHistory.getCancelManager()));
-        }
+      if (newHistory.getRequester() != null) {
+        when(userRepository.findById(newHistory.getRequesterId())).thenReturn(
+            Optional.of(newHistory.getRequester()));
+      }
+      if (newHistory.getApproveManager() != null) {
+        when(userRepository.findById(newHistory.getApproveManagerId())).thenReturn(
+            Optional.of(newHistory.getApproveManager()));
+      }
+      if (newHistory.getReturnManager() != null) {
+        when(userRepository.findById(newHistory.getReturnManagerId())).thenReturn(
+            Optional.of(newHistory.getReturnManager()));
+      }
+      if (newHistory.getLostManager() != null) {
+        when(userRepository.findById(newHistory.getLostManagerId())).thenReturn(
+            Optional.of(newHistory.getLostManager()));
+      }
+      if (newHistory.getCancelManager() != null) {
+        when(userRepository.findById(newHistory.getCancelManagerId())).thenReturn(
+            Optional.of(newHistory.getCancelManager()));
+      }
 
       when(historyRepository.save(mockArg(updatedHistory()))).thenReturn(updatedHistory());
 
@@ -489,11 +477,8 @@ public class HistoryDaoTest extends BaseDaoTest {
     @DisplayName("[SUCCESS]_[`index`를 변경할 시]_[-]")
     public void SUCCESS_changeIndex() {
       setTarget(randomHistory());
-      newHistory = randomHistory()
-          .withItem(randomItem())
-          .withNum(9000)
-          .withReturnManager(randomUser())
-          .withReturnedAt(1683076516);
+      newHistory = randomHistory().withItem(randomItem()).withNum(9000)
+          .withReturnManager(randomUser()).withReturnedAt(1683076516);
 
       when(historyRepository.findById(targetId)).thenReturn(Optional.of(target));
       when(itemRepository.findById(newHistory.getItemId())).thenReturn(
@@ -501,26 +486,26 @@ public class HistoryDaoTest extends BaseDaoTest {
       when(historyRepository.existsByItemIdAndNum(newHistory.getItemId(),
           newHistory.getNum())).thenReturn(false);
 
-        if (newHistory.getRequester() != null) {
-            when(userRepository.findById(newHistory.getRequesterId())).thenReturn(
-                Optional.of(newHistory.getRequester()));
-        }
-        if (newHistory.getApproveManager() != null) {
-            when(userRepository.findById(newHistory.getApproveManagerId())).thenReturn(
-                Optional.of(newHistory.getApproveManager()));
-        }
-        if (newHistory.getReturnManager() != null) {
-            when(userRepository.findById(newHistory.getReturnManagerId())).thenReturn(
-                Optional.of(newHistory.getReturnManager()));
-        }
-        if (newHistory.getLostManager() != null) {
-            when(userRepository.findById(newHistory.getLostManagerId())).thenReturn(
-                Optional.of(newHistory.getLostManager()));
-        }
-        if (newHistory.getCancelManager() != null) {
-            when(userRepository.findById(newHistory.getCancelManagerId())).thenReturn(
-                Optional.of(newHistory.getCancelManager()));
-        }
+      if (newHistory.getRequester() != null) {
+        when(userRepository.findById(newHistory.getRequesterId())).thenReturn(
+            Optional.of(newHistory.getRequester()));
+      }
+      if (newHistory.getApproveManager() != null) {
+        when(userRepository.findById(newHistory.getApproveManagerId())).thenReturn(
+            Optional.of(newHistory.getApproveManager()));
+      }
+      if (newHistory.getReturnManager() != null) {
+        when(userRepository.findById(newHistory.getReturnManagerId())).thenReturn(
+            Optional.of(newHistory.getReturnManager()));
+      }
+      if (newHistory.getLostManager() != null) {
+        when(userRepository.findById(newHistory.getLostManagerId())).thenReturn(
+            Optional.of(newHistory.getLostManager()));
+      }
+      if (newHistory.getCancelManager() != null) {
+        when(userRepository.findById(newHistory.getCancelManagerId())).thenReturn(
+            Optional.of(newHistory.getCancelManager()));
+      }
 
       when(historyRepository.save(mockArg(updatedHistory()))).thenReturn(updatedHistory());
 
@@ -533,11 +518,8 @@ public class HistoryDaoTest extends BaseDaoTest {
     @DisplayName("[ERROR]_[`id`에 해당하는 `history`가 존재하지 않을 시]_[NotFoundException]")
     public void ERROR_majorNotFound_NotFoundException() {
       setTarget(randomHistory());
-      newHistory = randomHistory()
-          .withItem(randomItem())
-          .withNum(9000)
-          .withReturnManager(randomUser())
-          .withReturnedAt(1683076516);
+      newHistory = randomHistory().withItem(randomItem()).withNum(9000)
+          .withReturnManager(randomUser()).withReturnedAt(1683076516);
 
       when(historyRepository.findById(targetId)).thenReturn(Optional.empty());
 
@@ -549,11 +531,8 @@ public class HistoryDaoTest extends BaseDaoTest {
     @DisplayName("[ERROR]_[`itemId`에 해당하는 `item`이 존재하지 않을 시]_[InvalidIndexException]")
     public void ERROR_itemNotFound_InvalidIndexException() {
       setTarget(randomHistory());
-      newHistory = randomHistory()
-          .withItem(randomItem())
-          .withNum(9000)
-          .withReturnManager(randomUser())
-          .withReturnedAt(1683076516);
+      newHistory = randomHistory().withItem(randomItem()).withNum(9000)
+          .withReturnManager(randomUser()).withReturnedAt(1683076516);
 
       when(historyRepository.findById(targetId)).thenReturn(Optional.of(target));
       when(itemRepository.findById(newHistory.getItemId())).thenReturn(Optional.empty());
@@ -565,11 +544,8 @@ public class HistoryDaoTest extends BaseDaoTest {
     @DisplayName("[ERROR]_[`userId`에 해당하는 `user`가 존재하지 않을 시]_[InvalidIndexException]")
     public void ERROR_wrongUnivId_InvalidIndexException() {
       setTarget(randomHistory());
-      newHistory = randomHistory()
-          .withItem(randomItem())
-          .withNum(9000)
-          .withReturnManager(randomUser())
-          .withReturnedAt(1683076516);
+      newHistory = randomHistory().withItem(randomItem()).withNum(9000)
+          .withReturnManager(randomUser()).withReturnedAt(1683076516);
 
       when(historyRepository.findById(targetId)).thenReturn(Optional.of(target));
       when(itemRepository.findById(newHistory.getItemId())).thenReturn(
@@ -585,11 +561,8 @@ public class HistoryDaoTest extends BaseDaoTest {
     @DisplayName("[ERROR]_[동일한 `index`를 갖는 `history`가 존재할 시]_[ConflictException]")
     public void ERROR_IndexConflict_ConflictException() {
       setTarget(randomHistory());
-      newHistory = randomHistory()
-          .withItem(randomItem())
-          .withNum(9000)
-          .withReturnManager(randomUser())
-          .withReturnedAt(1683076516);
+      newHistory = randomHistory().withItem(randomItem()).withNum(9000)
+          .withReturnManager(randomUser()).withReturnedAt(1683076516);
 
       when(historyRepository.findById(targetId)).thenReturn(Optional.of(target));
       when(itemRepository.findById(newHistory.getItemId())).thenReturn(

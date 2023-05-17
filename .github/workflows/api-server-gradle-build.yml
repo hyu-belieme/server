@@ -21,15 +21,15 @@ jobs:
       api-server-working-directory: ./api-server
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    - run: gradle init
-      working-directory: ${{ env.api-server-working-directory }}
-    - name: Build with Gradle and Test
-      run: ./gradlew clean build
-      working-directory: ${{ env.api-server-working-directory }}
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - run: gradle init
+        working-directory: ${{ env.api-server-working-directory }}
+      - name: Build with Gradle and Test
+        run: ./gradlew clean build
+        working-directory: ${{ env.api-server-working-directory }}
 

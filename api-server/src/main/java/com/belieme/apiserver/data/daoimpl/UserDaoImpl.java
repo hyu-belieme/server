@@ -29,10 +29,9 @@ import org.springframework.stereotype.Component;
 public class UserDaoImpl extends BaseDaoImpl implements UserDao {
 
   @Autowired
-  public UserDaoImpl(
-      UniversityRepository universityRepository, DepartmentRepository departmentRepository,
-      UserRepository userRepository, MajorRepository majorRepository,
-      MajorDepartmentJoinRepository majorDepartmentJoinRepository,
+  public UserDaoImpl(UniversityRepository universityRepository,
+      DepartmentRepository departmentRepository, UserRepository userRepository,
+      MajorRepository majorRepository, MajorDepartmentJoinRepository majorDepartmentJoinRepository,
       AuthorityRepository authorityRepository,
       AuthorityUserJoinRepository authorityUserJoinRepository, StuffRepository stuffRepository,
       ItemRepository itemRepository, HistoryRepository historyRepository) {
@@ -108,16 +107,8 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     checkUserIdConflict(userId);
     checkUserConflict(universityEntity.getId(), studentId);
 
-    UserEntity newUserEntity = new UserEntity(
-        userId,
-        universityEntity,
-        studentId,
-        name,
-        entranceYear,
-        token,
-        createdAt,
-        approvedAt
-    );
+    UserEntity newUserEntity = new UserEntity(userId, universityEntity, studentId, name,
+        entranceYear, token, createdAt, approvedAt);
     return userRepository.save(newUserEntity);
   }
 
@@ -129,24 +120,16 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
       checkUserConflict(newUniversity.getId(), studentId);
     }
 
-    return target
-        .withUniversity(newUniversity)
-        .withStudentId(studentId)
-        .withName(name)
-        .withEntranceYear(entranceYear)
-        .withToken(token)
-        .withCreatedAt(createdAt)
+    return target.withUniversity(newUniversity).withStudentId(studentId).withName(name)
+        .withEntranceYear(entranceYear).withToken(token).withCreatedAt(createdAt)
         .withApprovedAt(approvedAt);
   }
 
   private UserEntity saveAuthorityJoins(UserEntity newUserEntity, List<AuthorityDto> authorities) {
     for (AuthorityDto authority : authorities) {
-      AuthorityEntity authorityEntity = findAuthorityEntity(
-          authority.department().id(), authority.permission().name());
-      AuthorityUserJoinEntity newJoin = new AuthorityUserJoinEntity(
-          authorityEntity,
-          newUserEntity
-      );
+      AuthorityEntity authorityEntity = findAuthorityEntity(authority.department().id(),
+          authority.permission().name());
+      AuthorityUserJoinEntity newJoin = new AuthorityUserJoinEntity(authorityEntity, newUserEntity);
       AuthorityUserJoinEntity newAuthJoin = authorityUserJoinRepository.save(newJoin);
       newUserEntity = newUserEntity.withAuthorityAdd(newAuthJoin);
     }
@@ -162,8 +145,7 @@ public class UserDaoImpl extends BaseDaoImpl implements UserDao {
     UUID oldUniversityId = target.getUniversity().getId();
     String oldStudentId = target.getStudentId();
 
-    return !(oldUniversityId.equals(newUnivId)
-        && oldStudentId.equals(newStudentId));
+    return !(oldUniversityId.equals(newUnivId) && oldStudentId.equals(newStudentId));
   }
 
   private void checkUserIdConflict(UUID userId) {
