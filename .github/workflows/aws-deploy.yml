@@ -9,7 +9,7 @@ name: Deploy api and config server to AWS
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop", "fix/88-cd" ]
 
 permissions:
   contents: read
