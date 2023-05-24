@@ -15,7 +15,7 @@ import lombok.Setter;
 public class StuffRequest {
 
   @NotNull(message = "{message.error.badRequest.notNull}", groups = StuffCreateValidationGroup.class)
-  @JsonProperty("departmentId")
+  @JsonProperty("department-id")
   String departmentId;
 
   @Size(min = 1, max = 30, message = "{message.error.badRequest.outOfSize}", groups = {
