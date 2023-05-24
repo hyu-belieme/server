@@ -12,8 +12,8 @@ CURRENT_PID=$(pgrep -f $JAR_FILE)
 
 # 프로세스가 켜져 있으면 종료
 if [ -z $CURRENT_PID ]; then
-  sudo echo "$TIME_NOW > 현재 실행중인 애플리케이션이 없습니다" >> $DEPLOY_LOG
+  echo "$TIME_NOW > 현재 실행중인 애플리케이션이 없습니다" >> $DEPLOY_LOG
 else
-  sudo echo "$TIME_NOW > 실행중인 $CURRENT_PID 애플리케이션 종료 " >> $DEPLOY_LOG
-  sudo kill -15 $CURRENT_PID
+  echo "$TIME_NOW > 실행중인 $CURRENT_PID 애플리케이션 종료 " >> $DEPLOY_LOG
+  kill -15 $CURRENT_PID
 fi
