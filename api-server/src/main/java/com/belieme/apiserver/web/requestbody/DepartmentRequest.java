@@ -15,7 +15,7 @@ import lombok.Setter;
 public class DepartmentRequest {
 
   @NotNull(message = "{message.error.badRequest.notNull}", groups = DepartmentCreateValidationGroup.class)
-  @JsonProperty("universityId")
+  @JsonProperty("university-id")
   String universityId;
 
   @Size(min = 1, max = 30, message = "{message.error.badRequest.outOfSize}", groups = {
@@ -27,6 +27,6 @@ public class DepartmentRequest {
   String name;
 
   @NotNull(message = "{message.error.badRequest.notNull}", groups = DepartmentCreateValidationGroup.class)
-  @JsonProperty("baseMajors")
+  @JsonProperty("base-majors")
   List<String> baseMajors;
 }

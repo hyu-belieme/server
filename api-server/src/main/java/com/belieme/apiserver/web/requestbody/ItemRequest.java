@@ -10,6 +10,6 @@ import lombok.Setter;
 public class ItemRequest {
 
   @NotNull(message = "{message.error.badRequest.notNull}")
-  @JsonProperty("stuffId")
+  @JsonProperty("stuff-id")
   String stuffId;
 }
