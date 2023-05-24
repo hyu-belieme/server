@@ -7,6 +7,7 @@ import com.belieme.apiserver.domain.service.ItemService;
 import com.belieme.apiserver.web.requestbody.ItemRequest;
 import com.belieme.apiserver.web.responsebody.HistoryResponse;
 import com.belieme.apiserver.web.responsebody.ItemResponse;
+import com.belieme.apiserver.web.responsebody.StuffResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,12 +57,12 @@ public class ItemApiController extends BaseApiController {
   }
 
   @PostMapping("/${api.keyword.item}")
-  public ResponseEntity<ItemResponse> createNewItem(
+  public ResponseEntity<StuffResponse> createNewItem(
       @RequestHeader("${api.header.user-token}") String userToken,
       @RequestBody @Validated ItemRequest newItem) {
     UUID stuffId = toUUID(newItem.getStuffId());
     ItemDto itemDto = itemService.create(userToken, stuffId);
-    ItemResponse response = ItemResponse.from(itemDto);
+    StuffResponse response = StuffResponse.from(itemDto.stuff());
     return ResponseEntity.ok(response);
   }
 
