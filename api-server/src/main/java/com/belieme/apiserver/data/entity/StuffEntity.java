@@ -82,6 +82,18 @@ public class StuffEntity extends DataEntity<UUID> {
     return new StuffEntity(id, department, name, thumbnail, items);
   }
 
+  public StuffEntity withItemRemove(@NonNull ItemEntity item) {
+    List<ItemEntity> newItems = new ArrayList<>(items);
+    newItems.remove(item);
+    return new StuffEntity(id, department, name, thumbnail, newItems);
+  }
+
+  public StuffEntity withItemAdd(@NonNull ItemEntity item) {
+    List<ItemEntity> newItems = new ArrayList<>(items);
+    newItems.add(item);
+    return new StuffEntity(id, department, name, thumbnail, newItems);
+  }
+
   public StuffDto toStuffDto() {
     List<ItemDto> itemDtoList = new ArrayList<>();
     for (ItemEntity item : items) {
