@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreRemove;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
@@ -62,6 +64,16 @@ public class ItemEntity extends DataEntity<UUID> {
 
   public ItemEntity withStuff(@NonNull StuffEntity stuff) {
     return new ItemEntity(id, stuff, num, lastHistory);
+  }
+
+  @PrePersist
+  private void commitOnUserAfterCreate() {
+    this.stuff = stuff.withItemAdd(this);
+  }
+
+  @PreRemove
+  private void commitToUserBeforeRemove() {
+    this.stuff = stuff.withItemRemove(this);
   }
 
   public ItemEntity withNum(int num) {
