@@ -81,7 +81,7 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
 
     List<HistoryDto> output = new ArrayList<>();
     for (HistoryEntity historyEntity : historyRepository.findByRequesterId(requesterId)) {
-      if (historyEntity.getItem().getStuff().getDepartment().getId() == departmentId) {
+      if (historyEntity.getItem().getStuff().getDepartment().getId().equals(departmentId)) {
         output.add(historyEntity.toHistoryDto());
       }
     }
