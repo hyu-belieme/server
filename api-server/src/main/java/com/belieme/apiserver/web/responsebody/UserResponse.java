@@ -69,6 +69,6 @@ public class UserResponse extends JsonResponse {
   }
 
   public UserResponse withoutSecureInfo() {
-    return new UserResponse(id, university, studentId, name, entranceYear, null, null, 0, 0);
+    return new UserResponse(id, university, studentId, name, entranceYear, authorities, null, 0, 0);
   }
 }

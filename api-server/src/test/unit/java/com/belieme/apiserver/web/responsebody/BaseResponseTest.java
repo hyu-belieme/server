@@ -113,7 +113,13 @@ public class BaseResponseTest {
     JSONObject univJson = (JSONObject) json.get("university");
     basicUnivJsonCmpAssertions(univJson, user.university());
 
-    Assertions.assertThat(json.containsKey("authorities")).isFalse();
+    Assertions.assertThat(json.containsKey("authorities")).isTrue();
+    JSONArray jsonArray = (JSONArray) json.get("authorities");
+    for (int i = 0; i < jsonArray.size(); i++) {
+      JSONObject authorityJson = (JSONObject) jsonArray.get(i);
+      authorityJsonCmpAssertions(authorityJson, user.meaningfulAuthorities().get(i));
+    }
+
     Assertions.assertThat(json.containsKey("token")).isFalse();
     Assertions.assertThat(json.containsKey("createdAt")).isFalse();
     Assertions.assertThat(json.containsKey("approvedAt")).isFalse();
