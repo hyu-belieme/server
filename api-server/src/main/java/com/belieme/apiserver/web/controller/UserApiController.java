@@ -58,7 +58,7 @@ public class UserApiController extends BaseApiController {
   public ResponseEntity<UserResponse> getMyUserInfo(
       @RequestHeader("${api.header.user-token}") String userToken) {
     UserDto userDto = userService.getByToken(userToken);
-    UserResponse response = UserResponse.from(userDto);
+    UserResponse response = UserResponse.from(userDto).withoutSecureInfo();
     return ResponseEntity.ok(response);
   }
 
