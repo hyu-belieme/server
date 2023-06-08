@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-@JsonPropertyOrder({"id", "univ", "dept", "item", "num", "status", "requestedAt", "requester",
+@JsonPropertyOrder({"id", "university", "department", "stuff", "item", "num", "status", "requestedAt", "requester",
     "approvedAt", "approveManager", "lostAt", "lostManager", "returnedAt", "returnManager",
     "canceledAt", "cancelManager"})
 public class HistoryResponse extends JsonResponse {
@@ -17,9 +17,11 @@ public class HistoryResponse extends JsonResponse {
   private UniversityResponse university;
   @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
   private DepartmentResponse department;
-
+  @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
+  private StuffResponse stuff;
   @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ResponseFilter.class)
   private ItemResponse item;
+
   private int num;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -51,14 +53,15 @@ public class HistoryResponse extends JsonResponse {
   }
 
   private HistoryResponse(UUID id, UniversityResponse university, DepartmentResponse department,
-      ItemResponse item, int num, UserResponse requester, UserResponse approveManager,
-      UserResponse returnManager, UserResponse lostManager, UserResponse cancelManager,
-      long requestedAt, long approvedAt, long returnedAt, long lostAt, long canceledAt,
-      String status) {
+      StuffResponse stuff, ItemResponse item, int num, UserResponse requester,
+      UserResponse approveManager, UserResponse returnManager, UserResponse lostManager,
+      UserResponse cancelManager, long requestedAt, long approvedAt, long returnedAt, long lostAt,
+      long canceledAt, String status) {
     super(true);
     this.id = id;
     this.university = university;
     this.department = department;
+    this.stuff = stuff;
     this.item = item;
     this.num = num;
     this.requester = requester;
@@ -89,8 +92,10 @@ public class HistoryResponse extends JsonResponse {
     return new HistoryResponse(historyDto.id(),
         UniversityResponse.from(historyDto.item().stuff().department().university()),
         DepartmentResponse.from(historyDto.item().stuff().department()).withoutUniversity(),
-        ItemResponse.from(historyDto.item()).withoutUniversityAndDepartment(), historyDto.num(),
-        toNestedResponse(UserResponse.from(historyDto.requester())),
+        StuffResponse.from(historyDto.item().stuff()).withoutUniversityAndDepartment()
+            .withoutItems(),
+        ItemResponse.from(historyDto.item()).withoutUniversityAndDepartment().withoutStuffInfo(),
+        historyDto.num(), toNestedResponse(UserResponse.from(historyDto.requester())),
         toNestedResponse(UserResponse.from(historyDto.approveManager())),
         toNestedResponse(UserResponse.from(historyDto.returnManager())),
         toNestedResponse(UserResponse.from(historyDto.lostManager())),
@@ -101,15 +106,16 @@ public class HistoryResponse extends JsonResponse {
 
   public HistoryResponse withoutUniversityAndDepartment() {
     return new HistoryResponse(id, UniversityResponse.responseWillBeIgnore(),
-        DepartmentResponse.responseWillBeIgnore(), item, num, requester, approveManager,
+        DepartmentResponse.responseWillBeIgnore(), stuff, item, num, requester, approveManager,
         returnManager, lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt,
         canceledAt, status);
   }
 
-  public HistoryResponse withoutItem() {
-    return new HistoryResponse(id, university, department, ItemResponse.responseWillBeIgnore(), num,
-        requester, approveManager, returnManager, lostManager, cancelManager, requestedAt,
-        approvedAt, returnedAt, lostAt, canceledAt, status);
+  public HistoryResponse withoutStuffAndItem() {
+    return new HistoryResponse(id, university, department, StuffResponse.responseWillBeIgnore(),
+        ItemResponse.responseWillBeIgnore(), num, requester, approveManager, returnManager,
+        lostManager, cancelManager, requestedAt, approvedAt, returnedAt, lostAt, canceledAt,
+        status);
   }
 
   private static UserResponse toNestedResponse(UserResponse user) {

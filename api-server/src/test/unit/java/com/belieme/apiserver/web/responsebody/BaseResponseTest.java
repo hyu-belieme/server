@@ -179,6 +179,21 @@ public class BaseResponseTest {
     stuffInfoJsonCmpAssertions(json, stuff);
   }
 
+  protected void stuffJsonWithoutUnivAndDeptAndItemsInfoCmpAssertions(JSONObject json, StuffDto stuff) {
+    System.out.println("DTO : " + stuff);
+    System.out.println("JSON : " + json.toString());
+    System.out.println();
+
+    Assertions.assertThat(json.containsKey("university")).isFalse();
+
+    Assertions.assertThat(json.containsKey("department")).isFalse();
+
+    Assertions.assertThat(json.containsKey("items")).isFalse();
+
+    stuffInfoJsonCmpAssertions(json, stuff);
+  }
+
+
   protected void itemJsonCmpAssertions(JSONObject json, ItemDto item) {
     System.out.println("DTO : " + item);
     System.out.println("JSON : " + json.toString());
@@ -266,9 +281,13 @@ public class BaseResponseTest {
     JSONObject deptJson = (JSONObject) json.get("department");
     deptWithoutUnivJsonCmpAssertions(deptJson, history.item().stuff().department());
 
+    Assertions.assertThat(json.containsKey("stuff")).isTrue();
+    JSONObject stuffJson = (JSONObject) json.get("stuff");
+    stuffJsonWithoutUnivAndDeptAndItemsInfoCmpAssertions(stuffJson, history.item().stuff());
+
     Assertions.assertThat(json.containsKey("item")).isTrue();
     JSONObject itemJson = (JSONObject) json.get("item");
-    itemJsonWithoutUnivAndDeptInfoCmpAssertions(itemJson, history.item());
+    itemJsonWithoutUnivAndDeptAndStuffInfoCmpAssertions(itemJson, history.item());
 
     historyInfoJsonCmpAssertions(json, history);
   }
@@ -282,14 +301,18 @@ public class BaseResponseTest {
     Assertions.assertThat(json.containsKey("university")).isFalse();
     Assertions.assertThat(json.containsKey("department")).isFalse();
 
+    Assertions.assertThat(json.containsKey("stuff")).isTrue();
+    JSONObject stuffJson = (JSONObject) json.get("stuff");
+    stuffJsonWithoutUnivAndDeptAndItemsInfoCmpAssertions(stuffJson, history.item().stuff());
+
     Assertions.assertThat(json.containsKey("item")).isTrue();
     JSONObject itemJson = (JSONObject) json.get("item");
-    itemJsonWithoutUnivAndDeptInfoCmpAssertions(itemJson, history.item());
+    itemJsonWithoutUnivAndDeptAndStuffInfoCmpAssertions(itemJson, history.item());
 
     historyInfoJsonCmpAssertions(json, history);
   }
 
-  protected void historyJsonWithoutItemInfoCmpAssertions(JSONObject json, HistoryDto history) {
+  protected void historyJsonWithoutStuffAndItemInfoCmpAssertions(JSONObject json, HistoryDto history) {
     System.out.println("DTO : " + history);
     System.out.println("JSON : " + json.toString());
     System.out.println();
@@ -302,12 +325,13 @@ public class BaseResponseTest {
     JSONObject deptJson = (JSONObject) json.get("department");
     deptWithoutUnivJsonCmpAssertions(deptJson, history.item().stuff().department());
 
+    Assertions.assertThat(json.containsKey("stuff")).isFalse();
     Assertions.assertThat(json.containsKey("item")).isFalse();
 
     historyInfoJsonCmpAssertions(json, history);
   }
 
-  protected void historyJsonWithoutUnivAndDeptAndItemInfoCmpAssertions(JSONObject json,
+  protected void historyJsonWithoutUnivAndDeptAndStuffAndItemInfoCmpAssertions(JSONObject json,
       HistoryDto history) {
     System.out.println("DTO : " + history);
     System.out.println("JSON : " + json.toString());
@@ -315,6 +339,7 @@ public class BaseResponseTest {
 
     Assertions.assertThat(json.containsKey("university")).isFalse();
     Assertions.assertThat(json.containsKey("department")).isFalse();
+    Assertions.assertThat(json.containsKey("stuff")).isFalse();
     Assertions.assertThat(json.containsKey("item")).isFalse();
 
     historyInfoJsonCmpAssertions(json, history);
@@ -428,6 +453,6 @@ public class BaseResponseTest {
       Assertions.assertThat(historyJson).isNull();
       return;
     }
-    historyJsonWithoutUnivAndDeptAndItemInfoCmpAssertions(historyJson, item.lastHistory());
+    historyJsonWithoutUnivAndDeptAndStuffAndItemInfoCmpAssertions(historyJson, item.lastHistory());
   }
 }

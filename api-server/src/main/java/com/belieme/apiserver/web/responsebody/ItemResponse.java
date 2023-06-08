@@ -76,6 +76,6 @@ public class ItemResponse extends JsonResponse {
     if (history == null) {
       return null;
     }
-    return history.withoutItem().withoutUniversityAndDepartment();
+    return history.withoutStuffAndItem().withoutUniversityAndDepartment();
   }
 }
