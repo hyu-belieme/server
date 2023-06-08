@@ -33,22 +33,22 @@ public class HistoryResponseTest extends BaseResponseTest {
   }
 
   @RepeatedTest(10)
-  @DisplayName("[-]_[`item`을 제외한 `history json serialization` 테스트]_[-]")
-  public void historyJsonWithoutStuffSerializationTest() throws IOException, ParseException {
+  @DisplayName("[-]_[`stuff`와 `item`을 제외한 `history json serialization` 테스트]_[-]")
+  public void historyJsonWithoutStuffAndItemSerializationTest() throws IOException, ParseException {
     HistoryDto history = historyGetter.randomSelect();
 
-    JSONObject json = makeJsonObject(HistoryResponse.from(history).withoutItem());
-    historyJsonWithoutItemInfoCmpAssertions(json, history);
+    JSONObject json = makeJsonObject(HistoryResponse.from(history).withoutStuffAndItem());
+    historyJsonWithoutStuffAndItemInfoCmpAssertions(json, history);
   }
 
   @RepeatedTest(10)
-  @DisplayName("[-]_[`university`와 `department`, `item`을 제외한 `history json serialization` 테스트]_[-]")
-  public void historyJsonWithoutUnivAndDeptAndStuffSerializationTest()
+  @DisplayName("[-]_[`university`와 `department`, `stuff`, `item`을 제외한 `history json serialization` 테스트]_[-]")
+  public void historyJsonWithoutUnivAndDeptAndStuffAndItemSerializationTest()
       throws IOException, ParseException {
     HistoryDto history = historyGetter.randomSelect();
 
     JSONObject json = makeJsonObject(
-        HistoryResponse.from(history).withoutUniversityAndDepartment().withoutItem());
-    historyJsonWithoutUnivAndDeptAndItemInfoCmpAssertions(json, history);
+        HistoryResponse.from(history).withoutUniversityAndDepartment().withoutStuffAndItem());
+    historyJsonWithoutUnivAndDeptAndStuffAndItemInfoCmpAssertions(json, history);
   }
 }
