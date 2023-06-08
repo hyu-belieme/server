@@ -7,7 +7,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-@JsonPropertyOrder({"id", "univ", "dept", "stuff", "item", "num", "status", "requestedAt", "requester",
+@JsonPropertyOrder({"id", "university", "department", "stuff", "item", "num", "status", "requestedAt", "requester",
     "approvedAt", "approveManager", "lostAt", "lostManager", "returnedAt", "returnManager",
     "canceledAt", "cancelManager"})
 public class HistoryResponse extends JsonResponse {
