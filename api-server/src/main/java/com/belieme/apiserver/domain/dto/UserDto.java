@@ -159,6 +159,28 @@ public record UserDto(@NonNull UUID id, @NonNull UniversityDto university,
     return maxPermission;
   }
 
+  public Permission getMaxPermission() {
+    if (isDeveloper()) {
+      return Permission.DEVELOPER;
+    }
+
+    Permission maxPermission = Permission.BANNED;
+    for (AuthorityDto authority : authorities) {
+      if (authority.permission() == Permission.DEFAULT) {
+        maxPermission = Permission.USER;
+        break;
+      }
+    }
+
+    for (AuthorityDto authority : authorities) {
+      if (authority.permission() != Permission.DEFAULT) {
+        maxPermission = authority.permission();
+        break;
+      }
+    }
+    return maxPermission;
+  }
+
   private void overwriteAuthority(List<AuthorityDto> list, AuthorityDto newAuthority) {
     DepartmentDto targetDepartment = newAuthority.department();
     Permission newPermission = newAuthority.permission();

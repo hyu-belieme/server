@@ -173,6 +173,65 @@ public class UserServiceTest extends BaseServiceTest {
   }
 
   @Nested
+  @DisplayName("getById()")
+  public final class TestGetByUnivIdAndStudentId extends UserNestedTest {
+
+    private UserDto target;
+    private UUID targetUnivId;
+    private String targetStudentId;
+
+    @Override
+    protected void setUpDefault() {
+      setRequester(randomUserHaveMorePermission(Permission.MASTER));
+      setTarget(randomUser());
+    }
+
+    private void setTarget(UserDto user) {
+      this.target = user;
+      this.targetUnivId = user.university().id();
+      this.targetStudentId = user.studentId();
+    }
+
+    @Override
+    protected UserDto execMethod() {
+      return userService.getByUnivIdAndStudentId(userToken, targetUnivId, targetStudentId);
+    }
+
+    @RepeatedTest(10)
+    @DisplayName("[SUCCESS]_[`Master` 권한을 가진 `User`는 모든 `User`에 접근 가능하다]_[-]")
+    public void SUCCESS_devAccess() {
+      setUpDefault();
+
+      when(userDao.getByToken(userToken)).thenReturn(requester);
+      when(userDao.getByIndex(targetUnivId, targetStudentId)).thenReturn(target);
+
+      TestHelper.objectCompareTest(this::execMethod, target);
+    }
+
+    @RepeatedTest(10)
+    @DisplayName("[ERROR]_[해당 `index`에 `User`가 존재하지 않을 시]_[NotFoundException]")
+    public void ERROR_departmentNotFound_NotFoundException() {
+      setUpDefault();
+
+      when(userDao.getByToken(userToken)).thenReturn(requester);
+      when(userDao.getByIndex(targetUnivId, targetStudentId)).thenThrow(NotFoundException.class);
+
+      TestHelper.exceptionTest(this::execMethod, NotFoundException.class);
+    }
+
+    @RepeatedTest(10)
+    @DisplayName("[ERROR]_[권한이 없을 시]_[ForbiddenException]")
+    public void ERROR_accessDenied_ForbiddenException() {
+      setUpDefault();
+      setRequester(randomUserHaveLessPermission(Permission.MASTER));
+
+      when(userDao.getByToken(userToken)).thenReturn(requester);
+
+      TestHelper.exceptionTest(this::execMethod, ForbiddenException.class);
+    }
+  }
+
+  @Nested
   @DisplayName("getByToken()")
   public final class TestGetByToken extends UserNestedTest {
 
