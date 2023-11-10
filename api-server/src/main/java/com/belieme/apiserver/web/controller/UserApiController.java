@@ -54,6 +54,19 @@ public class UserApiController extends BaseApiController {
     return ResponseEntity.ok(response);
   }
 
+  @GetMapping("/${api.keyword.user}/${api.keyword.by-index}")
+  public ResponseEntity<UserResponse> getUserInfoByUnivIdAndStudentId(
+      @RequestHeader("${api.header.user-token}") String userToken,
+      @RequestParam (value = "${api.query.university-id}", required = true) String universityId,
+      @RequestParam (value = "${api.query.student-id}", required = true) String studentId
+  ) {
+    UUID parsedUniversityId = toUUID(universityId);
+
+    UserDto userDto = userService.getByUnivIdAndStudentId(userToken, parsedUniversityId, studentId);
+    UserResponse response = UserResponse.from(userDto).withoutSecureInfo();
+    return ResponseEntity.ok(response);
+  }
+
   @GetMapping("/${api.keyword.my-info}")
   public ResponseEntity<UserResponse> getMyUserInfo(
       @RequestHeader("${api.header.user-token}") String userToken) {
