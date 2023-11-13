@@ -12,3 +12,4 @@ spring:
           uri: git@github.com:hyu-belieme/server-cloud-config.git
           search-paths: /**
           basedir: ./config_cache
+          force-pull: true

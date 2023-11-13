@@ -78,14 +78,32 @@ public abstract class BaseService {
     }
   }
 
+  protected void checkUserPermission(UserDto requester) {
+    if (!requester.getMaxPermission().hasUserPermission()) {
+      throw new PermissionDeniedException();
+    }
+  }
+
   protected void checkStaffPermission(UserDto requester, DepartmentDto department) {
     if (!requester.getMaxPermission(department).hasStaffPermission()) {
       throw new PermissionDeniedException();
     }
   }
 
+  protected void checkStaffPermission(UserDto requester) {
+    if (!requester.getMaxPermission().hasStaffPermission()) {
+      throw new PermissionDeniedException();
+    }
+  }
+
   protected void checkMasterPermission(UserDto requester, DepartmentDto department) {
     if (!requester.getMaxPermission(department).hasMasterPermission()) {
+      throw new PermissionDeniedException();
+    }
+  }
+
+  protected void checkMasterPermission(UserDto requester) {
+    if (!requester.getMaxPermission().hasMasterPermission()) {
       throw new PermissionDeniedException();
     }
   }

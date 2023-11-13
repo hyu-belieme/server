@@ -71,6 +71,12 @@ public class UserService extends BaseService {
     return userDao.getById(userId);
   }
 
+  public UserDto getByUnivIdAndStudentId(@NonNull String userToken, @NonNull UUID univId, @NonNull String studentId) {
+    UserDto requester = validateTokenAndGetUser(userToken);
+    checkMasterPermission(requester);
+    return userDao.getByIndex(univId, studentId);
+  }
+
   public UserDto getByToken(@NonNull String userToken) {
     return validateTokenAndGetUser(userToken);
   }

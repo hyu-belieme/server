@@ -189,6 +189,18 @@ public abstract class BaseServiceTest {
     return rs.filter((user) -> user.getMaxPermission(dept) == permission);
   }
 
+  protected RandomGetter<UserDto> usersHaveLessPermission(RandomGetter<UserDto> rs, Permission permission) {
+    return rs.filter((user) -> !user.getMaxPermission().hasMorePermission(permission));
+  }
+
+  protected RandomGetter<UserDto> usersHaveMorePermission(RandomGetter<UserDto> rs, Permission permission) {
+    return rs.filter((user) -> user.getMaxPermission().hasMorePermission(permission));
+  }
+
+  protected RandomGetter<UserDto> usersHaveExactPermission(RandomGetter<UserDto> rs, Permission permission) {
+    return rs.filter((user) -> user.getMaxPermission() == permission);
+  }
+
   protected RandomGetter<StuffDto> stuffsOnDept(RandomGetter<StuffDto> rs, DepartmentDto dept) {
     return rs.filter((stuff) -> stuff.department().matchId(dept));
   }
@@ -238,6 +250,18 @@ public abstract class BaseServiceTest {
 
   protected UserDto randomUserHaveExactPermissionOnDept(DepartmentDto dept, Permission permission) {
     return randomSelectAndLog(usersHaveExactPermissionOnDept(allUsers(), dept, permission));
+  }
+
+  protected UserDto randomUserHaveMorePermission(Permission permission) {
+    return randomSelectAndLog(usersHaveMorePermission(allUsers(), permission));
+  }
+
+  protected UserDto randomUserHaveLessPermission(Permission permission) {
+    return randomSelectAndLog(usersHaveLessPermission(allUsers(), permission));
+  }
+
+  protected UserDto randomUserHaveExactPermission(Permission permission) {
+    return randomSelectAndLog(usersHaveExactPermission(allUsers(), permission));
   }
 
   protected StuffDto randomStuffOnDept(DepartmentDto dept) {
