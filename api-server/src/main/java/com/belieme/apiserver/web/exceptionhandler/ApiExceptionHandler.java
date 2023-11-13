@@ -5,6 +5,7 @@ import com.belieme.apiserver.error.info.CommonErrorInfo;
 import com.belieme.apiserver.error.info.ErrorInfo;
 import com.belieme.apiserver.util.message.Message;
 import com.belieme.apiserver.web.responsebody.ExceptionResponse;
+import jakarta.validation.ConstraintViolationException;
 import java.util.List;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -40,6 +41,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     HttpHeaders headers = new HttpHeaders();
     ExceptionResponse errorBody = makeResponse(e);
     return handleExceptionInternal(e, errorBody, headers, e.getHttpStatus(), request);
+  }
+
+  @ExceptionHandler({ConstraintViolationException.class})
+  public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e, WebRequest request) {
+    HttpHeaders headers = new HttpHeaders();
+    ErrorInfo errorInfo = CommonErrorInfo.BAD_REQUEST;
+    ExceptionResponse errorBody = makeResponse(errorInfo, makeValidationErrorResponse(e));
+    return handleExceptionInternal(e, errorBody, headers, errorInfo.httpStatus(), request);
   }
 
   @Override
@@ -82,6 +91,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     return e.getBindingResult().getFieldErrors().stream().map(
         fieldError -> new ExceptionResponse.ValidationError(fieldError.getField(),
             getMessageFromSource(new Message(fieldError.getDefaultMessage())))).toList();
+  }
+
+  private List<ExceptionResponse.ValidationError> makeValidationErrorResponse(
+      ConstraintViolationException e) {
+    return e.getConstraintViolations().stream().map(
+        constraintViolation -> new ExceptionResponse.ValidationError(
+            constraintViolation.getPropertyPath().toString(),
+            getMessageFromSource(new Message(constraintViolation.getMessage()))
+        )).toList();
   }
 
   private String getMessageFromSource(Message message) {
