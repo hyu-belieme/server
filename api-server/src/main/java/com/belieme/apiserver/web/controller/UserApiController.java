@@ -4,6 +4,7 @@ import com.belieme.apiserver.domain.dto.UserDto;
 import com.belieme.apiserver.domain.dto.enumeration.Permission;
 import com.belieme.apiserver.domain.service.UserService;
 import com.belieme.apiserver.error.exception.BadRequestException;
+import com.belieme.apiserver.error.exception.ServerException;
 import com.belieme.apiserver.error.exception.UnauthorizedException;
 import com.belieme.apiserver.web.requestbody.PermissionRequest;
 import com.belieme.apiserver.web.responsebody.UserResponse;
@@ -88,10 +89,13 @@ public class UserApiController extends BaseApiController {
       @RequestBody @Size(max=200) List<@Valid PermissionRequest> permissionRequests) {
     List<UserDto> results = new ArrayList<>();
     for(PermissionRequest permissionRequest : permissionRequests) {
-      UUID userId = toUUID(permissionRequest.getUserId());
-      UUID parsedDeptId = toUUID(permissionRequest.getDepartmentId());
+      try {
+        UUID userId = toUUID(permissionRequest.getUserId());
+        UUID parsedDeptId = toUUID(permissionRequest.getDepartmentId());
 
-      results.add(userService.updateAuthorityOfUser(userToken, userId, parsedDeptId, permissionRequest.getPermission()));
+        results.add(userService.updateAuthorityOfUser(userToken, userId, parsedDeptId, permissionRequest.getPermission()));
+      } catch (ServerException ignored) {
+      }
     }
     List<UserResponse> response = results.stream().map(e -> UserResponse.from(e).withoutSecureInfo()).toList();
     return ResponseEntity.ok(response);
