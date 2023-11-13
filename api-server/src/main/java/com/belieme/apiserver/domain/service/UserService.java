@@ -106,7 +106,7 @@ public class UserService extends BaseService {
     }
 
     return userDao.update(userId, targetUser.university().id(), targetUser.studentId(),
-        targetUser.name(), targetUser.entranceYear(), UUID.randomUUID().toString(),
+        targetUser.name(), targetUser.entranceYear(), targetUser.token(),
         targetUser.createdAt(), currentTime(),
         updateAuthorities(targetUser.authorities(), department, newPermission));
   }
