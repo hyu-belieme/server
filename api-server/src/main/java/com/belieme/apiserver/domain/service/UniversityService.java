@@ -11,7 +11,6 @@ import com.belieme.apiserver.domain.dao.StuffDao;
 import com.belieme.apiserver.domain.dao.UniversityDao;
 import com.belieme.apiserver.domain.dao.UserDao;
 import com.belieme.apiserver.domain.dto.UniversityDto;
-import com.belieme.apiserver.domain.dto.UserDto;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
@@ -40,15 +39,12 @@ public class UniversityService extends BaseService {
   }
 
   public List<UniversityDto> getAllList(@NonNull String userToken) {
-    UserDto requester = validateTokenAndGetUser(userToken);
-    checkDeveloperPermission(requester);
-
+    validateTokenAndGetUser(userToken);
     return universityDao.getAllList();
   }
 
   public UniversityDto getById(@NonNull String userToken, @NonNull UUID universityId) {
-    UserDto requester = validateTokenAndGetUser(userToken);
-    checkDeveloperPermission(requester);
+    validateTokenAndGetUser(userToken);
     return universityDao.getById(universityId);
   }
 }
