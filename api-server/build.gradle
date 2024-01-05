@@ -53,13 +53,13 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
-    runtimeOnly 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
+    implementation 'com.oracle.database.jdbc:ojdbc11:21.9.0.0'
     implementation 'com.oracle.database.security:osdt_cert:21.9.0.0'
     implementation 'com.oracle.database.security:oraclepki:21.9.0.0'
     implementation 'com.oracle.database.security:osdt_core:21.9.0.0'
 
     implementation 'mysql:mysql-connector-java:8.0.32'
-    runtimeOnly 'com.h2database:h2:2.1.214'
+    implementation 'com.h2database:h2:2.1.214'
 
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
