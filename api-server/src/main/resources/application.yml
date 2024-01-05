@@ -11,11 +11,26 @@ spring:
   application:
     name: belieme
   profiles:
-    active: api, cors, init
+    active:
+      - prod
+    group:
+      prod:
+        - datasource-prod
+        - jasypt-prod
+        - cors-prod
+        - init-prod
+      dev:
+        - datasource-dev
+        - jasypt-dev
+        - cors-dev
+        - init-dev
     include:
       - datasource
       - actuator
       - jasypt
+      - api
+      - cors
+      - init
   config:
     import: optional:configserver:http://localhost:8888
   data:
@@ -36,6 +51,9 @@ spring:
     always-use-message-format: true
     use-code-as-default-message: true
     fallback-to-system-locale: true
+
+  main:
+    allow-bean-definition-overriding: true
 
 management:
   endpoints:
