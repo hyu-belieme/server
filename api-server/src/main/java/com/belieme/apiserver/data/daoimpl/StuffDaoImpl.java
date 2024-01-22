@@ -62,20 +62,20 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
 
   @Override
   public StuffDto create(@NonNull UUID stuffId, @NonNull UUID departmentId, @NonNull String name,
-      String thumbnail) {
+      String thumbnail, @NonNull String desc) {
     DepartmentEntity departmentOfNewStuff = getDepartmentEntityOrThrowInvalidIndexException(
         departmentId);
 
     checkStuffIdConflict(stuffId);
     checkStuffConflict(departmentId, name);
 
-    StuffEntity newStuffEntity = new StuffEntity(stuffId, departmentOfNewStuff, name, thumbnail);
+    StuffEntity newStuffEntity = new StuffEntity(stuffId, departmentOfNewStuff, name, thumbnail, desc);
     return stuffRepository.save(newStuffEntity).toStuffDto();
   }
 
   @Override
   public StuffDto update(@NonNull UUID stuffId, @NonNull UUID newDepartmentId,
-      @NonNull String newName, String newThumbnail) {
+      @NonNull String newName, @NonNull String newThumbnail, @NonNull String newDesc) {
     StuffEntity target = findStuffEntity(stuffId);
     DepartmentEntity departmentOfNewStuff = getDepartmentEntityOrThrowInvalidIndexException(
         newDepartmentId);
@@ -84,8 +84,10 @@ public class StuffDaoImpl extends BaseDaoImpl implements StuffDao {
       checkStuffConflict(departmentOfNewStuff.getId(), newName);
     }
 
-    target = target.withDepartment(departmentOfNewStuff).withName(newName)
-        .withThumbnail(newThumbnail);
+    target = target.withDepartment(departmentOfNewStuff)
+        .withName(newName)
+        .withThumbnail(newThumbnail)
+        .withDesc(newDesc);
     return stuffRepository.save(target).toStuffDto();
   }
 

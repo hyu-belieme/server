@@ -19,9 +19,9 @@ public interface StuffDao {
 
   @Transactional
   StuffDto create(@NonNull UUID stuffId, @NonNull UUID departmentId, @NonNull String name,
-      String thumbnail);
+      String thumbnail, @NonNull String desc);
 
   @Transactional
   StuffDto update(@NonNull UUID stuffId, @NonNull UUID departmentId, @NonNull String name,
-      String thumbnail);
+      String thumbnail, @NonNull String desc);
 }

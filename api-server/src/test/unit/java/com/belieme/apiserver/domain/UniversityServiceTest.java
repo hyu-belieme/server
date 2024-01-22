@@ -3,9 +3,9 @@ package com.belieme.apiserver.domain;
 import static org.mockito.Mockito.when;
 
 import com.belieme.apiserver.domain.dto.UniversityDto;
-import com.belieme.apiserver.domain.exception.PermissionDeniedException;
 import com.belieme.apiserver.domain.service.UniversityService;
 import com.belieme.apiserver.error.exception.NotFoundException;
+import com.belieme.apiserver.error.exception.UnauthorizedException;
 import com.belieme.apiserver.util.TestHelper;
 import java.util.List;
 import java.util.UUID;
@@ -101,14 +101,14 @@ public class UniversityServiceTest extends BaseServiceTest {
   private abstract class UnivNestedTest extends BaseNestedTest {
 
     @RepeatedTest(10)
-    @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
-    public void accessDenied_PermissionDeniedException() {
+    @DisplayName("[ERROR]_[토큰 인증에 실패했을 시]_[UnauthorizedException]")
+    public void authorizedCheckFailed_UnauthorizedException() {
       setUpDefault();
       setRequester(randomNonDevUser());
 
-      when(userDao.getByToken(userToken)).thenReturn(requester);
+      when(userDao.getByToken(userToken)).thenThrow(NotFoundException.class);
 
-      TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
+      TestHelper.exceptionTest(this::execMethod, UnauthorizedException.class);
     }
   }
 }

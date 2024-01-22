@@ -18,6 +18,7 @@ public class StuffResponse extends JsonResponse {
   private DepartmentResponse department;
   private String name;
   private String thumbnail;
+  private String desc;
   private int amount;
   private int count;
 
@@ -29,13 +30,14 @@ public class StuffResponse extends JsonResponse {
   }
 
   private StuffResponse(UUID id, UniversityResponse university, DepartmentResponse department,
-      String name, String thumbnail, int amount, int count, List<ItemResponse> items) {
+      String name, String thumbnail, String desc, int amount, int count, List<ItemResponse> items) {
     super(true);
     this.id = id;
     this.university = university;
     this.department = department;
     this.name = name;
     this.thumbnail = thumbnail;
+    this.desc = desc;
     this.amount = amount;
     this.count = count;
     this.items = items;
@@ -57,15 +59,15 @@ public class StuffResponse extends JsonResponse {
     return new StuffResponse(stuffDto.id(),
         UniversityResponse.from(stuffDto.department().university()),
         DepartmentResponse.from(stuffDto.department()).withoutUniversity(), stuffDto.name(),
-        stuffDto.thumbnail(), stuffDto.amount(), stuffDto.count(), itemResponseList);
+        stuffDto.thumbnail(), stuffDto.desc(), stuffDto.amount(), stuffDto.count(), itemResponseList);
   }
 
   public StuffResponse withoutUniversityAndDepartment() {
     return new StuffResponse(id, UniversityResponse.responseWillBeIgnore(),
-        DepartmentResponse.responseWillBeIgnore(), name, thumbnail, amount, count, items);
+        DepartmentResponse.responseWillBeIgnore(), name, thumbnail, desc, amount, count, items);
   }
 
   public StuffResponse withoutItems() {
-    return new StuffResponse(id, university, department, name, thumbnail, amount, count, null);
+    return new StuffResponse(id, university, department, name, thumbnail, desc, amount, count, null);
   }
 }

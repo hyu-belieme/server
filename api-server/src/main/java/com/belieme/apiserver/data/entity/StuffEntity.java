@@ -42,6 +42,10 @@ public class StuffEntity extends DataEntity<UUID> {
   private String thumbnail;
 
   @NonNull
+  @Column(name = "description", length = 1024)
+  private String desc;
+
+  @NonNull
   @ManyToOne
   @JoinColumn(name = "department_id", referencedColumnName = "id", insertable = false, updatable = false)
   private DepartmentEntity department;
@@ -51,47 +55,53 @@ public class StuffEntity extends DataEntity<UUID> {
   private List<ItemEntity> items;
 
   public StuffEntity(@NonNull UUID id, @NonNull DepartmentEntity department, @NonNull String name,
-      @NonNull String thumbnail) {
+      @NonNull String thumbnail, @NonNull String desc) {
     this.id = id;
     this.department = department;
     this.departmentId = department.getId();
     this.name = name;
     this.thumbnail = thumbnail;
+    this.desc = desc;
     this.items = new ArrayList<>();
   }
 
   private StuffEntity(@NonNull UUID id, @NonNull DepartmentEntity department, @NonNull String name,
-      @NonNull String thumbnail, @NonNull List<ItemEntity> items) {
+      @NonNull String thumbnail, @NonNull String desc, @NonNull List<ItemEntity> items) {
     this.id = id;
     this.department = department;
     this.departmentId = department.getId();
     this.name = name;
     this.thumbnail = thumbnail;
+    this.desc = desc;
     this.items = new ArrayList<>(items);
   }
 
   public StuffEntity withDepartment(@NonNull DepartmentEntity department) {
-    return new StuffEntity(id, department, name, thumbnail, items);
+    return new StuffEntity(id, department, name, thumbnail, desc, items);
   }
 
   public StuffEntity withName(@NonNull String name) {
-    return new StuffEntity(id, department, name, thumbnail, items);
+    return new StuffEntity(id, department, name, thumbnail, desc, items);
   }
 
   public StuffEntity withThumbnail(@NonNull String thumbnail) {
-    return new StuffEntity(id, department, name, thumbnail, items);
+    return new StuffEntity(id, department, name, thumbnail, desc, items);
+  }
+
+  public StuffEntity withDesc(@NonNull String desc) {
+    return new StuffEntity(id, department, name, thumbnail, desc, items);
   }
 
   public StuffEntity withItemRemove(@NonNull ItemEntity item) {
     List<ItemEntity> newItems = new ArrayList<>(items);
     newItems.remove(item);
-    return new StuffEntity(id, department, name, thumbnail, newItems);
+    return new StuffEntity(id, department, name, thumbnail, desc, newItems);
   }
 
   public StuffEntity withItemAdd(@NonNull ItemEntity item) {
     List<ItemEntity> newItems = new ArrayList<>(items);
     newItems.add(item);
-    return new StuffEntity(id, department, name, thumbnail, newItems);
+    return new StuffEntity(id, department, name, thumbnail, desc, newItems);
   }
 
   public StuffDto toStuffDto() {
@@ -100,6 +110,6 @@ public class StuffEntity extends DataEntity<UUID> {
       itemDtoList.add(item.toItemDtoNestedToStuff());
     }
 
-    return new StuffDto(id, department.toDepartmentDto(), name, thumbnail, itemDtoList);
+    return new StuffDto(id, department.toDepartmentDto(), name, thumbnail, desc, itemDtoList);
   }
 }
