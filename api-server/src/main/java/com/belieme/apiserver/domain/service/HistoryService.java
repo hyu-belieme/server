@@ -10,6 +10,7 @@ import com.belieme.apiserver.domain.dao.StuffDao;
 import com.belieme.apiserver.domain.dao.UniversityDao;
 import com.belieme.apiserver.domain.dao.UserDao;
 import com.belieme.apiserver.domain.dto.DepartmentDto;
+import com.belieme.apiserver.domain.dto.HistoryCursorDto;
 import com.belieme.apiserver.domain.dto.HistoryDto;
 import com.belieme.apiserver.domain.dto.ItemDto;
 import com.belieme.apiserver.domain.dto.StuffDto;
@@ -41,30 +42,21 @@ public class HistoryService extends BaseService {
         itemDao, historyDao);
   }
 
-  public List<HistoryDto> getListByDepartment(@NonNull String userToken,
-      @NonNull UUID departmentId) {
+  public List<HistoryDto> getListByDepartment(@NonNull String userToken, @NonNull UUID departmentId, HistoryStatus status) {
     UserDto requester = validateTokenAndGetUser(userToken);
     DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
     checkStaffPermission(requester, department);
-    return historyDao.getListByDepartment(departmentId);
+    return historyDao.getListByDepartment(departmentId, status);
   }
 
-  public List<HistoryDto> getListByStuff(@NonNull String userToken, @NonNull UUID stuffId) {
+  public List<HistoryDto> getListByDepartment(@NonNull String userToken, @NonNull UUID departmentId, HistoryStatus status, String cursor, int limit) {
     UserDto requester = validateTokenAndGetUser(userToken);
-    StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
-    checkStaffPermission(requester, stuff.department());
-    return historyDao.getListByStuff(stuffId);
+    DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
+    checkStaffPermission(requester, department);
+    return historyDao.getListByDepartment(departmentId, status, parseCursorOrNull(cursor), limit);
   }
 
-  public List<HistoryDto> getListByItem(@NonNull String userToken, @NonNull UUID itemId) {
-    UserDto requester = validateTokenAndGetUser(userToken);
-    ItemDto item = getItemOrThrowInvalidIndexException(itemId);
-    checkStaffPermission(requester, item.stuff().department());
-    return historyDao.getListByItem(itemId);
-  }
-
-  public List<HistoryDto> getListByDepartmentAndRequester(@NonNull String userToken,
-      @NonNull UUID departmentId, @NonNull UUID userId) {
+  public List<HistoryDto> getListByDepartmentAndRequester(@NonNull String userToken, @NonNull UUID departmentId,  @NonNull UUID userId, HistoryStatus status) {
     UserDto requester = validateTokenAndGetUser(userToken);
     DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
     UserDto historyRequester = getUserOrThrowInvalidIndexException(userId);
@@ -73,8 +65,19 @@ public class HistoryService extends BaseService {
       checkStaffPermission(requester, department);
     }
     checkUserPermission(requester, department);
+    return historyDao.getListByDepartmentAndRequester(departmentId, userId, status);
+  }
 
-    return historyDao.getListByDepartmentAndRequester(departmentId, userId);
+  public List<HistoryDto> getListByDepartmentAndRequester(@NonNull String userToken, @NonNull UUID departmentId,  @NonNull UUID userId, HistoryStatus status, String cursor, int limit) {
+    UserDto requester = validateTokenAndGetUser(userToken);
+    DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
+    UserDto historyRequester = getUserOrThrowInvalidIndexException(userId);
+
+    if (!requester.matchId(historyRequester)) {
+      checkStaffPermission(requester, department);
+    }
+    checkUserPermission(requester, department);
+    return historyDao.getListByDepartmentAndRequester(departmentId, userId, status, parseCursorOrNull(cursor), limit);
   }
 
   public HistoryDto getById(@NonNull String userToken, @NonNull UUID historyId) {
@@ -210,7 +213,7 @@ public class HistoryService extends BaseService {
 
   private void checkRequesterRentalList(StuffDto stuff, UserDto requester) {
     List<HistoryDto> requesterHistory = historyDao.getListByDepartmentAndRequester(
-        stuff.department().id(), requester.id());
+        stuff.department().id(), requester.id(), null);
 
     int usingItemCount = 0;
     int usingSameStuffCount = 0;
@@ -249,6 +252,13 @@ public class HistoryService extends BaseService {
         getUserIdOrNull(newHistory.cancelManager()), newHistory.requestedAt(),
         newHistory.approvedAt(), newHistory.returnedAt(), newHistory.lostAt(),
         newHistory.canceledAt());
+  }
+
+  private HistoryCursorDto parseCursorOrNull(String cursor) {
+    if (cursor == null) {
+      return null;
+    }
+    return HistoryCursorDto.fromString(cursor);
   }
 
   private UUID getUserIdOrNull(UserDto user) {

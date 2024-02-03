@@ -1,6 +1,8 @@
 package com.belieme.apiserver.domain.dao;
 
+import com.belieme.apiserver.domain.dto.HistoryCursorDto;
 import com.belieme.apiserver.domain.dto.HistoryDto;
+import com.belieme.apiserver.domain.dto.enumeration.HistoryStatus;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
@@ -12,17 +14,19 @@ public interface HistoryDao {
   List<HistoryDto> getAllList();
 
   @Transactional
-  List<HistoryDto> getListByDepartment(@NonNull UUID departmentId);
+  List<HistoryDto> getListByDepartment(@NonNull UUID departmentId, HistoryStatus status);
 
   @Transactional
-  List<HistoryDto> getListByStuff(@NonNull UUID stuffId);
-
-  @Transactional
-  List<HistoryDto> getListByItem(@NonNull UUID itemId);
+  List<HistoryDto> getListByDepartment(@NonNull UUID departmentId,
+      HistoryStatus status, HistoryCursorDto cursor, int limit);
 
   @Transactional
   List<HistoryDto> getListByDepartmentAndRequester(@NonNull UUID departmentId,
-      @NonNull UUID requesterId);
+      @NonNull UUID requesterId, HistoryStatus status);
+
+  @Transactional
+  List<HistoryDto> getListByDepartmentAndRequester(@NonNull UUID departmentId,
+      @NonNull UUID requesterId, HistoryStatus status, HistoryCursorDto cursor, int limit);
 
   @Transactional
   HistoryDto getById(@NonNull UUID historyId);
