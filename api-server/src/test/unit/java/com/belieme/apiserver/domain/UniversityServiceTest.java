@@ -3,7 +3,6 @@ package com.belieme.apiserver.domain;
 import static org.mockito.Mockito.when;
 
 import com.belieme.apiserver.domain.dto.UniversityDto;
-import com.belieme.apiserver.domain.exception.PermissionDeniedException;
 import com.belieme.apiserver.domain.service.UniversityService;
 import com.belieme.apiserver.error.exception.NotFoundException;
 import com.belieme.apiserver.util.TestHelper;

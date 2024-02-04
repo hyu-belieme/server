@@ -63,7 +63,7 @@ public class StuffApiController extends BaseApiController {
       @RequestBody @Validated(StuffCreateValidationGroup.class) StuffRequest newStuff) {
     System.out.println(toUUID(newStuff.getDepartmentId()));
     StuffDto stuffDto = stuffService.create(userToken, toUUID(newStuff.getDepartmentId()),
-        newStuff.getName(), newStuff.getThumbnail(), newStuff.getAmount());
+        newStuff.getName(), newStuff.getThumbnail(), newStuff.getDesc(), newStuff.getAmount());
     StuffResponse response = StuffResponse.from(stuffDto);
     return ResponseEntity.ok(response);
   }
@@ -76,7 +76,7 @@ public class StuffApiController extends BaseApiController {
     UUID stuffId = toUUID(params.get(api.getVariable().stuffIndex()));
 
     StuffDto stuffDto = stuffService.update(userToken, stuffId, newStuff.getName(),
-        newStuff.getThumbnail());
+        newStuff.getThumbnail(), newStuff.getDesc());
     StuffResponse response = StuffResponse.from(stuffDto);
     return ResponseEntity.ok(response);
   }

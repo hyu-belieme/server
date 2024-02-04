@@ -5,25 +5,30 @@ import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
 
-public record StuffDto(@NonNull UUID id, @NonNull DepartmentDto department, @NonNull String name,
-                       String thumbnail, @NonNull List<ItemDto> items) {
+public record StuffDto(@NonNull UUID id, @NonNull DepartmentDto department,
+                       @NonNull String name, @NonNull String thumbnail,
+                       @NonNull String desc, @NonNull List<ItemDto> items) {
 
-  private static final UUID NIL_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-  public static final StuffDto nestedEndpoint = new StuffDto(NIL_UUID, DepartmentDto.nestedEndpoint,
-      "-", "-", new ArrayList<>());
+  private static final UUID NIL_UUID = UUID.fromString(
+      "00000000-0000-0000-0000-000000000000");
+  public static final StuffDto nestedEndpoint = new StuffDto(NIL_UUID,
+      DepartmentDto.nestedEndpoint, "-", "-", "", new ArrayList<>());
 
-  public StuffDto(@NonNull UUID id, @NonNull DepartmentDto department, @NonNull String name,
-      String thumbnail, @NonNull List<ItemDto> items) {
+  public StuffDto(@NonNull UUID id, @NonNull DepartmentDto department,
+      @NonNull String name, @NonNull String thumbnail, @NonNull String desc,
+      @NonNull List<ItemDto> items) {
     this.id = id;
     this.department = department;
     this.name = name;
     this.thumbnail = thumbnail;
+    this.desc = desc;
     this.items = new ArrayList<>(items);
   }
 
-  public static StuffDto init(@NonNull DepartmentDto department, @NonNull String name,
-      String thumbnail) {
-    return new StuffDto(UUID.randomUUID(), department, name, thumbnail, new ArrayList<>());
+  public static StuffDto init(@NonNull DepartmentDto department,
+      @NonNull String name, @NonNull String thumbnail, @NonNull String desc) {
+    return new StuffDto(UUID.randomUUID(), department, name, thumbnail, desc,
+        new ArrayList<>());
   }
 
   @Override
@@ -36,30 +41,36 @@ public record StuffDto(@NonNull UUID id, @NonNull DepartmentDto department, @Non
   }
 
   public StuffDto withDepartment(@NonNull DepartmentDto department) {
-    return new StuffDto(id, department, name, thumbnail, items);
+    return new StuffDto(id, department, name, thumbnail, desc, items);
   }
 
   public StuffDto withName(@NonNull String name) {
-    return new StuffDto(id, department, name, thumbnail, items);
+    return new StuffDto(id, department, name, thumbnail, desc, items);
   }
 
   public StuffDto withThumbnail(String thumbnail) {
-    return new StuffDto(id, department, name, thumbnail, items);
+    return new StuffDto(id, department, name, thumbnail, desc, items);
+  }
+
+  public StuffDto withDesc(String desc) {
+    return new StuffDto(id, department, name, thumbnail, desc, items);
   }
 
   public StuffDto withItems(@NonNull List<ItemDto> items) {
-    return new StuffDto(id, department, name, thumbnail, items);
+    return new StuffDto(id, department, name, thumbnail, desc, items);
   }
 
   public StuffDto withItemAdd(ItemDto itemDto) {
-    StuffDto output = new StuffDto(id, department, name, thumbnail, items);
+    StuffDto output = new StuffDto(id, department, name, thumbnail, desc,
+        items);
     output.items.add(itemDto.withStuff(nestedEndpoint));
 
     return output;
   }
 
   public StuffDto withItemRemove(ItemDto itemDto) {
-    StuffDto output = new StuffDto(id, department, name, thumbnail, items);
+    StuffDto output = new StuffDto(id, department, name, thumbnail, desc,
+        items);
     output.items.removeIf(item -> item.matchId(itemDto));
 
     return output;
@@ -104,7 +115,8 @@ public record StuffDto(@NonNull UUID id, @NonNull DepartmentDto department, @Non
     if (this.equals(nestedEndpoint)) {
       return "omitted";
     }
-    return "StuffDto{" + "id=" + id + ", department=" + department + ", name='" + name + '\''
-        + ", thumbnail='" + thumbnail + '\'' + ", items=" + items + '}';
+    return "StuffDto{" + "id=" + id + ", department=" + department + ", name='"
+        + name + '\'' + ", thumbnail='" + thumbnail + '\'' + ", desc=" + desc
+        + '\'' + ", items=" + items + '}';
   }
 }

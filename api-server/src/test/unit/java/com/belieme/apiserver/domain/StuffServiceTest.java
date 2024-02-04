@@ -167,6 +167,7 @@ public class StuffServiceTest extends BaseServiceTest {
     private UUID stuffId;
     private String stuffName;
     private String stuffThumbnail;
+    private String stuffDesc;
 
     private Integer amount;
 
@@ -183,11 +184,12 @@ public class StuffServiceTest extends BaseServiceTest {
       this.stuffId = stuff.id();
       this.stuffName = stuff.name();
       this.stuffThumbnail = stuff.thumbnail();
+      this.stuffDesc = stuff.desc();
     }
 
     @Override
     protected StuffDto execMethod() {
-      return stuffService.create(userToken, deptId, stuffName, stuffThumbnail, amount);
+      return stuffService.create(userToken, deptId, stuffName, stuffThumbnail, stuffDesc, amount);
     }
 
     @Override
@@ -203,11 +205,11 @@ public class StuffServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
-      when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail))).thenReturn(stuff);
+      when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail), eq(stuffDesc))).thenReturn(stuff);
 
       execMethod();
 
-      verify(stuffDao).create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail));
+      verify(stuffDao).create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail), eq(stuffDesc));
     }
 
     @RepeatedTest(10)
@@ -217,7 +219,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
-      when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail))).thenReturn(stuff);
+      when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail), eq(stuffDesc))).thenReturn(stuff);
       for (int i = 0; i < amount; i++) {
         ItemDto newItem = new ItemDto(UUID.randomUUID(), stuff, i + 1, null);
         when(itemDao.create(any(), eq(stuffId), eq(i + 1))).thenReturn(newItem);
@@ -230,7 +232,7 @@ public class StuffServiceTest extends BaseServiceTest {
       }
       execMethod();
 
-      verify(stuffDao).create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail));
+      verify(stuffDao).create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail), eq(stuffDesc));
       for (int i = 0; i < amount; i++) {
         verify(itemDao).create(any(), eq(stuffId), eq(i + 1));
       }
@@ -243,7 +245,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
-      when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail))).thenThrow(
+      when(stuffDao.create(any(), eq(deptId), eq(stuffName), eq(stuffThumbnail), eq(stuffDesc))).thenThrow(
           ConflictException.class);
 
       TestHelper.exceptionTest(this::execMethod, ConflictException.class);
@@ -284,6 +286,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
     private String newStuffName;
     private String newStuffThumbnail;
+    private String newDesc;
 
     @Override
     protected void setUpDefault() {
@@ -292,6 +295,7 @@ public class StuffServiceTest extends BaseServiceTest {
       setStuff(randomStuffOnDept(dept));
       newStuffName = "changed";
       newStuffThumbnail = "𝌡";
+      newDesc = "changed desc";
     }
 
     private void setStuff(StuffDto stuff) {
@@ -301,7 +305,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
     @Override
     protected StuffDto execMethod() {
-      return stuffService.update(userToken, targetStuffId, newStuffName, newStuffThumbnail);
+      return stuffService.update(userToken, targetStuffId, newStuffName, newStuffThumbnail, newDesc);
     }
 
     @Override
@@ -318,20 +322,21 @@ public class StuffServiceTest extends BaseServiceTest {
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
       when(stuffDao.update(targetStuffId, targetStuff.department().id(), newStuffName,
-          newStuffThumbnail)).thenReturn(expected);
+          newStuffThumbnail, newDesc)).thenReturn(expected);
 
       TestHelper.objectCompareTest(this::execMethod, expected);
 
       verify(stuffDao).update(targetStuffId, targetStuff.department().id(), newStuffName,
-          newStuffThumbnail);
+          newStuffThumbnail, newDesc);
     }
 
     @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffThumbnail`가 모두 `null`일 시]")
+    @DisplayName("[SUCCESS]_[`newStuffName`과 `newStuffThumbnail`, `newDesc`가 모두 `null`일 시]")
     public void SUCCESS_allMemberIsNull() {
       setUpDefault();
       newStuffName = null;
       newStuffThumbnail = null;
+      newDesc = null;
       StuffDto expected = targetStuff;
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
@@ -339,7 +344,7 @@ public class StuffServiceTest extends BaseServiceTest {
 
       TestHelper.objectCompareTest(this::execMethod, expected);
 
-      verify(stuffDao, never()).update(any(), any(), any(), any());
+      verify(stuffDao, never()).update(any(), any(), any(), any(), any());
     }
 
     @RepeatedTest(10)
@@ -352,12 +357,12 @@ public class StuffServiceTest extends BaseServiceTest {
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
       when(stuffDao.update(targetStuffId, targetStuff.department().id(), targetStuff.name(),
-          newStuffThumbnail)).thenReturn(expected);
+          newStuffThumbnail, newDesc)).thenReturn(expected);
 
       TestHelper.objectCompareTest(this::execMethod, expected);
 
       verify(stuffDao).update(targetStuffId, targetStuff.department().id(), targetStuff.name(),
-          newStuffThumbnail);
+          newStuffThumbnail, newDesc);
     }
 
     @RepeatedTest(10)
@@ -379,7 +384,7 @@ public class StuffServiceTest extends BaseServiceTest {
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(stuffDao.getById(targetStuffId)).thenReturn(targetStuff);
       when(stuffDao.update(targetStuffId, targetStuff.department().id(), newStuffName,
-          newStuffThumbnail)).thenThrow(ConflictException.class);
+          newStuffThumbnail, newDesc)).thenThrow(ConflictException.class);
 
       TestHelper.exceptionTest(this::execMethod, ConflictException.class);
     }

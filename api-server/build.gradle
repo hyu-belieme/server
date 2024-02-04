@@ -58,11 +58,11 @@ dependencies {
     implementation 'com.oracle.database.security:oraclepki:21.9.0.0'
     implementation 'com.oracle.database.security:osdt_core:21.9.0.0'
 
-    implementation 'mysql:mysql-connector-java:8.0.32'
+    implementation 'mysql:mysql-connector-java:8.0.33'
     implementation 'com.h2database:h2:2.1.214'
 
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-inline:5.2.0'

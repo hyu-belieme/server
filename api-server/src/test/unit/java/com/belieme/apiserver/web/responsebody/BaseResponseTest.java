@@ -393,6 +393,9 @@ public class BaseResponseTest {
     Assertions.assertThat(json.containsKey("thumbnail")).isTrue();
     Assertions.assertThat(json.get("thumbnail")).isEqualTo(stuff.thumbnail());
 
+    Assertions.assertThat(json.containsKey("desc")).isTrue();
+    Assertions.assertThat(json.get("desc")).isEqualTo(stuff.desc());
+
     Assertions.assertThat(json.containsKey("amount")).isTrue();
     Assertions.assertThat(json.get("amount")).isEqualTo((long) stuff.amount());
 

@@ -47,13 +47,13 @@ public class StuffService extends BaseService {
   }
 
   public StuffDto create(@NonNull String userToken, @NonNull UUID departmentId,
-      @NonNull String name, @NonNull String thumbnail, Integer amount) {
+      @NonNull String name, @NonNull String thumbnail, @NonNull String desc, Integer amount) {
     UserDto requester = validateTokenAndGetUser(userToken);
     System.out.println(departmentId);
     DepartmentDto department = getDepartmentOrThrowInvalidIndexException(departmentId);
     checkStaffPermission(requester, department);
 
-    StuffDto newStuff = stuffDao.create(UUID.randomUUID(), departmentId, name, thumbnail);
+    StuffDto newStuff = stuffDao.create(UUID.randomUUID(), departmentId, name, thumbnail, desc);
 
     if (amount == null) {
       return newStuff;
@@ -70,12 +70,12 @@ public class StuffService extends BaseService {
   }
 
   public StuffDto update(@NonNull String userToken, @NonNull UUID stuffId, String newName,
-      String newThumbnail) {
+      String newThumbnail, String newDesc) {
     UserDto requester = validateTokenAndGetUser(userToken);
     StuffDto oldStuff = stuffDao.getById(stuffId);
     checkStaffPermission(requester, oldStuff.department());
 
-    if (newName == null && newThumbnail == null) {
+    if (newName == null && newThumbnail == null && newDesc == null) {
       return oldStuff;
     }
     if (newName == null) {
@@ -84,7 +84,10 @@ public class StuffService extends BaseService {
     if (newThumbnail == null) {
       newThumbnail = oldStuff.thumbnail();
     }
+    if (newDesc == null) {
+      newDesc = oldStuff.desc();
+    }
 
-    return stuffDao.update(stuffId, oldStuff.department().id(), newName, newThumbnail);
+    return stuffDao.update(stuffId, oldStuff.department().id(), newName, newThumbnail, newDesc);
   }
 }

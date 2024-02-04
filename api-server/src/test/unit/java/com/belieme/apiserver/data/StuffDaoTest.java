@@ -136,7 +136,7 @@ public class StuffDaoTest extends BaseDaoTest {
 
     protected StuffDto execMethod() {
       return stuffDao.create(stuff.getId(), stuff.getDepartmentId(), stuff.getName(),
-          stuff.getThumbnail());
+          stuff.getThumbnail(), stuff.getDesc());
     }
 
     @RepeatedTest(10)
@@ -213,7 +213,7 @@ public class StuffDaoTest extends BaseDaoTest {
 
     protected StuffDto execMethod() {
       return stuffDao.update(targetId, newStuff.getDepartmentId(), newStuff.getName(),
-          newStuff.getThumbnail());
+          newStuff.getThumbnail(), newStuff.getDesc());
     }
 
     @RepeatedTest(10)

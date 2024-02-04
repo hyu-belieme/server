@@ -233,46 +233,46 @@ public class StubData extends BaseStub {
     // --------------------------------------------------------------------------------------
     // Stuffs init
     StuffDto SPEAKER_HYU_CSE = new StuffDto(UUID.fromString("5f35946d-a596-466c-94d3-0a09431a6309"),
-        HYU_CSE_DEPT, "블루투스 스피커", "📻", new ArrayList<>());
+        HYU_CSE_DEPT, "블루투스 스피커", "📻", "Lorem ipsum", new ArrayList<>());
     StuffDto UMBRELLA_HYU_CSE = new StuffDto(
         UUID.fromString("b1b566ba-ef96-4bff-9883-abb62aec7245"), HYU_CSE_DEPT, "우산", "🌂",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
     StuffDto PEN_HYU_CSE = new StuffDto(UUID.fromString("02143755-e80c-472b-9a23-1f9624364846"),
-        HYU_CSE_DEPT, "볼펜", "🖋️", new ArrayList<>());
+        HYU_CSE_DEPT, "볼펜", "🖋️", "Lorem ipsum", new ArrayList<>());
     StuffDto SCISSORS_HYU_CSE = new StuffDto(
         UUID.fromString("ec5de918-030f-40be-b060-3ddb415e358e"), HYU_CSE_DEPT, "가위", "✂️",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
     StuffDto SKATEBOARD_HYU_CSE = new StuffDto(
         UUID.fromString("a6aee430-b842-47c6-a6ef-c7410869b4a7"), HYU_CSE_DEPT, "스케이트보드", "🛹",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
 
     StuffDto UMBRELLA_HYU_ME = new StuffDto(UUID.fromString("d5405344-34f6-4b84-beaf-24f6506a4fc7"),
-        HYU_ME_DEPT, "우산", "🌂", new ArrayList<>());
+        HYU_ME_DEPT, "우산", "🌂", "Lorem ipsum", new ArrayList<>());
     StuffDto SCISSORS_HYU_ME = new StuffDto(UUID.fromString("13801bd5-b74a-43bb-b32b-323c3c59f9f2"),
-        HYU_ME_DEPT, "가위", "✂️", new ArrayList<>());
+        HYU_ME_DEPT, "가위", "✂️", "Lorem ipsum", new ArrayList<>());
     StuffDto HAMMER_HYU_ME = new StuffDto(UUID.fromString("fe54a401-27a6-4561-b749-ad392024185a"),
-        HYU_ME_DEPT, "망치", "🔨", new ArrayList<>());
+        HYU_ME_DEPT, "망치", "🔨", "Lorem ipsum", new ArrayList<>());
 
     StuffDto UMBRELLA_HYU_ENG = new StuffDto(
         UUID.fromString("a731bba0-f5ee-49ce-a830-9e5ae1727dad"), HYU_ENG_DEPT, "우산", "🌂",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
     StuffDto PEN_HYU_ENG = new StuffDto(UUID.fromString("6223fa36-7367-4099-b0d8-9bbfff04c755"),
-        HYU_ENG_DEPT, "볼펜", "🖋️", new ArrayList<>());
+        HYU_ENG_DEPT, "볼펜", "🖋️", "Lorem ipsum", new ArrayList<>());
     StuffDto SCISSORS_HYU_ENG = new StuffDto(
         UUID.fromString("cda0319e-0e85-41c9-8da7-33ccf04b4311"), HYU_ENG_DEPT, "가위", "✂️",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
     StuffDto CALCULATOR_HYU_ENG = new StuffDto(
         UUID.fromString("9ada08c5-8000-4ed8-a088-2486b25d8cf2"), HYU_ENG_DEPT, "계산기", "🧮️",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
 
     StuffDto PEN_CKU_MED = new StuffDto(UUID.fromString("89a9e2c1-6102-475d-b1a8-ce237c0b0223"),
-        CKU_MED_DEPT, "볼펜", "🖋️", new ArrayList<>());
+        CKU_MED_DEPT, "볼펜", "🖋️", "Lorem ipsum", new ArrayList<>());
     StuffDto SCISSORS_CKU_MED = new StuffDto(
         UUID.fromString("0613bdfd-71a0-46ee-910d-51e9b058efee"), CKU_MED_DEPT, "가위", "✂️",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
     StuffDto SOCCER_BALL_CKU_MED = new StuffDto(
         UUID.fromString("eebb3378-3d04-4ba9-a1cc-297d2d0ab156"), CKU_MED_DEPT, "축구공", "⚽️️",
-        new ArrayList<>());
+        "Lorem ipsum", new ArrayList<>());
 
     tmpAllStuffs = new ArrayList<>(
         List.of(SPEAKER_HYU_CSE, UMBRELLA_HYU_CSE, PEN_HYU_CSE, SCISSORS_HYU_CSE,
