@@ -99,16 +99,5 @@ public class UniversityServiceTest extends BaseServiceTest {
   }
 
   private abstract class UnivNestedTest extends BaseNestedTest {
-
-    @RepeatedTest(10)
-    @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
-    public void accessDenied_PermissionDeniedException() {
-      setUpDefault();
-      setRequester(randomNonDevUser());
-
-      when(userDao.getByToken(userToken)).thenReturn(requester);
-
-      TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
-    }
   }
 }

@@ -11,6 +11,7 @@ import com.belieme.apiserver.domain.dto.HistoryDto;
 import com.belieme.apiserver.domain.dto.ItemDto;
 import com.belieme.apiserver.domain.dto.StuffDto;
 import com.belieme.apiserver.domain.dto.UserDto;
+import com.belieme.apiserver.domain.dto.enumeration.HistoryStatus;
 import com.belieme.apiserver.domain.dto.enumeration.ItemStatus;
 import com.belieme.apiserver.domain.dto.enumeration.Permission;
 import com.belieme.apiserver.domain.exception.LostRegistrationRequestedOnLostItemException;
@@ -52,11 +53,23 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     private List<HistoryDto> historyList;
 
+    private HistoryStatus status;
+
+    private void setStatus(HistoryStatus status) {
+      this.status = status;
+    }
+
     @Override
     protected void setUpDefault() {
       setDept(TEST_DEPT);
       setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
 
+      setStatus(randomHistoryStatus());
+      historyList = getHistoryListByDeptAndStatus(dept, status);
+    }
+
+    private void setStatusNull() {
+      setStatus(null);
       historyList = getHistoryListByDept(dept);
     }
 
@@ -67,17 +80,31 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     @Override
     protected List<HistoryDto> execMethod() {
-      return historyService.getListByDepartment(userToken, deptId);
+      return historyService.getListByDepartment(userToken, deptId, status);
     }
 
     @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[-]_[-]")
-    public void SUCCESS() {
+    @DisplayName("[SUCCESS]_[특정 상태의 기록만 불러올 때]_[-]")
+    public void SUCCESS_statusIsNotNull() {
       setUpDefault();
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
-      when(historyDao.getListByDepartment(deptId)).thenReturn(historyList);
+      when(historyDao.getListByDepartment(deptId, status)).thenReturn(historyList);
+
+      System.out.println("Expected : " + historyList);
+      TestHelper.listCompareTest(this::execMethod, historyList);
+    }
+
+    @RepeatedTest(10)
+    @DisplayName("[SUCCESS]_[모든 상태의 기록만 불러올 때]_[-]")
+    public void SUCCESS_statusIsNull() {
+      setUpDefault();
+      setStatusNull();
+
+      when(userDao.getByToken(userToken)).thenReturn(requester);
+      when(departmentDao.getById(deptId)).thenReturn(dept);
+      when(historyDao.getListByDepartment(deptId, status)).thenReturn(historyList);
 
       System.out.println("Expected : " + historyList);
       TestHelper.listCompareTest(this::execMethod, historyList);
@@ -101,157 +128,11 @@ public class HistoryServiceTest extends BaseServiceTest {
           .filter((history) -> dept.matchId(history.item().stuff().department()))
           .collect(Collectors.toList());
     }
-  }
 
-  @Nested
-  @DisplayName("getListByStuff()")
-  public final class TestGetListByStuff extends HistoryNestedTest {
-
-    private StuffDto stuff;
-    private UUID stuffId;
-
-    private List<HistoryDto> historyList;
-
-    @Override
-    protected void setUpDefault() {
-      setDept(TEST_DEPT);
-      setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
-      setStuff(randomStuffOnDept(dept));
-      historyList = getHistoryListByStuff(stuff);
-    }
-
-    private void setStuff(StuffDto stuff) {
-      this.stuff = stuff;
-      this.stuffId = stuff.id();
-    }
-
-    @Override
-    protected void setRequesterAccessDenied() {
-      setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.STAFF));
-    }
-
-    @Override
-    protected List<HistoryDto> execMethod() {
-      return historyService.getListByStuff(userToken, stuffId);
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[-]_[-]")
-    public void SUCCESS() {
-      setUpDefault();
-
-      when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(stuffDao.getById(stuffId)).thenReturn(stuff);
-      when(historyDao.getListByStuff(stuffId)).thenReturn(historyList);
-
-      System.out.println("Expected : " + historyList);
-      TestHelper.listCompareTest(this::execMethod, historyList);
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[ERROR]_[해당 `index`의 `stuff`가 존재하지 않을 시]_[InvalidIndexException]")
-    public void ERROR_stuffInvalidIndex_InvalidIndexException() {
-      setUpDefault();
-
-      when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(stuffDao.getById(stuffId)).thenReturn(stuff);
-      when(historyDao.getListByStuff(stuffId)).thenThrow(InvalidIndexException.class);
-
-      TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
-    }
-
-    @Override
-    @RepeatedTest(10)
-    @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
-    public void ERROR_accessDenied_PermissionDeniedException() {
-      setUpDefault();
-      setRequesterAccessDenied();
-
-      when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(stuffDao.getById(stuffId)).thenReturn(stuff);
-
-      TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
-    }
-
-    private List<HistoryDto> getHistoryListByStuff(StuffDto stuff) {
-      return stub.ALL_HISTORIES.stream().filter((history) -> stuff.matchId(history.item().stuff()))
-          .collect(Collectors.toList());
-    }
-  }
-
-  @Nested
-  @DisplayName("getListByItem()")
-  public final class TestGetListByItem extends HistoryNestedTest {
-
-    private ItemDto item;
-    private UUID itemId;
-
-    private List<HistoryDto> historyList;
-
-    private void setItem(ItemDto item) {
-      this.item = item;
-      this.itemId = item.id();
-    }
-
-    @Override
-    protected void setUpDefault() {
-      setDept(TEST_DEPT);
-      setRequester(randomUserHaveMorePermissionOnDept(dept, Permission.STAFF));
-      setItem(randomItemOnDept(dept));
-
-      historyList = getHistoryListByItem(item);
-    }
-
-    @Override
-    protected void setRequesterAccessDenied() {
-      setRequester(randomUserHaveLessPermissionOnDept(dept, Permission.STAFF));
-    }
-
-    @Override
-    protected List<HistoryDto> execMethod() {
-      return historyService.getListByItem(userToken, itemId);
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[-]_[-]")
-    public void SUCCESS() {
-      setUpDefault();
-
-      when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.getListByItem(itemId)).thenReturn(historyList);
-
-      System.out.println("Expected : " + historyList);
-      TestHelper.listCompareTest(this::execMethod, historyList);
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[ERROR]_[해당 `index`의 `item`가 존재하지 않을 시]_[InvalidIndexException]")
-    public void ERROR_itemInvalidIndex_InvalidIndexException() {
-      setUpDefault();
-
-      when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.getListByItem(itemId)).thenThrow(InvalidIndexException.class);
-
-      TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
-    }
-
-    @Override
-    @RepeatedTest(10)
-    @DisplayName("[ERROR]_[권한이 없을 시]_[PermissionDeniedException]")
-    public void ERROR_accessDenied_PermissionDeniedException() {
-      setUpDefault();
-      setRequesterAccessDenied();
-
-      when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(itemDao.getById(itemId)).thenReturn(item);
-
-      TestHelper.exceptionTest(this::execMethod, PermissionDeniedException.class);
-    }
-
-    private List<HistoryDto> getHistoryListByItem(ItemDto item) {
-      return stub.ALL_HISTORIES.stream().filter((history) -> item.matchId(history.item()))
+    private List<HistoryDto> getHistoryListByDeptAndStatus(DepartmentDto dept, HistoryStatus status) {
+      return stub.ALL_HISTORIES.stream()
+          .filter((history) -> dept.matchId(history.item().stuff().department()))
+          .filter((history) -> history.status().dividedTo(status))
           .collect(Collectors.toList());
     }
   }
@@ -265,13 +146,17 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     private List<HistoryDto> historyList;
 
+    private HistoryStatus status;
+
     @Override
     protected void setUpDefault() {
       setDept(TEST_DEPT);
       setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
 
       setHistoryRequester(requester);
-      historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
+
+      setStatus(randomHistoryStatus());
+      historyList = getHistoryListByDeptAndRequesterAndStatus(dept, historyRequester, status);
     }
 
     private void setHistoryRequester(UserDto historyRequester) {
@@ -279,37 +164,79 @@ public class HistoryServiceTest extends BaseServiceTest {
       this.historyRequesterId = historyRequester.id();
     }
 
+    private void setStatus(HistoryStatus status) {
+      this.status = status;
+    }
+
+    private void setStatusNull() {
+      setStatus(null);
+      historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
+    }
+
     @Override
     protected List<HistoryDto> execMethod() {
-      return historyService.getListByDepartmentAndRequester(userToken, deptId, historyRequesterId);
+      return historyService.getListByDepartmentAndRequester(userToken, deptId, historyRequesterId, status);
     }
 
     @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[본인의 `History List`에 대한 `request`일 시]_[-]")
+    @DisplayName("[SUCCESS]_[본인의 `History List`에 대한 `request`이고 특정 상태에 대한 기록만 가져올 시]_[-]")
     public void SUCCESS_getHistoryListHerSelf() {
       setUpDefault();
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
       when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId, status)).thenReturn(
           historyList);
 
       TestHelper.listCompareTest(this::execMethod, historyList);
     }
 
     @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[타인의 `History List`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가질 시]_[-]")
+    @DisplayName("[SUCCESS]_[타인의 `History List`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가지고 특정 상태에 대한 기록만 가져올 시]_[-]")
     public void SUCCESS_getHistoryListOfOthers() {
       setDept(TEST_DEPT);
       setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.STAFF));
       setHistoryRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
-      historyList = getHistoryListByDeptAndRequester(dept, historyRequester);
+      historyList = getHistoryListByDeptAndRequesterAndStatus(dept, historyRequester, status);
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(departmentDao.getById(deptId)).thenReturn(dept);
       when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId, status)).thenReturn(
+          historyList);
+
+      System.out.println("Expected : " + historyList);
+      TestHelper.listCompareTest(this::execMethod, historyList);
+    }
+
+    @RepeatedTest(10)
+    @DisplayName("[SUCCESS]_[본인의 `History List`에 대한 `request`이고 모든 상태에 대한 기록을 가져올 시]_[-]")
+    public void SUCCESS_getHistoryListHerSelfAndStatusIsNull() {
+      setUpDefault();
+      setStatusNull();
+
+      when(userDao.getByToken(userToken)).thenReturn(requester);
+      when(departmentDao.getById(deptId)).thenReturn(dept);
+      when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
+      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId, status)).thenReturn(
+          historyList);
+
+      TestHelper.listCompareTest(this::execMethod, historyList);
+    }
+
+    @RepeatedTest(10)
+    @DisplayName("[SUCCESS]_[타인의 `History List`에 대한 `request`가 아니지만 `requester`가 `staff` 이상의 권한을 가지고 모든 상태에 대한 기록을 가져올 시]_[-]")
+    public void SUCCESS_getHistoryListOfOthersAndStatusIsNull() {
+      setDept(TEST_DEPT);
+      setRequester(randomUserHaveExactPermissionOnDept(dept, Permission.STAFF));
+      setHistoryRequester(randomUserHaveExactPermissionOnDept(dept, Permission.USER));
+      setStatusNull();
+
+      when(userDao.getByToken(userToken)).thenReturn(requester);
+      when(departmentDao.getById(deptId)).thenReturn(dept);
+      when(userDao.getById(historyRequesterId)).thenReturn(historyRequester);
+      when(historyDao.getListByDepartmentAndRequester(deptId, historyRequesterId, status)).thenReturn(
           historyList);
 
       System.out.println("Expected : " + historyList);
@@ -375,9 +302,19 @@ public class HistoryServiceTest extends BaseServiceTest {
 
     private List<HistoryDto> getHistoryListByDeptAndRequester(DepartmentDto dept,
         UserDto requester) {
-      return stub.ALL_HISTORIES.stream().filter(
-          (history) -> dept.matchId(history.item().stuff().department()) && requester.matchId(
-              history.requester())).collect(Collectors.toList());
+      return stub.ALL_HISTORIES.stream()
+          .filter((history) -> dept.matchId(history.item().stuff().department()))
+          .filter((history) -> requester.matchId(history.requester()))
+          .collect(Collectors.toList());
+    }
+
+    private List<HistoryDto> getHistoryListByDeptAndRequesterAndStatus(DepartmentDto dept,
+        UserDto requester, HistoryStatus status) {
+      return stub.ALL_HISTORIES.stream()
+          .filter((history) -> dept.matchId(history.item().stuff().department()))
+          .filter((history) -> requester.matchId(history.requester()))
+          .filter((history) -> history.status().dividedTo(status))
+          .collect(Collectors.toList());
     }
   }
 
@@ -505,7 +442,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(itemDao.getById(itemId)).thenReturn(item);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId, null)).thenReturn(
           new ArrayList<>());
 
       when(
@@ -556,7 +493,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       setItem(randomUsableItemOnStuff(targetStuff));
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId, null)).thenReturn(
           makeHistoryListWithSameStuff(item, requester));
       when(itemDao.getById(itemId)).thenReturn(item);
 
@@ -571,7 +508,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       setUpDefault();
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId, null)).thenReturn(
           makeHistoryListWithSameRequester(item, requester));
       when(itemDao.getById(itemId)).thenReturn(item);
 
@@ -641,7 +578,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(stuffDao.getById(stuff.id())).thenReturn(stuff);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId, null)).thenReturn(
           new ArrayList<>());
 
       when(historyDao.create(any(), eq(item.id()), eq(item.nextHistoryNum()), eq(requesterId),
@@ -692,7 +629,7 @@ public class HistoryServiceTest extends BaseServiceTest {
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
       when(stuffDao.getById(stuff.id())).thenReturn(stuff);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId, null)).thenReturn(
           makeHistoryListWithSameStuff(item, requester));
 
       TestHelper.exceptionTest(this::execMethod,
@@ -706,7 +643,7 @@ public class HistoryServiceTest extends BaseServiceTest {
       setUpDefault();
 
       when(userDao.getByToken(userToken)).thenReturn(requester);
-      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId)).thenReturn(
+      when(historyDao.getListByDepartmentAndRequester(deptId, requesterId, null)).thenReturn(
           makeHistoryListWithSameRequester(item, requester));
       when(stuffDao.getById(stuff.id())).thenReturn(stuff);
 
@@ -1210,6 +1147,11 @@ public class HistoryServiceTest extends BaseServiceTest {
       return null;
     }
     return user.id();
+  }
+
+  private HistoryStatus randomHistoryStatus() {
+    HistoryStatus[] statusList = HistoryStatus.values();
+    return statusList[(int) (statusList.length * Math.random())];
   }
 
   private UserDto randomUserHaveExactPermissionOnDeptWithExclude(DepartmentDto dept,

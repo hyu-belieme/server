@@ -1,8 +1,11 @@
 package com.belieme.apiserver.web.controller;
 
+import com.belieme.apiserver.domain.dto.HistoryCursorDto;
 import com.belieme.apiserver.domain.dto.HistoryDto;
+import com.belieme.apiserver.domain.dto.enumeration.HistoryStatus;
 import com.belieme.apiserver.domain.service.HistoryService;
 import com.belieme.apiserver.error.exception.BadRequestException;
+import com.belieme.apiserver.web.responsebody.CursorBasedPaginationWrapper;
 import com.belieme.apiserver.web.responsebody.HistoryResponse;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,21 +32,27 @@ public class HistoryApiController extends BaseApiController {
   @GetMapping("/${api.keyword.history}")
   public ResponseEntity<List<HistoryResponse>> getAllHistoriesOfDepartment(
       @RequestHeader("${api.header.user-token}") String userToken,
-      @RequestParam(value = "${api.query.department-id}", required = false) String departmentId,
+      @RequestParam(value = "${api.query.department-id}") String departmentId,
       @RequestParam(value = "${api.query.requester-id}", required = false) String requesterId,
-      @RequestParam(value = "${api.query.stuff-id}", required = false) String stuffId,
-      @RequestParam(value = "${api.query.item-id}", required = false) String itemId) {
-    if (departmentId != null && stuffId == null && itemId == null) {
-      return getListByDepartment(userToken, departmentId, requesterId);
-    }
-    if (stuffId != null && departmentId == null && requesterId == null && itemId == null) {
-      return getListByStuff(userToken, stuffId);
-    }
-    if (itemId != null && departmentId == null && requesterId == null && stuffId == null) {
-      return getListByItem(userToken, itemId);
-    }
+      @RequestParam(value = "status", required = false) String statusStr) {
+    HistoryStatus status = parseHistoryStatus(statusStr);
+    return getListByDepartment(userToken, departmentId, requesterId, status);
+  }
 
-    throw new BadRequestException();
+  @GetMapping("/${api.keyword.history}/with-pagination")
+  public ResponseEntity<CursorBasedPaginationWrapper<HistoryResponse>> getAllHistoriesOfDepartment(
+      @RequestHeader("${api.header.user-token}") String userToken,
+      @RequestParam(value = "${api.query.department-id}") String departmentId,
+      @RequestParam(value = "${api.query.requester-id}", required = false) String requesterId,
+      @RequestParam(value = "status", required = false) String status,
+      @RequestParam(value = "cursor", required = false) String cursor,
+      @RequestParam(value = "limit", required = false) Integer limit) {
+    int defaultLimit = 10;
+    if (limit != null) {
+      defaultLimit = limit;
+    }
+    return getListByDepartmentAndStatusWithCursor(userToken, departmentId,
+        requesterId, status, cursor, defaultLimit);
   }
 
   @GetMapping("/${api.keyword.history}/${api.keyword.history-index}")
@@ -57,38 +66,93 @@ public class HistoryApiController extends BaseApiController {
     return ResponseEntity.ok(response);
   }
 
-  private ResponseEntity<List<HistoryResponse>> getListByDepartment(String userToken,
-      String departmentId, String requesterId) {
+  private ResponseEntity<List<HistoryResponse>> getListByDepartment(
+      String userToken, String departmentId, String requesterId,
+      HistoryStatus status) {
     if (requesterId == null) {
-      List<HistoryDto> historyDtoList = historyService.getListByDepartment(userToken,
-          toUUID(departmentId));
+      List<HistoryDto> historyDtoList = historyService.getListByDepartment(
+          userToken, toUUID(departmentId), status);
       List<HistoryResponse> responseList = toResponseList(historyDtoList);
       return ResponseEntity.ok(responseList);
     }
 
-    List<HistoryDto> historyDtoList = historyService.getListByDepartmentAndRequester(userToken,
-        toUUID(departmentId), toUUID(requesterId));
+    List<HistoryDto> historyDtoList = historyService.getListByDepartmentAndRequester(
+        userToken, toUUID(departmentId), toUUID(requesterId), status);
     List<HistoryResponse> responseList = toResponseList(historyDtoList);
     return ResponseEntity.ok(responseList);
   }
 
-  private ResponseEntity<List<HistoryResponse>> getListByStuff(String userToken, String stuffId) {
-    List<HistoryDto> historyDtoList = historyService.getListByStuff(userToken, toUUID(stuffId));
-    List<HistoryResponse> responseList = toResponseList(historyDtoList);
-    return ResponseEntity.ok(responseList);
+  private ResponseEntity<CursorBasedPaginationWrapper<HistoryResponse>> getListByDepartmentAndStatusWithCursor(
+      String userToken, String departmentId, String requesterId,
+      String statusStr, String cursorStr, int limit) {
+    HistoryStatus status = parseHistoryStatus(statusStr);
+    if (requesterId == null) {
+      return makePaginatedResponse(cursorStr,
+          (cursor) -> historyService.getListByDepartment(userToken,
+              toUUID(departmentId), status, cursor, limit));
+    }
+    return makePaginatedResponse(cursorStr,
+        (cursor) -> historyService.getListByDepartmentAndRequester(userToken,
+            toUUID(departmentId), toUUID(requesterId), status, cursor, limit));
   }
 
-  private ResponseEntity<List<HistoryResponse>> getListByItem(String userToken, String itemId) {
-    List<HistoryDto> historyDtoList = historyService.getListByItem(userToken, toUUID(itemId));
-    List<HistoryResponse> responseList = toResponseList(historyDtoList);
-    return ResponseEntity.ok(responseList);
+  private HistoryStatus parseHistoryStatus(String statusStr) {
+    if (statusStr == null) {
+      return null;
+    }
+    try {
+      return HistoryStatus.valueOf(statusStr);
+    } catch (Exception e) {
+      throw new BadRequestException();
+    }
   }
 
-  private List<HistoryResponse> toResponseList(List<HistoryDto> historyDtoList) {
+  private List<HistoryResponse> toResponseList(
+      List<HistoryDto> historyDtoList) {
     List<HistoryResponse> responseList = new ArrayList<>();
     for (HistoryDto dto : historyDtoList) {
       responseList.add(HistoryResponse.from(dto));
     }
     return responseList;
+  }
+
+  private ResponseEntity<CursorBasedPaginationWrapper<HistoryResponse>> makePaginatedResponse(
+      String curCursorStr, MethodToGetPaginatedList method) {
+    List<HistoryDto> historyDtoList = method.method(curCursorStr);
+    HistoryCursorDto nextCursor = getNextCursor(historyDtoList);
+    if (nextCursor != null) {
+      List<HistoryDto> nextHistoryDtoList = method.method(
+          nextCursor.getCursorString());
+      if (nextHistoryDtoList.size() == 0) {
+        nextCursor = null;
+      }
+    }
+    return makeCursorResponse(historyDtoList, nextCursor);
+  }
+
+  private HistoryCursorDto getNextCursor(List<HistoryDto> historyDtoList) {
+    if (historyDtoList.size() == 0) {
+      return null;
+    }
+    return HistoryCursorDto.nextCursor(
+        historyDtoList.get(historyDtoList.size() - 1));
+  }
+
+  private ResponseEntity<CursorBasedPaginationWrapper<HistoryResponse>> makeCursorResponse(
+      List<HistoryDto> historyDtoList, HistoryCursorDto nextCursor) {
+    List<HistoryResponse> responseList = toResponseList(historyDtoList);
+    if (nextCursor == null) {
+      return ResponseEntity.ok(
+          new CursorBasedPaginationWrapper<>(responseList, responseList.size(),
+              null));
+    }
+    return ResponseEntity.ok(
+        new CursorBasedPaginationWrapper<>(responseList, responseList.size(),
+            nextCursor.getCursorString()));
+  }
+
+  private interface MethodToGetPaginatedList {
+
+    List<HistoryDto> method(String cursorStr);
   }
 }

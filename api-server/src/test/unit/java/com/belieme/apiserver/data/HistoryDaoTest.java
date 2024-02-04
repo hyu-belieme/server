@@ -7,10 +7,9 @@ import static org.mockito.Mockito.when;
 import com.belieme.apiserver.data.daoimpl.HistoryDaoImpl;
 import com.belieme.apiserver.data.entity.DepartmentEntity;
 import com.belieme.apiserver.data.entity.HistoryEntity;
-import com.belieme.apiserver.data.entity.ItemEntity;
-import com.belieme.apiserver.data.entity.StuffEntity;
 import com.belieme.apiserver.data.entity.UserEntity;
 import com.belieme.apiserver.domain.dto.HistoryDto;
+import com.belieme.apiserver.domain.dto.enumeration.HistoryStatus;
 import com.belieme.apiserver.error.exception.ConflictException;
 import com.belieme.apiserver.error.exception.InvalidIndexException;
 import com.belieme.apiserver.error.exception.NotFoundException;
@@ -50,131 +49,41 @@ public class HistoryDaoTest extends BaseDaoTest {
   }
 
   @Nested
-  @DisplayName("getListByItem()")
-  public class TestGetListByItem {
-
-    private ItemEntity item;
-    private UUID itemId;
-
-    private void setItem(ItemEntity item) {
-      this.item = item;
-      this.itemId = item.getId();
-    }
-
-    protected List<HistoryDto> execMethod() {
-      return historyDao.getListByItem(itemId);
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[-]_[-]")
-    public void SUCCESS() {
-      setItem(randomItem());
-
-      when(itemRepository.existsById(itemId)).thenReturn(true);
-      when(historyRepository.findByItemId(itemId)).thenReturn(historiesOnItem(itemId));
-
-      List<HistoryEntity> expect = new ArrayList<>();
-      for (HistoryEntity history : stub.ALL_HISTORIES) {
-        if (history.getItemId().equals(itemId)) {
-          expect.add(history);
-        }
-      }
-      TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[ERROR]_[잘못된 `itemId`가 주어졌을 시]_[InvalidIndexException]")
-    public void ERROR_wrongItemId_invalidIndexException() {
-      setItem(randomItem());
-
-      when(itemRepository.existsById(itemId)).thenReturn(false);
-
-      TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
-    }
-  }
-
-  @Nested
-  @DisplayName("getListByStuff()")
-  public class TestGetListByStuff {
-
-    private StuffEntity stuff;
-    private UUID stuffId;
-
-    private void setStuff(StuffEntity stuff) {
-      this.stuff = stuff;
-      this.stuffId = stuff.getId();
-    }
-
-    protected List<HistoryDto> execMethod() {
-      return historyDao.getListByStuff(stuffId);
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[SUCCESS]_[-]_[-]")
-    public void SUCCESS() {
-      setStuff(randomStuff());
-
-      when(stuffRepository.existsById(stuffId)).thenReturn(true);
-      when(itemRepository.findByStuffId(stuffId)).thenReturn(itemsOnStuff(stuffId));
-      for (ItemEntity item : itemsOnStuff(stuffId)) {
-        when(historyRepository.findByItemId(item.getId())).thenReturn(
-            historiesOnItem(item.getId()));
-      }
-
-      List<HistoryEntity> expect = new ArrayList<>();
-      for (HistoryEntity history : stub.ALL_HISTORIES) {
-        if (history.getItem().getStuffId().equals(stuffId)) {
-          expect.add(history);
-        }
-      }
-      TestHelper.listCompareTest(this::execMethod, toHistoryDtoList(expect));
-    }
-
-    @RepeatedTest(10)
-    @DisplayName("[ERROR]_[잘못된 `stuffId`가 주어졌을 시]_[InvalidIndexException]")
-    public void ERROR_wrongStuffId_invalidIndexException() {
-      setStuff(randomStuff());
-
-      when(stuffRepository.existsById(stuffId)).thenReturn(false);
-
-      TestHelper.exceptionTest(this::execMethod, InvalidIndexException.class);
-    }
-  }
-
-  @Nested
   @DisplayName("getListByDepartment()")
   public class TestGetListByDepartment {
 
     private DepartmentEntity dept;
     private UUID deptId;
 
+    private HistoryStatus status;
+
     private void setDept(DepartmentEntity dept) {
       this.dept = dept;
       this.deptId = dept.getId();
     }
 
+    private void setStatus(HistoryStatus status) {
+      this.status = status;
+    }
+
     protected List<HistoryDto> execMethod() {
-      return historyDao.getListByDepartment(deptId);
+      return historyDao.getListByDepartment(deptId, status);
     }
 
     @RepeatedTest(10)
     @DisplayName("[SUCCESS]_[-]_[-]")
     public void SUCCESS() {
       setDept(randomDept());
+      setStatus(randomHistoryStatus());
 
       when(deptRepository.existsById(deptId)).thenReturn(true);
-      when(stuffRepository.findByDepartmentId(deptId)).thenReturn(stuffsOnDept(deptId));
-      for (StuffEntity stuff : stuffsOnDept(deptId)) {
-        when(itemRepository.findByStuffId(stuff.getId())).thenReturn(itemsOnStuff(stuff.getId()));
-        for (ItemEntity item : itemsOnStuff(stuff.getId())) {
-          when(historyRepository.findByItemId(item.getId())).thenReturn(
-              historiesOnItem(item.getId()));
-        }
-      }
+      when(historyRepository.findByDepartmentId(deptId)).thenReturn(historiesByDepartment(deptId));
 
       List<HistoryEntity> expect = new ArrayList<>();
       for (HistoryEntity history : stub.ALL_HISTORIES) {
-        if (history.getItem().getStuff().getDepartmentId().equals(deptId)) {
+        HistoryDto historyDto = history.toHistoryDto();
+        if (history.getItem().getStuff().getDepartmentId().equals(deptId)
+            && (this.status == null || historyDto.status().dividedTo(this.status))) {
           expect.add(history);
         }
       }
@@ -202,6 +111,8 @@ public class HistoryDaoTest extends BaseDaoTest {
     private DepartmentEntity dept;
     private UUID deptId;
 
+    private HistoryStatus status;
+
     private void setUser(UserEntity requester) {
       this.requester = requester;
       this.requesterId = requester.getId();
@@ -212,8 +123,12 @@ public class HistoryDaoTest extends BaseDaoTest {
       this.deptId = dept.getId();
     }
 
+    private void setStatus(HistoryStatus status) {
+      this.status = status;
+    }
+
     protected List<HistoryDto> execMethod() {
-      return historyDao.getListByDepartmentAndRequester(deptId, requesterId);
+      return historyDao.getListByDepartmentAndRequester(deptId, requesterId, status);
     }
 
     @RepeatedTest(20)
@@ -221,16 +136,19 @@ public class HistoryDaoTest extends BaseDaoTest {
     public void SUCCESS() {
       setDept(randomDept());
       setUser(randomUser());
+      setStatus(randomHistoryStatus());
 
       when(deptRepository.existsById(deptId)).thenReturn(true);
       when(userRepository.existsById(requesterId)).thenReturn(true);
-      when(historyRepository.findByRequesterId(requesterId)).thenReturn(
-          historiesByRequesters(requesterId));
+      when(historyRepository.findByDepartmentIdAndRequesterId(deptId, requesterId)).thenReturn(
+          historiesByDepartmentAndRequester(deptId, requesterId));
 
       List<HistoryEntity> expect = new ArrayList<>();
       for (HistoryEntity history : stub.ALL_HISTORIES) {
+        HistoryDto historyDto = history.toHistoryDto();
         if (history.getItem().getStuff().getDepartmentId().equals(deptId)
-            && history.getRequesterId() != null && history.getRequesterId().equals(requesterId)) {
+            && history.getRequesterId() != null && history.getRequesterId().equals(requesterId)
+            && (this.status == null || historyDto.status().dividedTo(this.status))) {
           expect.add(history);
         }
       }
@@ -574,23 +492,24 @@ public class HistoryDaoTest extends BaseDaoTest {
     }
   }
 
-  private List<HistoryEntity> historiesByRequesters(UUID requesterId) {
-    return stub.ALL_HISTORIES.stream().filter(
-        (history) -> history.getRequesterId() != null && history.getRequesterId()
-            .equals(requesterId)).toList();
+  private HistoryStatus randomHistoryStatus() {
+    HistoryStatus[] statusList = HistoryStatus.values();
+    int idx = (int) ((statusList.length + 1) * Math.random());
+
+    if (idx >= statusList.length) return null;
+    return statusList[(int) (statusList.length * Math.random())];
   }
 
-  private List<StuffEntity> stuffsOnDept(UUID deptId) {
-    return stub.ALL_STUFFS.stream().filter((stuff) -> stuff.getDepartmentId().equals(deptId))
+  private List<HistoryEntity> historiesByDepartment(UUID deptId) {
+    return stub.ALL_HISTORIES.stream()
+        .filter((history) -> deptId.equals(history.getItem().getStuff().getDepartmentId()))
         .toList();
   }
 
-  private List<ItemEntity> itemsOnStuff(UUID stuffId) {
-    return stub.ALL_ITEMS.stream().filter((item) -> item.getStuffId().equals(stuffId)).toList();
-  }
-
-  private List<HistoryEntity> historiesOnItem(UUID itemId) {
-    return stub.ALL_HISTORIES.stream().filter((history) -> history.getItemId().equals(itemId))
+  private List<HistoryEntity> historiesByDepartmentAndRequester(UUID deptId, UUID requesterId) {
+    return stub.ALL_HISTORIES.stream()
+        .filter((history) -> deptId.equals(history.getItem().getStuff().getDepartmentId()))
+        .filter((history) -> requesterId.equals(history.getRequesterId()))
         .toList();
   }
 }

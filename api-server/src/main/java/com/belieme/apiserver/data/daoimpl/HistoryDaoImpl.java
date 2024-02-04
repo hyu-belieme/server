@@ -2,7 +2,6 @@ package com.belieme.apiserver.data.daoimpl;
 
 import com.belieme.apiserver.data.entity.HistoryEntity;
 import com.belieme.apiserver.data.entity.ItemEntity;
-import com.belieme.apiserver.data.entity.StuffEntity;
 import com.belieme.apiserver.data.entity.UserEntity;
 import com.belieme.apiserver.data.repository.AuthorityRepository;
 import com.belieme.apiserver.data.repository.AuthorityUserJoinRepository;
@@ -15,7 +14,9 @@ import com.belieme.apiserver.data.repository.StuffRepository;
 import com.belieme.apiserver.data.repository.UniversityRepository;
 import com.belieme.apiserver.data.repository.UserRepository;
 import com.belieme.apiserver.domain.dao.HistoryDao;
+import com.belieme.apiserver.domain.dto.HistoryCursorDto;
 import com.belieme.apiserver.domain.dto.HistoryDto;
+import com.belieme.apiserver.domain.dto.enumeration.HistoryStatus;
 import com.belieme.apiserver.error.exception.ConflictException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,50 +44,43 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
   }
 
   @Override
-  public List<HistoryDto> getListByDepartment(@NonNull UUID departmentId) {
+  public List<HistoryDto> getListByDepartment(@NonNull UUID departmentId,
+      HistoryStatus status) {
     validateDepartmentId(departmentId);
 
-    List<HistoryDto> output = new ArrayList<>();
-    for (StuffEntity stuff : stuffRepository.findByDepartmentId(departmentId)) {
-      for (ItemEntity item : itemRepository.findByStuffId(stuff.getId())) {
-        output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
-      }
-    }
-    return output;
+    List<HistoryEntity> targetList = historyRepository.findByDepartmentId(departmentId);
+    return filterByStatus(targetList, status);
   }
 
   @Override
-  public List<HistoryDto> getListByStuff(@NonNull UUID stuffId) {
-    validateStuffId(stuffId);
+  public List<HistoryDto> getListByDepartment(@NonNull UUID departmentId,
+      HistoryStatus status, HistoryCursorDto cursor, int limit) {
+    validateDepartmentId(departmentId);
 
-    List<HistoryDto> output = new ArrayList<>();
-    for (ItemEntity item : itemRepository.findByStuffId(stuffId)) {
-      output.addAll(toHistoryDtoList(historyRepository.findByItemId(item.getId())));
-    }
-    return output;
+    List<HistoryEntity> targetList = historyRepository.findByDepartmentId(departmentId);
+    return filterByStatusAndCursor(targetList, status, cursor, limit);
   }
 
   @Override
-  public List<HistoryDto> getListByItem(@NonNull UUID itemId) {
-    validateItemId(itemId);
-
-    return toHistoryDtoList(historyRepository.findByItemId(itemId));
-  }
-
-  @Override
-  public List<HistoryDto> getListByDepartmentAndRequester(@NonNull UUID departmentId,
-      @NonNull UUID requesterId) {
+  public List<HistoryDto> getListByDepartmentAndRequester(
+      @NonNull UUID departmentId, @NonNull UUID requesterId,
+      HistoryStatus status) {
     validateDepartmentId(departmentId);
     validateUserId(requesterId);
 
-    List<HistoryDto> output = new ArrayList<>();
-    for (HistoryEntity historyEntity : historyRepository.findByRequesterId(requesterId)) {
-      if (historyEntity.getItem().getStuff().getDepartment().getId().equals(departmentId)) {
-        output.add(historyEntity.toHistoryDto());
-      }
-    }
+    List<HistoryEntity> targetList = historyRepository.findByDepartmentIdAndRequesterId(departmentId, requesterId);
+    return filterByStatus(targetList, status);
+  }
 
-    return output;
+  @Override
+  public List<HistoryDto> getListByDepartmentAndRequester(
+      @NonNull UUID departmentId, @NonNull UUID requesterId,
+      HistoryStatus status, HistoryCursorDto cursor, int limit) {
+    validateDepartmentId(departmentId);
+    validateUserId(requesterId);
+
+    List<HistoryEntity> targetList = historyRepository.findByDepartmentIdAndRequesterId(departmentId, requesterId);
+    return filterByStatusAndCursor(targetList, status, cursor, limit);
   }
 
   @Override
@@ -131,6 +125,44 @@ public class HistoryDaoImpl extends BaseDaoImpl implements HistoryDao {
         .withApprovedAt(approvedAt).withReturnedAt(returnedAt).withLostAt(lostAt)
         .withCanceledAt(canceledAt);
     return historyRepository.save(target).toHistoryDto();
+  }
+
+  private List<HistoryDto> filterByStatus(List<HistoryEntity> targetList,
+      HistoryStatus status) {
+    List<HistoryDto> output = new ArrayList<>();
+    for (HistoryEntity historyEntity : targetList) {
+      HistoryDto history = historyEntity.toHistoryDto();
+      if(status != null && !history.status().dividedTo(status)) continue;
+      output.add(history);
+    }
+    return output;
+  }
+
+  private List<HistoryDto> filterByStatusAndCursor(
+      List<HistoryEntity> targetList, HistoryStatus status, HistoryCursorDto cursor, int limit) {
+    List<HistoryDto> output = new ArrayList<>();
+    for (HistoryEntity historyEntity : targetList) {
+      if (output.size() >= limit) break;
+
+      HistoryDto history = historyEntity.toHistoryDto();
+      if (status != null && !history.status().dividedTo(status)) continue;
+
+      if (cursor != null && history.requestedAt() > cursor.getRequestedAt()) continue;
+      if (cursor != null && history.requestedAt() < cursor.getRequestedAt()) {
+        output.add(history);
+        continue;
+      }
+
+      if (cursor != null && history.lostAt() > cursor.getLostAt()) continue;
+      if (cursor != null && history.lostAt() < cursor.getLostAt()) {
+        output.add(history);
+        continue;
+      }
+
+      if (cursor != null && history.id().compareTo(cursor.getId()) < 0) continue;
+      output.add(history);
+    }
+    return output;
   }
 
   private List<HistoryDto> toHistoryDtoList(Iterable<HistoryEntity> historyEntities) {
