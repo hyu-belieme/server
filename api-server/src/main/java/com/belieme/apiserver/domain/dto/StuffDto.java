@@ -1,6 +1,8 @@
 package com.belieme.apiserver.domain.dto;
 
+import com.belieme.apiserver.domain.util.Constants;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
@@ -100,6 +102,18 @@ public record StuffDto(@NonNull UUID id, @NonNull DepartmentDto department,
       }
     }
     return ++nextItemNum;
+  }
+
+  public List<Integer> nextItemNums(int amount) {
+    List<Integer> output = new ArrayList<>();
+    for (int i = 1; i <= Constants.MAX_ITEM_NUM; i++) {
+      output.add(i);
+    }
+    for (ItemDto item: items) {
+      output.removeIf((e) -> e.equals(item.num()));
+    }
+
+    return output.subList(0, Integer.min(amount, output.size()));
   }
 
   public int amount() {

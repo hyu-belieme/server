@@ -61,8 +61,8 @@ public class ItemApiController extends BaseApiController {
       @RequestHeader("${api.header.user-token}") String userToken,
       @RequestBody @Validated ItemRequest newItem) {
     UUID stuffId = toUUID(newItem.getStuffId());
-    ItemDto itemDto = itemService.create(userToken, stuffId);
-    StuffResponse response = StuffResponse.from(itemDto.stuff());
+    int amount = newItem.getAmount() != null ? newItem.getAmount() : 1;
+    StuffResponse response = StuffResponse.from(itemService.create(userToken, stuffId, amount));
     return ResponseEntity.ok(response);
   }
 

@@ -10,4 +10,6 @@ public class ItemRequest {
 
   @NotNull(message = "{message.error.badRequest.notNull}")
   String stuffId;
+
+  Integer amount;
 }
