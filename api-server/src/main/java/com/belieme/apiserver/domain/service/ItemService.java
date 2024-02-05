@@ -16,6 +16,7 @@ import com.belieme.apiserver.domain.exception.ItemAmountLimitExceededException;
 import com.belieme.apiserver.domain.util.Constants;
 import com.belieme.apiserver.error.exception.InvalidIndexException;
 import com.belieme.apiserver.error.exception.NotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.NonNull;
@@ -45,15 +46,21 @@ public class ItemService extends BaseService {
     return item;
   }
 
-  public ItemDto create(@NonNull String userToken, @NonNull UUID stuffId) {
+  public StuffDto create(@NonNull String userToken, @NonNull UUID stuffId, int amount) {
     UserDto requester = validateTokenAndGetUser(userToken);
     StuffDto stuff = getStuffOrThrowInvalidIndexException(stuffId);
     checkStaffPermission(requester, stuff.department());
 
-    if (stuff.nextItemNum() > Constants.MAX_ITEM_NUM) {
+    if (stuff.itemsSize() + amount > Constants.MAX_ITEM_NUM) {
       throw new ItemAmountLimitExceededException();
     }
-    return itemDao.create(UUID.randomUUID(), stuffId, stuff.nextItemNum());
+
+    List<ItemDto> newItem = stuff.items();
+    List<Integer> nextItemNums = stuff.nextItemNums(amount);
+    for (int nextItemNum: nextItemNums) {
+      newItem.add(itemDao.create(UUID.randomUUID(), stuffId, nextItemNum));
+    }
+    return stuff.withItems(newItem);
   }
 
   protected List<ItemDto> getItemListByStuffOrThrowInvalidIndexException(UUID stuffId) {
