@@ -1,6 +1,5 @@
 package com.belieme.apiserver.web.requestbody;
 
-import com.belieme.apiserver.domain.dto.enumeration.Permission;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,5 +15,5 @@ public class PermissionRequest {
   String departmentId;
 
   @NotNull(message = "{message.error.badRequest.notNull}")
-  Permission permission;
+  String permission;
 }

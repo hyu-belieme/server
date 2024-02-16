@@ -93,8 +93,10 @@ public class UserApiController extends BaseApiController {
         UUID userId = toUUID(permissionRequest.getUserId());
         UUID parsedDeptId = toUUID(permissionRequest.getDepartmentId());
 
-        results.add(userService.updateAuthorityOfUser(userToken, userId, parsedDeptId, permissionRequest.getPermission()));
-      } catch (ServerException ignored) {
+        results.add(
+            userService.updateAuthorityOfUser(userToken, userId, parsedDeptId,
+                Permission.valueOf(permissionRequest.getPermission())));
+      } catch (ServerException | IllegalArgumentException ignored) {
       }
     }
     List<UserResponse> response = results.stream().map(e -> UserResponse.from(e).withoutSecureInfo()).toList();
