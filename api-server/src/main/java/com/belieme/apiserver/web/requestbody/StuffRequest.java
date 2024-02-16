@@ -31,7 +31,7 @@ public class StuffRequest {
   @NotNull(message = "{message.error.badRequest.notNull}", groups = StuffCreateValidationGroup.class)
   String thumbnail;
 
-  @Size(min = 0, max = 1023, message = "{message.error.badRequest.outOfSize}", groups = {
+  @Size(min = 1, max = 1023, message = "{message.error.badRequest.outOfSize}", groups = {
       StuffCreateValidationGroup.class,
       StuffUpdateValidationGroup.class})
   @NotNull(message = "{message.error.badRequest.notNull}", groups = StuffCreateValidationGroup.class)
